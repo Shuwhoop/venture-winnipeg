@@ -357,3 +357,69 @@ button { cursor: pointer; }
   color: #6d28d9;
   font-size: 1.25rem;
 }
+.listing-card {
+  position: relative;
+}
+
+.listing-card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.listing-card-link:focus-visible {
+  outline: 3px solid #7c3aed;
+  outline-offset: 3px;
+}
+
+.listing-card .save-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid
+    rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background:
+    rgba(15, 23, 42, 0.82);
+  color: #ffffff;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.listing-card .save-button:hover {
+  transform: scale(1.08);
+}
+
+.listing-card .save-button.saved {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.listing-card .save-button:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.empty-state button {
+  min-height: 40px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #6d28d9;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}

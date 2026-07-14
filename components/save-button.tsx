@@ -1,0 +1,89 @@
+"use client";
+
+import {
+  useEffect,
+  useState
+} from "react";
+
+import type { Listing } from "@/lib/types";
+
+import {
+  isListingSaved,
+  SAVED_LISTINGS_EVENT,
+  toggleSavedListing
+} from "@/lib/saved-listings";
+
+type SaveButtonProps = {
+  listing: Listing;
+};
+
+export function SaveButton({
+  listing
+}: SaveButtonProps) {
+  const [saved, setSaved] =
+    useState(false);
+
+  useEffect(() => {
+    function refreshSavedState() {
+      setSaved(
+        isListingSaved(listing)
+      );
+    }
+
+    refreshSavedState();
+
+    window.addEventListener(
+      SAVED_LISTINGS_EVENT,
+      refreshSavedState
+    );
+
+    window.addEventListener(
+      "storage",
+      refreshSavedState
+    );
+
+    return () => {
+      window.removeEventListener(
+        SAVED_LISTINGS_EVENT,
+        refreshSavedState
+      );
+
+      window.removeEventListener(
+        "storage",
+        refreshSavedState
+      );
+    };
+  }, [listing]);
+
+  function handleSave() {
+    const newSavedState =
+      toggleSavedListing(listing);
+
+    setSaved(newSavedState);
+  }
+
+  return (
+    <button
+      className={`save-button ${
+        saved ? "saved" : ""
+      }`}
+      type="button"
+      aria-label={
+        saved
+          ? `Remove ${listing.name} from saved listings`
+          : `Save ${listing.name}`
+      }
+      aria-pressed={saved}
+      title={
+        saved
+          ? "Remove from saved"
+          : "Save listing"
+      }
+      onClick={handleSave}
+    >
+      <span aria-hidden="true">
+        {saved ? "♥" : "♡"}
+      </span>
+    </button>
+  );
+}
