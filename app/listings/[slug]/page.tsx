@@ -5,6 +5,10 @@ import {
 } from "@/lib/data/events";
 
 import {
+  ReportIssueForm
+} from "@/components/report-issue-form";
+
+import {
   getPublishedPlaceListingBySlug
 } from "@/lib/data/places";
 
@@ -174,20 +178,25 @@ export default async function ListingDetailPage({
           </p>
         </div>
 
-        <div>
-          <b>!</b>
-
-          <p>
-            <strong>Report an issue</strong>
-
-            <span>
-              Corrections enter Venture’s
-              moderation queue
-            </span>
-          </p>
-        </div>
+    <ReportIssueForm
+      entityId={listing.id}
+      entityType={
+        listing.type === "event"
+          ? "event"
+          : "place"
+      }
+      listingName={listing.name}
+    />
       </section>
-
+    <ReportIssueForm
+      entityId={listing.id}
+      entityType={
+        listing.type === "event"
+          ? "event"
+          : "place"
+      }
+      listingName={listing.name}
+    />
       {listing.rating ? (
         <p className="google-note">
           Google Maps content must remain
