@@ -8,7 +8,6 @@ import {
 import {
   getPublishedPlaceListings
 } from "@/lib/data/places";
-import { sampleListings } from "@/lib/sample-data";
 import type { Listing } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -95,10 +94,7 @@ export default async function ExplorePage({
     ...databasePlaces
   ];
 
-  const combinedListings =
-    databaseListings.length > 0
-      ? databaseListings
-      : sampleListings;
+  const combinedListings = databaseListings;
 
   const normalizedSearch =
     q.trim().toLowerCase();

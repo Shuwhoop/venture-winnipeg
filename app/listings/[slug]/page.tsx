@@ -8,10 +8,6 @@ import {
   getPublishedPlaceListingBySlug
 } from "@/lib/data/places";
 
-import {
-  getListingBySlug
-} from "@/lib/sample-data";
-
 export const dynamic = "force-dynamic";
 
 type ListingDetailPageProps = {
@@ -35,8 +31,7 @@ export default async function ListingDetailPage({
 
   const listing =
     databaseEvent ??
-    databasePlace ??
-    getListingBySlug(slug);
+    databasePlace;
 
   if (!listing) {
     notFound();
