@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 
 import {
-  getPublishedEventListingBySlug
-} from "@/lib/data/events";
-
-import {
   ReportIssueForm
 } from "@/components/report-issue-form";
+
+import {
+  getPublishedEventListingBySlug
+} from "@/lib/data/events";
 
 import {
   getPublishedPlaceListingBySlug
@@ -44,7 +44,8 @@ export default async function ListingDetailPage({
   const warning =
     listing.verification ===
       "community_reported" ||
-    listing.verification === "unverified";
+    listing.verification ===
+      "unverified";
 
   const actionUrl =
     listing.ticketUrl ??
@@ -58,7 +59,8 @@ export default async function ListingDetailPage({
       : "Open official source ↗";
 
   const verificationLabel =
-    listing.verification === "official_source"
+    listing.verification ===
+    "official_source"
       ? "Verified using an official source"
       : warning
         ? "Details need confirmation"
@@ -69,7 +71,9 @@ export default async function ListingDetailPage({
       <div
         className={`detail-hero ${listing.imageClass}`}
       >
-        <span>{listing.statusLabel}</span>
+        <span>
+          {listing.statusLabel}
+        </span>
       </div>
 
       <div className="detail-title">
@@ -93,7 +97,9 @@ export default async function ListingDetailPage({
           <strong>
             {listing.rating} ★ Google Maps
           </strong>{" "}
-          ({listing.ratingCount?.toLocaleString()} ratings)
+          (
+          {listing.ratingCount?.toLocaleString()}
+          {" "}ratings)
         </p>
       ) : null}
 
@@ -106,6 +112,7 @@ export default async function ListingDetailPage({
           <strong>
             {listing.timeOrHours}
           </strong>
+
           <span>Schedule</span>
         </div>
 
@@ -113,11 +120,15 @@ export default async function ListingDetailPage({
           <strong>
             {listing.neighbourhood}
           </strong>
+
           <span>Neighbourhood</span>
         </div>
 
         <div>
-          <strong>{listing.price}</strong>
+          <strong>
+            {listing.price}
+          </strong>
+
           <span>Price</span>
         </div>
 
@@ -152,7 +163,9 @@ export default async function ListingDetailPage({
         <h2>Safe & transparent</h2>
 
         <div>
-          <b>{warning ? "!" : "✓"}</b>
+          <b>
+            {warning ? "!" : "✓"}
+          </b>
 
           <p>
             <strong>
@@ -169,7 +182,9 @@ export default async function ListingDetailPage({
           <b>↗</b>
 
           <p>
-            <strong>Official source</strong>
+            <strong>
+              Official source
+            </strong>
 
             <span>
               Source information is stored
@@ -178,25 +193,17 @@ export default async function ListingDetailPage({
           </p>
         </div>
 
-    <ReportIssueForm
-      entityId={listing.id}
-      entityType={
-        listing.type === "event"
-          ? "event"
-          : "place"
-      }
-      listingName={listing.name}
-    />
+        <ReportIssueForm
+          entityId={listing.id}
+          entityType={
+            listing.type === "event"
+              ? "event"
+              : "place"
+          }
+          listingName={listing.name}
+        />
       </section>
-    <ReportIssueForm
-      entityId={listing.id}
-      entityType={
-        listing.type === "event"
-          ? "event"
-          : "place"
-      }
-      listingName={listing.name}
-    />
+
       {listing.rating ? (
         <p className="google-note">
           Google Maps content must remain
