@@ -17,6 +17,7 @@ type ExploreFilter =
   | "all"
   | "events"
   | "food"
+  | "open"
   | "verified";
 
 type ExplorePageProps = {
@@ -29,13 +30,14 @@ type ExplorePageProps = {
 function getValidFilter(
   filter: string | undefined
 ): ExploreFilter {
-  if (
-    filter === "events" ||
-    filter === "food" ||
-    filter === "verified"
-  ) {
-    return filter;
-  }
+if (
+  filter === "events" ||
+  filter === "food" ||
+  filter === "open" ||
+  filter === "verified"
+) {
+  return filter;
+}
 
   return "all";
 }
@@ -124,19 +126,25 @@ export default async function ExplorePage({
 
   const filteredListings =
     searchedListings.filter((listing) => {
-      switch (activeFilter) {
-        case "events":
-          return listing.type === "event";
+    switch (activeFilter) {
+      case "events":
+        return listing.type === "event";
 
-        case "food":
+      case "food":
         return listing.type === "restaurant";
 
-        case "verified":
-          return isVerified(listing);
+      case "open":
+        return (
+          listing.type === "restaurant" &&
+          listing.isOpenNow === true
+        );
 
-        default:
-          return true;
-      }
+      case "verified":
+        return isVerified(listing);
+
+      default:
+        return true;
+    }
     });
 
   const filters: {
@@ -154,6 +162,10 @@ export default async function ExplorePage({
     {
       label: "Food",
       value: "food"
+    },
+    {
+      label: "Open now",
+      value: "open"
     },
     {
       label: "Verified only",
@@ -193,34 +205,26 @@ export default async function ExplorePage({
       </form>
 
       <div
-        className="chips"
-        aria-label="Explore filters"
+    className="chips"
+    aria-label="Explore filters"
+  >
+    {filters.map((filter) => (
+      <Link
+        className={`filter-chip ${
+          activeFilter === filter.value
+            ? "active"
+            : ""
+        }`}
+        href={buildExploreHref(
+          filter.value,
+          q
+        )}
+        key={filter.value}
       >
-        {filters.map((filter) => (
-          <Link
-            className={`filter-chip ${
-              activeFilter === filter.value
-                ? "active"
-                : ""
-            }`}
-            href={buildExploreHref(
-              filter.value,
-              q
-            )}
-            key={filter.value}
-          >
-            {filter.label}
-          </Link>
-        ))}
-
-        <span
-          className="filter-chip disabled"
-          title="Real-time opening hours coming next"
-          aria-disabled="true"
-        >
-          Open now
-        </span>
-      </div>
+        {filter.label}
+      </Link>
+    ))}
+  </div>
 
       <CityMap />
 

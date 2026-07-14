@@ -31,4 +31,5 @@ export type Listing = {
   address?: string;
   officialUrl?: string;
   ticketUrl?: string;
+  isOpenNow?: boolean | null;
 };
