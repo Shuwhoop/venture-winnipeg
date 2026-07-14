@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { CityMap } from "@/components/city-map";
 import { ListingCard } from "@/components/listing-card";
 import {
@@ -11,16 +13,72 @@ import type { Listing } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
+type ExploreFilter =
+  | "all"
+  | "events"
+  | "food"
+  | "verified";
+
 type ExplorePageProps = {
   searchParams: Promise<{
     q?: string;
+    filter?: string;
   }>;
 };
+
+function getValidFilter(
+  filter: string | undefined
+): ExploreFilter {
+  if (
+    filter === "events" ||
+    filter === "food" ||
+    filter === "verified"
+  ) {
+    return filter;
+  }
+
+  return "all";
+}
+
+function buildExploreHref(
+  filter: ExploreFilter,
+  search: string
+): string {
+  const params = new URLSearchParams();
+
+  if (search.trim()) {
+    params.set("q", search.trim());
+  }
+
+  if (filter !== "all") {
+    params.set("filter", filter);
+  }
+
+  const query = params.toString();
+
+  return query
+    ? `/explore?${query}`
+    : "/explore";
+}
+
+function isVerified(listing: Listing): boolean {
+  return (
+    listing.verification !== "unverified" &&
+    listing.verification !==
+      "community_reported"
+  );
+}
 
 export default async function ExplorePage({
   searchParams
 }: ExplorePageProps) {
-  const { q = "" } = await searchParams;
+  const {
+    q = "",
+    filter: requestedFilter
+  } = await searchParams;
+
+  const activeFilter =
+    getValidFilter(requestedFilter);
 
   const [
     databaseEvents,
@@ -43,7 +101,7 @@ export default async function ExplorePage({
   const normalizedSearch =
     q.trim().toLowerCase();
 
-  const filteredListings =
+  const searchedListings =
     normalizedSearch.length === 0
       ? combinedListings
       : combinedListings.filter((listing) => {
@@ -64,6 +122,45 @@ export default async function ExplorePage({
           );
         });
 
+  const filteredListings =
+    searchedListings.filter((listing) => {
+      switch (activeFilter) {
+        case "events":
+          return listing.type === "event";
+
+        case "food":
+        return listing.type === "restaurant";
+
+        case "verified":
+          return isVerified(listing);
+
+        default:
+          return true;
+      }
+    });
+
+  const filters: {
+    label: string;
+    value: ExploreFilter;
+  }[] = [
+    {
+      label: "All",
+      value: "all"
+    },
+    {
+      label: "Events",
+      value: "events"
+    },
+    {
+      label: "Food",
+      value: "food"
+    },
+    {
+      label: "Verified only",
+      value: "verified"
+    }
+  ];
+
   return (
     <>
       <div className="page-heading">
@@ -71,7 +168,10 @@ export default async function ExplorePage({
         <h1>Explore Winnipeg</h1>
       </div>
 
-      <form className="search-field">
+      <form
+        className="search-field"
+        action="/explore"
+      >
         <label htmlFor="search">
           Search
         </label>
@@ -82,26 +182,44 @@ export default async function ExplorePage({
           defaultValue={q}
           placeholder="Try “anime downtown”"
         />
+
+        {activeFilter !== "all" ? (
+          <input
+            type="hidden"
+            name="filter"
+            value={activeFilter}
+          />
+        ) : null}
       </form>
 
-      <div className="chips">
-        {[
-          "All",
-          "Events",
-          "Food",
-          "Open now",
-          "Verified only"
-        ].map((chip, index) => (
-          <button
-            className={
-              index === 0 ? "active" : ""
-            }
-            key={chip}
-            type="button"
+      <div
+        className="chips"
+        aria-label="Explore filters"
+      >
+        {filters.map((filter) => (
+          <Link
+            className={`filter-chip ${
+              activeFilter === filter.value
+                ? "active"
+                : ""
+            }`}
+            href={buildExploreHref(
+              filter.value,
+              q
+            )}
+            key={filter.value}
           >
-            {chip}
-          </button>
+            {filter.label}
+          </Link>
         ))}
+
+        <span
+          className="filter-chip disabled"
+          title="Real-time opening hours coming next"
+          aria-disabled="true"
+        >
+          Open now
+        </span>
       </div>
 
       <CityMap />
@@ -109,7 +227,11 @@ export default async function ExplorePage({
       <section className="section-block">
         <div className="section-heading">
           <div>
-            <span>RESULTS</span>
+            <span>
+              {activeFilter === "all"
+                ? "RESULTS"
+                : activeFilter.toUpperCase()}
+            </span>
 
             <h2>
               {filteredListings.length}{" "}
@@ -136,8 +258,9 @@ export default async function ExplorePage({
             <h3>No matching listings</h3>
 
             <p>
-              Try another event, category,
-              venue, cuisine, or neighbourhood.
+              Try another filter, event,
+              venue, cuisine, category, or
+              neighbourhood.
             </p>
           </section>
         )}
