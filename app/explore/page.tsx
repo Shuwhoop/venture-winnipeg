@@ -1,6 +1,11 @@
 import { CityMap } from "@/components/city-map";
 import { ListingCard } from "@/components/listing-card";
-import { getPublishedPlaceListings } from "@/lib/data/places";
+import {
+  getPublishedEventListings
+} from "@/lib/data/events";
+import {
+  getPublishedPlaceListings
+} from "@/lib/data/places";
 import { sampleListings } from "@/lib/sample-data";
 import type { Listing } from "@/lib/types";
 
@@ -17,18 +22,22 @@ export default async function ExplorePage({
 }: ExplorePageProps) {
   const { q = "" } = await searchParams;
 
-  const databasePlaces =
-    await getPublishedPlaceListings(25);
+  const [
+    databaseEvents,
+    databasePlaces
+  ] = await Promise.all([
+    getPublishedEventListings(25),
+    getPublishedPlaceListings(25)
+  ]);
 
-  // Keep sample events temporarily until the
-  // real events table is connected.
-  const sampleEvents = sampleListings.filter(
-    (listing) => listing.type === "event"
-  );
+  const databaseListings: Listing[] = [
+    ...databaseEvents,
+    ...databasePlaces
+  ];
 
-  const combinedListings: Listing[] =
-    databasePlaces.length > 0
-      ? [...sampleEvents, ...databasePlaces]
+  const combinedListings =
+    databaseListings.length > 0
+      ? databaseListings
       : sampleListings;
 
   const normalizedSearch =
@@ -43,7 +52,9 @@ export default async function ExplorePage({
             listing.category,
             listing.subtitle,
             listing.neighbourhood,
-            listing.description
+            listing.description,
+            listing.venueName ?? "",
+            listing.address ?? ""
           ]
             .join(" ")
             .toLowerCase();
@@ -69,7 +80,7 @@ export default async function ExplorePage({
           id="search"
           name="q"
           defaultValue={q}
-          placeholder="Try “cheap date downtown Friday”"
+          placeholder="Try “anime downtown”"
         />
       </form>
 
@@ -99,6 +110,7 @@ export default async function ExplorePage({
         <div className="section-heading">
           <div>
             <span>RESULTS</span>
+
             <h2>
               {filteredListings.length}{" "}
               {filteredListings.length === 1
@@ -113,7 +125,7 @@ export default async function ExplorePage({
             {filteredListings.map(
               (listing) => (
                 <ListingCard
-                  key={listing.id}
+                  key={`${listing.type}-${listing.id}`}
                   listing={listing}
                 />
               )
@@ -124,8 +136,8 @@ export default async function ExplorePage({
             <h3>No matching listings</h3>
 
             <p>
-              Try another name, category,
-              cuisine, or neighbourhood.
+              Try another event, category,
+              venue, cuisine, or neighbourhood.
             </p>
           </section>
         )}

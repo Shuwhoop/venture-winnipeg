@@ -109,3 +109,11 @@ button { cursor: pointer; }
   font-size: 0.9rem;
   line-height: 1.5;
 }
+.detail-page > a.primary-action {
+  display: block;
+  box-sizing: border-box;
+  margin-left: 18px;
+  margin-right: 18px;
+  text-align: center;
+  text-decoration: none;
+}

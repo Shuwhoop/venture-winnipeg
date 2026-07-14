@@ -1,24 +1,41 @@
 import { notFound } from "next/navigation";
 
-import { getPublishedPlaceListingBySlug } from "@/lib/data/places";
-import { getListingBySlug } from "@/lib/sample-data";
+import {
+  getPublishedEventListingBySlug
+} from "@/lib/data/events";
+
+import {
+  getPublishedPlaceListingBySlug
+} from "@/lib/data/places";
+
+import {
+  getListingBySlug
+} from "@/lib/sample-data";
 
 export const dynamic = "force-dynamic";
 
-export default async function ListingDetailPage({
-  params
-}: {
+type ListingDetailPageProps = {
   params: Promise<{
     slug: string;
   }>;
-}) {
+};
+
+export default async function ListingDetailPage({
+  params
+}: ListingDetailPageProps) {
   const { slug } = await params;
 
-  const databaseListing =
-    await getPublishedPlaceListingBySlug(slug);
+  const [
+    databaseEvent,
+    databasePlace
+  ] = await Promise.all([
+    getPublishedEventListingBySlug(slug),
+    getPublishedPlaceListingBySlug(slug)
+  ]);
 
   const listing =
-    databaseListing ??
+    databaseEvent ??
+    databasePlace ??
     getListingBySlug(slug);
 
   if (!listing) {
@@ -28,8 +45,25 @@ export default async function ListingDetailPage({
   const warning =
     listing.verification ===
       "community_reported" ||
-    listing.verification ===
-      "unverified";
+    listing.verification === "unverified";
+
+  const actionUrl =
+    listing.ticketUrl ??
+    listing.officialUrl;
+
+  const actionLabel =
+    listing.type === "event"
+      ? listing.ticketUrl
+        ? "View tickets ↗"
+        : "Open official event page ↗"
+      : "Open official source ↗";
+
+  const verificationLabel =
+    listing.verification === "official_source"
+      ? "Verified using an official source"
+      : warning
+        ? "Details need confirmation"
+        : "Verified by Venture";
 
   return (
     <article className="detail-page">
@@ -60,28 +94,13 @@ export default async function ListingDetailPage({
           <strong>
             {listing.rating} ★ Google Maps
           </strong>{" "}
-          (
-          {listing.ratingCount?.toLocaleString()}{" "}
-          ratings)
+          ({listing.ratingCount?.toLocaleString()} ratings)
         </p>
       ) : null}
 
       <p className="lead">
         {listing.description}
       </p>
-
-      {warning ? (
-        <section className="listing-warning">
-          <strong>
-            Information not fully verified
-          </strong>
-
-          <p>
-            Confirm important details with the
-            official source before travelling.
-          </p>
-        </section>
-      ) : null}
 
       <div className="fact-grid">
         <div>
@@ -105,18 +124,30 @@ export default async function ListingDetailPage({
 
         <div>
           <strong>
-            {listing.distance}
+            {listing.type === "event"
+              ? listing.venueName ??
+                listing.distance
+              : listing.distance}
           </strong>
-          <span>Location</span>
+
+          <span>
+            {listing.type === "event"
+              ? "Venue"
+              : "Distance"}
+          </span>
         </div>
       </div>
 
-      <button
-        className="primary-action"
-        type="button"
-      >
-        Open official source ↗
-      </button>
+      {actionUrl ? (
+        <a
+          className="primary-action"
+          href={actionUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {actionLabel}
+        </a>
+      ) : null}
 
       <section className="trust-panel">
         <h2>Safe & transparent</h2>
@@ -126,9 +157,7 @@ export default async function ListingDetailPage({
 
           <p>
             <strong>
-              {warning
-                ? "Details need confirmation"
-                : "Verified by Venture"}
+              {verificationLabel}
             </strong>
 
             <span>
@@ -141,13 +170,11 @@ export default async function ListingDetailPage({
           <b>↗</b>
 
           <p>
-            <strong>
-              Official source
-            </strong>
+            <strong>Official source</strong>
 
             <span>
               Source information is stored
-              with this record
+              with this listing
             </span>
           </p>
         </div>
@@ -156,12 +183,10 @@ export default async function ListingDetailPage({
           <b>!</b>
 
           <p>
-            <strong>
-              Report an issue
-            </strong>
+            <strong>Report an issue</strong>
 
             <span>
-              Corrections enter the
+              Corrections enter Venture’s
               moderation queue
             </span>
           </p>
@@ -170,10 +195,11 @@ export default async function ListingDetailPage({
 
       {listing.rating ? (
         <p className="google-note">
-          Google Maps information must remain
-          separately attributed and governed
-          by the enabled Google product’s
-          current terms.
+          Google Maps content must remain
+          visually separated, correctly
+          attributed, and governed by the
+          enabled Google product’s current
+          terms.
         </p>
       ) : null}
     </article>

@@ -161,6 +161,7 @@ export async function getPublishedPlaceListings(
       google_rating_count
     `)
     .eq("status", "published")
+    .neq("place_type", "event_venue")
     .in("place_type", [
       "restaurant",
       "cafe",

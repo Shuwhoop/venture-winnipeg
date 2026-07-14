@@ -26,4 +26,9 @@ export type Listing = {
   imageClass: string;
   neighbourhood: string;
   description: string;
+
+  venueName?: string;
+  address?: string;
+  officialUrl?: string;
+  ticketUrl?: string;
 };
