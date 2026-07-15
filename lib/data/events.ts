@@ -83,7 +83,9 @@ const eventFields = `
   venue:places (
     name,
     neighbourhood,
-    address_line1
+    address_line1,
+    latitude,
+    longitude
   )
 `;
 
@@ -330,6 +332,12 @@ function eventToListing(event: EventRow): Listing {
 
     venueName: venue?.name,
     address: venue?.address_line1,
+
+    latitude:
+      venue?.latitude,
+
+    longitude:
+      venue?.longitude,
 
     officialUrl:
       event.organizer_website ?? undefined,

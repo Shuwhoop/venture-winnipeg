@@ -23,6 +23,8 @@ type PlaceRow = {
   source_checked_at: string | null;
   google_rating: number | null;
   google_rating_count: number | null;
+  latitude: number;
+  longitude: number;
 };
 
 type TimeInterval = {
@@ -513,7 +515,10 @@ function convertPlaceToListing(
       "Winnipeg",
 
     description:
-      place.short_description
+      place.short_description,
+
+    latitude: place.latitude,
+    longitude: place.longitude
   };
 }
 
@@ -533,8 +538,10 @@ const placeFields = `
   warning_message,
   source_checked_at,
   google_rating,
-  google_rating_count
-`;
+  google_rating_count,
+  latitude,
+  longitude
+  `;
 
 export async function getPublishedPlaceListings(
   limit = 10

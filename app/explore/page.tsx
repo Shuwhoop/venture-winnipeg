@@ -178,7 +178,6 @@ export default async function ExplorePage({
         }
       }
     );
-
   const filters: {
     label: string;
     value: ExploreFilter;
@@ -267,7 +266,9 @@ export default async function ExplorePage({
         ))}
       </div>
 
-      <CityMap />
+      <CityMap
+  listings={filteredListings}
+/>
 
       <PersonalizedExploreResults
         listings={filteredListings}
