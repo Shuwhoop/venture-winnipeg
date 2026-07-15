@@ -11,6 +11,9 @@ import {
 import {
   getPublishedPlaceListingBySlug
 } from "@/lib/data/places";
+import {
+  SaveButton
+} from "@/components/save-button";
 
 export const dynamic = "force-dynamic";
 
@@ -77,20 +80,27 @@ export default async function ListingDetailPage({
       </div>
 
       <div className="detail-title">
-        <div>
-          <small>
-            {listing.category.toUpperCase()}
-          </small>
+  <div>
+    <small>
+      {listing.category.toUpperCase()}
+    </small>
 
-          <h1>{listing.name}</h1>
-        </div>
+    <h1>{listing.name}</h1>
+  </div>
 
-        <b>
-          {warning
-            ? "! Unverified"
-            : "✓ Verified"}
-        </b>
-      </div>
+    <div className="detail-title-actions">
+      <SaveButton
+        listing={listing}
+        className="detail-save-button"
+      />
+
+      <b>
+        {warning
+          ? "! Unverified"
+          : "✓ Verified"}
+      </b>
+    </div>
+  </div>
 
       {listing.rating ? (
         <p className="rating">

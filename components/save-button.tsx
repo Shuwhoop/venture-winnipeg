@@ -15,10 +15,12 @@ import {
 
 type SaveButtonProps = {
   listing: Listing;
+  className?: string;
 };
 
 export function SaveButton({
-  listing
+  listing,
+  className = ""
 }: SaveButtonProps) {
   const [saved, setSaved] =
     useState(false);
@@ -64,9 +66,9 @@ export function SaveButton({
 
   return (
     <button
-      className={`save-button ${
+        className={`save-button ${className} ${
         saved ? "saved" : ""
-      }`}
+        }`}
       type="button"
       aria-label={
         saved
