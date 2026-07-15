@@ -23,6 +23,10 @@ import type {
 type PersonalizedExploreResultsProps = {
   listings: Listing[];
   eyebrow: string;
+  selectedListingKey?: string | null;
+  onSelectListing?: (
+    listing: Listing
+  ) => void;
 };
 
 const interestKeywords: Record<
@@ -166,8 +170,12 @@ const outingStyleKeywords: Record<
   ]
 };
 
-function normalize(value: string): string {
-  return value.trim().toLowerCase();
+function normalize(
+  value: string
+): string {
+  return value
+    .trim()
+    .toLowerCase();
 }
 
 function getListingText(
@@ -194,8 +202,11 @@ function includesAny(
   text: string,
   keywords: string[]
 ): boolean {
-  return keywords.some((keyword) =>
-    text.includes(normalize(keyword))
+  return keywords.some(
+    (keyword) =>
+      text.includes(
+        normalize(keyword)
+      )
   );
 }
 
@@ -203,7 +214,9 @@ function getHighestPrice(
   price: string
 ): number | null {
   if (
-    price.toLowerCase().includes("free")
+    price
+      .toLowerCase()
+      .includes("free")
   ) {
     return 0;
   }
@@ -395,7 +408,9 @@ function hasUsefulPreferences(
 
 export function PersonalizedExploreResults({
   listings,
-  eyebrow
+  eyebrow,
+  selectedListingKey = null,
+  onSelectListing
 }: PersonalizedExploreResultsProps) {
   const [
     preferences,
@@ -419,7 +434,11 @@ export function PersonalizedExploreResults({
 
       if (!storedPreferences) {
         setPreferences(null);
-        setPersonalizationActive(false);
+
+        setPersonalizationActive(
+          false
+        );
+
         return;
       }
 
@@ -462,28 +481,44 @@ export function PersonalizedExploreResults({
       }
 
       return listings
-        .map((listing, index) => ({
-          listing,
-          index,
-          score:
-            calculatePreferenceScore(
-              listing,
-              preferences
-            )
-        }))
-        .sort((first, second) => {
-          if (
-            second.score !== first.score
-          ) {
+        .map(
+          (
+            listing,
+            index
+          ) => ({
+            listing,
+            index,
+            score:
+              calculatePreferenceScore(
+                listing,
+                preferences
+              )
+          })
+        )
+        .sort(
+          (
+            first,
+            second
+          ) => {
+            if (
+              second.score !==
+              first.score
+            ) {
+              return (
+                second.score -
+                first.score
+              );
+            }
+
             return (
-              second.score - first.score
+              first.index -
+              second.index
             );
           }
-
-          return first.index - second.index;
-        })
+        )
         .map(
-          (result) => result.listing
+          (result) =>
+            result.listing
         );
     }, [
       listings,
@@ -495,7 +530,9 @@ export function PersonalizedExploreResults({
     <section className="section-block">
       <div className="section-heading">
         <div>
-          <span>{eyebrow}</span>
+          <span>
+            {eyebrow}
+          </span>
 
           <h2>
             {rankedListings.length}{" "}
@@ -531,17 +568,31 @@ export function PersonalizedExploreResults({
       {rankedListings.length > 0 ? (
         <div className="vertical-list">
           {rankedListings.map(
-            (listing) => (
-              <ListingCard
-                key={`${listing.type}-${listing.id}`}
-                listing={listing}
-              />
-            )
+            (listing) => {
+              const listingKey =
+                `${listing.type}-${listing.id}`;
+
+              return (
+                <ListingCard
+                  key={listingKey}
+                  listing={listing}
+                  selected={
+                    selectedListingKey ===
+                    listingKey
+                  }
+                  onSelect={
+                    onSelectListing
+                  }
+                />
+              );
+            }
           )}
         </div>
       ) : (
         <section className="empty-results">
-          <h3>No matching listings</h3>
+          <h3>
+            No matching listings
+          </h3>
 
           <p>
             Try another filter, event,

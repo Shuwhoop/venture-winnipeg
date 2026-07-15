@@ -709,4 +709,83 @@ button { cursor: pointer; }
 
 .venture-map-popup a:hover {
   text-decoration: underline;
+}.explore-map-anchor {
+  scroll-margin-top: 18px;
+}
+
+.listing-card {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.listing-card.is-selected {
+  border-color: #7c3aed;
+  box-shadow:
+    0 0 0 3px
+      rgba(124, 58, 237, 0.14),
+    0 12px 28px
+      rgba(76, 29, 149, 0.12);
+}
+
+.listing-card-map-target {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.listing-card-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.listing-card-actions > span {
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.listing-card.is-selected
+  .listing-card-actions > span {
+  color: #6d28d9;
+}
+
+.listing-card-view-link {
+  color: #6d28d9;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.listing-card-view-link:hover {
+  text-decoration: underline;
+}
+
+.maplibregl-marker svg {
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
+}
+
+.maplibregl-marker.venture-marker-selected {
+  z-index: 3;
+}
+
+.maplibregl-marker.venture-marker-selected
+  svg {
+  transform: scale(1.2);
+  filter:
+    drop-shadow(
+      0 4px 5px
+      rgba(76, 29, 149, 0.35)
+    );
 }

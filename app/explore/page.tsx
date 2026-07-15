@@ -1,12 +1,8 @@
 import Link from "next/link";
 
 import {
-  CityMap
-} from "@/components/city-map";
-
-import {
-  PersonalizedExploreResults
-} from "@/components/personalized-explore-results";
+  ExploreExperience
+} from "@/components/explore-experience";
 
 import {
   getPublishedEventListings
@@ -178,6 +174,7 @@ export default async function ExplorePage({
         }
       }
     );
+
   const filters: {
     label: string;
     value: ExploreFilter;
@@ -266,11 +263,7 @@ export default async function ExplorePage({
         ))}
       </div>
 
-      <CityMap
-  listings={filteredListings}
-/>
-
-      <PersonalizedExploreResults
+      <ExploreExperience
         listings={filteredListings}
         eyebrow={resultsEyebrow}
       />
