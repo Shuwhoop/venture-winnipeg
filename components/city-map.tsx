@@ -14,23 +14,12 @@ import type {
 
 type CityMapProps = {
   listings?: Listing[];
-  selectedListingKey?: string | null;
-  selectionVersion?: number;
-  onSelectListing?: (
-    listing: Listing
-  ) => void;
 };
 
 type MappableListing = Listing & {
   latitude: number;
   longitude: number;
 };
-
-function getListingKey(
-  listing: Listing
-): string {
-  return `${listing.type}-${listing.id}`;
-}
 
 function hasCoordinates(
   listing: Listing
@@ -87,32 +76,10 @@ function createPopupContent(
 }
 
 export function CityMap({
-  listings = [],
-  selectedListingKey = null,
-  selectionVersion = 0,
-  onSelectListing
+  listings = []
 }: CityMapProps) {
   const ref =
     useRef<HTMLDivElement>(null);
-
-  const mapRef =
-    useRef<maplibregl.Map | null>(
-      null
-    );
-
-  const markerRefs = useRef(
-    new Map<
-      string,
-      maplibregl.Marker
-    >()
-  );
-
-  const listingRefs = useRef(
-    new Map<
-      string,
-      MappableListing
-    >()
-  );
 
   const [
     message,
@@ -121,117 +88,124 @@ export function CityMap({
     null
   );
 
-useEffect(() => {
-  const currentMap = mapRef.current;
+  useEffect(() => {
+    const style =
+      process.env
+        .NEXT_PUBLIC_MAP_STYLE_URL;
 
-  if (!currentMap) {
-    return;
-  }
-
-  const activeMap: maplibregl.Map =
-    currentMap;
-
-  if (!selectedListingKey) {
-    markerRefs.current.forEach(
-      (marker) => {
-        marker
-          .getElement()
-          .classList.remove(
-            "venture-marker-selected"
-          );
-
-        marker
-          .getPopup()
-          ?.remove();
-      }
-    );
-
-    return;
-  }
-
-  const activeListingKey: string =
-    selectedListingKey;
-
-  function focusSelectedListing() {
-    const selectedListing =
-      listingRefs.current.get(
-        activeListingKey
+    if (!ref.current || !style) {
+      setMessage(
+        "Add a licensed MapLibre-compatible style URL to enable the live map."
       );
 
-    const selectedMarker =
-      markerRefs.current.get(
-        activeListingKey
-      );
-
-    if (
-      !selectedListing ||
-      !selectedMarker
-    ) {
       return;
     }
 
-    markerRefs.current.forEach(
-      (marker, markerKey) => {
-        marker
-          .getElement()
-          .classList.toggle(
-            "venture-marker-selected",
-            markerKey ===
-              activeListingKey
+  const safeListings =
+    Array.isArray(listings)
+      ? listings
+      : [];
+
+  const mappableListings =
+    safeListings.filter(
+      hasCoordinates
+    );
+
+    const map =
+      new maplibregl.Map({
+        container: ref.current,
+        style,
+        center: [
+          -97.1384,
+          49.8951
+        ],
+        zoom: 11
+      });
+
+    map.addControl(
+      new maplibregl.NavigationControl(),
+      "top-right"
+    );
+
+    map.once("load", () => {
+      if (
+        mappableListings.length === 0
+      ) {
+        setMessage(
+          "No mapped locations are available for these results yet."
+        );
+
+        return;
+      }
+
+      setMessage(null);
+
+      const bounds =
+        new maplibregl.LngLatBounds();
+
+      for (
+        const listing of
+        mappableListings
+      ) {
+        const coordinates: [
+          number,
+          number
+        ] = [
+          listing.longitude,
+          listing.latitude
+        ];
+
+        const popup =
+          new maplibregl.Popup({
+            offset: 22
+          }).setDOMContent(
+            createPopupContent(
+              listing
+            )
           );
 
-        if (
-          markerKey !==
-          activeListingKey
-        ) {
-          marker
-            .getPopup()
-            ?.remove();
-        }
-      }
-    );
+        new maplibregl.Marker({
+          color:
+            listing.type === "event"
+              ? "#6d28d9"
+              : "#15803d"
+        })
+          .setLngLat(coordinates)
+          .setPopup(popup)
+          .addTo(map);
 
-    activeMap.flyTo({
-      center: [
-        selectedListing.longitude,
-        selectedListing.latitude
-      ],
-      zoom: Math.max(
-        activeMap.getZoom(),
-        13.5
-      ),
-      duration: 700,
-      essential: true
+        bounds.extend(coordinates);
+      }
+
+      if (
+        mappableListings.length === 1
+      ) {
+        const onlyListing =
+          mappableListings[0];
+
+        map.jumpTo({
+          center: [
+            onlyListing.longitude,
+            onlyListing.latitude
+          ],
+          zoom: 13
+        });
+
+        return;
+      }
+
+      map.fitBounds(bounds, {
+        padding: 55,
+        maxZoom: 14,
+        duration: 0
+      });
     });
 
-    if (
-      !selectedMarker
-        .getPopup()
-        ?.isOpen()
-    ) {
-      selectedMarker.togglePopup();
-    }
-  }
+    return () => {
+      map.remove();
+    };
+  }, [listings]);
 
-  if (activeMap.loaded()) {
-    focusSelectedListing();
-  } else {
-    activeMap.once(
-      "load",
-      focusSelectedListing
-    );
-  }
-
-  return () => {
-    activeMap.off(
-      "load",
-      focusSelectedListing
-    );
-  };
-}, [
-  selectedListingKey,
-  selectionVersion
-]);
   return (
     <div className="map-shell">
       <div

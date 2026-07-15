@@ -24,19 +24,11 @@ const verificationCopy: Record<
   unverified: "Unverified"
 };
 
-type ListingCardProps = {
-  listing: Listing;
-  selected?: boolean;
-  onSelect?: (
-    listing: Listing
-  ) => void;
-};
-
 export function ListingCard({
-  listing,
-  selected = false,
-  onSelect
-}: ListingCardProps) {
+  listing
+}: {
+  listing: Listing;
+}) {
   const warning =
     listing.verification ===
       "community_reported" ||
@@ -44,28 +36,12 @@ export function ListingCard({
       "unverified";
 
   return (
-    <article
-      className={`listing-card ${
-        selected ? "is-selected" : ""
-      }`}
-    >
-      {onSelect ? (
-        <button
-          className="listing-card-link listing-card-map-target"
-          type="button"
-          aria-label={`Show ${listing.name} on the map`}
-          aria-pressed={selected}
-          onClick={() =>
-            onSelect(listing)
-          }
-        />
-      ) : (
-        <Link
-          className="listing-card-link"
-          href={`/listings/${listing.slug}`}
-          aria-label={`View ${listing.name}`}
-        />
-      )}
+    <article className="listing-card">
+      <Link
+        className="listing-card-link"
+        href={`/listings/${listing.slug}`}
+        aria-label={`View ${listing.name}`}
+      />
 
       <div
         className={`listing-image ${listing.imageClass}`}
@@ -93,23 +69,6 @@ export function ListingCard({
             {listing.distance}
           </span>
         </div>
-
-        {onSelect ? (
-          <div className="listing-card-actions">
-            <span>
-              {selected
-                ? "Shown on map"
-                : "Tap card to show on map"}
-            </span>
-
-            <Link
-              className="listing-card-view-link"
-              href={`/listings/${listing.slug}`}
-            >
-              View details
-            </Link>
-          </div>
-        ) : null}
 
         <div className="listing-footer">
           <strong>
