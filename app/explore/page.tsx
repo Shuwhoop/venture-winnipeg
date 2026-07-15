@@ -1,16 +1,27 @@
 import Link from "next/link";
 
-import { CityMap } from "@/components/city-map";
-import { ListingCard } from "@/components/listing-card";
+import {
+  CityMap
+} from "@/components/city-map";
+
+import {
+  PersonalizedExploreResults
+} from "@/components/personalized-explore-results";
+
 import {
   getPublishedEventListings
 } from "@/lib/data/events";
+
 import {
   getPublishedPlaceListings
 } from "@/lib/data/places";
-import type { Listing } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+import type {
+  Listing
+} from "@/lib/types";
+
+export const dynamic =
+  "force-dynamic";
 
 type ExploreFilter =
   | "all"
@@ -29,14 +40,14 @@ type ExplorePageProps = {
 function getValidFilter(
   filter: string | undefined
 ): ExploreFilter {
-if (
-  filter === "events" ||
-  filter === "food" ||
-  filter === "open" ||
-  filter === "verified"
-) {
-  return filter;
-}
+  if (
+    filter === "events" ||
+    filter === "food" ||
+    filter === "open" ||
+    filter === "verified"
+  ) {
+    return filter;
+  }
 
   return "all";
 }
@@ -45,26 +56,37 @@ function buildExploreHref(
   filter: ExploreFilter,
   search: string
 ): string {
-  const params = new URLSearchParams();
+  const params =
+    new URLSearchParams();
 
   if (search.trim()) {
-    params.set("q", search.trim());
+    params.set(
+      "q",
+      search.trim()
+    );
   }
 
   if (filter !== "all") {
-    params.set("filter", filter);
+    params.set(
+      "filter",
+      filter
+    );
   }
 
-  const query = params.toString();
+  const query =
+    params.toString();
 
   return query
     ? `/explore?${query}`
     : "/explore";
 }
 
-function isVerified(listing: Listing): boolean {
+function isVerified(
+  listing: Listing
+): boolean {
   return (
-    listing.verification !== "unverified" &&
+    listing.verification !==
+      "unverified" &&
     listing.verification !==
       "community_reported"
   );
@@ -79,7 +101,9 @@ export default async function ExplorePage({
   } = await searchParams;
 
   const activeFilter =
-    getValidFilter(requestedFilter);
+    getValidFilter(
+      requestedFilter
+    );
 
   const [
     databaseEvents,
@@ -89,12 +113,10 @@ export default async function ExplorePage({
     getPublishedPlaceListings(25)
   ]);
 
-  const databaseListings: Listing[] = [
+  const combinedListings: Listing[] = [
     ...databaseEvents,
     ...databasePlaces
   ];
-
-  const combinedListings = databaseListings;
 
   const normalizedSearch =
     q.trim().toLowerCase();
@@ -102,46 +124,60 @@ export default async function ExplorePage({
   const searchedListings =
     normalizedSearch.length === 0
       ? combinedListings
-      : combinedListings.filter((listing) => {
-          const searchableText = [
-            listing.name,
-            listing.category,
-            listing.subtitle,
-            listing.neighbourhood,
-            listing.description,
-            listing.venueName ?? "",
-            listing.address ?? ""
-          ]
-            .join(" ")
-            .toLowerCase();
+      : combinedListings.filter(
+          (listing) => {
+            const searchableText = [
+              listing.name,
+              listing.category,
+              listing.subtitle,
+              listing.neighbourhood,
+              listing.description,
+              listing.venueName ?? "",
+              listing.address ?? ""
+            ]
+              .join(" ")
+              .toLowerCase();
 
-          return searchableText.includes(
-            normalizedSearch
-          );
-        });
-
-  const filteredListings =
-    searchedListings.filter((listing) => {
-    switch (activeFilter) {
-      case "events":
-        return listing.type === "event";
-
-      case "food":
-        return listing.type === "restaurant";
-
-      case "open":
-        return (
-          listing.type === "restaurant" &&
-          listing.isOpenNow === true
+            return searchableText.includes(
+              normalizedSearch
+            );
+          }
         );
 
-      case "verified":
-        return isVerified(listing);
+  const filteredListings =
+    searchedListings.filter(
+      (listing) => {
+        switch (activeFilter) {
+          case "events":
+            return (
+              listing.type ===
+              "event"
+            );
 
-      default:
-        return true;
-    }
-    });
+          case "food":
+            return (
+              listing.type ===
+              "restaurant"
+            );
+
+          case "open":
+            return (
+              listing.type ===
+                "restaurant" &&
+              listing.isOpenNow ===
+                true
+            );
+
+          case "verified":
+            return isVerified(
+              listing
+            );
+
+          default:
+            return true;
+        }
+      }
+    );
 
   const filters: {
     label: string;
@@ -169,11 +205,19 @@ export default async function ExplorePage({
     }
   ];
 
+  const resultsEyebrow =
+    activeFilter === "all"
+      ? "RESULTS"
+      : activeFilter.toUpperCase();
+
   return (
     <>
       <div className="page-heading">
         <span>CITYWIDE</span>
-        <h1>Explore Winnipeg</h1>
+
+        <h1>
+          Explore Winnipeg
+        </h1>
       </div>
 
       <form
@@ -188,7 +232,7 @@ export default async function ExplorePage({
           id="search"
           name="q"
           defaultValue={q}
-          placeholder="Try “anime downtown”"
+          placeholder="Try anime downtown"
         />
 
         {activeFilter !== "all" ? (
@@ -201,70 +245,34 @@ export default async function ExplorePage({
       </form>
 
       <div
-    className="chips"
-    aria-label="Explore filters"
-  >
-    {filters.map((filter) => (
-      <Link
-        className={`filter-chip ${
-          activeFilter === filter.value
-            ? "active"
-            : ""
-        }`}
-        href={buildExploreHref(
-          filter.value,
-          q
-        )}
-        key={filter.value}
+        className="chips"
+        aria-label="Explore filters"
       >
-        {filter.label}
-      </Link>
-    ))}
-  </div>
+        {filters.map((filter) => (
+          <Link
+            className={`filter-chip ${
+              activeFilter ===
+              filter.value
+                ? "active"
+                : ""
+            }`}
+            href={buildExploreHref(
+              filter.value,
+              q
+            )}
+            key={filter.value}
+          >
+            {filter.label}
+          </Link>
+        ))}
+      </div>
 
       <CityMap />
 
-      <section className="section-block">
-        <div className="section-heading">
-          <div>
-            <span>
-              {activeFilter === "all"
-                ? "RESULTS"
-                : activeFilter.toUpperCase()}
-            </span>
-
-            <h2>
-              {filteredListings.length}{" "}
-              {filteredListings.length === 1
-                ? "listing"
-                : "listings"}
-            </h2>
-          </div>
-        </div>
-
-        {filteredListings.length > 0 ? (
-          <div className="vertical-list">
-            {filteredListings.map(
-              (listing) => (
-                <ListingCard
-                  key={`${listing.type}-${listing.id}`}
-                  listing={listing}
-                />
-              )
-            )}
-          </div>
-        ) : (
-          <section className="empty-results">
-            <h3>No matching listings</h3>
-
-            <p>
-              Try another filter, event,
-              venue, cuisine, category, or
-              neighbourhood.
-            </p>
-          </section>
-        )}
-      </section>
+      <PersonalizedExploreResults
+        listings={filteredListings}
+        eyebrow={resultsEyebrow}
+      />
     </>
   );
 }
