@@ -27,9 +27,11 @@ export type Listing = {
   neighbourhood: string;
   description: string;
 
-  venueName?: string;
-  address?: string;
-  officialUrl?: string;
-  ticketUrl?: string;
-  isOpenNow?: boolean | null;
+venueName?: string;
+address?: string;
+officialUrl?: string;
+ticketUrl?: string;
+isOpenNow?: boolean | null;
+latitude?: number;
+longitude?: number;
 };

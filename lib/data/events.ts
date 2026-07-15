@@ -10,6 +10,8 @@ type VenueRow = {
   name: string;
   neighbourhood: string | null;
   address_line1: string;
+  latitude: number;
+  longitude: number;
 };
 
 type EventRow = {

@@ -681,4 +681,32 @@ button { cursor: pointer; }
   color: #6b7280;
   font-size: 0.74rem;
   line-height: 1.4;
+}.venture-map-popup {
+  display: grid;
+  gap: 5px;
+  min-width: 150px;
+  padding: 2px;
+}
+
+.venture-map-popup strong {
+  color: #0f172a;
+  font-size: 0.88rem;
+}
+
+.venture-map-popup span {
+  color: #64748b;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.venture-map-popup a {
+  margin-top: 3px;
+  color: #6d28d9;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.venture-map-popup a:hover {
+  text-decoration: underline;
 }
