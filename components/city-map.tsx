@@ -2,11 +2,12 @@
 
 import {
   useEffect,
-  useRef,
-  useState
+  useRef
 } from "react";
 
 import maplibregl from "maplibre-gl";
+
+import "maplibre-gl/dist/maplibre-gl.css";
 
 import type {
   Listing
@@ -14,43 +15,69 @@ import type {
 
 type CityMapProps = {
   listings?: Listing[];
+  selectedListingKey?: string | null;
+  selectionVersion?: number;
+  onSelectListing?: (
+    listing: Listing
+  ) => void;
 };
 
-type MappableListing = Listing & {
-  latitude: number;
-  longitude: number;
+type MarkerRecord = {
+  marker: maplibregl.Marker;
+  popup: maplibregl.Popup;
+  listing: Listing;
 };
 
-function hasCoordinates(
+const WINNIPEG_CENTER: [
+  number,
+  number
+] = [
+  -97.1384,
+  49.8951
+];
+
+function getListingKey(
   listing: Listing
-): listing is MappableListing {
-  return (
-    typeof listing.latitude ===
-      "number" &&
-    Number.isFinite(
-      listing.latitude
-    ) &&
-    typeof listing.longitude ===
-      "number" &&
-    Number.isFinite(
-      listing.longitude
-    )
-  );
+): string {
+  return `${listing.type}-${listing.id}`;
+}
+
+function getCoordinates(
+  listing: Listing
+): [number, number] | null {
+  const latitude =
+    Number(listing.latitude);
+
+  const longitude =
+    Number(listing.longitude);
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude)
+  ) {
+    return null;
+  }
+
+  return [
+    longitude,
+    latitude
+  ];
 }
 
 function createPopupContent(
   listing: Listing
-): HTMLElement {
-  const container =
+): HTMLDivElement {
+  const popupContent =
     document.createElement("div");
 
-  container.className =
+  popupContent.className =
     "venture-map-popup";
 
-  const title =
+  const heading =
     document.createElement("strong");
 
-  title.textContent = listing.name;
+  heading.textContent =
+    listing.name;
 
   const description =
     document.createElement("span");
@@ -58,166 +85,355 @@ function createPopupContent(
   description.textContent =
     listing.subtitle;
 
-  const link =
+  const detailsLink =
     document.createElement("a");
 
-  link.href =
+  detailsLink.href =
     `/listings/${listing.slug}`;
 
-  link.textContent = "View listing";
+  detailsLink.textContent =
+    "View details";
 
-  container.append(
-    title,
+  popupContent.append(
+    heading,
     description,
-    link
+    detailsLink
   );
 
-  return container;
+  return popupContent;
 }
 
 export function CityMap({
-  listings = []
+  listings = [],
+  selectedListingKey = null,
+  selectionVersion = 0,
+  onSelectListing
 }: CityMapProps) {
-  const ref =
+  const mapContainerRef =
     useRef<HTMLDivElement>(null);
 
-  const [
-    message,
-    setMessage
-  ] = useState<string | null>(
-    null
-  );
+  const mapRef =
+    useRef<maplibregl.Map | null>(
+      null
+    );
+
+  const markersRef =
+    useRef<
+      Map<string, MarkerRecord>
+    >(new Map());
 
   useEffect(() => {
-    const style =
-      process.env
-        .NEXT_PUBLIC_MAP_STYLE_URL;
-
-    if (!ref.current || !style) {
-      setMessage(
-        "Add a licensed MapLibre-compatible style URL to enable the live map."
-      );
-
+    if (
+      !mapContainerRef.current ||
+      mapRef.current
+    ) {
       return;
     }
 
-  const safeListings =
-    Array.isArray(listings)
-      ? listings
-      : [];
-
-  const mappableListings =
-    safeListings.filter(
-      hasCoordinates
-    );
+    const mapStyle =
+      process.env
+        .NEXT_PUBLIC_MAP_STYLE_URL ||
+      "https://demotiles.maplibre.org/style.json";
 
     const map =
       new maplibregl.Map({
-        container: ref.current,
-        style,
-        center: [
-          -97.1384,
-          49.8951
-        ],
-        zoom: 11
+        container:
+          mapContainerRef.current,
+        style: mapStyle,
+        center: WINNIPEG_CENTER,
+        zoom: 10.5
       });
 
     map.addControl(
-      new maplibregl.NavigationControl(),
+      new maplibregl.NavigationControl({
+        showCompass: true,
+        showZoom: true
+      }),
       "top-right"
     );
 
-    map.once("load", () => {
-      if (
-        mappableListings.length === 0
-      ) {
-        setMessage(
-          "No mapped locations are available for these results yet."
-        );
+    mapRef.current = map;
 
-        return;
-      }
+    return () => {
+      markersRef.current.forEach(
+        ({
+          marker,
+          popup
+        }) => {
+          popup.remove();
+          marker.remove();
+        }
+      );
 
-      setMessage(null);
+      markersRef.current.clear();
+
+      map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const currentMap =
+      mapRef.current;
+
+    if (!currentMap) {
+      return;
+    }
+
+    const activeMap:
+      maplibregl.Map =
+        currentMap;
+
+    function displayMarkers() {
+      markersRef.current.forEach(
+        ({
+          marker,
+          popup
+        }) => {
+          popup.remove();
+          marker.remove();
+        }
+      );
+
+      markersRef.current.clear();
 
       const bounds =
         new maplibregl.LngLatBounds();
 
+      let markerCount = 0;
+
       for (
-        const listing of
-        mappableListings
+        const listing
+        of listings
       ) {
-        const coordinates: [
-          number,
-          number
-        ] = [
-          listing.longitude,
-          listing.latitude
-        ];
+        const coordinates =
+          getCoordinates(listing);
+
+        if (!coordinates) {
+          continue;
+        }
+
+        const listingKey =
+          getListingKey(listing);
+
+        const markerColor =
+          listing.type === "event"
+            ? "#7c3aed"
+            : "#169447";
 
         const popup =
           new maplibregl.Popup({
-            offset: 22
-          }).setDOMContent(
-            createPopupContent(
-              listing
-            )
-          );
+            offset: 28,
+            closeButton: false,
+            closeOnClick: false
+          })
+            .setLngLat(coordinates)
+            .setDOMContent(
+              createPopupContent(
+                listing
+              )
+            );
 
-        new maplibregl.Marker({
-          color:
-            listing.type === "event"
-              ? "#6d28d9"
-              : "#15803d"
-        })
-          .setLngLat(coordinates)
-          .setPopup(popup)
-          .addTo(map);
+        const marker =
+          new maplibregl.Marker({
+            color: markerColor
+          })
+            .setLngLat(coordinates)
+            .addTo(activeMap);
+
+        const markerElement =
+          marker.getElement();
+
+        markerElement.setAttribute(
+          "role",
+          "button"
+        );
+
+        markerElement.setAttribute(
+          "aria-label",
+          `Show ${listing.name}`
+        );
+
+        markerElement.tabIndex = 0;
+
+        markerElement.addEventListener(
+          "click",
+          (event) => {
+            event.stopPropagation();
+
+            onSelectListing?.(
+              listing
+            );
+          }
+        );
+
+        markerElement.addEventListener(
+          "keydown",
+          (event) => {
+            if (
+              event.key !== "Enter" &&
+              event.key !== " "
+            ) {
+              return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            onSelectListing?.(
+              listing
+            );
+          }
+        );
+
+        markersRef.current.set(
+          listingKey,
+          {
+            marker,
+            popup,
+            listing
+          }
+        );
 
         bounds.extend(coordinates);
+        markerCount += 1;
       }
 
-      if (
-        mappableListings.length === 1
-      ) {
-        const onlyListing =
-          mappableListings[0];
-
-        map.jumpTo({
-          center: [
-            onlyListing.longitude,
-            onlyListing.latitude
-          ],
-          zoom: 13
+      if (markerCount === 1) {
+        activeMap.easeTo({
+          center:
+            bounds.getCenter(),
+          zoom: 13,
+          duration: 600
         });
+      }
 
+      if (markerCount > 1) {
+        activeMap.fitBounds(
+          bounds,
+          {
+            padding: 55,
+            maxZoom: 13,
+            duration: 600
+          }
+        );
+      }
+    }
+
+    if (activeMap.loaded()) {
+      displayMarkers();
+    } else {
+      activeMap.once(
+        "load",
+        displayMarkers
+      );
+    }
+
+    return () => {
+      activeMap.off(
+        "load",
+        displayMarkers
+      );
+    };
+  }, [
+    listings,
+    onSelectListing
+  ]);
+
+  useEffect(() => {
+    const currentMap =
+      mapRef.current;
+
+    if (!currentMap) {
+      return;
+    }
+
+    const activeMap:
+      maplibregl.Map =
+        currentMap;
+
+    function updateSelection() {
+      markersRef.current.forEach(
+        ({
+          marker,
+          popup
+        }) => {
+          marker
+            .getElement()
+            .classList.remove(
+              "venture-marker-selected"
+            );
+
+          popup.remove();
+        }
+      );
+
+      if (!selectedListingKey) {
         return;
       }
 
-      map.fitBounds(bounds, {
-        padding: 55,
-        maxZoom: 14,
-        duration: 0
+      const selectedRecord =
+        markersRef.current.get(
+          selectedListingKey
+        );
+
+      if (!selectedRecord) {
+        return;
+      }
+
+      const {
+        marker,
+        popup
+      } = selectedRecord;
+
+      marker
+        .getElement()
+        .classList.add(
+          "venture-marker-selected"
+        );
+
+      popup
+        .setLngLat(
+          marker.getLngLat()
+        )
+        .addTo(activeMap);
+
+      activeMap.flyTo({
+        center:
+          marker.getLngLat(),
+        zoom: 14,
+        duration: 700,
+        essential: true
       });
-    });
+    }
+
+    if (activeMap.loaded()) {
+      updateSelection();
+    } else {
+      activeMap.once(
+        "load",
+        updateSelection
+      );
+    }
 
     return () => {
-      map.remove();
+      activeMap.off(
+        "load",
+        updateSelection
+      );
     };
-  }, [listings]);
+  }, [
+    selectedListingKey,
+    selectionVersion,
+    listings
+  ]);
 
   return (
-    <div className="map-shell">
-      <div
-        className="city-map"
-        ref={ref}
-      />
-
-      {message ? (
-        <div className="map-placeholder">
-          {message}
-        </div>
-      ) : null}
-    </div>
+    <div
+      ref={mapContainerRef}
+      className="city-map"
+      role="region"
+      aria-label="Map of Winnipeg listings"
+    />
   );
 }

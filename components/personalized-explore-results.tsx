@@ -23,8 +23,9 @@ import type {
 type PersonalizedExploreResultsProps = {
   listings: Listing[];
   eyebrow: string;
+  selectedListingKey?: string | null;
+  onSelectListing?: (listing: Listing) => void;
 };
-
 const interestKeywords: Record<
   string,
   string[]
@@ -395,7 +396,9 @@ function hasUsefulPreferences(
 
 export function PersonalizedExploreResults({
   listings,
-  eyebrow
+  eyebrow,
+  selectedListingKey = null,
+  onSelectListing
 }: PersonalizedExploreResultsProps) {
   const [
     preferences,
@@ -532,10 +535,15 @@ export function PersonalizedExploreResults({
         <div className="vertical-list">
           {rankedListings.map(
             (listing) => (
-              <ListingCard
-                key={`${listing.type}-${listing.id}`}
-                listing={listing}
-              />
+          <ListingCard
+            key={`${listing.type}-${listing.id}`}
+            listing={listing}
+            selected={
+              selectedListingKey ===
+              `${listing.type}-${listing.id}`
+            }
+            onSelect={onSelectListing}
+          />
             )
           )}
         </div>

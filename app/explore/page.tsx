@@ -1,12 +1,8 @@
 import Link from "next/link";
 
 import {
-  CityMap
-} from "@/components/city-map";
-
-import {
-  PersonalizedExploreResults
-} from "@/components/personalized-explore-results";
+  ExploreExperience
+} from "@/components/explore-experience";
 
 import {
   getPublishedEventListings
@@ -20,8 +16,7 @@ import type {
   Listing
 } from "@/lib/types";
 
-export const dynamic =
-  "force-dynamic";
+export const dynamic = "force-dynamic";
 
 type ExploreFilter =
   | "all"
@@ -56,8 +51,7 @@ function buildExploreHref(
   filter: ExploreFilter,
   search: string
 ): string {
-  const params =
-    new URLSearchParams();
+  const params = new URLSearchParams();
 
   if (search.trim()) {
     params.set(
@@ -73,8 +67,7 @@ function buildExploreHref(
     );
   }
 
-  const query =
-    params.toString();
+  const query = params.toString();
 
   return query
     ? `/explore?${query}`
@@ -85,10 +78,8 @@ function isVerified(
   listing: Listing
 ): boolean {
   return (
-    listing.verification !==
-      "unverified" &&
-    listing.verification !==
-      "community_reported"
+    listing.verification !== "unverified" &&
+    listing.verification !== "community_reported"
   );
 }
 
@@ -101,9 +92,7 @@ export default async function ExplorePage({
   } = await searchParams;
 
   const activeFilter =
-    getValidFilter(
-      requestedFilter
-    );
+    getValidFilter(requestedFilter);
 
   const [
     databaseEvents,
@@ -149,35 +138,26 @@ export default async function ExplorePage({
       (listing) => {
         switch (activeFilter) {
           case "events":
-            return (
-              listing.type ===
-              "event"
-            );
+            return listing.type === "event";
 
           case "food":
-            return (
-              listing.type ===
-              "restaurant"
-            );
+            return listing.type === "restaurant";
 
           case "open":
             return (
-              listing.type ===
-                "restaurant" &&
-              listing.isOpenNow ===
-                true
+              listing.type === "restaurant" &&
+              listing.isOpenNow === true
             );
 
           case "verified":
-            return isVerified(
-              listing
-            );
+            return isVerified(listing);
 
           default:
             return true;
         }
       }
     );
+
   const filters: {
     label: string;
     value: ExploreFilter;
@@ -214,9 +194,7 @@ export default async function ExplorePage({
       <div className="page-heading">
         <span>CITYWIDE</span>
 
-        <h1>
-          Explore Winnipeg
-        </h1>
+        <h1>Explore Winnipeg</h1>
       </div>
 
       <form
@@ -250,8 +228,7 @@ export default async function ExplorePage({
         {filters.map((filter) => (
           <Link
             className={`filter-chip ${
-              activeFilter ===
-              filter.value
+              activeFilter === filter.value
                 ? "active"
                 : ""
             }`}
@@ -266,11 +243,7 @@ export default async function ExplorePage({
         ))}
       </div>
 
-      <CityMap
-  listings={filteredListings}
-/>
-
-      <PersonalizedExploreResults
+      <ExploreExperience
         listings={filteredListings}
         eyebrow={resultsEyebrow}
       />
