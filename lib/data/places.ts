@@ -518,7 +518,23 @@ function convertPlaceToListing(
       place.short_description,
 
     latitude: place.latitude,
-    longitude: place.longitude
+    longitude: place.longitude,
+
+    placeType:
+      place.place_type,
+
+    weeklyHours:
+      place.weekly_hours,
+
+    priceLevel:
+      place.price_level,
+
+    searchTerms: [
+      place.primary_category,
+      place.cuisine_primary ?? "",
+      place.place_type,
+      place.neighbourhood ?? ""
+    ].filter(Boolean)
   };
 }
 

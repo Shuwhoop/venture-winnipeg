@@ -116,6 +116,19 @@ function formatMoney(
     ? `$${amount}`
     : `$${amount.toFixed(2)}`;
 }
+  function getNumericPrice(
+    value: number | string | null
+  ): number | null {
+    if (value === null) {
+      return null;
+    }
+
+    const amount = Number(value);
+
+    return Number.isFinite(amount)
+      ? amount
+      : null;
+  }
 
 function formatEventPrice(event: EventRow): string {
   const minimum = formatMoney(
@@ -341,9 +354,44 @@ function eventToListing(event: EventRow): Listing {
 
     officialUrl:
       event.organizer_website ?? undefined,
-
     ticketUrl:
-      event.ticket_url ?? undefined
+      event.ticket_url ?? undefined,
+
+    startAt: event.start_at,
+
+    endAt:
+      event.end_at ?? undefined,
+
+    doorsAt:
+      event.doors_at ?? undefined,
+
+    timezone:
+      event.timezone ||
+      "America/Winnipeg",
+
+    minimumPriceCad:
+      getNumericPrice(
+        event.minimum_price_cad
+      ),
+
+    maximumPriceCad:
+      getNumericPrice(
+        event.maximum_price_cad
+      ),
+
+    ageLabel:
+      event.age_label,
+
+    indoorOutdoor:
+      event.indoor_outdoor,
+
+    searchTerms: [
+      event.primary_category,
+      ...(event.secondary_categories ?? []),
+      ...(event.tags ?? []),
+      event.age_label,
+      event.indoor_outdoor
+    ].filter(Boolean)
   };
 }
 

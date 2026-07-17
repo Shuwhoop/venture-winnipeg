@@ -435,8 +435,9 @@ export default function BuildOutingPage() {
       OUTING_DRAFT_KEY,
       JSON.stringify(draft)
     );
-
-    setDraftReady(true);
+    window.location.assign(
+    "/build-outing/results"
+    );
   }
 
   return (
