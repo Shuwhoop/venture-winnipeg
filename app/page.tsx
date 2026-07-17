@@ -1,15 +1,23 @@
 import Link from "next/link";
 
-import { ListingCard } from "@/components/listing-card";
+import {
+  ListingCard
+} from "@/components/listing-card";
+
 import {
   getPublishedEventListings
 } from "@/lib/data/events";
+
 import {
   getPublishedPlaceListings
 } from "@/lib/data/places";
-import type { Listing } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+import type {
+  Listing
+} from "@/lib/types";
+
+export const dynamic =
+  "force-dynamic";
 
 function isTonightEvent(
   listing: Listing
@@ -36,6 +44,7 @@ export default async function HomePage() {
     ...databaseEvents.filter(
       isTonightEvent
     ),
+
     ...databasePlaces.filter(
       (listing) =>
         listing.isOpenNow === true
@@ -46,7 +55,9 @@ export default async function HomePage() {
     databaseEvents[0],
     databasePlaces[0]
   ].filter(
-    (listing): listing is Listing =>
+    (
+      listing
+    ): listing is Listing =>
       Boolean(listing)
   );
 
@@ -92,11 +103,14 @@ export default async function HomePage() {
         className="search-button"
         href="/explore"
       >
-        <span aria-hidden="true">⌕</span>
+        <span aria-hidden="true">
+          {"\u2315"}
+        </span>
 
         <span>
           Search events, restaurants,
-          venues, or neighbourhoods…
+          venues, or neighbourhoods
+          {"\u2026"}
         </span>
       </Link>
 
@@ -140,6 +154,108 @@ export default async function HomePage() {
         </Link>
       </div>
 
+      <section className="outing-builder-hero">
+        <div className="outing-builder-glow" />
+
+        <div className="outing-builder-content">
+          <span className="outing-builder-eyebrow">
+            VENTURE BUILDER
+          </span>
+
+          <h1>
+            What should we do tonight?
+          </h1>
+
+          <p>
+            Choose the kind of night you
+            want. Venture will combine
+            real Winnipeg events,
+            restaurants, opening hours,
+            timing, budget, and travel
+            into one complete outing.
+          </p>
+
+          <div className="outing-builder-features">
+            <span>
+              {"\u2713"} Your interests
+            </span>
+
+            <span>
+              {"\u2713"} Real listings
+            </span>
+
+            <span>
+              {"\u2713"} Timed itinerary
+            </span>
+          </div>
+
+          <div className="outing-builder-actions">
+            <Link
+              className="outing-builder-primary"
+              href="/build-outing"
+            >
+              Build my outing
+
+              <span aria-hidden="true">
+                {"\u2192"}
+              </span>
+            </Link>
+
+            <Link
+              className="outing-builder-secondary"
+              href="/explore"
+            >
+              Browse first
+            </Link>
+          </div>
+        </div>
+
+        <div
+          className="outing-builder-preview"
+          aria-hidden="true"
+        >
+          <div className="outing-builder-preview-heading">
+            <span>YOUR NIGHT</span>
+            <strong>3 connected stops</strong>
+          </div>
+
+          <div className="outing-builder-preview-stop">
+            <b>1</b>
+
+            <div>
+              <small>6:00 PM</small>
+              <strong>Food</strong>
+            </div>
+          </div>
+
+          <div className="outing-builder-preview-line">
+            <span />
+          </div>
+
+          <div className="outing-builder-preview-stop">
+            <b>2</b>
+
+            <div>
+              <small>7:30 PM</small>
+              <strong>Event</strong>
+            </div>
+          </div>
+
+          <div className="outing-builder-preview-line">
+            <span />
+          </div>
+
+          <div className="outing-builder-preview-stop">
+            <b>3</b>
+
+            <div>
+              <small>10:00 PM</small>
+              <strong>Final stop</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="section-block">
         <div className="section-heading">
           <div>
@@ -149,11 +265,11 @@ export default async function HomePage() {
                 : "FEATURED PICKS"}
             </span>
 
-            <h1>
+            <h2>
               {showingTonight
                 ? "Tonight in Winnipeg"
                 : "Discover Winnipeg"}
-            </h1>
+            </h2>
           </div>
 
           <Link href="/explore">
@@ -179,53 +295,62 @@ export default async function HomePage() {
             </h3>
 
             <p>
-              Verified Winnipeg places and
-              events will appear here as they
-              are added.
+              Verified Winnipeg places
+              and events will appear here
+              as they are added.
             </p>
           </section>
         )}
       </section>
 
-      {featuredEvent && featuredPlace ? (
+      {featuredEvent &&
+      featuredPlace ? (
         <section className="section-block">
           <div className="section-heading">
             <div>
-              <span>PLAN AHEAD</span>
-              <h2>Build an outing</h2>
+              <span>
+                OUTING INSPIRATION
+              </span>
+
+              <h2>
+                Start with two real picks
+              </h2>
             </div>
 
-            <Link href="/tonight">
-              Explore ideas
+            <Link href="/build-outing">
+              Build yours
             </Link>
           </div>
 
           <Link
             className="pairing-card"
-            href="/tonight"
+            href="/build-outing"
           >
             <div className="pairing-icon">
-              ◉ + ✦
+              {"\u25C9 + \u2726"}
             </div>
 
             <div>
               <small>
-                Two verified Winnipeg picks
+                A possible Winnipeg pairing
               </small>
 
               <h3>
-                {featuredPlace.name} +{" "}
+                {featuredPlace.name}
+                {" + "}
                 {featuredEvent.name}
               </h3>
 
               <p>
                 {featuredPlace.neighbourhood}
-                {" · "}
+                {" \u00B7 "}
                 {featuredEvent.timeOrHours}
               </p>
             </div>
 
-            <strong>›</strong>
+            <strong aria-hidden="true">
+              {"\u203A"}
+            </strong>
           </Link>
         </section>
       ) : null}
@@ -233,7 +358,9 @@ export default async function HomePage() {
       <section className="newsletter-panel">
         <span>EVERY THURSDAY</span>
 
-        <h2>Venture This Weekend</h2>
+        <h2>
+          Venture This Weekend
+        </h2>
 
         <p>
           One clean email with notable
