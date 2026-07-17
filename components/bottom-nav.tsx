@@ -6,7 +6,10 @@ import {
 } from "react";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+
+import {
+  usePathname
+} from "next/navigation";
 
 import {
   getSavedListingReferences,
@@ -18,37 +21,141 @@ import {
   SAVED_OUTINGS_EVENT
 } from "@/lib/saved-outings";
 
-const items = [
+type NavIconName =
+  | "home"
+  | "explore"
+  | "build"
+  | "saved"
+  | "profile";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: NavIconName;
+  special?: boolean;
+};
+
+const items: NavItem[] = [
   {
     href: "/",
     label: "Home",
-    icon: "\u2302"
+    icon: "home"
   },
   {
     href: "/explore",
     label: "Explore",
-    icon: "\u2315"
+    icon: "explore"
   },
   {
     href: "/build-outing",
     label: "Build",
-    icon: "\u2726",
+    icon: "build",
     special: true
   },
   {
     href: "/saved",
     label: "Saved",
-    icon: "\u2661"
+    icon: "saved"
   },
   {
     href: "/profile",
     label: "Profile",
-    icon: "\u25C9"
+    icon: "profile"
   }
 ];
 
+function NavigationIcon({
+  name
+}: {
+  name: NavIconName;
+}) {
+  if (name === "home") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M3.5 10.5 12 3l8.5 7.5v9a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5v-9Z"
+        />
+
+        <path
+          d="M9 21v-7h6v7"
+        />
+      </svg>
+    );
+  }
+
+  if (name === "explore") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="9"
+        />
+
+        <path
+          d="m15.8 8.2-2.2 5.4-5.4 2.2 2.2-5.4 5.4-2.2Z"
+        />
+      </svg>
+    );
+  }
+
+  if (name === "build") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 2.7 14 8l5.3 2-5.3 2-2 5.3-2-5.3-5.3-2 5.3-2 2-5.3Z"
+        />
+
+        <path
+          d="m18.5 15 .8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2Z"
+        />
+      </svg>
+    );
+  }
+
+  if (name === "saved") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M20.8 8.7c0 5.5-8.8 11-8.8 11s-8.8-5.5-8.8-11A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5Z"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="8"
+        r="4"
+      />
+
+      <path
+        d="M4.5 21c.5-5 3-7.5 7.5-7.5s7 2.5 7.5 7.5"
+      />
+    </svg>
+  );
+}
+
 export function BottomNav() {
-  const pathname = usePathname();
+  const pathname =
+    usePathname();
 
   const [
     savedCount,
@@ -58,10 +165,12 @@ export function BottomNav() {
   useEffect(() => {
     function refreshSavedCount() {
       const savedListings =
-        getSavedListingReferences().length;
+        getSavedListingReferences()
+          .length;
 
       const savedOutings =
-        getSavedOutings().length;
+        getSavedOutings()
+          .length;
 
       setSavedCount(
         savedListings +
@@ -123,7 +232,9 @@ export function BottomNav() {
         return (
           <Link
             className={`nav-link ${
-              active ? "active" : ""
+              active
+                ? "active"
+                : ""
             } ${
               item.special
                 ? "special"
@@ -138,7 +249,9 @@ export function BottomNav() {
             }
           >
             <span className="nav-icon">
-              {item.icon}
+              <NavigationIcon
+                name={item.icon}
+              />
 
               {isSavedLink &&
               savedCount > 0 ? (

@@ -9,7 +9,9 @@ import {
 import maplibregl from "maplibre-gl";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-
+import {
+  getVentureMapStyle
+} from "@/lib/venture-map-style";
 import type {
   GeneratedOutingPlan
 } from "@/lib/saved-outings";
@@ -279,9 +281,7 @@ export function OutingRouteMap({
     }
 
     const mapStyle =
-      process.env
-        .NEXT_PUBLIC_MAP_STYLE_URL ||
-      "https://demotiles.maplibre.org/style.json";
+    getVentureMapStyle();
 
     const firstStop =
       coordinateStops[0];

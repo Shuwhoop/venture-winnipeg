@@ -4,7 +4,9 @@ import {
   useEffect,
   useRef
 } from "react";
-
+import {
+  getVentureMapStyle
+} from "@/lib/venture-map-style";
 import maplibregl from "maplibre-gl";
 
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -130,10 +132,8 @@ export function CityMap({
       return;
     }
 
-    const mapStyle =
-      process.env
-        .NEXT_PUBLIC_MAP_STYLE_URL ||
-      "https://demotiles.maplibre.org/style.json";
+  const mapStyle =
+    getVentureMapStyle();
 
     const map =
       new maplibregl.Map({

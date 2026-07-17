@@ -5,6 +5,10 @@ import {
 } from "@/components/listing-card";
 
 import {
+  VentureNightAnimation
+} from "@/components/venture-night-animation";
+
+import {
   getPublishedEventListings
 } from "@/lib/data/events";
 
@@ -210,50 +214,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div
-          className="outing-builder-preview"
-          aria-hidden="true"
-        >
-          <div className="outing-builder-preview-heading">
-            <span>YOUR NIGHT</span>
-            <strong>3 connected stops</strong>
-          </div>
-
-          <div className="outing-builder-preview-stop">
-            <b>1</b>
-
-            <div>
-              <small>6:00 PM</small>
-              <strong>Food</strong>
-            </div>
-          </div>
-
-          <div className="outing-builder-preview-line">
-            <span />
-          </div>
-
-          <div className="outing-builder-preview-stop">
-            <b>2</b>
-
-            <div>
-              <small>7:30 PM</small>
-              <strong>Event</strong>
-            </div>
-          </div>
-
-          <div className="outing-builder-preview-line">
-            <span />
-          </div>
-
-          <div className="outing-builder-preview-stop">
-            <b>3</b>
-
-            <div>
-              <small>10:00 PM</small>
-              <strong>Final stop</strong>
-            </div>
-          </div>
-        </div>
+        <VentureNightAnimation />
       </section>
 
       <section className="section-block">
@@ -356,7 +317,9 @@ export default async function HomePage() {
       ) : null}
 
       <section className="newsletter-panel">
-        <span>EVERY THURSDAY</span>
+        <span>
+          EVERY THURSDAY
+        </span>
 
         <h2>
           Venture This Weekend

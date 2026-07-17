@@ -5,7 +5,9 @@ import {
   useMemo,
   useState
 } from "react";
-
+import {
+  PlanningModeIllustration
+} from "@/components/planning-mode-illustration";
 import {
   defaultPreferences,
   loadPreferences,
@@ -16,14 +18,21 @@ import {
 const OUTING_DRAFT_KEY =
   "venture:outing-draft:v1";
 
+const TOTAL_STEPS = 8;
+
+type PlanningMode =
+  | "solo"
+  | "group";
+
 type OutingType = {
   id: string;
   icon: string;
   title: string;
-  description: string;
+  shortDescription: string;
 };
 
 type OutingDraft = {
+  planningMode: PlanningMode;
   outingTypeId: string;
   outingTypeTitle: string;
   date: string;
@@ -42,57 +51,57 @@ const outingTypes: OutingType[] = [
     id: "date-night",
     icon: "♡",
     title: "Date Night",
-    description:
-      "Dinner, an activity, and somewhere memorable to end the night."
+    shortDescription:
+      "Food, an activity, and a memorable finish."
   },
   {
     id: "friends-night",
     icon: "☻",
     title: "Friends Night",
-    description:
-      "A lively plan built for groups, laughs, food, and shared experiences."
+    shortDescription:
+      "A lively night for your favourite people."
   },
   {
     id: "solo-outing",
     icon: "◉",
-    title: "Solo Outing",
-    description:
-      "A comfortable adventure designed around your own interests and pace."
+    title: "Solo Adventure",
+    shortDescription:
+      "Explore the city at your own pace."
   },
   {
     id: "family-plan",
     icon: "⌂",
     title: "Family Plan",
-    description:
-      "Family-friendly activities, food, timing, and practical travel."
+    shortDescription:
+      "Practical, welcoming, family-friendly fun."
   },
   {
     id: "food-crawl",
     icon: "◇",
     title: "Food Crawl",
-    description:
-      "Several food stops connected into one Winnipeg route."
+    shortDescription:
+      "Several delicious Winnipeg stops."
   },
   {
     id: "nightlife",
     icon: "✦",
     title: "Nightlife",
-    description:
-      "Music, entertainment, dancing, and late-night destinations."
+    shortDescription:
+      "Music, entertainment, and late-night energy."
   },
   {
     id: "budget-night",
     icon: "$",
     title: "Budget Night",
-    description:
-      "A complete outing built around free and affordable options."
+    shortDescription:
+      "A complete outing without overspending."
   },
   {
     id: "surprise-me",
     icon: "?",
     title: "Surprise Me",
-    description:
-      "Let Venture build something unexpected from what is happening."
+    shortDescription:
+      "Let Venture choose the adventure."
   }
 ];
 
@@ -128,45 +137,118 @@ const durationOptions = [
 ];
 
 const transportationOptions = [
-  "Walking",
-  "Transit",
-  "Driving",
-  "Rideshare"
+  {
+    value: "Walking",
+    icon: "●",
+    description: "Keep stops close"
+  },
+  {
+    value: "Transit",
+    icon: "▣",
+    description: "Use Winnipeg Transit"
+  },
+  {
+    value: "Driving",
+    icon: "▰",
+    description: "Explore more of the city"
+  },
+  {
+    value: "Rideshare",
+    icon: "↗",
+    description: "Flexible travel"
+  }
 ];
 
 const budgetOptions: {
   value: BudgetPreference;
   label: string;
+  amount: string;
   description: string;
 }[] = [
   {
     value: "free",
     label: "Free",
+    amount: "$0",
     description:
-      "Prioritize outings with no admission cost."
+      "No admission cost"
   },
   {
     value: "under-40",
     label: "Under $40",
+    amount: "$40",
     description:
-      "Keep the estimated total below $40 per person."
+      "Affordable per person"
   },
   {
     value: "under-80",
     label: "Under $80",
+    amount: "$80",
     description:
-      "Allow more food, ticket, and activity options."
+      "More food and ticket choices"
   },
   {
     value: "flexible",
     label: "Flexible",
+    amount: "∞",
     description:
-      "Prioritize the experience over a strict total."
+      "Prioritize the experience"
+  }
+];
+
+const stepContent = [
+  {
+    eyebrow: "PLANNING MODE",
+    title: "Who is this outing for?",
+    description:
+      "Choose Solo for your own adventure or Group when planning with friends."
+  },
+  {
+    eyebrow: "OUTING TYPE",
+    title: "What kind of outing?",
+    description:
+      "Pick the mood Venture should build around."
+  },
+  {
+    eyebrow: "WHEN",
+    title: "When are you going?",
+    description:
+      "Choose the date, start time, and length."
+  },
+  {
+    eyebrow: "INTERESTS",
+    title: "What sounds good?",
+    description:
+      "Your Profile interests start selected."
+  },
+  {
+    eyebrow: "BUDGET",
+    title: "What is the budget?",
+    description:
+      "Estimated amount per person."
+  },
+  {
+    eyebrow: "AREA",
+    title: "Where should Venture search?",
+    description:
+      "Leave everything clear to search all Winnipeg."
+  },
+  {
+    eyebrow: "TRAVEL",
+    title: "How are you getting around?",
+    description:
+      "This affects distance and travel time."
+  },
+  {
+    eyebrow: "REVIEW",
+    title: "Ready to build your outing?",
+    description:
+      "Check the plan ingredients before Venture connects the stops."
   }
 ];
 
 function getTodayInputValue(): string {
-  const currentDate = new Date();
+  const currentDate =
+    new Date();
 
   const timezoneOffset =
     currentDate.getTimezoneOffset() *
@@ -190,7 +272,10 @@ function toggleValue(
         (currentValue) =>
           currentValue !== value
       )
-    : [...currentValues, value];
+    : [
+        ...currentValues,
+        value
+      ];
 }
 
 function getBudgetLabel(
@@ -206,14 +291,25 @@ function getBudgetLabel(
 
 export default function BuildOutingPage() {
   const [
-    step,
-    setStep
-  ] = useState<1 | 2>(1);
+    currentStep,
+    setCurrentStep
+  ] = useState(0);
+
+  const [
+    planningMode,
+    setPlanningMode
+  ] =
+    useState<PlanningMode | null>(
+      null
+    );
 
   const [
     selectedType,
     setSelectedType
-  ] = useState<string | null>(null);
+  ] =
+    useState<string | null>(
+      null
+    );
 
   const [
     profilePreferences,
@@ -271,11 +367,6 @@ export default function BuildOutingPage() {
     setTransportation
   ] = useState("Transit");
 
-  const [
-    draftReady,
-    setDraftReady
-  ] = useState(false);
-
   useEffect(() => {
     const loadedPreferences =
       loadPreferences();
@@ -310,7 +401,8 @@ export default function BuildOutingPage() {
       () =>
         outingTypes.find(
           (outing) =>
-            outing.id === selectedType
+            outing.id ===
+            selectedType
         ) ?? null,
       [selectedType]
     );
@@ -324,7 +416,9 @@ export default function BuildOutingPage() {
             ...profilePreferences.interests
           ])
         ),
-      [profilePreferences.interests]
+      [
+        profilePreferences.interests
+      ]
     );
 
   const availableNeighbourhoods =
@@ -341,26 +435,44 @@ export default function BuildOutingPage() {
       ]
     );
 
-  function handleTypeSelection(
-    outingId: string
-  ) {
-    setSelectedType(
-      (currentType) =>
-        currentType === outingId
-          ? null
-          : outingId
-    );
+  const progress =
+    ((currentStep + 1) /
+      TOTAL_STEPS) *
+    100;
 
-    setDraftReady(false);
-  }
+  const content =
+    stepContent[currentStep];
 
-  function handleContinue() {
-    if (!selectedOuting) {
+  const canContinue =
+    currentStep === 0
+      ? planningMode !== null
+      : currentStep === 1
+        ? selectedOuting !== null
+        : currentStep === 2
+          ? Boolean(
+              outingDate &&
+              startTime &&
+              duration
+            )
+          : true;
+
+  function goForward() {
+    if (!canContinue) {
       return;
     }
 
-    setStep(2);
-    setDraftReady(false);
+    if (
+      currentStep ===
+      TOTAL_STEPS - 1
+    ) {
+      handlePrepareOuting();
+      return;
+    }
+
+    setCurrentStep(
+      (current) =>
+        current + 1
+    );
 
     window.scrollTo({
       top: 0,
@@ -368,9 +480,15 @@ export default function BuildOutingPage() {
     });
   }
 
-  function handleBack() {
-    setStep(1);
-    setDraftReady(false);
+  function goBack() {
+    if (currentStep === 0) {
+      return;
+    }
+
+    setCurrentStep(
+      (current) =>
+        current - 1
+    );
 
     window.scrollTo({
       top: 0,
@@ -378,28 +496,15 @@ export default function BuildOutingPage() {
     });
   }
 
-  function resetToProfileDefaults() {
+  function resetInterests() {
     setSelectedInterests(
       profilePreferences.interests
     );
-
-    setSelectedNeighbourhoods(
-      profilePreferences.neighbourhoods
-    );
-
-    setBudget(
-      profilePreferences.budget
-    );
-
-    setAlcoholFree(
-      profilePreferences.alcoholFree
-    );
-
-    setDraftReady(false);
   }
 
   function handlePrepareOuting() {
     if (
+      !planningMode ||
       !selectedOuting ||
       !outingDate ||
       !startTime
@@ -408,15 +513,20 @@ export default function BuildOutingPage() {
     }
 
     const draft: OutingDraft = {
+      planningMode,
+
       outingTypeId:
         selectedOuting.id,
 
       outingTypeTitle:
         selectedOuting.title,
 
-      date: outingDate,
+      date:
+        outingDate,
+
       startTime,
       duration,
+
       interests:
         selectedInterests,
 
@@ -435,314 +545,279 @@ export default function BuildOutingPage() {
       OUTING_DRAFT_KEY,
       JSON.stringify(draft)
     );
+
     window.location.assign(
-    "/build-outing/results"
+      "/build-outing/results"
     );
   }
 
   return (
-    <main className="build-outing-page">
-      <div
-        className="builder-progress"
-        aria-label={`Step ${step} of 2`}
-      >
-        <span
-          className={
-            step >= 1
-              ? "active"
-              : ""
-          }
-        />
+    <main className="outing-wizard">
+      <div className="outing-wizard-progress">
+        <div>
+          <span>
+            STEP {currentStep + 1} OF{" "}
+            {TOTAL_STEPS}
+          </span>
 
-        <span
-          className={
-            step >= 2
-              ? "active"
-              : ""
-          }
-        />
+          <strong>
+            {Math.round(progress)}%
+          </strong>
+        </div>
+
+        <div className="outing-wizard-progress-track">
+          <span
+            style={{
+              width: `${progress}%`
+            }}
+          />
+        </div>
       </div>
 
-      {step === 1 ? (
-        <>
-          <section className="build-outing-hero">
-            <span className="build-outing-eyebrow">
-              STEP 1 OF 2
-            </span>
+      <section className="outing-wizard-screen">
+        <header className="outing-wizard-heading">
+          <span>{content.eyebrow}</span>
 
-            <h1>
-              What kind of outing
-              are you feeling?
-            </h1>
+          <h1>{content.title}</h1>
 
-            <p>
-              Choose the mood. Venture
-              will use real Winnipeg
-              events, places, opening
-              hours, and travel time to
-              build the plan.
-            </p>
-          </section>
+          <p>{content.description}</p>
+        </header>
 
-          <section
-            className="outing-type-grid"
-            aria-label="Choose an outing type"
-          >
-            {outingTypes.map(
-              (outing) => {
-                const selected =
-                  outing.id ===
-                  selectedType;
-
-                return (
-                  <button
-                    className={`outing-type-card ${
-                      selected
-                        ? "selected"
-                        : ""
-                    }`}
-                    type="button"
-                    key={outing.id}
-                    aria-pressed={
-                      selected
-                    }
-                    onClick={() =>
-                      handleTypeSelection(
-                        outing.id
-                      )
-                    }
-                  >
-                    <span
-                      className="outing-type-icon"
-                      aria-hidden="true"
-                    >
-                      {outing.icon}
-                    </span>
-
-                    <span className="outing-type-copy">
-                      <strong>
-                        {outing.title}
-                      </strong>
-
-                      <small>
-                        {
-                          outing.description
-                        }
-                      </small>
-                    </span>
-
-                    <span
-                      className="outing-type-check"
-                      aria-hidden="true"
-                    >
-                      {selected
-                        ? "✓"
-                        : ""}
-                    </span>
-                  </button>
-                );
-              }
-            )}
-          </section>
-
-          {selectedOuting ? (
-            <section className="outing-selection-summary">
-              <span>
-                YOUR OUTING
-              </span>
-
-              <strong>
-                {selectedOuting.title}
-              </strong>
-
-              <p>
-                Next, customize the
-                timing, budget, travel,
-                and interests for this
-                particular outing.
-              </p>
-            </section>
-          ) : null}
-
-          <div className="build-outing-action">
+        <div
+          className="outing-wizard-content"
+          key={currentStep}
+                >
+        {currentStep === 0 ? (
+        <section
+            className="mode-choice-stage"
+            aria-label="Choose planning mode"
+        >
             <button
-              type="button"
-              disabled={
-                !selectedOuting
-              }
-              onClick={
-                handleContinue
-              }
+            type="button"
+            className={`mode-choice-card mode-choice-solo ${
+                planningMode === "solo"
+                ? "selected"
+                : ""
+            }`}
+            aria-pressed={
+                planningMode === "solo"
+            }
+            onClick={() =>
+                setPlanningMode("solo")
+            }
             >
-              Customize this outing
-            </button>
+            <PlanningModeIllustration
+                mode="solo"
+                selected={
+                planningMode === "solo"
+                }
+            />
 
-            <small>
-              Your Profile preferences
-              will be used as the
-              starting point.
-            </small>
-          </div>
-        </>
-      ) : (
-        <>
-          <section className="builder-step-heading">
-            <button
-              className="builder-back-button"
-              type="button"
-              onClick={handleBack}
-            >
-              ← Back
-            </button>
+            <div className="mode-choice-copy">
+                <span className="mode-choice-label">
+                SOLO
+                </span>
 
-            <span className="build-outing-eyebrow">
-              STEP 2 OF 2
-            </span>
+                <strong>
+                Explore on my own
+                </strong>
 
-            <h1>
-              Customize your{" "}
-              {selectedOuting?.title ??
-                "outing"}
-            </h1>
-
-            <p>
-              These choices apply only
-              to this outing. Your
-              Profile will stay exactly
-              as it is.
-            </p>
-          </section>
-
-          <section className="profile-defaults-note">
-            <span aria-hidden="true">
-              ✦
-            </span>
-
-            <div>
-              <strong>
-                Using{" "}
-                {profilePreferences.displayName ||
-                  "your"}
-                &apos;s Profile defaults
-              </strong>
-
-              <small>
-                Interests, budget,
-                neighbourhoods, and
-                alcohol preference were
-                filled automatically.
-              </small>
+                <small>
+                A happy self-date, food crawl,
+                event, or city adventure shaped
+                around your pace.
+                </small>
             </div>
 
-            <button
-              type="button"
-              onClick={
-                resetToProfileDefaults
-              }
-            >
-              Reset
+            <span className="mode-choice-check">
+                {planningMode === "solo"
+                ? "✓"
+                : ""}
+            </span>
             </button>
-          </section>
 
-          <section className="outing-customizer">
-            <div className="customizer-section">
-              <div className="customizer-heading">
-                <span>WHEN</span>
-                <h2>
-                  When are you going?
-                </h2>
-              </div>
+            <button
+            type="button"
+            className={`mode-choice-card mode-choice-group ${
+                planningMode === "group"
+                ? "selected"
+                : ""
+            }`}
+            aria-pressed={
+                planningMode === "group"
+            }
+            onClick={() =>
+                setPlanningMode("group")
+            }
+            >
+            <PlanningModeIllustration
+                mode="group"
+                selected={
+                planningMode === "group"
+                }
+            />
 
-              <div className="builder-field-grid">
-                <label className="builder-field">
+            <div className="mode-choice-copy">
+                <span className="mode-choice-label">
+                GROUP
+                </span>
+
+                <strong>
+                Bring the whole crew
+                </strong>
+
+                <small>
+                Start a lively shared plan for
+                friends, birthdays, celebrations,
+                and spontaneous nights.
+                </small>
+            </div>
+
+            <span className="mode-choice-check">
+                {planningMode === "group"
+                ? "✓"
+                : ""}
+            </span>
+            </button>
+        </section>
+        ) : null}
+
+          {currentStep === 1 ? (
+            <>
+              <section className="outing-type-compact-grid">
+                {outingTypes.map(
+                  (outing) => {
+                    const selected =
+                      selectedType ===
+                      outing.id;
+
+                    return (
+                      <button
+                        type="button"
+                        key={outing.id}
+                        className={
+                          selected
+                            ? "selected"
+                            : ""
+                        }
+                        aria-pressed={
+                          selected
+                        }
+                        onClick={() =>
+                          setSelectedType(
+                            selected
+                              ? null
+                              : outing.id
+                          )
+                        }
+                      >
+                        <span>
+                          {outing.icon}
+                        </span>
+
+                        <strong>
+                          {outing.title}
+                        </strong>
+                      </button>
+                    );
+                  }
+                )}
+              </section>
+
+              {selectedOuting ? (
+                <p className="outing-type-description">
+                  <strong>
+                    {selectedOuting.title}
+                  </strong>
+
+                  {
+                    selectedOuting.shortDescription
+                  }
+                </p>
+              ) : null}
+            </>
+          ) : null}
+
+          {currentStep === 2 ? (
+            <section className="wizard-compact-panel">
+              <div className="wizard-date-grid">
+                <label>
                   <span>Date</span>
 
                   <input
                     type="date"
                     value={outingDate}
-                    onChange={(event) => {
+                    onChange={(event) =>
                       setOutingDate(
                         event.target.value
-                      );
-
-                      setDraftReady(
-                        false
-                      );
-                    }}
+                      )
+                    }
                   />
                 </label>
 
-                <label className="builder-field">
+                <label>
                   <span>Start time</span>
 
                   <input
                     type="time"
                     value={startTime}
-                    onChange={(event) => {
+                    onChange={(event) =>
                       setStartTime(
                         event.target.value
-                      );
-
-                      setDraftReady(
-                        false
-                      );
-                    }}
+                      )
+                    }
                   />
                 </label>
               </div>
 
-              <div
-                className="choice-chip-grid"
-                aria-label="Outing duration"
-              >
+              <div className="wizard-small-grid">
                 {durationOptions.map(
                   (option) => (
                     <button
-                      className={`builder-choice-chip ${
-                        duration ===
-                        option
-                          ? "selected"
-                          : ""
-                      }`}
                       type="button"
                       key={option}
-                      aria-pressed={
-                        duration ===
-                        option
+                      className={
+                        duration === option
+                          ? "selected"
+                          : ""
                       }
-                      onClick={() => {
-                        setDuration(
-                          option
-                        );
-
-                        setDraftReady(
-                          false
-                        );
-                      }}
+                      onClick={() =>
+                        setDuration(option)
+                      }
                     >
-                      {option}
+                      <strong>
+                        {option}
+                      </strong>
+
+                      <small>Length</small>
                     </button>
                   )
                 )}
               </div>
-            </div>
+            </section>
+          ) : null}
 
-            <div className="customizer-section">
-              <div className="customizer-heading">
-                <span>INTERESTS</span>
-                <h2>
-                  What sounds good?
-                </h2>
-
+          {currentStep === 3 ? (
+            <section className="wizard-compact-panel">
+              <div className="profile-default-row">
                 <p>
-                  Select as many as you
-                  like. Venture will
-                  balance them across
-                  the outing.
+                  Using{" "}
+                  <strong>
+                    {profilePreferences.displayName ||
+                      "your"}
+                    &apos;s Profile
+                  </strong>
                 </p>
+
+                <button
+                  type="button"
+                  onClick={resetInterests}
+                >
+                  Reset
+                </button>
               </div>
 
-              <div className="choice-chip-grid">
+              <div className="interest-compact-grid">
                 {availableInterests.map(
                   (interest) => {
                     const selected =
@@ -752,115 +827,74 @@ export default function BuildOutingPage() {
 
                     return (
                       <button
-                        className={`builder-choice-chip ${
-                          selected
-                            ? "selected"
-                            : ""
-                        }`}
                         type="button"
                         key={interest}
-                        aria-pressed={
-                          selected
-                        }
-                        onClick={() => {
-                          setSelectedInterests(
-                            (
-                              currentInterests
-                            ) =>
-                              toggleValue(
-                                currentInterests,
-                                interest
-                              )
-                          );
-
-                          setDraftReady(
-                            false
-                          );
-                        }}
-                      >
-                        {interest}
-                      </button>
-                    );
-                  }
-                )}
-              </div>
-            </div>
-
-            <div className="customizer-section">
-              <div className="customizer-heading">
-                <span>BUDGET</span>
-                <h2>
-                  What is the budget?
-                </h2>
-
-                <p>
-                  This is the estimated
-                  amount per person.
-                </p>
-              </div>
-
-              <div className="budget-option-grid">
-                {budgetOptions.map(
-                  (option) => {
-                    const selected =
-                      budget ===
-                      option.value;
-
-                    return (
-                      <button
-                        className={`budget-option ${
+                        className={
                           selected
                             ? "selected"
                             : ""
-                        }`}
-                        type="button"
-                        key={
-                          option.value
                         }
-                        aria-pressed={
-                          selected
+                        onClick={() =>
+                          setSelectedInterests(
+                            (current) =>
+                              toggleValue(
+                                current,
+                                interest
+                              )
+                          )
                         }
-                        onClick={() => {
-                          setBudget(
-                            option.value
-                          );
-
-                          setDraftReady(
-                            false
-                          );
-                        }}
                       >
-                        <strong>
-                          {option.label}
-                        </strong>
+                        {interest}
 
-                        <small>
-                          {
-                            option.description
-                          }
-                        </small>
+                        <span>
+                          {selected
+                            ? "✓"
+                            : ""}
+                        </span>
                       </button>
                     );
                   }
                 )}
               </div>
-            </div>
+            </section>
+          ) : null}
 
-            <div className="customizer-section">
-              <div className="customizer-heading">
-                <span>AREA</span>
-                <h2>
-                  Preferred neighbourhoods
-                </h2>
+          {currentStep === 4 ? (
+            <section className="budget-compact-grid">
+              {budgetOptions.map(
+                (option) => (
+                  <button
+                    type="button"
+                    key={option.value}
+                    className={
+                      budget === option.value
+                        ? "selected"
+                        : ""
+                    }
+                    onClick={() =>
+                      setBudget(option.value)
+                    }
+                  >
+                    <span>
+                      {option.amount}
+                    </span>
 
-                <p>
-                  Leave every option
-                  unselected to search
-                  anywhere in Winnipeg.
-                </p>
-              </div>
+                    <strong>
+                      {option.label}
+                    </strong>
 
-              <div className="choice-chip-grid">
+                    <small>
+                      {option.description}
+                    </small>
+                  </button>
+                )
+              )}
+            </section>
+          ) : null}
+
+          {currentStep === 5 ? (
+            <section className="wizard-compact-panel">
+              <div className="area-compact-grid">
                 {availableNeighbourhoods.map(
                   (neighbourhood) => {
                     const selected =
@@ -870,211 +904,214 @@ export default function BuildOutingPage() {
 
                     return (
                       <button
-                        className={`builder-choice-chip ${
+                        type="button"
+                        key={neighbourhood}
+                        className={
                           selected
                             ? "selected"
                             : ""
-                        }`}
-                        type="button"
-                        key={neighbourhood}
-                        aria-pressed={
-                          selected
                         }
-                        onClick={() => {
+                        onClick={() =>
                           setSelectedNeighbourhoods(
-                            (
-                              currentNeighbourhoods
-                            ) =>
+                            (current) =>
                               toggleValue(
-                                currentNeighbourhoods,
+                                current,
                                 neighbourhood
                               )
-                          );
-
-                          setDraftReady(
-                            false
-                          );
-                        }}
+                          )
+                        }
                       >
-                        {neighbourhood}
+                        <span>●</span>
+
+                        <strong>
+                          {neighbourhood}
+                        </strong>
+
+                        <i>
+                          {selected
+                            ? "✓"
+                            : ""}
+                        </i>
                       </button>
                     );
                   }
                 )}
               </div>
-            </div>
 
-            <div className="customizer-section">
-              <div className="customizer-heading">
-                <span>TRAVEL</span>
-                <h2>
-                  How are you getting around?
-                </h2>
-              </div>
+              <p className="wizard-compact-note">
+                Nothing selected means
+                anywhere in Winnipeg.
+              </p>
+            </section>
+          ) : null}
 
-              <div className="choice-chip-grid">
+          {currentStep === 6 ? (
+            <section className="wizard-compact-panel">
+              <div className="travel-compact-grid">
                 {transportationOptions.map(
                   (option) => (
                     <button
-                      className={`builder-choice-chip ${
+                      type="button"
+                      key={option.value}
+                      className={
                         transportation ===
-                        option
+                        option.value
                           ? "selected"
                           : ""
-                      }`}
-                      type="button"
-                      key={option}
-                      aria-pressed={
-                        transportation ===
-                        option
                       }
-                      onClick={() => {
+                      onClick={() =>
                         setTransportation(
-                          option
-                        );
-
-                        setDraftReady(
-                          false
-                        );
-                      }}
+                          option.value
+                        )
+                      }
                     >
-                      {option}
+                      <span>
+                        {option.icon}
+                      </span>
+
+                      <strong>
+                        {option.value}
+                      </strong>
+
+                      <small>
+                        {option.description}
+                      </small>
                     </button>
                   )
                 )}
               </div>
-            </div>
 
-            <div className="customizer-section">
-              <label className="builder-toggle-row">
+              <label className="alcohol-compact-toggle">
                 <div>
                   <strong>
                     Alcohol-free outing
                   </strong>
 
                   <small>
-                    Avoid plans focused
-                    on bars, breweries,
-                    or alcohol.
+                    Avoid alcohol-focused
+                    destinations.
                   </small>
                 </div>
 
                 <input
                   type="checkbox"
-                  checked={
-                    alcoholFree
-                  }
-                  onChange={(event) => {
+                  checked={alcoholFree}
+                  onChange={(event) =>
                     setAlcoholFree(
                       event.target.checked
-                    );
-
-                    setDraftReady(
-                      false
-                    );
-                  }}
+                    )
+                  }
                 />
               </label>
-            </div>
-          </section>
+            </section>
+          ) : null}
 
-          {draftReady &&
+          {currentStep === 7 &&
+          planningMode &&
           selectedOuting ? (
-            <section className="outing-draft-ready">
-              <span
-                className="outing-draft-icon"
-                aria-hidden="true"
-              >
-                ✓
-              </span>
-
-              <div>
+            <section className="review-compact-card">
+              <div className="review-compact-hero">
                 <span>
-                  OUTING SETUP READY
+                  {planningMode === "solo"
+                    ? "SOLO OUTING"
+                    : "GROUP OUTING"}
                 </span>
 
                 <h2>
                   {selectedOuting.title}
                 </h2>
+              </div>
 
-                <div className="outing-draft-summary">
-                  <p>
-                    <strong>
-                      When
-                    </strong>
+              <div className="review-compact-grid">
+                <div>
+                  <span>WHEN</span>
+
+                  <strong>
                     {outingDate},{" "}
-                    {startTime} for{" "}
-                    {duration}
-                  </p>
+                    {startTime}
+                  </strong>
 
-                  <p>
-                    <strong>
-                      Budget
-                    </strong>
+                  <small>{duration}</small>
+                </div>
+
+                <div>
+                  <span>BUDGET</span>
+
+                  <strong>
                     {getBudgetLabel(
                       budget
-                    )}{" "}
-                    per person
-                  </p>
+                    )}
+                  </strong>
+                </div>
 
-                  <p>
-                    <strong>
-                      Travel
-                    </strong>
+                <div>
+                  <span>TRAVEL</span>
+
+                  <strong>
                     {transportation}
-                  </p>
+                  </strong>
+                </div>
 
-                  <p>
-                    <strong>
-                      Area
-                    </strong>
+                <div>
+                  <span>AREA</span>
+
+                  <strong>
                     {selectedNeighbourhoods.length >
                     0
                       ? selectedNeighbourhoods.join(
                           ", "
                         )
-                      : "Anywhere in Winnipeg"}
-                  </p>
+                      : "All Winnipeg"}
+                  </strong>
+                </div>
 
-                  <p>
-                    <strong>
-                      Interests
-                    </strong>
+                <div className="review-wide">
+                  <span>INTERESTS</span>
+
+                  <strong>
                     {selectedInterests.length >
                     0
                       ? selectedInterests.join(
                           ", "
                         )
                       : "Surprise me"}
-                  </p>
+                  </strong>
                 </div>
               </div>
             </section>
           ) : null}
+        </div>
+      </section>
 
-          <div className="build-outing-action builder-final-action">
-            <button
-              type="button"
-              disabled={
-                !outingDate ||
-                !startTime
-              }
-              onClick={
-                handlePrepareOuting
-              }
-            >
-              Prepare my outing
-            </button>
+      <div className="outing-wizard-actions">
+        {currentStep > 0 ? (
+          <button
+            type="button"
+            className="outing-wizard-back"
+            onClick={goBack}
+          >
+            ← Back
+          </button>
+        ) : (
+          <span />
+        )}
 
-            <small>
-              Venture will use this
-              setup to match real
-              listings in the itinerary
-              generator.
-            </small>
-          </div>
-        </>
-      )}
+        <button
+          type="button"
+          className="outing-wizard-next"
+          disabled={!canContinue}
+          onClick={goForward}
+        >
+          {currentStep ===
+          TOTAL_STEPS - 1
+            ? "Build my outing"
+            : "Continue"}
+
+          <span aria-hidden="true">
+            →
+          </span>
+        </button>
+      </div>
     </main>
   );
 }
