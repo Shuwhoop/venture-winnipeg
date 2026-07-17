@@ -13,6 +13,11 @@ import {
   SAVED_LISTINGS_EVENT
 } from "@/lib/saved-listings";
 
+import {
+  getSavedOutings,
+  SAVED_OUTINGS_EVENT
+} from "@/lib/saved-outings";
+
 const items = [
   {
     href: "/",
@@ -52,8 +57,15 @@ export function BottomNav() {
 
   useEffect(() => {
     function refreshSavedCount() {
+      const savedListings =
+        getSavedListingReferences().length;
+
+      const savedOutings =
+        getSavedOutings().length;
+
       setSavedCount(
-        getSavedListingReferences().length
+        savedListings +
+        savedOutings
       );
     }
 
@@ -65,6 +77,11 @@ export function BottomNav() {
     );
 
     window.addEventListener(
+      SAVED_OUTINGS_EVENT,
+      refreshSavedCount
+    );
+
+    window.addEventListener(
       "storage",
       refreshSavedCount
     );
@@ -72,6 +89,11 @@ export function BottomNav() {
     return () => {
       window.removeEventListener(
         SAVED_LISTINGS_EVENT,
+        refreshSavedCount
+      );
+
+      window.removeEventListener(
+        SAVED_OUTINGS_EVENT,
         refreshSavedCount
       );
 
@@ -110,7 +132,9 @@ export function BottomNav() {
             href={item.href}
             key={item.href}
             aria-current={
-              active ? "page" : undefined
+              active
+                ? "page"
+                : undefined
             }
           >
             <span className="nav-icon">
@@ -122,8 +146,8 @@ export function BottomNav() {
                   className="saved-count-badge"
                   aria-label={`${savedCount} saved ${
                     savedCount === 1
-                      ? "listing"
-                      : "listings"
+                      ? "item"
+                      : "items"
                   }`}
                 >
                   {savedCount > 99
@@ -133,7 +157,9 @@ export function BottomNav() {
               ) : null}
             </span>
 
-            <small>{item.label}</small>
+            <small>
+              {item.label}
+            </small>
           </Link>
         );
       })}

@@ -12,9 +12,12 @@ import type {
   BudgetPreference
 } from "@/lib/profile-preferences";
 
-import type {
-  Listing
-} from "@/lib/types";
+import {
+  isOutingSaved,
+  removeSavedOuting,
+  saveOuting,
+  type GeneratedOutingPlan
+} from "@/lib/saved-outings";
 
 const OUTING_DRAFT_KEY =
   "venture:outing-draft:v1";
@@ -34,32 +37,6 @@ type OutingDraft = {
   transportation: string;
   alcoholFree: boolean;
   createdAt: string;
-};
-
-type GeneratedStop = {
-  order: number;
-  startTime: string;
-  endTime: string;
-  durationMinutes: number;
-  travelFromPreviousMinutes: number | null;
-  estimatedCostCad: number | null;
-  reason: string;
-  listing: Listing;
-};
-
-type GeneratedPlan = {
-  planId: string;
-  generatedAt: string;
-  title: string;
-  date: string;
-  requestedStartTime: string;
-  requestedDuration: string;
-  transportation: string;
-  alcoholFree: boolean;
-  estimatedTotalCad: number | null;
-  stops: GeneratedStop[];
-  warnings: string[];
-  candidateCount: number;
 };
 
 type PageStatus =
@@ -94,7 +71,8 @@ function formatPlanDate(
       month: "long",
       day: "numeric",
       year: "numeric",
-      timeZone: "America/Winnipeg"
+      timeZone:
+        "America/Winnipeg"
     }
   ).format(
     new Date(
@@ -129,25 +107,55 @@ function formatCost(
   ).format(value);
 }
 
+function buildShareText(
+  plan: GeneratedOutingPlan
+): string {
+  const stopLines =
+    plan.stops.map(
+      (stop) =>
+        `${stop.order}. ${stop.startTime}–${stop.endTime}: ${stop.listing.name}`
+    );
+
+  return [
+    plan.title,
+    formatPlanDate(plan.date),
+    "",
+    ...stopLines,
+    "",
+    "Built with Venture Winnipeg"
+  ].join("\n");
+}
+
 export default function OutingResultsPage() {
   const [
     status,
     setStatus
-  ] = useState<PageStatus>(
-    "loading"
-  );
+  ] =
+    useState<PageStatus>(
+      "loading"
+    );
 
   const [
     plan,
     setPlan
   ] =
-    useState<GeneratedPlan | null>(
+    useState<GeneratedOutingPlan | null>(
       null
     );
 
   const [
     errorMessage,
     setErrorMessage
+  ] = useState("");
+
+  const [
+    saved,
+    setSaved
+  ] = useState(false);
+
+  const [
+    actionMessage,
+    setActionMessage
   ] = useState("");
 
   const generateOuting =
@@ -182,6 +190,7 @@ export default function OutingResultsPage() {
 
       setStatus("loading");
       setErrorMessage("");
+      setActionMessage("");
 
       try {
         const response =
@@ -204,7 +213,7 @@ export default function OutingResultsPage() {
 
         const result =
           (await response.json()) as
-            | GeneratedPlan
+            | GeneratedOutingPlan
             | {
                 error?: string;
               };
@@ -219,9 +228,15 @@ export default function OutingResultsPage() {
         }
 
         const generatedPlan =
-          result as GeneratedPlan;
+          result as GeneratedOutingPlan;
 
         setPlan(generatedPlan);
+        setSaved(
+          isOutingSaved(
+            generatedPlan.planId
+          )
+        );
+
         setStatus("ready");
 
         window.localStorage.setItem(
@@ -244,6 +259,78 @@ export default function OutingResultsPage() {
   useEffect(() => {
     void generateOuting();
   }, [generateOuting]);
+
+  function handleSaveOuting() {
+    if (!plan) {
+      return;
+    }
+
+    if (saved) {
+      removeSavedOuting(
+        plan.planId
+      );
+
+      setSaved(false);
+      setActionMessage(
+        "Outing removed from Saved."
+      );
+
+      return;
+    }
+
+    saveOuting(plan);
+    setSaved(true);
+
+    setActionMessage(
+      "Outing saved."
+    );
+  }
+
+  async function handleShareOuting() {
+    if (!plan) {
+      return;
+    }
+
+    const shareText =
+      buildShareText(plan);
+
+    try {
+      if (
+        typeof navigator.share ===
+        "function"
+      ) {
+        await navigator.share({
+          title: plan.title,
+          text: shareText
+        });
+
+        setActionMessage(
+          "Outing shared."
+        );
+
+        return;
+      }
+
+      await navigator.clipboard.writeText(
+        shareText
+      );
+
+      setActionMessage(
+        "Outing copied to your clipboard."
+      );
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        error.name === "AbortError"
+      ) {
+        return;
+      }
+
+      setActionMessage(
+        "The outing could not be shared."
+      );
+    }
+  }
 
   return (
     <main className="outing-results-page">
@@ -392,6 +479,50 @@ export default function OutingResultsPage() {
               </strong>
             </div>
           </section>
+
+          <section className="outing-quick-actions">
+            <button
+              className={
+                saved
+                  ? "saved"
+                  : ""
+              }
+              type="button"
+              onClick={
+                handleSaveOuting
+              }
+            >
+              <span aria-hidden="true">
+                {saved ? "♥" : "♡"}
+              </span>
+
+              {saved
+                ? "Saved"
+                : "Save outing"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                void handleShareOuting();
+              }}
+            >
+              <span aria-hidden="true">
+                ↗
+              </span>
+
+              Share outing
+            </button>
+          </section>
+
+          {actionMessage ? (
+            <p
+              className="outing-action-message"
+              role="status"
+            >
+              {actionMessage}
+            </p>
+          ) : null}
 
           {plan.warnings.length >
           0 ? (
