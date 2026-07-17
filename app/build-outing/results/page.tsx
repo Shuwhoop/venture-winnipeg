@@ -5,7 +5,9 @@ import {
   useEffect,
   useState
 } from "react";
-
+import {
+  OutingRouteMap
+} from "@/components/outing-route-map";
 import Link from "next/link";
 
 import type {
@@ -515,17 +517,20 @@ export default function OutingResultsPage() {
             </button>
           </section>
 
-          {actionMessage ? (
+            {actionMessage ? (
             <p
-              className="outing-action-message"
-              role="status"
+                className="outing-action-message"
+                role="status"
             >
-              {actionMessage}
+                {actionMessage}
             </p>
-          ) : null}
+            ) : null}
 
-          {plan.warnings.length >
-          0 ? (
+            <OutingRouteMap
+            plan={plan}
+            />
+
+            {plan.warnings.length > 0 ? (
             <section className="outing-warning-list">
               {plan.warnings.map(
                 (warning) => (
