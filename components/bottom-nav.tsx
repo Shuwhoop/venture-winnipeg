@@ -17,28 +17,28 @@ const items = [
   {
     href: "/",
     label: "Home",
-    icon: "⌂"
+    icon: "\u2302"
   },
   {
     href: "/explore",
     label: "Explore",
-    icon: "⌕"
+    icon: "\u2315"
   },
   {
-    href: "/tonight",
-    label: "Tonight",
-    icon: "✦",
+    href: "/build-outing",
+    label: "Build",
+    icon: "\u2726",
     special: true
   },
   {
     href: "/saved",
     label: "Saved",
-    icon: "♡"
+    icon: "\u2661"
   },
   {
     href: "/profile",
     label: "Profile",
-    icon: "◉"
+    icon: "\u25C9"
   }
 ];
 
