@@ -242,3 +242,105 @@
     padding: 19px;
   }
 }
+
+
+/* VENTURE SUBMIT POLISH 2026-07-18 */
+.page {
+  container-type: inline-size;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.page,
+.page * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.hero h1 {
+  max-width: 100%;
+  font-size: clamp(2.25rem, 12cqw, 3.35rem) !important;
+  line-height: 0.96 !important;
+  letter-spacing: -0.052em !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+}
+
+.page h2,
+.page h3,
+.page button,
+.page strong {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.page p,
+.page small,
+.page label,
+.page a,
+.page dd,
+.page textarea {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.page input,
+.page select,
+.page textarea,
+.page button {
+  width: 100%;
+  max-width: 100%;
+}
+
+@container (max-width: 390px) {
+  .hero h1 {
+    font-size: clamp(2.1rem, 11.4cqw, 3rem) !important;
+  }
+}
+
+
+/* VENTURE SUBMIT CHECKBOX FIX 2026-07-18 */
+.page input[type="checkbox"],
+.page input[type="radio"] {
+  width: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  margin: 1px 0 0 !important;
+  padding: 0 !important;
+  flex: 0 0 20px !important;
+  accent-color: #d01013;
+  cursor: pointer;
+}
+
+.page label:has(input[type="checkbox"]),
+.page label:has(input[type="radio"]) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  text-align: left !important;
+  cursor: pointer;
+}
+
+.page label:has(input[type="checkbox"]) > *,
+.page label:has(input[type="radio"]) > * {
+  min-width: 0;
+}
+
+.page label:has(input[type="checkbox"]) span,
+.page label:has(input[type="radio"]) span {
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}

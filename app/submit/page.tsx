@@ -598,7 +598,7 @@ export default function SubmitListingPage() {
                 }
               >
                 <span>
-                  Official website
+                  Official website (optional)
                 </span>
 
                 <input
@@ -973,7 +973,6 @@ export default function SubmitListingPage() {
                 </span>
 
                 <input
-                  required
                   type="url"
                   maxLength={
                     500

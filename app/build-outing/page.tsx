@@ -1,5 +1,7 @@
 "use client";
 
+import SubmitListingEntry from "@/components/submit-listing-entry/submit-listing-entry";
+
 import {
   useEffect,
   useMemo,
@@ -1112,6 +1114,8 @@ export default function BuildOutingPage() {
           </span>
         </button>
       </div>
+    
+      <SubmitListingEntry placement="home" />
     </main>
   );
 }

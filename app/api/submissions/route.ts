@@ -301,10 +301,9 @@ function parseEvent(
     );
 
   const ticketUrl =
-    requiredText(
-      value.ticketUrl,
-      500
-    );
+    typeof value.ticketUrl === "string"
+      ? value.ticketUrl.trim()
+      : "";
 
   const organizerWebsite =
     optionalText(
@@ -626,8 +625,7 @@ export async function POST(
 
           payload,
 
-          source_url:
-            sourceUrl,
+          source_url: sourceUrl || null,
 
           submitter_notes:
             optionalText(
