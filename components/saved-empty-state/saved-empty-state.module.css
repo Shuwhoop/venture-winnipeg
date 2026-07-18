@@ -1,0 +1,414 @@
+.page {
+  container-type: inline-size;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: calc(100dvh - 154px);
+  max-width: 100%;
+  padding: 24px 15px 118px;
+  overflow: hidden;
+  color: #241f20;
+}
+
+.page,
+.page * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.card {
+  display: grid;
+  justify-items: center;
+  width: min(100%, 390px);
+  max-width: 100%;
+  margin: auto;
+  text-align: center;
+}
+
+.activityOrbit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(76cqw, 280px);
+  height: min(76cqw, 280px);
+  max-width: 280px;
+  max-height: 280px;
+  min-width: 220px;
+  min-height: 220px;
+  isolation: isolate;
+}
+
+.activityOrbit::before,
+.activityOrbit::after {
+  position: absolute;
+  content: "";
+  border: 1.5px dashed
+    rgba(36, 31, 32, 0.22);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.activityOrbit::before {
+  inset: 24px;
+  animation:
+    slowSpin 24s linear infinite;
+}
+
+.activityOrbit::after {
+  inset: 54px;
+  border-style: solid;
+  border-color:
+    rgba(237, 178, 0, 0.28);
+  animation:
+    reverseSpin 18s linear infinite;
+}
+
+.heart {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border: 3px solid #241f20;
+  border-radius: 23px;
+  background: #ffcf00;
+  box-shadow:
+    5px 6px 0
+    rgba(36, 31, 32, 0.17);
+  animation:
+    heartBreathe 2.8s
+    ease-in-out infinite;
+}
+
+.heart span {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.activity {
+  --float-distance: 6px;
+
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #241f20;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    3px 4px 0
+    rgba(36, 31, 32, 0.14);
+  font-size: 1.12rem;
+  line-height: 1;
+  animation:
+    activityFloat 3.5s
+    ease-in-out infinite;
+  animation-delay:
+    calc(
+      var(--activity-index) *
+      -0.32s
+    );
+}
+
+.music {
+  top: 7%;
+  left: 24%;
+  rotate: -7deg;
+}
+
+.food {
+  top: 15%;
+  right: 10%;
+  rotate: 8deg;
+}
+
+.bowling {
+  top: 43%;
+  right: 0;
+  rotate: -4deg;
+}
+
+.sports {
+  right: 12%;
+  bottom: 10%;
+  rotate: 7deg;
+}
+
+.arts {
+  bottom: 2%;
+  left: 38%;
+  rotate: -6deg;
+}
+
+.outdoors {
+  bottom: 13%;
+  left: 8%;
+  rotate: 5deg;
+}
+
+.shows {
+  top: 43%;
+  left: 0;
+  rotate: -7deg;
+}
+
+.games {
+  top: 12%;
+  left: 7%;
+  rotate: 6deg;
+}
+
+.spark {
+  position: absolute;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #d01013;
+  border-radius: 999px;
+  background: #ffcf00;
+  animation:
+    sparkPop 2.6s
+    ease-in-out infinite;
+}
+
+.sparkOne {
+  top: 31%;
+  left: 27%;
+}
+
+.sparkTwo {
+  right: 27%;
+  bottom: 31%;
+  animation-delay: -0.8s;
+}
+
+.sparkThree {
+  right: 24%;
+  top: 36%;
+  animation-delay: -1.6s;
+}
+
+.copy {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  margin-top: -6px;
+}
+
+.eyebrow {
+  color: #d01013;
+  font-size: 0.61rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.copy h1 {
+  max-width: 100%;
+  margin: 8px 0 0;
+  font-size: clamp(
+    2rem,
+    9cqw,
+    2.65rem
+  );
+  line-height: 0.98;
+  letter-spacing: -0.052em;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.copy p {
+  max-width: 320px;
+  margin: 12px 0 0;
+  color: #6b6162;
+  font-size: 0.91rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: grid;
+  width: min(100%, 270px);
+  gap: 11px;
+  margin-top: 22px;
+}
+
+.primary,
+.secondary {
+  display: flex;
+  align-items: center;
+  justify-content:
+    space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  max-width: 100%;
+  padding: 11px 14px;
+  border: 2px solid #241f20;
+  border-radius: 14px;
+  font-size: 0.87rem;
+  font-weight: 900;
+  line-height: 1.15;
+  text-align: left;
+  text-decoration: none;
+  overflow-wrap: normal;
+  word-break: normal;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.primary {
+  background: #d01013;
+  color: #ffffff;
+  box-shadow:
+    4px 4px 0 #edb200;
+}
+
+.secondary {
+  background: #ffffff;
+  color: #241f20;
+  box-shadow:
+    4px 4px 0
+    rgba(36, 31, 32, 0.14);
+}
+
+.primary:hover,
+.secondary:hover {
+  transform:
+    translateY(-2px);
+}
+
+.primary:active,
+.secondary:active {
+  transform:
+    translateY(1px);
+  box-shadow:
+    1px 1px 0
+    rgba(36, 31, 32, 0.25);
+}
+
+.primary span,
+.secondary span {
+  flex: 0 0 auto;
+  font-size: 1rem;
+}
+
+.tip {
+  max-width: 280px;
+  margin: 17px 0 0;
+  color: #887d7e;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+@keyframes activityFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate:
+      0
+      calc(
+        var(--float-distance) *
+        -1
+      );
+  }
+}
+
+@keyframes heartBreathe {
+  0%,
+  100% {
+    transform:
+      scale(1)
+      rotate(-1deg);
+  }
+
+  50% {
+    transform:
+      scale(1.055)
+      rotate(1deg);
+  }
+}
+
+@keyframes sparkPop {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform:
+      scale(0.75);
+  }
+
+  50% {
+    opacity: 1;
+    transform:
+      scale(1.18);
+  }
+}
+
+@keyframes slowSpin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+@keyframes reverseSpin {
+  to {
+    transform:
+      rotate(-360deg);
+  }
+}
+
+@container (max-width: 350px) {
+  .page {
+    padding-inline: 10px;
+  }
+
+  .activityOrbit {
+    width: 220px;
+    height: 220px;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .activity {
+    width: 37px;
+    height: 37px;
+    border-radius: 12px;
+    font-size: 1rem;
+  }
+
+  .heart {
+    width: 68px;
+    height: 68px;
+  }
+
+  .copy h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .activity,
+  .heart,
+  .spark,
+  .activityOrbit::before,
+  .activityOrbit::after {
+    animation: none;
+  }
+
+  .primary,
+  .secondary {
+    transition: none;
+  }
+}

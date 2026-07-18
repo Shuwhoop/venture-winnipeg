@@ -19,3 +19,5 @@ data/overture-winnipeg-places.geojson
 data/overture-winnipeg-places.geojson.state
 
 *.before-auth.bak
+
+*.bak
