@@ -2,6 +2,8 @@ import {
   redirect
 } from "next/navigation";
 
+import Link from "next/link";
+
 import {
   getVentureAdmin
 } from "@/lib/auth/admin";
@@ -20,6 +22,7 @@ export const dynamic =
 type LoginSearchParams = {
   error?: string;
   signedOut?: string;
+  passwordUpdated?: string;
 };
 
 
@@ -27,17 +30,38 @@ function getMessage(
   error:
     string | undefined,
   signedOut:
+    string | undefined,
+  passwordUpdated:
     string | undefined
-) {
+): {
+  tone:
+    "error" | "success";
+  text:
+    string;
+} | null {
+  if (
+    passwordUpdated ===
+    "1"
+  ) {
+    return {
+      tone:
+        "success",
+
+      text:
+        "Your password was updated. Sign in with the new password."
+    };
+  }
+
   if (
     signedOut === "1"
   ) {
     return {
       tone:
         "success",
+
       text:
         "You have been signed out."
-    } as const;
+    };
   }
 
   if (
@@ -46,9 +70,10 @@ function getMessage(
     return {
       tone:
         "error",
+
       text:
         "Sign in with an authorized Venture administrator account."
-    } as const;
+    };
   }
 
   if (
@@ -57,9 +82,10 @@ function getMessage(
     return {
       tone:
         "error",
+
       text:
         "That account is not authorized to manage Venture."
-    } as const;
+    };
   }
 
   if (
@@ -68,9 +94,10 @@ function getMessage(
     return {
       tone:
         "error",
+
       text:
         "The email or password was not accepted."
-    } as const;
+    };
   }
 
   return null;
@@ -98,7 +125,8 @@ export default async function AdminLoginPage({
   const message =
     getMessage(
       parameters.error,
-      parameters.signedOut
+      parameters.signedOut,
+      parameters.passwordUpdated
     );
 
   return (
@@ -184,6 +212,15 @@ export default async function AdminLoginPage({
               type="password"
             />
           </label>
+
+          <Link
+            className={
+              styles.forgot
+            }
+            href="/admin/forgot-password"
+          >
+            Forgot your password?
+          </Link>
 
           <button
             type="submit"

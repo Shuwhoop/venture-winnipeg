@@ -117,6 +117,14 @@
   border-color: #241f20;
 }
 
+.forgot {
+  width: fit-content;
+  margin-top: -7px;
+  color: #8a1114;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
 .form button {
   min-height: 50px;
   margin-top: 3px;

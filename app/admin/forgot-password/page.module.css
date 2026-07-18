@@ -1,0 +1,135 @@
+.page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 22px;
+  background:
+    radial-gradient(
+      circle at 12% 10%,
+      rgba(255, 207, 0, 0.44),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 88%,
+      rgba(208, 16, 19, 0.12),
+      transparent 31%
+    ),
+    #fffaf2;
+  color: #241f20;
+}
+
+.card {
+  width: min(500px, 100%);
+  box-sizing: border-box;
+  padding: 34px;
+  border: 2px solid #241f20;
+  border-radius: 27px;
+  background: #ffffff;
+  box-shadow: 7px 7px 0 #edb200;
+}
+
+.eyebrow {
+  color: #d01013;
+  font-size: 0.69rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.card h1 {
+  margin: 8px 0 0;
+  font-size: clamp(
+    2.2rem,
+    8vw,
+    4rem
+  );
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.intro {
+  margin: 15px 0 0;
+  color: #665d5e;
+  line-height: 1.6;
+}
+
+.form {
+  display: grid;
+  gap: 17px;
+  margin-top: 25px;
+}
+
+.form label {
+  display: grid;
+  gap: 7px;
+}
+
+.form label > span {
+  color: #5d5354;
+  font-size: 0.73rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 49px;
+  padding: 11px 13px;
+  border: 1.5px solid #bdb1aa;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #241f20;
+  font: inherit;
+}
+
+.form input:focus {
+  outline: 3px solid
+    rgba(255, 207, 0, 0.44);
+  border-color: #241f20;
+}
+
+.form button {
+  min-height: 50px;
+  border: 2px solid #241f20;
+  border-radius: 14px;
+  background: #d01013;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #edb200;
+}
+
+.form button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.message {
+  margin: 18px 0 0;
+  padding: 13px 14px;
+  border-radius: 13px;
+  background: #fff3bd;
+  color: #5b4906;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.back {
+  display: inline-block;
+  margin-top: 19px;
+  color: #8a1114;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
