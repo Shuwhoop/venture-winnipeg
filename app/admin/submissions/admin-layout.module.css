@@ -2,64 +2,96 @@
   position: sticky;
   z-index: 50;
   top: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 10px max(
-    16px,
-    calc((100% - 1120px) / 2)
-  );
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
   border-bottom: 2px solid #241f20;
   background:
-    rgba(255, 250, 242, 0.96);
+    rgba(255, 250, 242, 0.98);
   color: #241f20;
   backdrop-filter: blur(12px);
 }
 
-.bar > div {
+.identity {
   display: grid;
-  gap: 1px;
+  min-width: 0;
+  gap: 2px;
 }
 
-.bar span {
+.identity span {
   color: #d01013;
-  font-size: 0.61rem;
+  font-size: 0.58rem;
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
 }
 
-.bar strong {
-  font-size: 0.82rem;
+.identity strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
 }
 
-.bar button {
-  min-height: 36px;
-  padding: 7px 13px;
+.navigation {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  min-width: 0;
+}
+
+.navigation a,
+.logout button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 38px;
+  box-sizing: border-box;
+  padding: 7px 8px;
   border: 2px solid #241f20;
   border-radius: 11px;
   background: #ffffff;
   color: #241f20;
   font: inherit;
-  font-size: 0.76rem;
+  font-size: 0.69rem;
   font-weight: 900;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: normal;
+}
+
+.navigation a:hover,
+.logout button:hover {
+  background: #ffcf00;
+}
+
+.logout {
+  margin: 0;
+}
+
+.logout button {
+  min-width: 72px;
   cursor: pointer;
 }
 
-@media (max-width: 600px) {
-  .bar {
-    padding:
-      9px 12px;
+@media (max-width: 370px) {
+  .navigation {
+    grid-template-columns: 1fr;
   }
 
-  .bar span {
-    display: none;
-  }
-
-  .bar strong {
-    max-width: 210px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .navigation a {
+    width: 100%;
   }
 }

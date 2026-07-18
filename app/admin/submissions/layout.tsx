@@ -1,6 +1,4 @@
-import type {
-  ReactNode
-} from "react";
+import Link from "next/link";
 
 import {
   requireVentureAdmin
@@ -21,19 +19,23 @@ export default async function SubmissionAdminLayout({
   children
 }: {
   children:
-    ReactNode;
+    React.ReactNode;
 }) {
   const admin =
     await requireVentureAdmin();
 
   return (
     <>
-      <div
+      <header
         className={
           styles.bar
         }
       >
-        <div>
+        <div
+          className={
+            styles.identity
+          }
+        >
           <span>
             SECURE ADMIN SESSION
           </span>
@@ -43,9 +45,37 @@ export default async function SubmissionAdminLayout({
           </strong>
         </div>
 
+        <nav
+          aria-label="Admin navigation"
+          className={
+            styles.navigation
+          }
+        >
+          <Link
+            href="/admin/submissions"
+          >
+            Review queue
+          </Link>
+
+          <Link
+            href="/admin/submissions/history"
+          >
+            History
+          </Link>
+
+          <Link
+            href="/submit"
+          >
+            Public form
+          </Link>
+        </nav>
+
         <form
           action={
             logoutAdmin
+          }
+          className={
+            styles.logout
           }
         >
           <button
@@ -54,7 +84,7 @@ export default async function SubmissionAdminLayout({
             Log out
           </button>
         </form>
-      </div>
+      </header>
 
       {children}
     </>
