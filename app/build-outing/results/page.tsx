@@ -28,6 +28,9 @@ const GENERATED_OUTING_KEY =
   "venture:generated-outing:v1";
 
 type OutingDraft = {
+  planningMode:
+    | "solo"
+    | "group";
   outingTypeId: string;
   outingTypeTitle: string;
   date: string;
@@ -40,7 +43,6 @@ type OutingDraft = {
   alcoholFree: boolean;
   createdAt: string;
 };
-
 type PageStatus =
   | "loading"
   | "ready"
@@ -289,51 +291,138 @@ export default function OutingResultsPage() {
   }
 
   async function handleShareOuting() {
-    if (!plan) {
-      return;
+  if (!plan) {
+    return;
+  }
+
+  const storedDraft =
+    window.localStorage.getItem(
+      OUTING_DRAFT_KEY
+    );
+
+  if (!storedDraft) {
+    setActionMessage(
+      "The outing setup could not be found."
+    );
+
+    return;
+  }
+
+  let draft: OutingDraft;
+
+  try {
+    draft =
+      JSON.parse(
+        storedDraft
+      ) as OutingDraft;
+  } catch {
+    setActionMessage(
+      "The outing setup could not be read."
+    );
+
+    return;
+  }
+
+  setActionMessage(
+    "Creating your share link..."
+  );
+
+  try {
+    const response =
+      await fetch(
+        "/api/outings/share",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              draft,
+              plan
+            })
+        }
+      );
+
+    const responseText =
+      await response.text();
+
+    let result: {
+      shareUrl?: string;
+      shareCode?: string;
+      error?: string;
+    };
+
+    try {
+      result =
+        JSON.parse(responseText);
+    } catch {
+      throw new Error(
+        `Share request failed with status ${response.status}.`
+      );
+    }
+
+    if (
+      !response.ok ||
+      !result.shareUrl
+    ) {
+      throw new Error(
+        result.error ||
+        "The share link could not be created."
+      );
     }
 
     const shareText =
       buildShareText(plan);
 
-    try {
-      if (
-        typeof navigator.share ===
-        "function"
-      ) {
-        await navigator.share({
-          title: plan.title,
-          text: shareText
-        });
+    if (
+      typeof navigator.share ===
+      "function"
+    ) {
+      await navigator.share({
+        title:
+          plan.title,
 
-        setActionMessage(
-          "Outing shared."
-        );
+        text:
+          shareText,
 
-        return;
-      }
-
-      await navigator.clipboard.writeText(
-        shareText
-      );
+        url:
+          result.shareUrl
+      });
 
       setActionMessage(
-        "Outing copied to your clipboard."
+        "Outing shared."
       );
-    } catch (error) {
-      if (
-        error instanceof DOMException &&
-        error.name === "AbortError"
-      ) {
-        return;
-      }
 
-      setActionMessage(
-        "The outing could not be shared."
-      );
+      return;
     }
-  }
 
+    await navigator.clipboard.writeText(
+      `${shareText}\n\n${result.shareUrl}`
+    );
+
+    setActionMessage(
+      "Share link copied to your clipboard."
+    );
+  } catch (error) {
+    if (
+      error instanceof DOMException &&
+      error.name === "AbortError"
+    ) {
+      setActionMessage("");
+      return;
+    }
+
+    setActionMessage(
+      error instanceof Error
+        ? error.message
+        : "The outing could not be shared."
+    );
+  }
+}
   return (
     <main className="outing-results-page">
       <header className="outing-results-heading">

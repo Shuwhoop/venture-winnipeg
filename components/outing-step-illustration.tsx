@@ -144,4 +144,4 @@ export function OutingStepIllustration({
       ) : null}
     </div>
   );
-}
+}   

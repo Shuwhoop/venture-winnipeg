@@ -83,40 +83,28 @@ export default async function HomePage() {
 
   return (
     <>
-      <section
-        className="mode-switcher"
-        aria-label="Discovery mode"
-      >
-        <Link href="/explore?filter=events">
-          Events
-        </Link>
+<Link
+  className="search-button venture-simple-search"
+  href="/explore"
+  aria-label="Search Winnipeg"
+>
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 24 24"
+  >
+    <circle
+      cx="11"
+      cy="11"
+      r="6"
+    />
 
-        <Link href="/explore?filter=food">
-          Food
-        </Link>
+    <path d="M16 16L21 21" />
+  </svg>
 
-        <Link
-          className="active"
-          href="/explore"
-        >
-          Both
-        </Link>
-      </section>
-
-      <Link
-        className="search-button"
-        href="/explore"
-      >
-        <span aria-hidden="true">
-          {"\u2315"}
-        </span>
-
-        <span>
-          Search events, restaurants,
-          venues, or neighbourhoods
-          {"\u2026"}
-        </span>
-      </Link>
+  <span>
+    Search Winnipeg
+  </span>
+</Link>
 
       <div
         className="chips"

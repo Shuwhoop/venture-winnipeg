@@ -1,19 +1,41 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import {
+  createBrowserClient
+} from "@supabase/ssr";
 
-let browserClient: SupabaseClient | null = null;
+import type {
+  SupabaseClient
+} from "@supabase/supabase-js";
 
-export function getSupabaseBrowserClient(): SupabaseClient {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+let browserClient:
+  SupabaseClient | null =
+  null;
+
+
+export function getSupabaseBrowserClient():
+  SupabaseClient {
+  const url =
+    process.env
+      .NEXT_PUBLIC_SUPABASE_URL;
+
   const publishableKey =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    process.env
+      .NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!url || !publishableKey) {
+  if (
+    !url ||
+    !publishableKey
+  ) {
     throw new Error(
       "Supabase public environment variables are not configured."
     );
   }
 
-  browserClient ??= createClient(url, publishableKey);
+  browserClient ??=
+    createBrowserClient(
+      url,
+      publishableKey
+    );
 
   return browserClient;
 }

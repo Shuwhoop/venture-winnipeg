@@ -11,3 +11,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .vercel
+
+supabase/.temp/
+
+data/overture-winnipeg-places.geojson
+
+data/overture-winnipeg-places.geojson.state
+
+*.before-auth.bak

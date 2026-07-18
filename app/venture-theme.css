@@ -2452,4 +2452,61 @@ h4,
   .venture-night-animation * {
     animation: none !important;
   }
+}/* Simplified homepage search */
+
+.venture-simple-search {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  width: 100%;
+  min-height: 52px;
+  margin-top: 18px;
+  padding: 0 16px;
+
+  border:
+    2px solid
+    var(--venture-line-dark);
+
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  color:
+    var(--venture-ink);
+
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  box-shadow: none;
+}
+
+.venture-simple-search svg {
+  width: 21px;
+  height: 21px;
+  flex-shrink: 0;
+
+  fill: none;
+
+  stroke:
+    var(--venture-ink);
+
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.venture-simple-search span {
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.venture-simple-search:hover {
+  border-color:
+    var(--venture-red);
+
+  background:
+    var(--venture-cream);
 }

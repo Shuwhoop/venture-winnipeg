@@ -1,0 +1,385 @@
+{
+  "version": 1,
+  "checkedAt": "2026-07-17T18:00:00.000Z",
+  "restaurants": [
+    {
+      "slug": "clementine-cafe",
+      "placeType": "cafe",
+      "name": "Clementine",
+      "shortDescription": "Creative brunch and lunch in Winnipeg's Exchange District.",
+      "fullDescription": "A downtown brunch restaurant serving inventive breakfast and lunch dishes in a relaxed basement dining room.",
+      "primaryCategory": "Brunch",
+      "secondaryCategories": [
+        "Breakfast",
+        "Lunch",
+        "Cafe"
+      ],
+      "tags": [
+        "brunch",
+        "breakfast",
+        "lunch",
+        "exchange district",
+        "date night",
+        "friends",
+        "solo outing"
+      ],
+      "addressLine1": "123 Princess Street",
+      "addressLine2": null,
+      "city": "Winnipeg",
+      "province": "Manitoba",
+      "postalCode": "R3B 1K8",
+      "neighbourhood": "Exchange District",
+      "latitude": 49.89901,
+      "longitude": -97.14153,
+      "officialPhone": "204-942-9497",
+      "officialEmail": null,
+      "officialWebsite": "https://clementinewinnipeg.com/",
+      "menuUrl": "https://clementinewinnipeg.com/",
+      "reservationUrl": null,
+      "priceLevel": 2,
+      "cuisinePrimary": "Contemporary brunch",
+      "cuisineSecondary": [
+        "Canadian",
+        "Mediterranean-inspired"
+      ],
+      "weeklyHours": {
+        "monday": {
+          "open": "09:00",
+          "close": "14:00"
+        },
+        "tuesday": {
+          "open": "09:00",
+          "close": "14:00"
+        },
+        "wednesday": {
+          "open": "09:00",
+          "close": "14:00"
+        },
+        "thursday": {
+          "open": "09:00",
+          "close": "14:00"
+        },
+        "friday": {
+          "open": "09:00",
+          "close": "14:00"
+        },
+        "saturday": {
+          "open": "09:00",
+          "close": "14:00"
+        },
+        "sunday": {
+          "open": "09:00",
+          "close": "14:00"
+        }
+      },
+      "takeoutAvailable": true,
+      "deliveryAvailable": null,
+      "dietaryOptions": [
+        "vegetarian options",
+        "vegan options",
+        "gluten-free options"
+      ],
+      "atmosphereTags": [
+        "casual",
+        "busy",
+        "brunch",
+        "downtown"
+      ],
+      "goodFor": [
+        "brunch",
+        "friends",
+        "solo",
+        "date"
+      ],
+      "accessibilityNotes": "Guests needing accessibility assistance are encouraged to call when they arrive.",
+      "parkingNotes": "Street and paid downtown parking may be available nearby.",
+      "transitNotes": "Located in the Exchange District near several downtown transit routes.",
+      "warningMessage": null,
+      "sources": [
+        {
+          "name": "Clementine official website",
+          "sourceType": "official_website",
+          "baseUrl": "https://clementinewinnipeg.com",
+          "sourceUrl": "https://clementinewinnipeg.com/",
+          "rightsBasis": "link_only",
+          "termsUrl": null,
+          "attributionText": "Clementine",
+          "isPrimary": true,
+          "fieldCoverage": {
+            "identity": true,
+            "address": true,
+            "phone": true,
+            "hours": true,
+            "menu": true,
+            "accessibility": true
+          },
+          "legalNotes": "Only factual listing information and links are stored."
+        },
+        {
+          "name": "OpenStreetMap contributors",
+          "sourceType": "open_data",
+          "baseUrl": "https://www.openstreetmap.org",
+          "sourceUrl": "https://www.openstreetmap.org/node/5402811587",
+          "rightsBasis": "open_licence",
+          "termsUrl": "https://www.openstreetmap.org/copyright",
+          "attributionText": "© OpenStreetMap contributors",
+          "isPrimary": false,
+          "fieldCoverage": {
+            "coordinates": true
+          },
+          "legalNotes": "Coordinate attribution retained under OpenStreetMap licensing."
+        }
+      ]
+    },
+    {
+      "slug": "deer-and-almond",
+      "placeType": "fine_dining",
+      "name": "Deer + Almond",
+      "shortDescription": "Creative tasting menus and contemporary Canadian dining in the Exchange District.",
+      "fullDescription": "An intimate Winnipeg restaurant centred on inventive tasting menus, seasonal ingredients, and special-occasion dining.",
+      "primaryCategory": "Fine dining",
+      "secondaryCategories": [
+        "Tasting menu",
+        "Contemporary Canadian"
+      ],
+      "tags": [
+        "fine dining",
+        "tasting menu",
+        "date night",
+        "special occasion",
+        "exchange district",
+        "reservations"
+      ],
+      "addressLine1": "85 Princess Street",
+      "addressLine2": null,
+      "city": "Winnipeg",
+      "province": "Manitoba",
+      "postalCode": "R3B 1K6",
+      "neighbourhood": "Exchange District",
+      "latitude": 49.89784,
+      "longitude": -97.14244,
+      "officialPhone": "204-504-8562",
+      "officialEmail": "dnaeventsandbookings@gmail.com",
+      "officialWebsite": "https://www.deerandalmond.com/",
+      "menuUrl": "https://www.deerandalmond.com/food-drink",
+      "reservationUrl": "https://www.deerandalmond.com/",
+      "priceLevel": 4,
+      "cuisinePrimary": "Contemporary Canadian",
+      "cuisineSecondary": [
+        "Seasonal",
+        "Tasting menu"
+      ],
+      "weeklyHours": {
+        "monday": {
+          "closed": true
+        },
+        "tuesday": {
+          "open": "17:00",
+          "close": "23:00"
+        },
+        "wednesday": {
+          "open": "17:00",
+          "close": "23:00"
+        },
+        "thursday": {
+          "open": "17:00",
+          "close": "23:00"
+        },
+        "friday": {
+          "open": "17:00",
+          "close": "23:00"
+        },
+        "saturday": {
+          "open": "17:00",
+          "close": "23:00"
+        },
+        "sunday": {
+          "closed": true
+        }
+      },
+      "takeoutAvailable": false,
+      "deliveryAvailable": false,
+      "dietaryOptions": [
+        "allergy accommodations by request",
+        "dietary accommodations by request"
+      ],
+      "atmosphereTags": [
+        "intimate",
+        "creative",
+        "upscale",
+        "date night"
+      ],
+      "goodFor": [
+        "date night",
+        "special occasions",
+        "small groups"
+      ],
+      "accessibilityNotes": null,
+      "parkingNotes": "Street and paid parking are available throughout the Exchange District.",
+      "transitNotes": "Located within walking distance of downtown transit routes.",
+      "warningMessage": "The official website describes closing time as late. Venture uses 11:00 PM conservatively for itinerary calculations.",
+      "sources": [
+        {
+          "name": "Deer and Almond official website",
+          "sourceType": "official_website",
+          "baseUrl": "https://www.deerandalmond.com",
+          "sourceUrl": "https://www.deerandalmond.com/",
+          "rightsBasis": "link_only",
+          "termsUrl": null,
+          "attributionText": "Deer + Almond",
+          "isPrimary": true,
+          "fieldCoverage": {
+            "identity": true,
+            "phone": true,
+            "hours": true,
+            "menu": true,
+            "reservations": true,
+            "dietary_accommodations": true
+          },
+          "legalNotes": "Only factual listing information and links are stored."
+        },
+        {
+          "name": "OpenStreetMap contributors",
+          "sourceType": "open_data",
+          "baseUrl": "https://www.openstreetmap.org",
+          "sourceUrl": "https://www.openstreetmap.org/node/2688717954",
+          "rightsBasis": "open_licence",
+          "termsUrl": "https://www.openstreetmap.org/copyright",
+          "attributionText": "© OpenStreetMap contributors",
+          "isPrimary": false,
+          "fieldCoverage": {
+            "address": true,
+            "coordinates": true
+          },
+          "legalNotes": "Coordinate attribution retained under OpenStreetMap licensing."
+        }
+      ]
+    },
+    {
+      "slug": "bmc-market-osborne",
+      "placeType": "fast_casual",
+      "name": "BMC Market Osborne",
+      "shortDescription": "Affordable Mexican tacos and quesadillas in South Osborne.",
+      "fullDescription": "A casual neighbourhood taqueria known for handmade-style tacos, quesadillas, Mexican drinks, and budget-friendly meals.",
+      "primaryCategory": "Mexican",
+      "secondaryCategories": [
+        "Tacos",
+        "Quick bites"
+      ],
+      "tags": [
+        "mexican",
+        "tacos",
+        "quesadillas",
+        "budget",
+        "south osborne",
+        "takeout",
+        "family friendly"
+      ],
+      "addressLine1": "722 Osborne Street",
+      "addressLine2": null,
+      "city": "Winnipeg",
+      "province": "Manitoba",
+      "postalCode": "R3L 2C2",
+      "neighbourhood": "South Osborne",
+      "latitude": 49.86158,
+      "longitude": -97.13113,
+      "officialPhone": "204-415-5192",
+      "officialEmail": "info.bmcmarket@gmail.com",
+      "officialWebsite": "https://bmcmarket.com/",
+      "menuUrl": "https://bmcmarket.com/",
+      "reservationUrl": null,
+      "priceLevel": 1,
+      "cuisinePrimary": "Mexican",
+      "cuisineSecondary": [
+        "Tacos"
+      ],
+      "weeklyHours": {
+        "monday": {
+          "open": "11:30",
+          "close": "19:00"
+        },
+        "tuesday": {
+          "open": "11:30",
+          "close": "19:00"
+        },
+        "wednesday": {
+          "open": "11:30",
+          "close": "19:00"
+        },
+        "thursday": {
+          "open": "11:30",
+          "close": "19:00"
+        },
+        "friday": {
+          "open": "11:30",
+          "close": "19:00"
+        },
+        "saturday": {
+          "open": "11:30",
+          "close": "19:00"
+        },
+        "sunday": {
+          "open": "12:00",
+          "close": "18:00"
+        }
+      },
+      "takeoutAvailable": true,
+      "deliveryAvailable": null,
+      "dietaryOptions": [
+        "vegetarian options"
+      ],
+      "atmosphereTags": [
+        "casual",
+        "affordable",
+        "quick meal",
+        "family friendly"
+      ],
+      "goodFor": [
+        "lunch",
+        "budget outing",
+        "friends",
+        "family",
+        "takeout"
+      ],
+      "accessibilityNotes": null,
+      "parkingNotes": "Street parking is available in the surrounding South Osborne area.",
+      "transitNotes": "Located on Osborne Street along Winnipeg Transit routes.",
+      "warningMessage": "Coordinates were manually checked against the public street address and should be reviewed visually on Venture's map.",
+      "sources": [
+        {
+          "name": "BMC Market official website",
+          "sourceType": "official_website",
+          "baseUrl": "https://bmcmarket.com",
+          "sourceUrl": "https://bmcmarket.com/",
+          "rightsBasis": "link_only",
+          "termsUrl": null,
+          "attributionText": "BMC Market",
+          "isPrimary": true,
+          "fieldCoverage": {
+            "identity": true,
+            "address": true,
+            "phone": true,
+            "email": true,
+            "hours": true,
+            "menu": true
+          },
+          "legalNotes": "Only factual listing information and links are stored."
+        },
+        {
+          "name": "OpenStreetMap contributors",
+          "sourceType": "open_data",
+          "baseUrl": "https://www.openstreetmap.org",
+          "sourceUrl": "https://www.openstreetmap.org/search?query=722%20Osborne%20Street%20Winnipeg",
+          "rightsBasis": "open_licence",
+          "termsUrl": "https://www.openstreetmap.org/copyright",
+          "attributionText": "© OpenStreetMap contributors",
+          "isPrimary": false,
+          "fieldCoverage": {
+            "coordinates": true
+          },
+          "legalNotes": "Coordinates were manually geocoded from the published address."
+        }
+      ]
+    }
+  ]
+}
