@@ -1,4 +1,4 @@
-import {
+﻿import {
   existsSync,
   readFileSync
 } from "node:fs";
@@ -120,7 +120,7 @@ requireText(
     "handleReplaceStop",
     "handleRefreshUnlocked",
     "/api/outings/generate/replace-stop",
-    "Refresh unlocked",
+    "Every stop is locked. Unlock at least one stop first.",
     "outing-stop-controls"
   ]
 );
@@ -179,3 +179,4 @@ if (failed) {
     "\nBuild an Outing intelligence checks passed."
   );
 }
+
