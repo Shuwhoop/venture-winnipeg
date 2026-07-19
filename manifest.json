@@ -1,0 +1,15 @@
+{
+  "name": "Venture by Boogie Bangers Newsletter Foundation",
+  "version": "1.0.0",
+  "reply_to": "venturebangers@gmail.com",
+  "features": [
+    "Venture by Boogie Bangers branding",
+    "public newsletter signup",
+    "Supabase subscriber database",
+    "express consent logging",
+    "warm welcome email",
+    "Prince Malimbiza founder message only in welcome email",
+    "unsubscribe page and one-click endpoint",
+    "Home and Profile newsletter entry points"
+  ]
+}

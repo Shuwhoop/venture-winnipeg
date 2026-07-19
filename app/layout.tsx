@@ -19,7 +19,7 @@ import {
 
 export const metadata: Metadata = {
   title:
-    "Venture | Discover Your City",
+    "Venture by Boogie Bangers | Discover Your City",
 
   description:
     "Find trustworthy events, restaurants, and complete outings across Winnipeg.",
@@ -58,7 +58,7 @@ export default function RootLayout({
             <Link
               className="brand"
               href="/"
-              aria-label="Venture home"
+              aria-label="Venture by Boogie Bangers home"
             >
               <span className="brand-mark">
                 <span>V</span>

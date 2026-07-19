@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Venture",
-    short_name: "Venture",
+    name: "Venture by Boogie Bangers",
+    short_name: "Venture by Boogie Bangers",
     description: "Discover trustworthy events, restaurants, and complete outings in Winnipeg.",
     start_url: "/",
     display: "standalone",

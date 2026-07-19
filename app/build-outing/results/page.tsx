@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useState
 } from "react";
 import {
@@ -27,10 +28,25 @@ const OUTING_DRAFT_KEY =
 const GENERATED_OUTING_KEY =
   "venture:generated-outing:v1";
 
+type StopKind =
+  | "food"
+  | "event"
+  | "drinks";
+
+type StopMix = {
+  food: number;
+  events: number;
+  drinks: number;
+};
+
 type OutingDraft = {
   planningMode:
     | "solo"
     | "group";
+  buildMethod?:
+    | "surprise"
+    | "mix"
+    | "anchor";
   outingTypeId: string;
   outingTypeTitle: string;
   date: string;
@@ -41,8 +57,26 @@ type OutingDraft = {
   budget: BudgetPreference;
   transportation: string;
   alcoholFree: boolean;
+  partySize?: number;
+  maxTravelMinutes?: number;
+  mustIncludeTerms?: string[];
+  avoidTerms?: string[];
+  stopMix?: StopMix;
+  totalStops?: number;
+  allowedKinds?: StopKind[];
+  anchorListingKey?:
+    | string
+    | null;
+  anchorListingName?:
+    | string
+    | null;
+  soloVibe?: string | null;
+  soloPace?: string | null;
+  groupVibe?: string | null;
+  groupPriority?: string | null;
   createdAt: string;
 };
+
 type PageStatus =
   | "loading"
   | "ready"
@@ -130,6 +164,136 @@ function buildShareText(
   ].join("\n");
 }
 
+function getListingSearchText(
+  listing: GeneratedOutingPlan["stops"][number]["listing"]
+): string {
+  return [
+    listing.name,
+    listing.category,
+    listing.subtitle,
+    listing.description,
+    listing.neighbourhood,
+    listing.venueName ?? "",
+    listing.address ?? "",
+    listing.placeType ?? "",
+    ...(listing.searchTerms ?? [])
+  ]
+    .join(" ")
+    .toLowerCase();
+}
+
+function getStopKind(
+  stop:
+    GeneratedOutingPlan["stops"][number]
+): StopKind {
+  if (stop.kind) {
+    return stop.kind;
+  }
+
+  if (
+    stop.listing.type ===
+    "event"
+  ) {
+    return "event";
+  }
+
+  const text =
+    getListingSearchText(
+      stop.listing
+    );
+
+  return (
+    stop.listing.placeType ===
+      "bar_pub" ||
+    stop.listing.placeType ===
+      "brewery" ||
+    [
+      "bar",
+      "pub",
+      "cocktail",
+      "brewery",
+      "nightclub",
+      "nightlife"
+    ].some(
+      (keyword) =>
+        text.includes(keyword)
+    )
+  )
+    ? "drinks"
+    : "food";
+}
+
+function getKindDetails(
+  kind: StopKind
+): {
+  label: string;
+  icon: string;
+} {
+  if (kind === "event") {
+    return {
+      label: "EVENT",
+      icon: "🎟"
+    };
+  }
+
+  if (kind === "drinks") {
+    return {
+      label: "DRINKS",
+      icon: "🍸"
+    };
+  }
+
+  return {
+    label: "FOOD",
+    icon: "🍽"
+  };
+}
+
+function getBuildMethodLabel(
+  method:
+    GeneratedOutingPlan["buildMethod"]
+): string {
+  if (method === "anchor") {
+    return "Built around a starting point";
+  }
+
+  if (method === "mix") {
+    return "Your exact stop mix";
+  }
+
+  return "Venture surprise route";
+}
+
+function formatMixSummary(
+  mix:
+    | StopMix
+    | undefined
+): string {
+  if (!mix) {
+    return "Flexible route";
+  }
+
+  const parts = [
+    mix.food > 0
+      ? `${mix.food} food`
+      : "",
+    mix.events > 0
+      ? `${mix.events} ${
+          mix.events === 1
+            ? "event"
+            : "events"
+        }`
+      : "",
+    mix.drinks > 0
+      ? `${mix.drinks} drinks`
+      : ""
+  ].filter(Boolean);
+
+  return parts.length > 0
+    ? parts.join(" • ")
+    : "Flexible route";
+}
+
 export default function OutingResultsPage() {
   const [
     status,
@@ -162,6 +326,45 @@ export default function OutingResultsPage() {
     setActionMessage
   ] = useState("");
 
+  const [
+    draft,
+    setDraft
+  ] =
+    useState<OutingDraft | null>(
+      null
+    );
+
+  const [
+    lockedOrders,
+    setLockedOrders
+  ] = useState<number[]>([]);
+
+  const [
+    replacingOrder,
+    setReplacingOrder
+  ] =
+    useState<number | null>(
+      null
+    );
+
+  const [
+    refreshingUnlocked,
+    setRefreshingUnlocked
+  ] = useState(false);
+
+  const [
+    excludedListingKeys,
+    setExcludedListingKeys
+  ] = useState<string[]>([]);
+
+  const [
+    addingKind,
+    setAddingKind
+  ] =
+    useState<StopKind | null>(
+      null
+    );
+
   const generateOuting =
     useCallback(async () => {
       const storedDraft =
@@ -175,10 +378,10 @@ export default function OutingResultsPage() {
         return;
       }
 
-      let draft: OutingDraft;
+      let parsedDraft: OutingDraft;
 
       try {
-        draft =
+        parsedDraft =
           JSON.parse(
             storedDraft
           ) as OutingDraft;
@@ -191,6 +394,10 @@ export default function OutingResultsPage() {
 
         return;
       }
+
+      setDraft(
+        parsedDraft
+      );
 
       setStatus("loading");
       setErrorMessage("");
@@ -210,7 +417,7 @@ export default function OutingResultsPage() {
 
               body:
                 JSON.stringify(
-                  draft
+                  parsedDraft
                 )
             }
           );
@@ -241,6 +448,12 @@ export default function OutingResultsPage() {
           )
         );
 
+        setLockedOrders([]);
+        setExcludedListingKeys([]);
+        setReplacingOrder(null);
+        setRefreshingUnlocked(false);
+        setAddingKind(null);
+
         setStatus("ready");
 
         window.localStorage.setItem(
@@ -263,6 +476,130 @@ export default function OutingResultsPage() {
   useEffect(() => {
     void generateOuting();
   }, [generateOuting]);
+
+  const partySize =
+    Math.max(
+      1,
+      Math.min(
+        12,
+        draft?.partySize ??
+          1
+      )
+    );
+
+  const maxTravelMinutes =
+    Math.max(
+      5,
+      Math.min(
+        90,
+        draft?.maxTravelMinutes ??
+          20
+      )
+    );
+
+  const preferenceWarnings =
+    useMemo(
+      () => {
+        if (!plan) {
+          return [];
+        }
+
+        const warnings:
+          string[] = [];
+
+        const longLegs =
+          plan.stops.filter(
+            (stop) =>
+              stop
+                .travelFromPreviousMinutes !==
+                null &&
+              stop
+                .travelFromPreviousMinutes >
+                maxTravelMinutes
+          );
+
+        if (
+          longLegs.length >
+          0
+        ) {
+          warnings.push(
+            `${longLegs.length} travel ${
+              longLegs.length === 1
+                ? "leg is"
+                : "legs are"
+            } longer than your ${maxTravelMinutes}-minute comfort limit.`
+          );
+        }
+
+        const mustIncludeTerms =
+          draft
+            ?.mustIncludeTerms ??
+          [];
+
+        if (
+          mustIncludeTerms.length >
+          0
+        ) {
+          const combinedText =
+            plan.stops
+              .map(
+                (stop) =>
+                  getListingSearchText(
+                    stop.listing
+                  )
+              )
+              .join(" ");
+
+          const missingTerms =
+            mustIncludeTerms.filter(
+              (term) =>
+                !combinedText.includes(
+                  term.toLowerCase()
+                )
+            );
+
+          if (
+            missingTerms.length >
+            0
+          ) {
+            warnings.push(
+              `Venture could not confidently include: ${missingTerms.join(", ")}.`
+            );
+          }
+        }
+
+        return warnings;
+      },
+      [
+        draft,
+        maxTravelMinutes,
+        plan
+      ]
+    );
+
+  const allWarnings =
+    useMemo(
+      () =>
+        Array.from(
+          new Set([
+            ...(plan?.warnings ?? []),
+            ...preferenceWarnings
+          ])
+        ),
+      [
+        plan,
+        preferenceWarnings
+      ]
+    );
+
+  const estimatedGroupTotal =
+    plan?.estimatedTotalCad ===
+      null ||
+    plan?.estimatedTotalCad ===
+      undefined
+      ? null
+      : plan.estimatedTotalCad *
+        partySize;
 
   function handleSaveOuting() {
     if (!plan) {
@@ -288,6 +625,411 @@ export default function OutingResultsPage() {
     setActionMessage(
       "Outing saved."
     );
+  }
+
+  function toggleLock(
+    stopOrder: number
+  ) {
+    setLockedOrders(
+      (current) =>
+        current.includes(
+          stopOrder
+        )
+          ? current.filter(
+              (order) =>
+                order !==
+                stopOrder
+            )
+          : [
+              ...current,
+              stopOrder
+            ]
+    );
+  }
+
+  async function requestReplacement(
+    currentPlan:
+      GeneratedOutingPlan,
+    stopOrder: number,
+    exclusions: string[]
+  ): Promise<{
+    plan:
+      GeneratedOutingPlan;
+    previousListingKey:
+      string;
+  }> {
+    if (!draft) {
+      throw new Error(
+        "The outing setup could not be found."
+      );
+    }
+
+    const response =
+      await fetch(
+        "/api/outings/generate/replace-stop",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              draft,
+              plan:
+                currentPlan,
+              stopOrder,
+
+              excludedListingKeys:
+                exclusions
+            })
+        }
+      );
+
+    const result =
+      (await response.json()) as {
+        plan?:
+          GeneratedOutingPlan;
+        previousListingKey?:
+          string;
+        error?: string;
+      };
+
+    if (
+      !response.ok ||
+      !result.plan ||
+      !result.previousListingKey
+    ) {
+      throw new Error(
+        result.error ||
+        "No suitable replacement was found."
+      );
+    }
+
+    return {
+      plan:
+        result.plan,
+
+      previousListingKey:
+        result.previousListingKey
+    };
+  }
+
+  async function handleReplaceStop(
+    stopOrder: number
+  ) {
+    if (
+      !plan ||
+      replacingOrder !==
+        null ||
+      refreshingUnlocked
+    ) {
+      return;
+    }
+
+    setReplacingOrder(
+      stopOrder
+    );
+
+    setActionMessage(
+      `Finding a new option for stop ${stopOrder}...`
+    );
+
+    try {
+      const result =
+        await requestReplacement(
+          plan,
+          stopOrder,
+          excludedListingKeys
+        );
+
+      const updatedExclusions =
+        Array.from(
+          new Set([
+            ...excludedListingKeys,
+            result
+              .previousListingKey
+          ])
+        );
+
+      setPlan(
+        result.plan
+      );
+
+      setExcludedListingKeys(
+        updatedExclusions
+      );
+
+      setSaved(false);
+
+      window.localStorage.setItem(
+        GENERATED_OUTING_KEY,
+        JSON.stringify(
+          result.plan
+        )
+      );
+
+      setActionMessage(
+        `Stop ${stopOrder} was replaced.`
+      );
+    } catch (error) {
+      setActionMessage(
+        error instanceof Error
+          ? error.message
+          : "The stop could not be replaced."
+      );
+    } finally {
+      setReplacingOrder(
+        null
+      );
+    }
+  }
+
+  async function handleRefreshUnlocked() {
+    if (
+      !plan ||
+      !draft ||
+      refreshingUnlocked ||
+      replacingOrder !==
+        null
+    ) {
+      return;
+    }
+
+    const unlockedOrders =
+      plan.stops
+        .map(
+          (stop) =>
+            stop.order
+        )
+        .filter(
+          (order) =>
+            !lockedOrders.includes(
+              order
+            )
+        );
+
+    if (
+      unlockedOrders.length ===
+      0
+    ) {
+      setActionMessage(
+        "Every stop is locked. Unlock at least one stop first."
+      );
+
+      return;
+    }
+
+    setRefreshingUnlocked(
+      true
+    );
+
+    setActionMessage(
+      `Refreshing ${unlockedOrders.length} unlocked ${
+        unlockedOrders.length ===
+        1
+          ? "stop"
+          : "stops"
+      }...`
+    );
+
+    let workingPlan =
+      plan;
+
+    let workingExclusions = [
+      ...excludedListingKeys
+    ];
+
+    let replacedCount =
+      0;
+
+    try {
+      for (
+        const stopOrder
+        of unlockedOrders
+      ) {
+        try {
+          const result =
+            await requestReplacement(
+              workingPlan,
+              stopOrder,
+              workingExclusions
+            );
+
+          workingPlan =
+            result.plan;
+
+          workingExclusions =
+            Array.from(
+              new Set([
+                ...workingExclusions,
+                result
+                  .previousListingKey
+              ])
+            );
+
+          replacedCount += 1;
+        } catch {
+          /*
+           * Keep the current stop when
+           * no trustworthy replacement
+           * fits its exact window.
+           */
+        }
+      }
+
+      if (
+        replacedCount ===
+        0
+      ) {
+        setActionMessage(
+          "No other verified listings fit the unlocked time slots."
+        );
+
+        return;
+      }
+
+      setPlan(
+        workingPlan
+      );
+
+      setExcludedListingKeys(
+        workingExclusions
+      );
+
+      setSaved(false);
+
+      window.localStorage.setItem(
+        GENERATED_OUTING_KEY,
+        JSON.stringify(
+          workingPlan
+        )
+      );
+
+      setActionMessage(
+        `Refreshed ${replacedCount} ${
+          replacedCount === 1
+            ? "stop"
+            : "stops"
+        }.`
+      );
+    } finally {
+      setRefreshingUnlocked(
+        false
+      );
+    }
+  }
+
+  async function handleAddStop(
+    requestedKind: StopKind
+  ) {
+    if (
+      !plan ||
+      !draft ||
+      addingKind !== null ||
+      replacingOrder !== null ||
+      refreshingUnlocked
+    ) {
+      return;
+    }
+
+    if (
+      plan.stops.length >= 5
+    ) {
+      setActionMessage(
+        "This outing already has the current maximum of five stops."
+      );
+      return;
+    }
+
+    setAddingKind(
+      requestedKind
+    );
+
+    setActionMessage(
+      `Finding another ${requestedKind} stop...`
+    );
+
+    try {
+      const response =
+        await fetch(
+          "/api/outings/generate/add-stop",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body:
+              JSON.stringify({
+                draft,
+                plan,
+                requestedKind,
+                excludedListingKeys
+              })
+          }
+        );
+
+      const result =
+        (await response.json()) as {
+          plan?:
+            GeneratedOutingPlan;
+          addedListingKey?:
+            string;
+          error?: string;
+        };
+
+      if (
+        !response.ok ||
+        !result.plan
+      ) {
+        throw new Error(
+          result.error ||
+          `No additional ${requestedKind} stop fits this outing.`
+        );
+      }
+
+      setPlan(
+        result.plan
+      );
+      setSaved(false);
+      setLockedOrders([]);
+
+      if (
+        result.addedListingKey
+      ) {
+        setExcludedListingKeys(
+          (current) =>
+            Array.from(
+              new Set([
+                ...current,
+                result.addedListingKey!
+              ])
+            )
+        );
+      }
+
+      window.localStorage.setItem(
+        GENERATED_OUTING_KEY,
+        JSON.stringify(
+          result.plan
+        )
+      );
+
+      setActionMessage(
+        `Added another ${requestedKind} stop. Stop numbers were refreshed.`
+      );
+    } catch (error) {
+      setActionMessage(
+        error instanceof Error
+          ? error.message
+          : "The stop could not be added."
+      );
+    } finally {
+      setAddingKind(null);
+    }
   }
 
   async function handleShareOuting() {
@@ -424,24 +1166,38 @@ export default function OutingResultsPage() {
   }
 }
   return (
-    <main className="outing-results-page">
-      <header className="outing-results-heading">
-        <span>
-          VENTURE BUILDER
-        </span>
+    <main className="outing-results-page outing-results-v3">
+      <header className="outing-results-heading outing-results-hero-v3">
+        <div className="outing-results-hero-copy">
+          <span>
+            VENTURE BUILDER
+          </span>
 
-        <h1>
-          {plan
-            ? plan.title
-            : "Building your outing"}
-        </h1>
+          <h1>
+            {plan
+              ? plan.title
+              : "Building your outing"}
+          </h1>
 
-        <p>
-          A Winnipeg plan based on
-          your timing, interests,
-          budget, travel choice, and
-          verified listings.
-        </p>
+          <p>
+            {plan
+              ? getBuildMethodLabel(
+                  plan.buildMethod
+                )
+              : "Connecting verified Winnipeg listings into one route."}
+          </p>
+        </div>
+
+        <div
+          className="outing-results-route-art"
+          aria-hidden="true"
+        >
+          <span>1</span>
+          <i />
+          <span>2</span>
+          <i />
+          <span>3</span>
+        </div>
       </header>
 
       {status === "loading" ? (
@@ -453,13 +1209,14 @@ export default function OutingResultsPage() {
 
           <div>
             <strong>
-              Connecting the evening
+              Connecting the outing
             </strong>
 
             <p>
               Checking event times,
-              opening hours, prices,
-              and travel between stops.
+              opening hours, requested
+              categories, prices, and
+              travel between stops.
             </p>
           </div>
         </section>
@@ -476,9 +1233,9 @@ export default function OutingResultsPage() {
           </h2>
 
           <p>
-            Choose the type of outing
-            and customize the evening
-            before generating a plan.
+            Choose how Venture should
+            build the route before
+            generating a plan.
           </p>
 
           <Link href="/build-outing">
@@ -519,59 +1276,35 @@ export default function OutingResultsPage() {
       {status === "ready" &&
       plan ? (
         <>
-          <section className="outing-plan-summary">
-            <div>
-              <span>DATE</span>
+          <section className="outing-map-first-stage">
+            <OutingRouteMap
+              plan={plan}
+            />
 
-              <strong>
-                {formatPlanDate(
-                  plan.date
-                )}
-              </strong>
-            </div>
-
-            <div>
-              <span>START</span>
-
-              <strong>
-                {
-                  plan.requestedStartTime
-                }
-              </strong>
-            </div>
-
-            <div>
-              <span>LENGTH</span>
-
-              <strong>
-                {
-                  plan.requestedDuration
-                }
-              </strong>
-            </div>
-
-            <div>
-              <span>TRAVEL</span>
-
-              <strong>
-                {plan.transportation}
-              </strong>
-            </div>
-
-            <div>
+            <div className="outing-map-caption-card">
               <span>
-                ESTIMATED TOTAL
+                YOUR ROUTE RECIPE
               </span>
 
               <strong>
-                {formatCost(
-                  plan.estimatedTotalCad
+                {formatMixSummary(
+                  plan.actualMix
                 )}
               </strong>
+
+              <small>
+                {plan.anchorListingName
+                  ? `Anchored by ${plan.anchorListingName}`
+                  : `${plan.stops.length} verified ${
+                      plan.stops.length === 1
+                        ? "stop"
+                        : "stops"
+                    } connected in itinerary order`}
+              </small>
             </div>
           </section>
 
-          <section className="outing-quick-actions">
+          <section className="outing-action-dock">
             <button
               className={
                 saved
@@ -589,7 +1322,7 @@ export default function OutingResultsPage() {
 
               {saved
                 ? "Saved"
-                : "Save outing"}
+                : "Save"}
             </button>
 
             <button
@@ -602,26 +1335,189 @@ export default function OutingResultsPage() {
                 ↗
               </span>
 
-              Share outing
+              Share
+            </button>
+
+            <button
+              type="button"
+              disabled={
+                refreshingUnlocked ||
+                replacingOrder !== null ||
+                addingKind !== null
+              }
+              onClick={() => {
+                void handleRefreshUnlocked();
+              }}
+            >
+              <span aria-hidden="true">
+                ↻
+              </span>
+
+              {refreshingUnlocked
+                ? "Refreshing"
+                : "Refresh"}
             </button>
           </section>
 
-            {actionMessage ? (
+          {actionMessage ? (
             <p
-                className="outing-action-message"
-                role="status"
+              className="outing-action-message"
+              role="status"
             >
-                {actionMessage}
+              {actionMessage}
             </p>
+          ) : null}
+
+          <section className="outing-plan-summary outing-plan-summary-v3">
+            <div>
+              <span>DATE</span>
+              <strong>
+                {formatPlanDate(
+                  plan.date
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>START</span>
+              <strong>
+                {plan.requestedStartTime}
+              </strong>
+            </div>
+
+            <div>
+              <span>PEOPLE</span>
+              <strong>
+                {partySize}
+              </strong>
+            </div>
+
+            <div>
+              <span>LENGTH</span>
+              <strong>
+                {plan.requestedDuration}
+              </strong>
+            </div>
+
+            <div>
+              <span>TRAVEL</span>
+              <strong>
+                {plan.transportation}
+              </strong>
+              <small>
+                Max {maxTravelMinutes} min
+                per leg
+              </small>
+            </div>
+
+            <div>
+              <span>
+                PER PERSON
+              </span>
+              <strong>
+                {formatCost(
+                  plan.estimatedTotalCad
+                )}
+              </strong>
+            </div>
+
+            {partySize > 1 ? (
+              <div>
+                <span>
+                  GROUP ESTIMATE
+                </span>
+                <strong>
+                  {formatCost(
+                    estimatedGroupTotal
+                  )}
+                </strong>
+              </div>
             ) : null}
+          </section>
 
-            <OutingRouteMap
-            plan={plan}
-            />
+          <section className="outing-add-stop-panel">
+            <div>
+              <span>
+                KEEP BUILDING
+              </span>
 
-            {plan.warnings.length > 0 ? (
+              <h2>
+                Add another stop
+              </h2>
+
+              <p>
+                Venture will place it in
+                an available gap without
+                breaking the existing
+                route.
+              </p>
+            </div>
+
+            <div className="outing-add-stop-grid">
+              {(
+                [
+                  {
+                    kind:
+                      "food" as const,
+                    icon: "🍽",
+                    label: "Food"
+                  },
+                  {
+                    kind:
+                      "event" as const,
+                    icon: "🎟",
+                    label: "Event"
+                  },
+                  {
+                    kind:
+                      "drinks" as const,
+                    icon: "🍸",
+                    label: "Drinks"
+                  }
+                ]
+              ).map(
+                (option) => (
+                  <button
+                    type="button"
+                    key={option.kind}
+                    disabled={
+                      addingKind !== null ||
+                      replacingOrder !== null ||
+                      refreshingUnlocked ||
+                      plan.stops.length >= 5 ||
+                      (
+                        option.kind ===
+                          "drinks" &&
+                        plan.alcoholFree
+                      )
+                    }
+                    onClick={() => {
+                      void handleAddStop(
+                        option.kind
+                      );
+                    }}
+                  >
+                    <span
+                      aria-hidden="true"
+                    >
+                      {option.icon}
+                    </span>
+
+                    <strong>
+                      {addingKind ===
+                      option.kind
+                        ? "Adding..."
+                        : `Add ${option.label}`}
+                    </strong>
+                  </button>
+                )
+              )}
+            </div>
+          </section>
+
+          {allWarnings.length > 0 ? (
             <section className="outing-warning-list">
-              {plan.warnings.map(
+              {allWarnings.map(
                 (warning) => (
                   <p key={warning}>
                     <span
@@ -629,7 +1525,6 @@ export default function OutingResultsPage() {
                     >
                       !
                     </span>
-
                     {warning}
                   </p>
                 )
@@ -637,121 +1532,182 @@ export default function OutingResultsPage() {
             </section>
           ) : null}
 
-          {plan.stops.length >
-          0 ? (
-            <section className="outing-timeline">
+          {plan.stops.length > 0 ? (
+            <section className="outing-timeline outing-timeline-v3">
               <div className="section-heading">
                 <div>
                   <span>
-                    YOUR PLAN
+                    PLAN DETAILS
                   </span>
 
                   <h2>
-                    {plan.stops.length}{" "}
-                    {plan.stops.length ===
-                    1
-                      ? "stop"
-                      : "stops"}
+                    Your {plan.stops.length}-stop outing
                   </h2>
+
+                  <p>
+                    Lock favourites, replace
+                    anything uncertain, or
+                    open each listing for
+                    full details.
+                  </p>
                 </div>
               </div>
 
               {plan.stops.map(
-                (stop) => (
-                  <div
-                    className="outing-stop-wrapper"
-                    key={`${stop.listing.type}-${stop.listing.id}`}
-                  >
-                    {stop.travelFromPreviousMinutes !==
-                    null ? (
-                      <div className="outing-travel-row">
-                        <span
-                          aria-hidden="true"
-                        >
-                          ↓
-                        </span>
+                (stop) => {
+                  const kind =
+                    getStopKind(stop);
 
-                        <p>
-                          About{" "}
-                          {
-                            stop.travelFromPreviousMinutes
-                          }{" "}
-                          minutes by{" "}
-                          {plan.transportation.toLowerCase()}
-                        </p>
-                      </div>
-                    ) : null}
+                  const kindDetails =
+                    getKindDetails(kind);
 
-                    <article className="outing-stop-card">
-                      <div className="outing-stop-order">
-                        {stop.order}
-                      </div>
-
-                      <div className="outing-stop-content">
-                        <div className="outing-stop-topline">
-                          <span>
-                            {stop.startTime}–
-                            {stop.endTime}
+                  return (
+                    <div
+                      className={`outing-stop-wrapper outing-kind-${kind}`}
+                      key={`${stop.listing.type}-${stop.listing.id}-${stop.order}`}
+                    >
+                      {stop.travelFromPreviousMinutes !==
+                      null ? (
+                        <div className="outing-travel-row">
+                          <span
+                            aria-hidden="true"
+                          >
+                            ↓
                           </span>
 
-                          <small>
-                            {stop.listing.type ===
-                            "event"
-                              ? "EVENT"
-                              : "PLACE"}
-                          </small>
+                          <p>
+                            About{" "}
+                            {stop.travelFromPreviousMinutes}{" "}
+                            minutes by{" "}
+                            {plan.transportation.toLowerCase()}
+                          </p>
+                        </div>
+                      ) : null}
+
+                      <article className="outing-stop-card outing-stop-card-v3">
+                        <div className="outing-stop-order">
+                          {stop.order}
                         </div>
 
-                        <h2>
-                          {
-                            stop.listing
-                              .name
-                          }
-                        </h2>
+                        <div className="outing-stop-content">
+                          <div className="outing-stop-topline">
+                            <span>
+                              {stop.startTime}–
+                              {stop.endTime}
+                            </span>
 
-                        <p className="outing-stop-subtitle">
-                          {
-                            stop.listing
-                              .subtitle
-                          }
-                        </p>
+                            <small className={`outing-kind-badge kind-${kind}`}>
+                              <i
+                                aria-hidden="true"
+                              >
+                                {kindDetails.icon}
+                              </i>
+                              {kindDetails.label}
+                            </small>
+                          </div>
 
-                        <p className="outing-stop-reason">
-                          {stop.reason}
-                        </p>
+                          <h2>
+                            {stop.listing.name}
+                          </h2>
 
-                        <div className="outing-stop-details">
-                          <span>
-                            {
-                              stop.listing
-                                .neighbourhood
-                            }
-                          </span>
+                          <p className="outing-stop-subtitle">
+                            {stop.listing.subtitle}
+                          </p>
 
-                          <span>
-                            {formatCost(
-                              stop.estimatedCostCad
-                            )}
-                          </span>
+                          <p className="outing-stop-reason">
+                            {stop.reason}
+                          </p>
 
-                          <span>
-                            {
-                              stop.listing
-                                .timeOrHours
-                            }
-                          </span>
+                          <div className="outing-stop-details">
+                            <span>
+                              {stop.listing.neighbourhood}
+                            </span>
+
+                            <span>
+                              {formatCost(
+                                stop.estimatedCostCad
+                              )}
+                            </span>
+
+                            <span>
+                              {stop.listing.timeOrHours}
+                            </span>
+                          </div>
+
+                          <div className="outing-stop-controls">
+                            <button
+                              type="button"
+                              className={
+                                lockedOrders.includes(
+                                  stop.order
+                                )
+                                  ? "locked"
+                                  : ""
+                              }
+                              aria-pressed={
+                                lockedOrders.includes(
+                                  stop.order
+                                )
+                              }
+                              onClick={() =>
+                                toggleLock(
+                                  stop.order
+                                )
+                              }
+                            >
+                              <span aria-hidden="true">
+                                {lockedOrders.includes(
+                                  stop.order
+                                )
+                                  ? "🔒"
+                                  : "🔓"}
+                              </span>
+
+                              {lockedOrders.includes(
+                                stop.order
+                              )
+                                ? "Locked"
+                                : "Lock"}
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={
+                                lockedOrders.includes(
+                                  stop.order
+                                ) ||
+                                replacingOrder !== null ||
+                                refreshingUnlocked ||
+                                addingKind !== null
+                              }
+                              onClick={() => {
+                                void handleReplaceStop(
+                                  stop.order
+                                );
+                              }}
+                            >
+                              <span aria-hidden="true">
+                                ↻
+                              </span>
+
+                              {replacingOrder ===
+                              stop.order
+                                ? "Replacing..."
+                                : `Replace ${kind}`}
+                            </button>
+                          </div>
+
+                          <Link
+                            className="outing-stop-link"
+                            href={`/listings/${stop.listing.slug}`}
+                          >
+                            View full listing
+                          </Link>
                         </div>
-
-                        <Link
-                          className="outing-stop-link"
-                          href={`/listings/${stop.listing.slug}`}
-                        >
-                          View details
-                        </Link>
-                      </div>
-                    </article>
-                  </div>
-                )
+                      </article>
+                    </div>
+                  );
+                }
               )}
             </section>
           ) : (
@@ -768,8 +1724,7 @@ export default function OutingResultsPage() {
                 Try another date, a
                 longer outing, a more
                 flexible budget, or
-                fewer neighbourhood
-                restrictions.
+                fewer category requests.
               </p>
 
               <Link href="/build-outing">

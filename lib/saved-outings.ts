@@ -8,8 +8,20 @@ export const SAVED_OUTINGS_KEY =
 export const SAVED_OUTINGS_EVENT =
   "venture:saved-outings-updated";
 
+export type OutingStopKind =
+  | "food"
+  | "event"
+  | "drinks";
+
+export type OutingStopMix = {
+  food: number;
+  events: number;
+  drinks: number;
+};
+
 export type GeneratedOutingStop = {
   order: number;
+  kind?: OutingStopKind;
   startTime: string;
   endTime: string;
   durationMinutes: number;
@@ -32,16 +44,80 @@ export type GeneratedOutingPlan = {
   requestedDuration: string;
   transportation: string;
   alcoholFree: boolean;
+
+  planningMode?:
+    | "solo"
+    | "group";
+
+  buildMethod?:
+    | "surprise"
+    | "mix"
+    | "anchor";
+
+  partySize?: number;
+  maxTravelMinutes?: number;
+  mustIncludeTerms?: string[];
+  avoidTerms?: string[];
+
+  requestedMix?:
+    OutingStopMix;
+
+  actualMix?:
+    OutingStopMix;
+
+  anchorListingKey?:
+    | string
+    | null;
+
+  anchorListingName?:
+    | string
+    | null;
+
+  soloVibe?:
+    | "slow-reset"
+    | "curious-explorer"
+    | "treat-myself"
+    | "social-solo"
+    | null;
+
+  soloPace?:
+    | "relaxed"
+    | "balanced"
+    | "packed"
+    | null;
+
+  groupVibe?:
+    | "friends-night"
+    | "date-night"
+    | "celebration"
+    | "family-plan"
+    | "nightlife"
+    | null;
+
+  groupPriority?:
+    | "everyone-happy"
+    | "budget-friendly"
+    | "minimal-travel"
+    | null;
+
   estimatedTotalCad:
     | number
     | null;
+
+  estimatedGroupTotalCad?:
+    | number
+    | null;
+
   stops: GeneratedOutingStop[];
   warnings: string[];
   candidateCount: number;
 };
 
 function notifySavedOutingsChanged() {
-  if (typeof window === "undefined") {
+  if (
+    typeof window ===
+    "undefined"
+  ) {
     return;
   }
 
@@ -54,7 +130,10 @@ function notifySavedOutingsChanged() {
 
 export function getSavedOutings():
   GeneratedOutingPlan[] {
-  if (typeof window === "undefined") {
+  if (
+    typeof window ===
+    "undefined"
+  ) {
     return [];
   }
 
@@ -104,7 +183,10 @@ export function isOutingSaved(
 export function saveOuting(
   plan: GeneratedOutingPlan
 ) {
-  if (typeof window === "undefined") {
+  if (
+    typeof window ===
+    "undefined"
+  ) {
     return;
   }
 
@@ -132,14 +214,18 @@ export function saveOuting(
 export function removeSavedOuting(
   planId: string
 ) {
-  if (typeof window === "undefined") {
+  if (
+    typeof window ===
+    "undefined"
+  ) {
     return;
   }
 
   const updatedOutings =
     getSavedOutings().filter(
       (outing) =>
-        outing.planId !== planId
+        outing.planId !==
+        planId
     );
 
   window.localStorage.setItem(

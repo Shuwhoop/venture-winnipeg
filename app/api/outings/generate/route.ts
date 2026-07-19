@@ -30,7 +30,52 @@ const weekdayOrder = [
   "saturday"
 ] as const;
 
+type PlanningMode =
+  | "solo"
+  | "group";
+
+type BuildMethod =
+  | "surprise"
+  | "mix"
+  | "anchor";
+
+type StopKind =
+  | "food"
+  | "event"
+  | "drinks";
+
+type StopMix = {
+  food: number;
+  events: number;
+  drinks: number;
+};
+
+type SoloVibe =
+  | "slow-reset"
+  | "curious-explorer"
+  | "treat-myself"
+  | "social-solo";
+
+type SoloPace =
+  | "relaxed"
+  | "balanced"
+  | "packed";
+
+type GroupVibe =
+  | "friends-night"
+  | "date-night"
+  | "celebration"
+  | "family-plan"
+  | "nightlife";
+
+type GroupPriority =
+  | "everyone-happy"
+  | "budget-friendly"
+  | "minimal-travel";
+
 type GenerateOutingRequest = {
+  planningMode: PlanningMode;
+  buildMethod: BuildMethod;
   outingTypeId: string;
   outingTypeTitle: string;
   date: string;
@@ -41,6 +86,21 @@ type GenerateOutingRequest = {
   budget: BudgetPreference;
   transportation: string;
   alcoholFree: boolean;
+  partySize: number;
+  maxTravelMinutes: number;
+  mustIncludeTerms: string[];
+  avoidTerms: string[];
+  stopMix: StopMix;
+  totalStops: number;
+  allowedKinds: StopKind[];
+  anchorListingKey: string | null;
+  anchorListingName: string | null;
+  soloVibe: SoloVibe | null;
+  soloPace: SoloPace | null;
+  groupVibe: GroupVibe | null;
+  groupPriority:
+    | GroupPriority
+    | null;
 };
 
 type TimeInterval = {
@@ -50,6 +110,7 @@ type TimeInterval = {
 
 type Candidate = {
   listing: Listing;
+  kind: StopKind;
   score: number;
   intervals: TimeInterval[];
   fixedStart?: number;
@@ -59,11 +120,16 @@ type Candidate = {
 
 type PlannedStop = {
   order: number;
+  kind: StopKind;
   startTime: string;
   endTime: string;
   durationMinutes: number;
-  travelFromPreviousMinutes: number | null;
-  estimatedCostCad: number | null;
+  travelFromPreviousMinutes:
+    | number
+    | null;
+  estimatedCostCad:
+    | number
+    | null;
   reason: string;
   listing: Listing;
 };
@@ -72,7 +138,14 @@ type ProposedStop = {
   candidate: Candidate;
   start: number;
   end: number;
-  travelFromPreviousMinutes: number | null;
+  travelFromPreviousMinutes:
+    | number
+    | null;
+};
+
+type RequestedSlot = {
+  kind: StopKind;
+  listingKey?: string;
 };
 
 const trustedStatuses =
@@ -267,6 +340,52 @@ function isBudgetPreference(
   );
 }
 
+function isPlanningMode(
+  value: unknown
+): value is PlanningMode {
+  return (
+    value === "solo" ||
+    value === "group"
+  );
+}
+
+function isBuildMethod(
+  value: unknown
+): value is BuildMethod {
+  return (
+    value === "surprise" ||
+    value === "mix" ||
+    value === "anchor"
+  );
+}
+
+function isStopKind(
+  value: unknown
+): value is StopKind {
+  return (
+    value === "food" ||
+    value === "event" ||
+    value === "drinks"
+  );
+}
+
+function readCount(
+  value: unknown,
+  fallback = 0
+): number {
+  return typeof value ===
+      "number" &&
+    Number.isFinite(value)
+      ? Math.min(
+          5,
+          Math.max(
+            0,
+            Math.round(value)
+          )
+        )
+      : fallback;
+}
+
 function parseRequest(
   value: unknown
 ): GenerateOutingRequest | null {
@@ -282,6 +401,231 @@ function parseRequest(
       string,
       unknown
     >;
+
+  const planningMode =
+    isPlanningMode(
+      body.planningMode
+    )
+      ? body.planningMode
+      : "solo";
+
+  const buildMethod =
+    isBuildMethod(
+      body.buildMethod
+    )
+      ? body.buildMethod
+      : "surprise";
+
+  const partySize =
+    planningMode === "solo"
+      ? 1
+      : typeof body.partySize ===
+            "number" &&
+          Number.isFinite(
+            body.partySize
+          )
+        ? Math.min(
+            12,
+            Math.max(
+              2,
+              Math.round(
+                body.partySize
+              )
+            )
+          )
+        : 2;
+
+  const maxTravelMinutes =
+    typeof body.maxTravelMinutes ===
+      "number" &&
+    Number.isFinite(
+      body.maxTravelMinutes
+    )
+      ? Math.min(
+          90,
+          Math.max(
+            5,
+            Math.round(
+              body.maxTravelMinutes
+            )
+          )
+        )
+      : 20;
+
+  const mustIncludeTerms =
+    body.mustIncludeTerms ===
+      undefined
+      ? []
+      : isStringArray(
+          body.mustIncludeTerms
+        )
+        ? body.mustIncludeTerms
+            .map(
+              (term) =>
+                term.trim()
+            )
+            .filter(Boolean)
+            .slice(0, 8)
+        : null;
+
+  const avoidTerms =
+    body.avoidTerms ===
+      undefined
+      ? []
+      : isStringArray(
+          body.avoidTerms
+        )
+        ? body.avoidTerms
+            .map(
+              (term) =>
+                term.trim()
+            )
+            .filter(Boolean)
+            .slice(0, 8)
+        : null;
+
+  const mixValue =
+    body.stopMix &&
+    typeof body.stopMix ===
+      "object"
+      ? body.stopMix as Record<
+          string,
+          unknown
+        >
+      : {};
+
+  const stopMix: StopMix = {
+    food:
+      readCount(
+        mixValue.food,
+        buildMethod === "mix"
+          ? 1
+          : 0
+      ),
+    events:
+      readCount(
+        mixValue.events,
+        buildMethod === "mix"
+          ? 1
+          : 0
+      ),
+    drinks:
+      readCount(
+        mixValue.drinks,
+        buildMethod === "mix"
+          ? 1
+          : 0
+      )
+  };
+
+  if (
+    body.alcoholFree === true
+  ) {
+    stopMix.drinks = 0;
+  }
+
+  const totalStops =
+    typeof body.totalStops ===
+      "number" &&
+    Number.isFinite(
+      body.totalStops
+    )
+      ? Math.min(
+          5,
+          Math.max(
+            1,
+            Math.round(
+              body.totalStops
+            )
+          )
+        )
+      : 3;
+
+  const allowedKinds =
+    Array.isArray(
+      body.allowedKinds
+    )
+      ? body.allowedKinds
+          .filter(isStopKind)
+          .filter(
+            (kind) =>
+              !(
+                body.alcoholFree ===
+                  true &&
+                kind === "drinks"
+              )
+          )
+      : body.alcoholFree ===
+          true
+        ? [
+            "food",
+            "event"
+          ] as StopKind[]
+        : [
+            "food",
+            "event",
+            "drinks"
+          ] as StopKind[];
+
+  const anchorListingKey =
+    typeof body.anchorListingKey ===
+      "string" &&
+    body.anchorListingKey.trim()
+      ? body.anchorListingKey.trim()
+      : null;
+
+  const anchorListingName =
+    typeof body.anchorListingName ===
+      "string" &&
+    body.anchorListingName.trim()
+      ? body.anchorListingName.trim()
+      : null;
+
+  const soloVibe =
+    body.soloVibe ===
+        "slow-reset" ||
+    body.soloVibe ===
+        "curious-explorer" ||
+    body.soloVibe ===
+        "treat-myself" ||
+    body.soloVibe ===
+        "social-solo"
+      ? body.soloVibe
+      : null;
+
+  const soloPace =
+    body.soloPace ===
+        "relaxed" ||
+    body.soloPace ===
+        "balanced" ||
+    body.soloPace ===
+        "packed"
+      ? body.soloPace
+      : null;
+
+  const groupVibe =
+    body.groupVibe ===
+        "friends-night" ||
+    body.groupVibe ===
+        "date-night" ||
+    body.groupVibe ===
+        "celebration" ||
+    body.groupVibe ===
+        "family-plan" ||
+    body.groupVibe ===
+        "nightlife"
+      ? body.groupVibe
+      : null;
+
+  const groupPriority =
+    body.groupPriority ===
+        "everyone-happy" ||
+    body.groupPriority ===
+        "budget-friendly" ||
+    body.groupPriority ===
+        "minimal-travel"
+      ? body.groupPriority
+      : null;
 
   if (
     typeof body.outingTypeId !==
@@ -303,7 +647,26 @@ function parseRequest(
     typeof body.transportation !==
       "string" ||
     typeof body.alcoholFree !==
-      "boolean"
+      "boolean" ||
+    mustIncludeTerms === null ||
+    avoidTerms === null ||
+    (
+      buildMethod === "anchor" &&
+      !anchorListingKey
+    ) ||
+    (
+      buildMethod === "mix" &&
+      stopMix.food +
+        stopMix.events +
+        stopMix.drinks ===
+        0
+    ) ||
+    (
+      buildMethod ===
+        "surprise" &&
+      allowedKinds.length ===
+        0
+    )
   ) {
     return null;
   }
@@ -320,29 +683,44 @@ function parseRequest(
   }
 
   return {
+    planningMode,
+    buildMethod,
     outingTypeId:
       body.outingTypeId,
-
     outingTypeTitle:
       body.outingTypeTitle,
-
     date: body.date,
-    startTime: body.startTime,
-    duration: body.duration,
-
+    startTime:
+      body.startTime,
+    duration:
+      body.duration,
     interests:
       body.interests,
-
     neighbourhoods:
       body.neighbourhoods,
-
     budget: body.budget,
-
     transportation:
       body.transportation,
-
     alcoholFree:
-      body.alcoholFree
+      body.alcoholFree,
+    partySize,
+    maxTravelMinutes,
+    mustIncludeTerms,
+    avoidTerms,
+    stopMix,
+    totalStops,
+    allowedKinds:
+      Array.from(
+        new Set(
+          allowedKinds
+        )
+      ),
+    anchorListingKey,
+    anchorListingName,
+    soloVibe,
+    soloPace,
+    groupVibe,
+    groupPriority
   };
 }
 
@@ -426,6 +804,30 @@ function getListingText(
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
+}
+
+function matchesAnyTerm(
+  listing: Listing,
+  terms: string[]
+): boolean {
+  if (
+    terms.length ===
+    0
+  ) {
+    return false;
+  }
+
+  const listingText =
+    getListingText(
+      listing
+    );
+
+  return terms.some(
+    (term) =>
+      listingText.includes(
+        normalize(term)
+      )
+  );
 }
 
 function includesKeyword(
@@ -986,6 +1388,22 @@ function isAlcoholFocused(
   );
 }
 
+function getListingKind(
+  listing: Listing
+): StopKind {
+  if (
+    listing.type === "event"
+  ) {
+    return "event";
+  }
+
+  return isAlcoholFocused(
+    listing
+  )
+    ? "drinks"
+    : "food";
+}
+
 function scoreListing(
   listing: Listing,
   draft: GenerateOutingRequest
@@ -1004,6 +1422,20 @@ function scoreListing(
 
   let score =
     matchedInterests.length * 6;
+
+  for (
+    const term
+    of draft.mustIncludeTerms
+  ) {
+    if (
+      includesKeyword(
+        text,
+        term
+      )
+    ) {
+      score += 12;
+    }
+  }
 
   const typeKeywords =
     outingTypeKeywords[
@@ -1047,9 +1479,175 @@ function scoreListing(
   }
 
   if (
-    listing.type === "event"
+    draft.planningMode ===
+    "solo"
   ) {
-    score += 4;
+    if (
+      draft.soloVibe ===
+      "slow-reset"
+    ) {
+      if (
+        [
+          "cafe",
+          "coffee",
+          "museum",
+          "gallery",
+          "park",
+          "book",
+          "quiet"
+        ].some(
+          (keyword) =>
+            text.includes(keyword)
+        )
+      ) {
+        score += 6;
+      }
+
+      if (
+        isAlcoholFocused(
+          listing
+        )
+      ) {
+        score -= 5;
+      }
+    }
+
+    if (
+      draft.soloVibe ===
+      "curious-explorer" &&
+      [
+        "museum",
+        "market",
+        "gallery",
+        "workshop",
+        "festival",
+        "art"
+      ].some(
+        (keyword) =>
+          text.includes(keyword)
+      )
+    ) {
+      score += 6;
+    }
+
+    if (
+      draft.soloVibe ===
+      "treat-myself" &&
+      [
+        "restaurant",
+        "dessert",
+        "bakery",
+        "dining",
+        "theatre",
+        "spa"
+      ].some(
+        (keyword) =>
+          text.includes(keyword)
+      )
+    ) {
+      score += 6;
+    }
+
+    if (
+      draft.soloVibe ===
+      "social-solo" &&
+      [
+        "live music",
+        "comedy",
+        "market",
+        "festival",
+        "sports",
+        "bar"
+      ].some(
+        (keyword) =>
+          text.includes(keyword)
+      )
+    ) {
+      score += 6;
+    }
+  }
+
+  if (
+    draft.planningMode ===
+    "group"
+  ) {
+    const groupKeywords:
+      Record<
+        GroupVibe,
+        string[]
+      > = {
+        "friends-night": [
+          "bowling",
+          "comedy",
+          "gaming",
+          "music",
+          "restaurant",
+          "sports"
+        ],
+        "date-night": [
+          "dining",
+          "restaurant",
+          "dessert",
+          "art",
+          "theatre",
+          "music"
+        ],
+        celebration: [
+          "music",
+          "bar",
+          "cocktail",
+          "dessert",
+          "restaurant",
+          "party"
+        ],
+        "family-plan": [
+          "family",
+          "kids",
+          "children",
+          "all ages",
+          "market",
+          "festival"
+        ],
+        nightlife: [
+          "nightlife",
+          "club",
+          "bar",
+          "concert",
+          "music",
+          "late night"
+        ]
+      };
+
+    if (
+      draft.groupVibe &&
+      groupKeywords[
+        draft.groupVibe
+      ].some(
+        (keyword) =>
+          text.includes(keyword)
+      )
+    ) {
+      score += 6;
+    }
+
+    if (
+      draft.groupPriority ===
+        "everyone-happy" &&
+      listing.rating &&
+      listing.rating >= 4.3
+    ) {
+      score += 4;
+    }
+
+    if (
+      draft.groupPriority ===
+        "budget-friendly" &&
+      getEstimatedCost(
+        listing
+      ) === 0
+    ) {
+      score += 6;
+    }
   }
 
   if (
@@ -1057,19 +1655,11 @@ function scoreListing(
       "food-crawl"
   ) {
     score +=
-      listing.type ===
-      "restaurant"
+      getListingKind(
+        listing
+      ) === "food"
         ? 10
         : -5;
-  }
-
-  if (
-    draft.outingTypeId ===
-      "date-night" &&
-    listing.type ===
-      "restaurant"
-  ) {
-    score += 4;
   }
 
   if (
@@ -1094,6 +1684,14 @@ function scoreListing(
       "official_source"
   ) {
     score += 3;
+  }
+
+  if (
+    draft.buildMethod ===
+    "surprise"
+  ) {
+    score +=
+      Math.random() * 5;
   }
 
   return {
@@ -1291,8 +1889,20 @@ function getTravelMinutes(
 function fitsTransportation(
   first: Listing,
   second: Listing,
-  transportation: string
+  transportation: string,
+  maxTravelMinutes: number
 ): boolean {
+  if (
+    getTravelMinutes(
+      first,
+      second,
+      transportation
+    ) >
+    maxTravelMinutes
+  ) {
+    return false;
+  }
+
   const distance =
     getDistanceKm(
       first,
@@ -1414,6 +2024,8 @@ function chooseBestCandidate(
   usedKeys: Set<string>,
   currentCost: number,
   budgetLimit: number | null,
+  transportation: string,
+  maxTravelMinutes: number,
   previousListing?: Listing
 ): Candidate[] {
   return candidates
@@ -1443,7 +2055,8 @@ function chooseBestCandidate(
           !fitsTransportation(
             previousListing,
             candidate.listing,
-            "Driving"
+            transportation,
+            maxTravelMinutes
           )
         ) {
           return false;
@@ -1538,7 +2151,8 @@ function buildPlanAroundEvent(
       !fitsTransportation(
         place.listing,
         eventCandidate.listing,
-        draft.transportation
+        draft.transportation,
+        draft.maxTravelMinutes
       )
     ) {
       continue;
@@ -1639,7 +2253,8 @@ function buildPlanAroundEvent(
       !fitsTransportation(
         eventCandidate.listing,
         place.listing,
-        draft.transportation
+        draft.transportation,
+        draft.maxTravelMinutes
       )
     ) {
       continue;
@@ -1719,6 +2334,8 @@ function buildFlexiblePlan(
         usedKeys,
         currentCost,
         budgetLimit,
+        draft.transportation,
+        draft.maxTravelMinutes,
         previousListing
       );
 
@@ -1749,7 +2366,8 @@ function buildFlexiblePlan(
         !fitsTransportation(
           previousListing,
           candidate.listing,
-          draft.transportation
+          draft.transportation,
+          draft.maxTravelMinutes
         )
       ) {
         continue;
@@ -1861,10 +2479,22 @@ function createCandidate(
     return null;
   }
 
+  const kind =
+    getListingKind(
+      listing
+    );
+
   if (
     draft.alcoholFree &&
-    isAlcoholFocused(
-      listing
+    kind === "drinks"
+  ) {
+    return null;
+  }
+
+  if (
+    matchesAnyTerm(
+      listing,
+      draft.avoidTerms
     )
   ) {
     return null;
@@ -1882,7 +2512,6 @@ function createCandidate(
               listing,
               draft.date
             ),
-
           fixedStart:
             undefined
         };
@@ -1911,26 +2540,1080 @@ function createCandidate(
 
   return {
     listing,
+    kind,
     score,
     intervals:
       availability.intervals,
-
     fixedStart:
       availability.fixedStart,
-
     estimatedCostCad:
       getEstimatedCost(
         listing
       ),
-
     matchedInterests
   };
+}
+
+function getListingKey(
+  listing: Listing
+): string {
+  return `${listing.type}-${listing.id}`;
+}
+
+function getStopDuration(
+  candidate: Candidate,
+  draft: GenerateOutingRequest,
+  start: number,
+  windowEnd: number
+): number | null {
+  if (
+    candidate.kind === "event"
+  ) {
+    const interval =
+      candidate.intervals.find(
+        (currentInterval) =>
+          start >=
+            currentInterval.start &&
+          start <
+            currentInterval.end
+      );
+
+    if (!interval) {
+      return null;
+    }
+
+    const available =
+      Math.min(
+        interval.end - start,
+        windowEnd - start,
+        120
+      );
+
+    return available >= 45
+      ? available
+      : null;
+  }
+
+  if (
+    draft.planningMode ===
+      "solo" &&
+    draft.soloPace ===
+      "relaxed"
+  ) {
+    return 75;
+  }
+
+  if (
+    draft.planningMode ===
+      "solo" &&
+    draft.soloPace ===
+      "packed"
+  ) {
+    return 45;
+  }
+
+  return 60;
+}
+
+function getLatestAvailableStart(
+  candidate: Candidate,
+  latestEnd: number,
+  duration: number,
+  windowStart: number
+): number | null {
+  for (
+    const interval
+    of [...candidate.intervals]
+      .sort(
+        (first, second) =>
+          second.end -
+          first.end
+      )
+  ) {
+    const end =
+      Math.min(
+        latestEnd,
+        interval.end
+      );
+
+    const start =
+      end - duration;
+
+    if (
+      start >= interval.start &&
+      start >= windowStart
+    ) {
+      return start;
+    }
+  }
+
+  return null;
+}
+
+function countSequence(
+  sequence: StopKind[]
+): StopMix {
+  return sequence.reduce<StopMix>(
+    (counts, kind) => {
+      if (kind === "event") {
+        counts.events += 1;
+      } else {
+        counts[kind] += 1;
+      }
+
+      return counts;
+    },
+    {
+      food: 0,
+      events: 0,
+      drinks: 0
+    }
+  );
+}
+
+function buildMixSequence(
+  mix: StopMix
+): StopKind[] {
+  let food =
+    mix.food;
+  let events =
+    mix.events;
+  let drinks =
+    mix.drinks;
+
+  const sequence:
+    StopKind[] = [];
+
+  if (food > 0) {
+    sequence.push("food");
+    food -= 1;
+  }
+
+  while (
+    events > 0 ||
+    food > 0
+  ) {
+    if (events > 0) {
+      sequence.push("event");
+      events -= 1;
+    }
+
+    if (food > 0) {
+      sequence.push("food");
+      food -= 1;
+    }
+  }
+
+  while (drinks > 0) {
+    sequence.push("drinks");
+    drinks -= 1;
+  }
+
+  return sequence.slice(0, 5);
+}
+
+function buildSurpriseSequence(
+  draft: GenerateOutingRequest,
+  candidates: Candidate[]
+): StopKind[] {
+  const availableKinds =
+    new Set(
+      candidates.map(
+        (candidate) =>
+          candidate.kind
+      )
+    );
+
+  let allowed =
+    draft.allowedKinds.filter(
+      (kind) =>
+        availableKinds.has(kind) &&
+        !(
+          draft.alcoholFree &&
+          kind === "drinks"
+        )
+    );
+
+  if (allowed.length === 0) {
+    allowed =
+      Array.from(
+        availableKinds
+      ).filter(
+        (kind) =>
+          !(
+            draft.alcoholFree &&
+            kind === "drinks"
+          )
+      );
+  }
+
+  if (allowed.length === 0) {
+    return [];
+  }
+
+  const patterns:
+    Record<number, StopKind[]> = {
+      1: ["food"],
+      2: [
+        "food",
+        "event"
+      ],
+      3: [
+        "food",
+        "event",
+        "drinks"
+      ],
+      4: [
+        "food",
+        "event",
+        "food",
+        "drinks"
+      ],
+      5: [
+        "food",
+        "event",
+        "food",
+        "event",
+        "drinks"
+      ]
+    };
+
+  const preferred =
+    patterns[
+      draft.totalStops
+    ] ?? patterns[3];
+
+  const sequence =
+    preferred.filter(
+      (kind) =>
+        allowed.includes(kind)
+    );
+
+  let fillIndex = 0;
+
+  while (
+    sequence.length <
+    draft.totalStops
+  ) {
+    sequence.push(
+      allowed[
+        fillIndex %
+        allowed.length
+      ]
+    );
+
+    fillIndex += 1;
+  }
+
+  return sequence.slice(
+    0,
+    draft.totalStops
+  );
+}
+
+function buildRequestedSlots(
+  draft: GenerateOutingRequest,
+  candidates: Candidate[],
+  anchorCandidate:
+    | Candidate
+    | null
+): RequestedSlot[] {
+  if (
+    draft.buildMethod ===
+    "surprise"
+  ) {
+    return buildSurpriseSequence(
+      draft,
+      candidates
+    ).map(
+      (kind) => ({
+        kind
+      })
+    );
+  }
+
+  const sequence =
+    buildMixSequence(
+      draft.stopMix
+    );
+
+  if (
+    draft.buildMethod !==
+      "anchor" ||
+    !anchorCandidate
+  ) {
+    return sequence.map(
+      (kind) => ({
+        kind
+      })
+    );
+  }
+
+  const slots =
+    sequence.map(
+      (kind) => ({
+        kind
+      })
+    );
+
+  const anchorSlot:
+    RequestedSlot = {
+      kind:
+        anchorCandidate.kind,
+      listingKey:
+        getListingKey(
+          anchorCandidate.listing
+        )
+    };
+
+  if (
+    anchorCandidate.kind ===
+    "food"
+  ) {
+    slots.unshift(
+      anchorSlot
+    );
+  } else if (
+    anchorCandidate.kind ===
+    "drinks"
+  ) {
+    slots.push(
+      anchorSlot
+    );
+  } else {
+    const firstFoodIndex =
+      slots.findIndex(
+        (slot) =>
+          slot.kind === "food"
+      );
+
+    slots.splice(
+      firstFoodIndex >= 0
+        ? firstFoodIndex + 1
+        : 0,
+      0,
+      anchorSlot
+    );
+  }
+
+  return slots.slice(0, 5);
+}
+
+function getCandidateForSlot(
+  slot: RequestedSlot,
+  candidates: Candidate[],
+  usedKeys: Set<string>
+): Candidate[] {
+  return candidates
+    .filter(
+      (candidate) => {
+        const key =
+          getListingKey(
+            candidate.listing
+          );
+
+        if (
+          usedKeys.has(key) ||
+          candidate.kind !==
+            slot.kind
+        ) {
+          return false;
+        }
+
+        return (
+          !slot.listingKey ||
+          slot.listingKey === key
+        );
+      }
+    )
+    .sort(
+      (first, second) =>
+        second.score -
+        first.score
+    );
+}
+
+function chooseProposal(
+  proposals: Array<{
+    stop: ProposedStop;
+    contextualScore: number;
+  }>,
+  draft: GenerateOutingRequest
+): ProposedStop | null {
+  const ordered =
+    proposals.sort(
+      (first, second) =>
+        second.contextualScore -
+        first.contextualScore
+    );
+
+  if (
+    ordered.length === 0
+  ) {
+    return null;
+  }
+
+  if (
+    draft.buildMethod !==
+      "surprise" ||
+    ordered.length === 1
+  ) {
+    return ordered[0].stop;
+  }
+
+  /*
+   * Surprise routes choose from the
+   * best verified fits instead of
+   * repeating the exact same winner.
+   * Squaring the random value keeps
+   * the strongest candidates more
+   * likely than the edge cases.
+   */
+  const shortlist =
+    ordered.slice(
+      0,
+      Math.min(
+        5,
+        ordered.length
+      )
+    );
+
+  const randomIndex =
+    Math.floor(
+      Math.pow(
+        Math.random(),
+        2
+      ) *
+      shortlist.length
+    );
+
+  return shortlist[
+    Math.min(
+      randomIndex,
+      shortlist.length - 1
+    )
+  ].stop;
+}
+
+function chooseForwardStop(
+  slot: RequestedSlot,
+  candidates: Candidate[],
+  usedKeys: Set<string>,
+  draft: GenerateOutingRequest,
+  earliestTime: number,
+  windowEnd: number,
+  previousListing:
+    | Listing
+    | null,
+  currentCost: number,
+  budgetLimit: number | null
+): ProposedStop | null {
+  const proposals:
+    Array<{
+      stop: ProposedStop;
+      contextualScore: number;
+    }> = [];
+
+  for (
+    const candidate
+    of getCandidateForSlot(
+      slot,
+      candidates,
+      usedKeys
+    )
+  ) {
+    if (
+      !canAffordCandidate(
+        currentCost,
+        candidate,
+        budgetLimit
+      )
+    ) {
+      continue;
+    }
+
+    if (
+      previousListing &&
+      !fitsTransportation(
+        previousListing,
+        candidate.listing,
+        draft.transportation,
+        draft.maxTravelMinutes
+      )
+    ) {
+      continue;
+    }
+
+    const travelMinutes =
+      previousListing
+        ? getTravelMinutes(
+            previousListing,
+            candidate.listing,
+            draft.transportation
+          )
+        : 0;
+
+    const earliestStart =
+      earliestTime +
+      travelMinutes;
+
+    const candidateStart =
+      candidate.fixedStart !==
+        undefined
+        ? candidate.fixedStart
+        : getEarliestAvailableStart(
+            candidate,
+            earliestStart,
+            draft.planningMode ===
+                "solo" &&
+              draft.soloPace ===
+                "packed"
+              ? 45
+              : draft.planningMode ===
+                    "solo" &&
+                  draft.soloPace ===
+                    "relaxed"
+                ? 75
+                : 60,
+            windowEnd
+          );
+
+    if (
+      candidateStart === null ||
+      candidateStart <
+        earliestStart
+    ) {
+      continue;
+    }
+
+    const duration =
+      getStopDuration(
+        candidate,
+        draft,
+        candidateStart,
+        windowEnd
+      );
+
+    if (
+      duration === null ||
+      !isAvailableForSlot(
+        candidate,
+        candidateStart,
+        duration
+      ) ||
+      candidateStart +
+        duration >
+        windowEnd
+    ) {
+      continue;
+    }
+
+    proposals.push({
+      stop: {
+        candidate,
+        start:
+          candidateStart,
+        end:
+          candidateStart +
+          duration,
+        travelFromPreviousMinutes:
+          previousListing
+            ? travelMinutes
+            : null
+      },
+      contextualScore:
+        candidate.score -
+        travelMinutes * 0.22
+    });
+  }
+
+  return chooseProposal(
+    proposals,
+    draft
+  );
+}
+
+function chooseBackwardStop(
+  slot: RequestedSlot,
+  candidates: Candidate[],
+  usedKeys: Set<string>,
+  draft: GenerateOutingRequest,
+  latestBoundary: number,
+  windowStart: number,
+  nextListing: Listing,
+  currentCost: number,
+  budgetLimit: number | null
+): ProposedStop | null {
+  const proposals:
+    Array<{
+      stop: ProposedStop;
+      contextualScore: number;
+    }> = [];
+
+  for (
+    const candidate
+    of getCandidateForSlot(
+      slot,
+      candidates,
+      usedKeys
+    )
+  ) {
+    if (
+      !canAffordCandidate(
+        currentCost,
+        candidate,
+        budgetLimit
+      ) ||
+      !fitsTransportation(
+        candidate.listing,
+        nextListing,
+        draft.transportation,
+        draft.maxTravelMinutes
+      )
+    ) {
+      continue;
+    }
+
+    const travelMinutes =
+      getTravelMinutes(
+        candidate.listing,
+        nextListing,
+        draft.transportation
+      );
+
+    const latestEnd =
+      latestBoundary -
+      travelMinutes;
+
+    const baseDuration =
+      candidate.kind === "event"
+        ? 90
+        : draft.planningMode ===
+              "solo" &&
+            draft.soloPace ===
+              "packed"
+          ? 45
+          : draft.planningMode ===
+                "solo" &&
+              draft.soloPace ===
+                "relaxed"
+            ? 75
+            : 60;
+
+    const candidateStart =
+      candidate.fixedStart !==
+        undefined
+        ? candidate.fixedStart
+        : getLatestAvailableStart(
+            candidate,
+            latestEnd,
+            baseDuration,
+            windowStart
+          );
+
+    if (
+      candidateStart === null
+    ) {
+      continue;
+    }
+
+    const duration =
+      getStopDuration(
+        candidate,
+        draft,
+        candidateStart,
+        latestEnd
+      );
+
+    if (
+      duration === null ||
+      candidateStart <
+        windowStart ||
+      candidateStart +
+        duration >
+        latestEnd ||
+      !isAvailableForSlot(
+        candidate,
+        candidateStart,
+        duration
+      )
+    ) {
+      continue;
+    }
+
+    proposals.push({
+      stop: {
+        candidate,
+        start:
+          candidateStart,
+        end:
+          candidateStart +
+          duration,
+        travelFromPreviousMinutes:
+          null
+      },
+      contextualScore:
+        candidate.score -
+        travelMinutes * 0.22
+    });
+  }
+
+  return chooseProposal(
+    proposals,
+    draft
+  );
+}
+
+function normalizeProposedStops(
+  stops: ProposedStop[],
+  transportation: string
+): ProposedStop[] {
+  return [...stops]
+    .sort(
+      (first, second) =>
+        first.start -
+        second.start
+    )
+    .map(
+      (stop, index, ordered) => ({
+        ...stop,
+        travelFromPreviousMinutes:
+          index === 0
+            ? null
+            : getTravelMinutes(
+                ordered[
+                  index - 1
+                ].candidate.listing,
+                stop.candidate.listing,
+                transportation
+              )
+      })
+    );
+}
+
+function buildPlanForSlots(
+  slots: RequestedSlot[],
+  candidates: Candidate[],
+  draft: GenerateOutingRequest,
+  windowStart: number,
+  windowEnd: number,
+  budgetLimit: number | null
+): ProposedStop[] {
+  if (
+    slots.length === 0
+  ) {
+    return [];
+  }
+
+  const workingSlots =
+    slots.map(
+      (slot) => ({
+        ...slot
+      })
+    );
+
+  let pivotIndex =
+    workingSlots.findIndex(
+      (slot) => {
+        if (!slot.listingKey) {
+          return false;
+        }
+
+        return candidates.some(
+          (candidate) =>
+            getListingKey(
+              candidate.listing
+            ) ===
+              slot.listingKey &&
+            candidate.kind ===
+              "event"
+        );
+      }
+    );
+
+  if (pivotIndex < 0) {
+    pivotIndex =
+      workingSlots.findIndex(
+        (slot) =>
+          slot.kind === "event"
+      );
+
+    if (pivotIndex >= 0) {
+      const eventCandidates =
+        candidates.filter(
+          (candidate) =>
+            candidate.kind ===
+              "event"
+        );
+
+      const eventCandidate =
+        draft.buildMethod ===
+          "surprise" &&
+        eventCandidates.length > 1
+          ? eventCandidates[
+              Math.floor(
+                Math.pow(
+                  Math.random(),
+                  2
+                ) *
+                Math.min(
+                  5,
+                  eventCandidates.length
+                )
+              )
+            ]
+          : eventCandidates[0];
+
+      if (eventCandidate) {
+        workingSlots[
+          pivotIndex
+        ].listingKey =
+          getListingKey(
+            eventCandidate.listing
+          );
+      }
+    }
+  }
+
+  if (pivotIndex >= 0) {
+    const pivotSlot =
+      workingSlots[
+        pivotIndex
+      ];
+
+    const pivotCandidate =
+      getCandidateForSlot(
+        pivotSlot,
+        candidates,
+        new Set()
+      )[0];
+
+    if (
+      pivotCandidate &&
+      pivotCandidate.kind ===
+        "event" &&
+      pivotCandidate.fixedStart !==
+        undefined
+    ) {
+      const pivotStart =
+        pivotCandidate.fixedStart;
+
+      const pivotDuration =
+        getStopDuration(
+          pivotCandidate,
+          draft,
+          pivotStart,
+          windowEnd
+        );
+
+      if (
+        pivotDuration !== null &&
+        pivotStart >=
+          windowStart &&
+        pivotStart +
+          pivotDuration <=
+          windowEnd
+      ) {
+        const usedKeys =
+          new Set<string>([
+            getListingKey(
+              pivotCandidate.listing
+            )
+          ]);
+
+        const stops:
+          ProposedStop[] = [
+            {
+              candidate:
+                pivotCandidate,
+              start:
+                pivotStart,
+              end:
+                pivotStart +
+                pivotDuration,
+              travelFromPreviousMinutes:
+                null
+            }
+          ];
+
+        let currentCost =
+          pivotCandidate.estimatedCostCad ??
+          0;
+
+        let latestBoundary =
+          pivotStart;
+
+        let nextListing =
+          pivotCandidate.listing;
+
+        for (
+          let index =
+            pivotIndex - 1;
+          index >= 0;
+          index -= 1
+        ) {
+          const selected =
+            chooseBackwardStop(
+              workingSlots[index],
+              candidates,
+              usedKeys,
+              draft,
+              latestBoundary,
+              windowStart,
+              nextListing,
+              currentCost,
+              budgetLimit
+            );
+
+          if (!selected) {
+            continue;
+          }
+
+          stops.push(selected);
+          usedKeys.add(
+            getListingKey(
+              selected.candidate
+                .listing
+            )
+          );
+          currentCost +=
+            selected.candidate
+              .estimatedCostCad ??
+            0;
+          latestBoundary =
+            selected.start;
+          nextListing =
+            selected.candidate
+              .listing;
+        }
+
+        let earliestTime =
+          pivotStart +
+          pivotDuration;
+
+        let previousListing =
+          pivotCandidate.listing;
+
+        for (
+          let index =
+            pivotIndex + 1;
+          index <
+            workingSlots.length;
+          index += 1
+        ) {
+          const selected =
+            chooseForwardStop(
+              workingSlots[index],
+              candidates,
+              usedKeys,
+              draft,
+              earliestTime,
+              windowEnd,
+              previousListing,
+              currentCost,
+              budgetLimit
+            );
+
+          if (!selected) {
+            continue;
+          }
+
+          stops.push(selected);
+          usedKeys.add(
+            getListingKey(
+              selected.candidate
+                .listing
+            )
+          );
+          currentCost +=
+            selected.candidate
+              .estimatedCostCad ??
+            0;
+          earliestTime =
+            selected.end;
+          previousListing =
+            selected.candidate
+              .listing;
+        }
+
+        return normalizeProposedStops(
+          stops,
+          draft.transportation
+        ).slice(0, 5);
+      }
+    }
+  }
+
+  const stops:
+    ProposedStop[] = [];
+
+  const usedKeys =
+    new Set<string>();
+
+  let currentCost = 0;
+  let currentTime =
+    windowStart;
+
+  let previousListing:
+    Listing | null = null;
+
+  for (
+    const slot
+    of workingSlots
+  ) {
+    const selected =
+      chooseForwardStop(
+        slot,
+        candidates,
+        usedKeys,
+        draft,
+        currentTime,
+        windowEnd,
+        previousListing,
+        currentCost,
+        budgetLimit
+      );
+
+    if (!selected) {
+      continue;
+    }
+
+    stops.push(selected);
+    usedKeys.add(
+      getListingKey(
+        selected.candidate
+          .listing
+      )
+    );
+    currentCost +=
+      selected.candidate
+        .estimatedCostCad ??
+      0;
+    currentTime =
+      selected.end;
+    previousListing =
+      selected.candidate
+        .listing;
+  }
+
+  return normalizeProposedStops(
+    stops,
+    draft.transportation
+  ).slice(0, 5);
 }
 
 function getPlanTitle(
   draft: GenerateOutingRequest,
   stops: ProposedStop[]
 ): string {
+  if (
+    draft.buildMethod ===
+      "anchor" &&
+    draft.anchorListingName
+  ) {
+    return `${draft.outingTypeTitle} around ${draft.anchorListingName}`;
+  }
+
   const neighbourhoods =
     Array.from(
       new Set(
@@ -2023,51 +3706,73 @@ export async function POST(
     places
   ] = await Promise.all([
     getPublishedEventListings(
-      100
+      180
     ),
-
     getPublishedPlaceListings(
-      100
+      220
     )
   ]);
 
-  const candidates = [
+  const allListings = [
     ...events,
     ...places
-  ]
-    .map(
-      (listing) =>
-        createCandidate(
-          listing,
-          draft,
-          windowStart,
-          windowEnd
-        )
-    )
-    .filter(
-      (
-        candidate
-      ): candidate is Candidate =>
-        candidate !== null
-    )
-    .sort(
-      (first, second) =>
-        second.score -
-        first.score
-    );
+  ];
 
-  const eventCandidates =
-    candidates.filter(
-      (candidate) =>
-        candidate.listing.type ===
-        "event"
-    );
+  const candidates =
+    allListings
+      .map(
+        (listing) =>
+          createCandidate(
+            listing,
+            draft,
+            windowStart,
+            windowEnd
+          )
+      )
+      .filter(
+        (
+          candidate
+        ): candidate is Candidate =>
+          candidate !== null
+      )
+      .sort(
+        (first, second) =>
+          second.score -
+          first.score
+      );
 
-  const placeCandidates =
-    candidates.filter(
-      (candidate) =>
-        candidate.listing.type ===
-        "restaurant"
+  const anchorCandidate =
+    draft.anchorListingKey
+      ? candidates.find(
+          (candidate) =>
+            getListingKey(
+              candidate.listing
+            ) ===
+            draft.anchorListingKey
+        ) ?? null
+      : null;
+
+  if (
+    draft.buildMethod ===
+      "anchor" &&
+    !anchorCandidate
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "Your chosen starting point is not available inside this date and time window. Change the time, length, or starting listing."
+      },
+      {
+        status: 409
+      }
+    );
+  }
+
+  const requestedSlots =
+    buildRequestedSlots(
+      draft,
+      candidates,
+      anchorCandidate
     );
 
   const budgetLimit =
@@ -2075,60 +3780,36 @@ export async function POST(
       draft.budget
     );
 
-  const shouldUseEventAnchor =
-    draft.outingTypeId !==
-      "food-crawl" &&
-    eventCandidates.length >
-      0;
-
-  let proposedStops:
-    ProposedStop[] = [];
-
-  if (shouldUseEventAnchor) {
-    for (
-      const eventCandidate
-      of eventCandidates
-    ) {
-      if (
-        !canAffordCandidate(
-          0,
-          eventCandidate,
-          budgetLimit
-        )
-      ) {
-        continue;
-      }
-
-      proposedStops =
-        buildPlanAroundEvent(
-          eventCandidate,
-          placeCandidates,
-          draft,
-          windowStart,
-          windowEnd,
-          budgetLimit
-        );
-
-      if (
-        proposedStops.length >
-        0
-      ) {
-        break;
-      }
-    }
-  }
+  const proposedStops =
+    buildPlanForSlots(
+      requestedSlots,
+      candidates,
+      draft,
+      windowStart,
+      windowEnd,
+      budgetLimit
+    );
 
   if (
-    proposedStops.length === 0
+    draft.anchorListingKey &&
+    !proposedStops.some(
+      (stop) =>
+        getListingKey(
+          stop.candidate
+            .listing
+        ) ===
+        draft.anchorListingKey
+    )
   ) {
-    proposedStops =
-      buildFlexiblePlan(
-        candidates,
-        draft,
-        windowStart,
-        windowEnd,
-        budgetLimit
-      );
+    return NextResponse.json(
+      {
+        error:
+          "Venture could not safely connect the chosen starting point to the requested stops inside this time and travel window."
+      },
+      {
+        status: 409
+      }
+    );
   }
 
   const stops:
@@ -2137,34 +3818,29 @@ export async function POST(
         (stop, index) => ({
           order:
             index + 1,
-
+          kind:
+            stop.candidate.kind,
           startTime:
             formatMinutes(
               stop.start
             ),
-
           endTime:
             formatMinutes(
               stop.end
             ),
-
           durationMinutes:
             stop.end -
             stop.start,
-
           travelFromPreviousMinutes:
             stop.travelFromPreviousMinutes,
-
           estimatedCostCad:
             stop.candidate
               .estimatedCostCad,
-
           reason:
             getStopReason(
               stop.candidate,
               draft
             ),
-
           listing:
             stop.candidate
               .listing
@@ -2199,20 +3875,68 @@ export async function POST(
   const warnings:
     string[] = [];
 
-  if (stops.length === 0) {
-    warnings.push(
-      "No verified listings matched the selected date, time, hours, and preferences."
-    );
-  } else if (
-    stops.length < 3
+  if (
+    stops.length === 0
   ) {
     warnings.push(
-      `Only ${stops.length} verified ${
-        stops.length === 1
-          ? "stop was"
-          : "stops were"
-      } available without inventing or using unconfirmed information.`
+      "No verified listings matched the selected date, time, hours, categories, and preferences."
     );
+  }
+
+  const requestedSequence =
+    requestedSlots.map(
+      (slot) =>
+        slot.kind
+    );
+
+  const requestedMix =
+    countSequence(
+      requestedSequence
+    );
+
+  const actualMix =
+    countSequence(
+      stops.map(
+        (stop) =>
+          stop.kind
+      )
+    );
+
+  const categoryLabels:
+    Array<{
+      key: keyof StopMix;
+      label: string;
+    }> = [
+      {
+        key: "food",
+        label: "food"
+      },
+      {
+        key: "events",
+        label: "event"
+      },
+      {
+        key: "drinks",
+        label: "drinks"
+      }
+    ];
+
+  for (
+    const category
+    of categoryLabels
+  ) {
+    if (
+      actualMix[category.key] <
+      requestedMix[category.key]
+    ) {
+      warnings.push(
+        `Venture found ${actualMix[category.key]} of ${requestedMix[category.key]} requested ${category.label} ${
+          requestedMix[category.key] === 1
+            ? "stop"
+            : "stops"
+        } inside the verified time and travel window.`
+      );
+    }
   }
 
   if (
@@ -2227,38 +3951,91 @@ export async function POST(
     );
   }
 
+  const combinedStopText =
+    stops
+      .map(
+        (stop) =>
+          getListingText(
+            stop.listing
+          )
+      )
+      .join(" ");
+
+  const missingMustIncludeTerms =
+    draft.mustIncludeTerms.filter(
+      (term) =>
+        !combinedStopText.includes(
+          normalize(term)
+        )
+    );
+
+  if (
+    missingMustIncludeTerms.length >
+    0
+  ) {
+    warnings.push(
+      `Venture could not confidently include: ${missingMustIncludeTerms.join(", ")}.`
+    );
+  }
+
   return NextResponse.json({
     planId:
       crypto.randomUUID(),
-
     generatedAt:
       new Date().toISOString(),
-
     title:
       getPlanTitle(
         draft,
         proposedStops
       ),
-
     date:
       draft.date,
-
     requestedStartTime:
       draft.startTime,
-
     requestedDuration:
       draft.duration,
-
     transportation:
       draft.transportation,
-
     alcoholFree:
       draft.alcoholFree,
-
+    planningMode:
+      draft.planningMode,
+    buildMethod:
+      draft.buildMethod,
+    partySize:
+      draft.partySize,
+    maxTravelMinutes:
+      draft.maxTravelMinutes,
+    mustIncludeTerms:
+      draft.mustIncludeTerms,
+    avoidTerms:
+      draft.avoidTerms,
+    requestedMix,
+    actualMix,
+    anchorListingKey:
+      draft.anchorListingKey,
+    anchorListingName:
+      draft.anchorListingName,
+    soloVibe:
+      draft.soloVibe,
+    soloPace:
+      draft.soloPace,
+    groupVibe:
+      draft.groupVibe,
+    groupPriority:
+      draft.groupPriority,
     estimatedTotalCad,
+    estimatedGroupTotalCad:
+      estimatedTotalCad ===
+      null
+        ? null
+        : estimatedTotalCad *
+          draft.partySize,
     stops,
-    warnings,
-
+    warnings:
+      Array.from(
+        new Set(warnings)
+      ),
     candidateCount:
       candidates.length
   });

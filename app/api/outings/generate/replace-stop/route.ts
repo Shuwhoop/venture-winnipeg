@@ -53,6 +53,10 @@ type OutingDraft = {
   budget: BudgetPreference;
   transportation: string;
   alcoholFree: boolean;
+  partySize: number;
+  maxTravelMinutes: number;
+  mustIncludeTerms: string[];
+  avoidTerms: string[];
   createdAt?: string;
 };
 
@@ -232,6 +236,72 @@ function parseRequest(
       | GeneratedOutingPlan
       | undefined;
 
+  const partySize =
+    typeof draft?.partySize ===
+      "number" &&
+    Number.isFinite(
+      draft.partySize
+    )
+      ? Math.min(
+          12,
+          Math.max(
+            1,
+            Math.round(
+              draft.partySize
+            )
+          )
+        )
+      : 1;
+
+  const maxTravelMinutes =
+    typeof draft?.maxTravelMinutes ===
+      "number" &&
+    Number.isFinite(
+      draft.maxTravelMinutes
+    )
+      ? Math.min(
+          90,
+          Math.max(
+            5,
+            Math.round(
+              draft.maxTravelMinutes
+            )
+          )
+        )
+      : 20;
+
+  const mustIncludeTerms =
+    draft?.mustIncludeTerms ===
+      undefined
+      ? []
+      : isStringArray(
+          draft.mustIncludeTerms
+        )
+        ? draft.mustIncludeTerms
+            .map(
+              (term) =>
+                term.trim()
+            )
+            .filter(Boolean)
+            .slice(0, 8)
+        : null;
+
+  const avoidTerms =
+    draft?.avoidTerms ===
+      undefined
+      ? []
+      : isStringArray(
+          draft.avoidTerms
+        )
+        ? draft.avoidTerms
+            .map(
+              (term) =>
+                term.trim()
+            )
+            .filter(Boolean)
+            .slice(0, 8)
+        : null;
+
   if (
     !draft ||
     typeof draft !== "object" ||
@@ -266,7 +336,11 @@ function parseRequest(
     typeof draft.transportation !==
       "string" ||
     typeof draft.alcoholFree !==
-      "boolean"
+      "boolean" ||
+    mustIncludeTerms ===
+      null ||
+    avoidTerms ===
+      null
   ) {
     return null;
   }
@@ -316,6 +390,11 @@ function parseRequest(
 
       alcoholFree:
         draft.alcoholFree,
+
+      partySize,
+      maxTravelMinutes,
+      mustIncludeTerms,
+      avoidTerms,
 
       createdAt:
         typeof draft.createdAt ===
@@ -1003,6 +1082,25 @@ function isAlcoholFocused(
   );
 }
 
+function getListingKind(
+  listing: Listing
+):
+  | "food"
+  | "event"
+  | "drinks" {
+  if (
+    listing.type === "event"
+  ) {
+    return "event";
+  }
+
+  return isAlcoholFocused(
+    listing
+  )
+    ? "drinks"
+    : "food";
+}
+
 function getEstimatedCost(
   listing: Listing
 ): number | null {
@@ -1076,6 +1174,30 @@ function getBudgetLimit(
   }
 }
 
+function matchesAnyTerm(
+  listing: Listing,
+  terms: string[]
+): boolean {
+  if (
+    terms.length ===
+    0
+  ) {
+    return false;
+  }
+
+  const text =
+    getListingText(
+      listing
+    );
+
+  return terms.some(
+    (term) =>
+      text.includes(
+        normalize(term)
+      )
+  );
+}
+
 function scoreListing(
   listing: Listing,
   targetListing: Listing,
@@ -1084,6 +1206,11 @@ function scoreListing(
   score: number;
   matchedInterests: string[];
 } {
+  const text =
+    getListingText(
+      listing
+    );
+
   const matchedInterests =
     getMatchedInterests(
       listing,
@@ -1092,6 +1219,19 @@ function scoreListing(
 
   let score =
     matchedInterests.length * 6;
+
+  for (
+    const term
+    of draft.mustIncludeTerms
+  ) {
+    if (
+      text.includes(
+        normalize(term)
+      )
+    ) {
+      score += 10;
+    }
+  }
 
   if (
     listing.type ===
@@ -1284,8 +1424,20 @@ function getTravelMinutes(
 function fitsTransportation(
   first: Listing,
   second: Listing,
-  transportation: string
+  transportation: string,
+  maxTravelMinutes: number
 ): boolean {
+  if (
+    getTravelMinutes(
+      first,
+      second,
+      transportation
+    ) >
+    maxTravelMinutes
+  ) {
+    return false;
+  }
+
   const distance =
     getDistanceKm(
       first,
@@ -1397,6 +1549,12 @@ export async function POST(
       }
     );
   }
+
+  const targetKind =
+    targetStop.kind ??
+    getListingKind(
+      targetStop.listing
+    );
 
   const normalizedTimes =
     getNormalizedStopTimes(
@@ -1516,6 +1674,14 @@ export async function POST(
           }
 
           if (
+            getListingKind(
+              listing
+            ) !== targetKind
+          ) {
+            return false;
+          }
+
+          if (
             !trustedStatuses.has(
               listing.verification
             )
@@ -1527,6 +1693,15 @@ export async function POST(
             draft.alcoholFree &&
             isAlcoholFocused(
               listing
+            )
+          ) {
+            return false;
+          }
+
+          if (
+            matchesAnyTerm(
+              listing,
+              draft.avoidTerms
             )
           ) {
             return false;
@@ -1566,7 +1741,8 @@ export async function POST(
               !fitsTransportation(
                 previousStop.listing,
                 listing,
-                draft.transportation
+                draft.transportation,
+                draft.maxTravelMinutes
               )
             ) {
               return false;
@@ -1596,7 +1772,8 @@ export async function POST(
               !fitsTransportation(
                 listing,
                 nextStop.listing,
-                draft.transportation
+                draft.transportation,
+                draft.maxTravelMinutes
               )
             ) {
               return false;
@@ -1677,6 +1854,11 @@ export async function POST(
   const replacementStop:
     GeneratedOutingStop = {
       ...targetStop,
+
+      kind:
+        getListingKind(
+          replacement.listing
+        ),
 
       travelFromPreviousMinutes:
         travelFromPrevious,
@@ -1783,6 +1965,22 @@ export async function POST(
               ) =>
                 total + cost,
               0
+            )
+          : null,
+
+      estimatedGroupTotalCad:
+        knownCosts.length > 0
+          ? knownCosts.reduce(
+              (
+                total,
+                cost
+              ) =>
+                total + cost,
+              0
+            ) *
+            Math.max(
+              1,
+              draft.partySize
             )
           : null,
 

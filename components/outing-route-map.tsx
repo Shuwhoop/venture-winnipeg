@@ -9,9 +9,11 @@ import {
 import maplibregl from "maplibre-gl";
 
 import "maplibre-gl/dist/maplibre-gl.css";
+
 import {
   getVentureMapStyle
 } from "@/lib/venture-map-style";
+
 import type {
   GeneratedOutingPlan
 } from "@/lib/saved-outings";
@@ -23,7 +25,6 @@ type OutingRouteMapProps = {
 type CoordinateStop = {
   stop:
     GeneratedOutingPlan["stops"][number];
-
   latitude: number;
   longitude: number;
 };
@@ -44,31 +45,41 @@ function createPopupContent(
   } = coordinateStop;
 
   const popup =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   popup.className =
     "venture-map-popup";
 
   const order =
-    document.createElement("span");
+    document.createElement(
+      "span"
+    );
 
   order.textContent =
     `Stop ${stop.order}`;
 
   const heading =
-    document.createElement("strong");
+    document.createElement(
+      "strong"
+    );
 
   heading.textContent =
     stop.listing.name;
 
   const time =
-    document.createElement("small");
+    document.createElement(
+      "small"
+    );
 
   time.textContent =
     `${stop.startTime}–${stop.endTime}`;
 
   const link =
-    document.createElement("a");
+    document.createElement(
+      "a"
+    );
 
   link.href =
     `/listings/${stop.listing.slug}`;
@@ -94,11 +105,15 @@ function getGoogleMapsTravelMode(
       .trim()
       .toLowerCase();
 
-  if (normalized === "walking") {
+  if (
+    normalized === "walking"
+  ) {
     return "walking";
   }
 
-  if (normalized === "transit") {
+  if (
+    normalized === "transit"
+  ) {
     return "transit";
   }
 
@@ -110,10 +125,14 @@ function getGoogleMapsStopQuery(
     GeneratedOutingPlan["stops"][number]
 ): string {
   const latitude =
-    Number(stop.listing.latitude);
+    Number(
+      stop.listing.latitude
+    );
 
   const longitude =
-    Number(stop.listing.longitude);
+    Number(
+      stop.listing.longitude
+    );
 
   if (
     Number.isFinite(latitude) &&
@@ -151,12 +170,16 @@ function buildGoogleMapsUrl(
       getGoogleMapsStopQuery
     );
 
-  if (stopQueries.length === 0) {
+  if (
+    stopQueries.length === 0
+  ) {
     return null;
   }
 
-  if (stopQueries.length === 1) {
-    const params =
+  if (
+    stopQueries.length === 1
+  ) {
+    const parameters =
       new URLSearchParams({
         api: "1",
         query:
@@ -165,22 +188,19 @@ function buildGoogleMapsUrl(
 
     return (
       "https://www.google.com/maps/search/?" +
-      params.toString()
+      parameters.toString()
     );
   }
 
-  const params =
+  const parameters =
     new URLSearchParams({
       api: "1",
-
       origin:
         stopQueries[0],
-
       destination:
         stopQueries[
           stopQueries.length - 1
         ],
-
       travelmode:
         getGoogleMapsTravelMode(
           plan.transportation
@@ -193,8 +213,10 @@ function buildGoogleMapsUrl(
       -1
     );
 
-  if (waypoints.length > 0) {
-    params.set(
+  if (
+    waypoints.length > 0
+  ) {
+    parameters.set(
       "waypoints",
       waypoints.join("|")
     );
@@ -202,65 +224,135 @@ function buildGoogleMapsUrl(
 
   return (
     "https://www.google.com/maps/dir/?" +
-    params.toString()
+    parameters.toString()
   );
+}
+
+function getStopIcon(
+  stop:
+    GeneratedOutingPlan["stops"][number]
+): string {
+  if (
+    stop.kind === "event" ||
+    stop.listing.type ===
+      "event"
+  ) {
+    return "🎟";
+  }
+
+  if (
+    stop.kind === "drinks"
+  ) {
+    return "🍸";
+  }
+
+  return "🍽";
+}
+
+function getStopKindLabel(
+  stop:
+    GeneratedOutingPlan["stops"][number]
+): string {
+  if (
+    stop.kind === "event" ||
+    stop.listing.type ===
+      "event"
+  ) {
+    return "Event";
+  }
+
+  if (
+    stop.kind === "drinks"
+  ) {
+    return "Drinks";
+  }
+
+  return "Food";
+}
+
+function getStopKindClassName(
+  stop:
+    GeneratedOutingPlan["stops"][number]
+): string {
+  if (
+    stop.kind === "event" ||
+    stop.listing.type ===
+      "event"
+  ) {
+    return "event";
+  }
+
+  if (
+    stop.kind === "drinks"
+  ) {
+    return "drinks";
+  }
+
+  return "food";
 }
 
 export function OutingRouteMap({
   plan
 }: OutingRouteMapProps) {
   const containerRef =
-    useRef<HTMLDivElement>(null);
+    useRef<HTMLDivElement>(
+      null
+    );
 
   const mapRef =
     useRef<maplibregl.Map | null>(
       null
     );
 
+  const orderedStops =
+    useMemo(
+      () =>
+        [...plan.stops].sort(
+          (first, second) =>
+            first.order -
+            second.order
+        ),
+      [plan.stops]
+    );
+
   const coordinateStops =
     useMemo<CoordinateStop[]>(
       () =>
-        [...plan.stops]
-          .sort(
-            (first, second) =>
-              first.order -
-              second.order
-          )
-          .flatMap(
-            (stop) => {
-              const latitude =
-                Number(
-                  stop.listing
-                    .latitude
-                );
+        orderedStops.flatMap(
+          (stop) => {
+            const latitude =
+              Number(
+                stop.listing
+                  .latitude
+              );
 
-              const longitude =
-                Number(
-                  stop.listing
-                    .longitude
-                );
+            const longitude =
+              Number(
+                stop.listing
+                  .longitude
+              );
 
-              if (
-                !Number.isFinite(
-                  latitude
-                ) ||
-                !Number.isFinite(
-                  longitude
-                )
-              ) {
-                return [];
-              }
-
-              return [
-                {
-                  stop,
-                  latitude,
-                  longitude
-                }
-              ];
+            if (
+              !Number.isFinite(
+                latitude
+              ) ||
+              !Number.isFinite(
+                longitude
+              )
+            ) {
+              return [];
             }
-          ),
-      [plan.stops]
+
+            return [
+              {
+                stop,
+                latitude,
+                longitude
+              }
+            ];
+          }
+        ),
+      [orderedStops]
     );
 
   const googleMapsUrl =
@@ -274,14 +366,19 @@ export function OutingRouteMap({
 
   useEffect(() => {
     if (
-      !containerRef.current ||
+      !containerRef.current
+    ) {
+      return;
+    }
+
+    if (
       coordinateStops.length === 0
     ) {
       return;
     }
 
     const mapStyle =
-    getVentureMapStyle();
+      getVentureMapStyle();
 
     const firstStop =
       coordinateStops[0];
@@ -290,15 +387,15 @@ export function OutingRouteMap({
       new maplibregl.Map({
         container:
           containerRef.current,
-
         style:
           mapStyle,
-
-        center: [
-          firstStop.longitude,
-          firstStop.latitude
-        ],
-
+        center:
+          firstStop
+            ? [
+                firstStop.longitude,
+                firstStop.latitude
+              ]
+            : WINNIPEG_CENTER,
         zoom:
           coordinateStops.length ===
           1
@@ -331,7 +428,8 @@ export function OutingRouteMap({
           "button"
         );
 
-      element.type = "button";
+      element.type =
+        "button";
 
       element.className =
         "outing-route-marker";
@@ -398,12 +496,9 @@ export function OutingRouteMap({
             "venture-outing-route",
             {
               type: "geojson",
-
               data: {
                 type: "Feature",
-
                 properties: {},
-
                 geometry: {
                   type: "LineString",
                   coordinates
@@ -412,33 +507,50 @@ export function OutingRouteMap({
             }
           );
 
-            map.addLayer({
-            id: "venture-outing-route-line",
-
+          map.addLayer({
+            id:
+              "venture-outing-route-halo",
             type: "line",
-
-            source: "venture-outing-route",
-
+            source:
+              "venture-outing-route",
             layout: {
-                "line-cap": "round",
-                "line-join": "round"
+              "line-cap": "round",
+              "line-join": "round"
             },
-
             paint: {
-                "line-color": "#7c3aed",
-                "line-width": 4,
-                "line-opacity": 0.78,
-                "line-dasharray": [
-                1.2,
-                1.2
-                ]
+              "line-color":
+                "#ffcf00",
+              "line-width": 10,
+              "line-opacity": 0.8
             }
-            });
+          });
+
+          map.addLayer({
+            id:
+              "venture-outing-route-line",
+            type: "line",
+            source:
+              "venture-outing-route",
+            layout: {
+              "line-cap": "round",
+              "line-join": "round"
+            },
+            paint: {
+              "line-color":
+                "#d01013",
+              "line-width": 4,
+              "line-opacity": 0.95,
+              "line-dasharray": [
+                1.2,
+                1.1
+              ]
+            }
+          });
 
           map.fitBounds(
             bounds,
             {
-              padding: 55,
+              padding: 58,
               maxZoom: 14,
               duration: 700
             }
@@ -454,26 +566,26 @@ export function OutingRouteMap({
       );
 
       map.remove();
-
-      mapRef.current = null;
+      mapRef.current =
+        null;
     };
   }, [coordinateStops]);
 
   return (
-    <section className="outing-route-panel">
+    <section className="outing-route-panel outing-route-panel-featured">
       <div className="outing-route-heading">
         <div>
           <span>
-            ROUTE OVERVIEW
+            START WITH THE MAP
           </span>
 
           <h2>
-            Your night on the map
+            Your route at a glance
           </h2>
 
           <p>
-            Stops are numbered in
-            itinerary order.
+            Tap a numbered marker to
+            preview each stop.
           </p>
         </div>
 
@@ -483,7 +595,7 @@ export function OutingRouteMap({
             target="_blank"
             rel="noreferrer"
           >
-            Open in Google Maps
+            Open route
             <span aria-hidden="true">
               ↗
             </span>
@@ -491,11 +603,52 @@ export function OutingRouteMap({
         ) : null}
       </div>
 
+      <div className="outing-map-stop-strip">
+        {orderedStops.map(
+          (stop) => {
+            const kindClassName =
+              getStopKindClassName(
+                stop
+              );
+
+            return (
+              <article
+                className={`outing-map-stop-pill outing-map-stop-pill-${kindClassName}`}
+                key={`${stop.listing.type}-${stop.listing.id}-${stop.order}`}
+              >
+                <b>
+                  {stop.order}
+                </b>
+
+                <i aria-hidden="true">
+                  {getStopIcon(stop)}
+                </i>
+
+                <div>
+                  <strong>
+                    {stop.listing.name}
+                  </strong>
+
+                  <small>
+                    {getStopKindLabel(
+                      stop
+                    )}
+                    {stop.listing.neighbourhood
+                      ? ` • ${stop.listing.neighbourhood}`
+                      : ""}
+                  </small>
+                </div>
+              </article>
+            );
+          }
+        )}
+      </div>
+
       {coordinateStops.length >
       0 ? (
         <div
           ref={containerRef}
-          className="outing-route-map"
+          className="outing-route-map outing-route-map-featured"
           role="region"
           aria-label="Map showing the generated outing route"
         />
@@ -515,9 +668,9 @@ export function OutingRouteMap({
       )}
 
       <p className="outing-route-note">
-        Venture shows a visual overview.
-        Google Maps calculates the actual
-        street, transit, and traffic route.
+        Venture shows the outing order.
+        Google Maps calculates live
+        streets, transit, and traffic.
       </p>
     </section>
   );

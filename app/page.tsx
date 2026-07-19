@@ -1,3 +1,5 @@
+import NewsletterSignup from "@/components/newsletter-signup/newsletter-signup";
+
 import Link from "next/link";
 
 import {
@@ -304,25 +306,7 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <section className="newsletter-panel">
-        <span>
-          EVERY THURSDAY
-        </span>
-
-        <h2>
-          Venture This Weekend
-        </h2>
-
-        <p>
-          One clean email with notable
-          events, food spots, and outing
-          ideas across Winnipeg.
-        </p>
-
-        <span className="newsletter-coming-soon">
-          Newsletter signup coming soon
-        </span>
-      </section>
+      <NewsletterSignup placement="home" />
     </>
   );
 }

@@ -1,5 +1,8 @@
 "use client";
 
+
+import NewsletterSignup from "@/components/newsletter-signup/newsletter-signup";
+
 import {
   useEffect,
   useState
@@ -384,6 +387,8 @@ export default function ProfilePage() {
           </p>
         ) : null}
       </section>
+    
+      <NewsletterSignup placement="profile" />
     </>
   );
 }
