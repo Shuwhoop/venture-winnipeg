@@ -21,3 +21,25 @@ data/overture-winnipeg-places.geojson.state
 *.before-auth.bak
 
 *.bak
+# Venture local backups and generated packages
+venture-backups/
+build-outing-backup-*/
+payload/
+venture-outing-creator-v3-package/
+*.zip
+*.rar
+*.7z
+
+# Local secrets and configuration
+.env.*
+!.env.example
+
+# Next.js and Node output
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+
+# Operating-system clutter
+Thumbs.db
