@@ -5,6 +5,10 @@ import {
   useState
 } from "react";
 
+import {
+  trackBetaEvent
+} from "@/lib/beta/client";
+
 type ReportIssueFormProps = {
   entityId: string;
   entityType: "event" | "place";
@@ -81,6 +85,18 @@ export function ReportIssueForm({
         result.message ??
             "Thanks. Your report was submitted for review."
         );
+
+        trackBetaEvent({
+          eventName: "report_submitted",
+          pagePath: window.location.pathname,
+          properties: {
+            entityId,
+            entityType,
+            listingName,
+            reason:
+              String(form.get("reason") || "")
+          }
+        });
 
         setTimeout(() => {
         setIsOpen(false);

@@ -6,6 +6,10 @@ import {
   SaveButton
 } from "@/components/save-button";
 
+import {
+  trackBetaEvent
+} from "@/lib/beta/client";
+
 import type {
   Listing
 } from "@/lib/types";
@@ -48,13 +52,43 @@ export function ListingCard({
           type="button"
           aria-label={`Show ${listing.name} on the map`}
           aria-pressed={selected}
-          onClick={() => onSelect(listing)}
+          onClick={() => {
+            trackBetaEvent({
+              eventName: "listing_map_selected",
+              pagePath: window.location.pathname,
+              properties: {
+                listingId: listing.id,
+                listingSlug: listing.slug,
+                listingType: listing.type,
+                listingName: listing.name,
+                category: listing.category,
+                neighbourhood: listing.neighbourhood
+              }
+            });
+
+            onSelect(listing);
+          }}
         />
       ) : (
         <Link
           className="listing-card-link"
           href={`/listings/${listing.slug}`}
           aria-label={`View ${listing.name}`}
+          onClick={() => {
+            trackBetaEvent({
+              eventName: "listing_detail_opened",
+              pagePath: window.location.pathname,
+              properties: {
+                listingId: listing.id,
+                listingSlug: listing.slug,
+                listingType: listing.type,
+                listingName: listing.name,
+                category: listing.category,
+                neighbourhood: listing.neighbourhood,
+                source: "listing-card"
+              }
+            });
+          }}
         />
       )}
 
@@ -110,6 +144,21 @@ export function ListingCard({
             <Link
               className="listing-card-view-link"
               href={`/listings/${listing.slug}`}
+              onClick={() => {
+                trackBetaEvent({
+                  eventName: "listing_detail_opened",
+                  pagePath: window.location.pathname,
+                  properties: {
+                    listingId: listing.id,
+                    listingSlug: listing.slug,
+                    listingType: listing.type,
+                    listingName: listing.name,
+                    category: listing.category,
+                    neighbourhood: listing.neighbourhood,
+                    source: "map-card"
+                  }
+                });
+              }}
             >
               View details
             </Link>

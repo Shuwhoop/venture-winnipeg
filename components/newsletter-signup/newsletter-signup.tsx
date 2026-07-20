@@ -7,6 +7,10 @@ import {
 
 import Link from "next/link";
 
+import {
+  trackBetaEvent
+} from "@/lib/beta/client";
+
 import styles from "./newsletter-signup.module.css";
 
 
@@ -109,6 +113,7 @@ export default function NewsletterSignup({
         await response.json() as {
           message?: string;
           error?: string;
+          alreadySubscribed?: boolean;
         };
 
       if (!response.ok) {
@@ -128,6 +133,16 @@ export default function NewsletterSignup({
       );
 
       form.reset();
+
+      trackBetaEvent({
+        eventName: "newsletter_signup",
+        pagePath: window.location.pathname,
+        properties: {
+          placement,
+          alreadySubscribed:
+            Boolean(result.alreadySubscribed)
+        }
+      });
     } catch (error) {
       setFormState(
         "error"

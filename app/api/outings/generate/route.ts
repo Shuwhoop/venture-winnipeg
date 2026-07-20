@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
 import {
+  recordServerBetaEvent
+} from "@/lib/beta/server";
+
+import {
   getPublishedEventListings
 } from "@/lib/data/events";
 
@@ -4010,6 +4014,24 @@ export async function POST(
       }. Widen the area, travel limit, time window, or budget to complete the route.`
     );
   }
+
+  await recordServerBetaEvent({
+    request,
+    eventName: "outing_generated",
+    pagePath: "/build-outing/results",
+    properties: {
+      planStatus,
+      planningMode: draft.planningMode,
+      buildMethod: draft.buildMethod,
+      transportation: draft.transportation,
+      partySize: draft.partySize,
+      requestedStopCount,
+      actualStopCount,
+      missingStopCount,
+      candidateCount: candidates.length,
+      alcoholFree: draft.alcoholFree
+    }
+  });
 
   return NextResponse.json({
     planId:

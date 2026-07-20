@@ -4,14 +4,22 @@ import {
   BETA_EVENT_NAMES,
   BETA_FEEDBACK_CATEGORIES,
   type BetaEventName,
-  type BetaFeedbackCategory
+  type BetaFeedbackCategory,
+  type BetaPrimitive
 } from "@/lib/beta/types";
+import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const EMAIL_PATTERN =
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const ANALYTICS_VISITOR_COOKIE =
+  "venture_analytics_visitor";
+
+const ANALYTICS_SESSION_COOKIE =
+  "venture_analytics_session";
 
 type RateLimitEntry = {
   count: number;
@@ -94,6 +102,9 @@ export function cleanSessionId(
 
   return value.toLowerCase();
 }
+
+export const cleanVisitorId =
+  cleanSessionId;
 
 export function cleanPagePath(
   value: unknown
@@ -187,7 +198,7 @@ export function cleanContactEmail(
 
 export function cleanEventProperties(
   value: unknown
-): Record<string, string | number | boolean | null> {
+): Record<string, BetaPrimitive> {
   if (
     !value ||
     typeof value !== "object" ||
@@ -198,11 +209,11 @@ export function cleanEventProperties(
 
   const result: Record<
     string,
-    string | number | boolean | null
+    BetaPrimitive
   > = {};
 
   for (const [rawKey, rawValue] of Object.entries(value)) {
-    if (Object.keys(result).length >= 12) {
+    if (Object.keys(result).length >= 18) {
       break;
     }
 
@@ -216,11 +227,9 @@ export function cleanEventProperties(
       continue;
     }
 
-    if (
-      typeof rawValue === "string"
-    ) {
+    if (typeof rawValue === "string") {
       result[key] =
-        rawValue.slice(0, 160);
+        rawValue.slice(0, 180);
     } else if (
       typeof rawValue === "number" &&
       Number.isFinite(rawValue)
@@ -235,4 +244,150 @@ export function cleanEventProperties(
   }
 
   return result;
+}
+
+export function cleanClientCreatedAt(
+  value: unknown
+): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (!Number.isFinite(date.getTime())) {
+    return null;
+  }
+
+  const difference =
+    Math.abs(Date.now() - date.getTime());
+
+  if (difference > 24 * 60 * 60 * 1000) {
+    return null;
+  }
+
+  return date.toISOString();
+}
+
+export function cleanEventVersion(
+  value: unknown
+): number {
+  const numeric = Number(value);
+
+  if (
+    Number.isInteger(numeric) &&
+    numeric >= 1 &&
+    numeric <= 20
+  ) {
+    return numeric;
+  }
+
+  return 1;
+}
+
+function parseCookies(
+  request: Request
+): Map<string, string> {
+  const result = new Map<string, string>();
+  const value = request.headers.get("cookie") || "";
+
+  for (const part of value.split(";")) {
+    const separator = part.indexOf("=");
+
+    if (separator < 1) {
+      continue;
+    }
+
+    const key = part.slice(0, separator).trim();
+    const raw = part.slice(separator + 1).trim();
+
+    try {
+      result.set(key, decodeURIComponent(raw));
+    } catch {
+      result.set(key, raw);
+    }
+  }
+
+  return result;
+}
+
+export async function recordServerBetaEvent({
+  request,
+  eventName,
+  pagePath,
+  properties = {}
+}: {
+  request: Request;
+  eventName: BetaEventName;
+  pagePath: string;
+  properties?: Record<string, BetaPrimitive>;
+}) {
+  try {
+    const cookies = parseCookies(request);
+    const sessionId = cleanSessionId(
+      cookies.get(ANALYTICS_SESSION_COOKIE)
+    );
+    const visitorId = cleanVisitorId(
+      cookies.get(ANALYTICS_VISITOR_COOKIE)
+    );
+
+    if (!sessionId) {
+      return;
+    }
+
+    const supabase =
+      getSupabaseAdminClient();
+
+    const payload = {
+      session_id: sessionId,
+      visitor_id: visitorId,
+      event_name: eventName,
+      page_path: pagePath,
+      properties:
+        cleanEventProperties(properties),
+      event_version: 2,
+      client_created_at: null
+    };
+
+    const { error } =
+      await supabase
+        .from("beta_events")
+        .insert(payload);
+
+    if (
+      error &&
+      (
+        error.code === "42703" ||
+        error.code === "PGRST204"
+      )
+    ) {
+      await supabase
+        .from("beta_events")
+        .insert({
+          session_id: sessionId,
+          event_name: eventName,
+          page_path: pagePath,
+          properties:
+            cleanEventProperties(properties)
+        });
+
+      return;
+    }
+
+    if (error) {
+      console.error(
+        "Server analytics event insert failed",
+        {
+          code: error.code,
+          message: error.message,
+          eventName
+        }
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Server analytics event failed",
+      error
+    );
+  }
 }

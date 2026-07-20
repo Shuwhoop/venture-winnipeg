@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
 import {
+  recordServerBetaEvent
+} from "@/lib/beta/server";
+
+import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
 
@@ -433,6 +437,19 @@ export async function POST(
       new URL(
         request.url
       ).origin;
+
+    await recordServerBetaEvent({
+      request,
+      eventName: "outing_shared",
+      pagePath: "/build-outing/results",
+      properties: {
+        shareCode,
+        planningMode: draft.planningMode,
+        stopCount: plan.stops.length,
+        estimatedTotalCad:
+          plan.estimatedTotalCad
+      }
+    });
 
     return NextResponse.json(
       {

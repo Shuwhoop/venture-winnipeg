@@ -110,7 +110,8 @@ export default async function DataHealthPage({
         </div>
 
         <div className={styles.headerActions}>
-          <Link href="/admin/beta">Beta insights</Link>
+          <Link href="/admin/analytics">Analytics Lab</Link>
+          <Link href="/admin/beta">Beta inbox</Link>
           <Link href="/admin/import">Import inventory</Link>
           <Link href="/admin/submissions">Review submissions</Link>
           <a href="/api/admin/data-health" target="_blank" rel="noreferrer">

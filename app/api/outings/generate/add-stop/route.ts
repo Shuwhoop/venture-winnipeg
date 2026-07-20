@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
 import {
+  recordServerBetaEvent
+} from "@/lib/beta/server";
+
+import {
   getPublishedEventListings
 } from "@/lib/data/events";
 
@@ -2275,6 +2279,18 @@ export async function POST(
       candidateCount:
         candidates.length
     };
+
+  await recordServerBetaEvent({
+    request,
+    eventName: "outing_stop_added",
+    pagePath: "/build-outing/results",
+    properties: {
+      addedKind: requestedKind,
+      addedListingKey:
+        getListingKey(selected.listing),
+      candidateCount: candidates.length
+    }
+  });
 
   return NextResponse.json({
     plan:

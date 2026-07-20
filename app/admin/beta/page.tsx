@@ -64,6 +64,7 @@ export default async function BetaInsightsPage({
         </div>
 
         <div className={styles.actions}>
+          <Link href="/admin/analytics">Analytics Lab</Link>
           <Link href="/admin/data-health">Data health</Link>
           <Link href="/admin/import">Import inventory</Link>
         </div>

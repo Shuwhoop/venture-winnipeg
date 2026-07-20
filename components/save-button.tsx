@@ -8,6 +8,10 @@ import {
 import type { Listing } from "@/lib/types";
 
 import {
+  trackBetaEvent
+} from "@/lib/beta/client";
+
+import {
   isListingSaved,
   SAVED_LISTINGS_EVENT,
   toggleSavedListing
@@ -62,6 +66,23 @@ export function SaveButton({
       toggleSavedListing(listing);
 
     setSaved(newSavedState);
+
+    trackBetaEvent({
+      eventName:
+        newSavedState
+          ? "listing_saved"
+          : "listing_unsaved",
+      pagePath:
+        window.location.pathname,
+      properties: {
+        listingId: listing.id,
+        listingSlug: listing.slug,
+        listingType: listing.type,
+        listingName: listing.name,
+        category: listing.category,
+        neighbourhood: listing.neighbourhood
+      }
+    });
   }
 
   return (

@@ -1,5 +1,21 @@
 export const BETA_EVENT_NAMES = [
+  "session_started",
   "page_view",
+  "discovery_viewed",
+  "listing_detail_opened",
+  "listing_map_selected",
+  "listing_saved",
+  "listing_unsaved",
+  "saved_page_viewed",
+  "outing_builder_opened",
+  "outing_result_viewed",
+  "outing_generated",
+  "outing_stop_replaced",
+  "outing_stop_added",
+  "outing_shared",
+  "shared_outing_viewed",
+  "newsletter_signup",
+  "report_submitted",
   "feedback_opened",
   "feedback_submitted"
 ] as const;
@@ -19,14 +35,20 @@ export const BETA_FEEDBACK_CATEGORIES = [
 export type BetaFeedbackCategory =
   (typeof BETA_FEEDBACK_CATEGORIES)[number];
 
+export type BetaPrimitive =
+  | string
+  | number
+  | boolean
+  | null;
+
 export type BetaEventPayload = {
   sessionId: string;
+  visitorId?: string | null;
   eventName: BetaEventName;
   pagePath: string;
-  properties?: Record<
-    string,
-    string | number | boolean | null
-  >;
+  clientCreatedAt?: string;
+  eventVersion?: number;
+  properties?: Record<string, BetaPrimitive>;
   website?: string;
 };
 

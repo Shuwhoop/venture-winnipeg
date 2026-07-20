@@ -10,6 +10,10 @@ import "./globals.css";
 import "./venture-theme.css";
 
 import {
+  VentureAnalytics
+} from "@/components/analytics/venture-analytics";
+
+import {
   BetaFeedback
 } from "@/components/beta-feedback/beta-feedback";
 
@@ -96,6 +100,11 @@ export default function RootLayout({
           <BottomNav />
 
           <ServiceWorkerRegistration />
+
+          {process.env.NEXT_PUBLIC_ANALYTICS_ENABLED !==
+          "false" ? (
+            <VentureAnalytics />
+          ) : null}
 
           {process.env.NEXT_PUBLIC_BETA_FEEDBACK_ENABLED !==
           "false" ? (

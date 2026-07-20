@@ -4,10 +4,13 @@ import {
 
 import {
   checkBetaRateLimit,
+  cleanClientCreatedAt,
   cleanEventName,
   cleanEventProperties,
+  cleanEventVersion,
   cleanPagePath,
   cleanSessionId,
+  cleanVisitorId,
   getClientAddress,
   isAllowedBetaOrigin
 } from "@/lib/beta/server";
@@ -30,7 +33,7 @@ export async function POST(
 
   if (!checkBetaRateLimit({
     key,
-    limit: 120,
+    limit: 240,
     windowMinutes: 60
   })) {
     return NextResponse.json(
@@ -60,6 +63,8 @@ export async function POST(
 
   const sessionId =
     cleanSessionId(body.sessionId);
+  const visitorId =
+    cleanVisitorId(body.visitorId);
   const eventName =
     cleanEventName(body.eventName);
   const pagePath =
@@ -75,16 +80,44 @@ export async function POST(
   const supabase =
     getSupabaseAdminClient();
 
-  const { error } =
+  const expandedPayload = {
+    session_id: sessionId,
+    visitor_id: visitorId,
+    event_name: eventName,
+    page_path: pagePath,
+    properties:
+      cleanEventProperties(body.properties),
+    client_created_at:
+      cleanClientCreatedAt(body.clientCreatedAt),
+    event_version:
+      cleanEventVersion(body.eventVersion)
+  };
+
+  let { error } =
     await supabase
       .from("beta_events")
-      .insert({
-        session_id: sessionId,
-        event_name: eventName,
-        page_path: pagePath,
-        properties:
-          cleanEventProperties(body.properties)
-      });
+      .insert(expandedPayload);
+
+  if (
+    error &&
+    (
+      error.code === "42703" ||
+      error.code === "PGRST204"
+    )
+  ) {
+    const fallback =
+      await supabase
+        .from("beta_events")
+        .insert({
+          session_id: sessionId,
+          event_name: eventName,
+          page_path: pagePath,
+          properties:
+            cleanEventProperties(body.properties)
+        });
+
+    error = fallback.error;
+  }
 
   if (error) {
     console.error("Beta event insert failed", {

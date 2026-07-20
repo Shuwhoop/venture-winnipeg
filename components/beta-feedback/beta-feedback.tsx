@@ -55,20 +55,6 @@ export function BetaFeedback() {
 
   const isAdmin = pathname.startsWith("/admin");
 
-  useEffect(() => {
-    if (isAdmin) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      trackBetaEvent({
-        eventName: "page_view",
-        pagePath: pathname
-      });
-    }, 400);
-
-    return () => window.clearTimeout(timeout);
-  }, [isAdmin, pathname]);
 
   useEffect(() => {
     if (!open) {
