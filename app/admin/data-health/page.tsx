@@ -110,6 +110,7 @@ export default async function DataHealthPage({
         </div>
 
         <div className={styles.headerActions}>
+          <Link href="/admin/import">Import inventory</Link>
           <Link href="/admin/submissions">Review submissions</Link>
           <a href="/api/admin/data-health" target="_blank" rel="noreferrer">
             Open JSON report
