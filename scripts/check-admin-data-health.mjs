@@ -30,7 +30,9 @@ for (const marker of [
   "requireVentureAdmin",
   "Listing repair queue",
   "Outing eligible",
-  "Pitch ready"
+  "Pitch ready",
+  "data-label=\"Listing\"",
+  "Public blockers"
 ]) {
   if (!page.includes(marker)) {
     console.error(`PAGE CHECK FAILED: ${marker}`);
@@ -43,7 +45,9 @@ for (const marker of [
   "missing-coordinates",
   "stale-source",
   "outingEligible",
-  "pitchReady"
+  "pitchReady",
+  "publishedNeedsAttention",
+  "getQueueGroup"
 ]) {
   if (!moduleText.includes(marker)) {
     console.error(`MODULE CHECK FAILED: ${marker}`);

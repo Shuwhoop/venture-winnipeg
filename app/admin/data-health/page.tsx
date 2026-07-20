@@ -147,15 +147,15 @@ export default async function DataHealthPage({
         </article>
 
         <article className={styles.metricWarning}>
-          <span>Needs attention</span>
-          <strong>{metrics.needsAttention}</strong>
-          <small>At least one quality or freshness issue</small>
+          <span>Public blockers</span>
+          <strong>{metrics.publishedNeedsAttention}</strong>
+          <small>{metrics.needsAttention} records need attention across all statuses</small>
         </article>
 
         <article>
           <span>Future events</span>
           <strong>{metrics.futureEvents}</strong>
-          <small>{metrics.expiredEvents} past or expired</small>
+          <small>Published and current · {metrics.expiredEvents} past or expired</small>
         </article>
       </section>
 
@@ -237,7 +237,7 @@ export default async function DataHealthPage({
           <h2>Listing repair queue</h2>
           <p>
             Showing {report.records.length} of {report.totalMatchingRecords}
-            matching records. Records with the most serious gaps appear first.
+            matching records. Public blockers and near-ready listings appear first; drafts follow.
           </p>
         </div>
         <time dateTime={report.generatedAt}>
@@ -266,7 +266,7 @@ export default async function DataHealthPage({
             <tbody>
               {report.records.map((record) => (
                 <tr key={record.key}>
-                  <td>
+                  <td data-label="Listing">
                     <strong>{record.name}</strong>
                     <span>
                       {record.entityType === "place" ? "Place" : "Event"} ·{" "}
@@ -274,11 +274,11 @@ export default async function DataHealthPage({
                     </span>
                     <small>{record.neighbourhood ?? "Neighbourhood missing"}</small>
                   </td>
-                  <td>
+                  <td data-label="State">
                     <span className={styles.status}>{record.status}</span>
                     <small>{record.verificationStatus.replaceAll("_", " ")}</small>
                   </td>
-                  <td>
+                  <td data-label="Readiness">
                     <span
                       className={
                         record.pitchReady
@@ -295,7 +295,7 @@ export default async function DataHealthPage({
                           : "Not eligible"}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Issues">
                     <div className={styles.issueList}>
                       {record.issues.length === 0 ? (
                         <span className={styles.noIssues}>No issues</span>
@@ -312,7 +312,7 @@ export default async function DataHealthPage({
                       )}
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Source checked">
                     <span>{formatDate(record.sourceCheckedAt)}</span>
                     {record.primarySourceUrl ? (
                       <a
@@ -324,7 +324,7 @@ export default async function DataHealthPage({
                       </a>
                     ) : null}
                   </td>
-                  <td>
+                  <td data-label="Open">
                     <Link href={record.publicPath}>View listing</Link>
                   </td>
                 </tr>

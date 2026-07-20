@@ -90,6 +90,7 @@ export type DataHealthMetrics = {
   outingEligible: number;
   pitchReady: number;
   needsAttention: number;
+  publishedNeedsAttention: number;
   missingHours: number;
   missingCoordinates: number;
   missingSources: number;
@@ -713,6 +714,9 @@ function calculateMetrics(records: DataHealthRecord[]): DataHealthMetrics {
     outingEligible: records.filter((record) => record.outingEligible).length,
     pitchReady: records.filter((record) => record.pitchReady).length,
     needsAttention: records.filter((record) => record.issues.length > 0).length,
+    publishedNeedsAttention: records.filter(
+      (record) => record.status === "published" && record.issues.length > 0
+    ).length,
     missingHours:
       countIssue("missing-hours") + countIssue("invalid-hours"),
     missingCoordinates: countIssue("missing-coordinates"),
@@ -721,6 +725,7 @@ function calculateMetrics(records: DataHealthRecord[]): DataHealthMetrics {
     staleSources: countIssue("stale-source"),
     futureEvents: events.filter(
       (record) =>
+        record.status === "published" &&
         !record.issues.some(
           (current) =>
             current.code === "past-event" || current.code === "expired-event"
@@ -824,12 +829,44 @@ export async function getDataHealthReport(
       createEventRecord(row, sourceMap.get(`event:${row.id}`), now)
     )
   ].sort((first, second) => {
-    if (first.pitchReady !== second.pitchReady) {
-      return first.pitchReady ? 1 : -1;
+    const getQueueGroup = (record: DataHealthRecord): number => {
+      if (record.pitchReady) {
+        return 4;
+      }
+
+      if (record.status === "published" && record.outingEligible) {
+        return 0;
+      }
+
+      if (record.status === "published") {
+        return 1;
+      }
+
+      if (record.status === "draft") {
+        return 2;
+      }
+
+      return 3;
+    };
+
+    const firstGroup = getQueueGroup(first);
+    const secondGroup = getQueueGroup(second);
+
+    if (firstGroup !== secondGroup) {
+      return firstGroup - secondGroup;
     }
 
-    if (first.issues.length !== second.issues.length) {
-      return second.issues.length - first.issues.length;
+    const severityWeight = { high: 3, medium: 2, low: 1 } as const;
+    const getIssueScore = (record: DataHealthRecord): number =>
+      record.issues.reduce(
+        (total, current) => total + severityWeight[current.severity],
+        0
+      );
+
+    const issueScoreDifference = getIssueScore(second) - getIssueScore(first);
+
+    if (issueScoreDifference !== 0) {
+      return issueScoreDifference;
     }
 
     return first.name.localeCompare(second.name);
