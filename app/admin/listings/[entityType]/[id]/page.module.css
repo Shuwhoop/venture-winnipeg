@@ -146,6 +146,105 @@
   outline: 3px solid rgba(109, 40, 217, 0.13);
 }
 
+
+
+.hoursQuickFill {
+  display: grid;
+  gap: 14px;
+  border: 1px solid #d9c9f8;
+  border-radius: 18px;
+  padding: 16px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(109, 40, 217, 0.08),
+      rgba(255, 210, 0, 0.12)
+    ),
+    #fff;
+}
+
+.quickFillHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.quickFillHeading span {
+  color: #6d28d9;
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.quickFillHeading h3 {
+  margin: 4px 0 0;
+  font-size: 1.2rem;
+  letter-spacing: -0.025em;
+}
+
+.quickFillHeading p {
+  max-width: 410px;
+  margin: 0;
+  color: #625d6a;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.quickTimeGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quickHourActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quickHourActions button {
+  min-height: 42px;
+  border: 1px solid #6d28d9;
+  border-radius: 11px;
+  padding: 9px 12px;
+  background: #6d28d9;
+  color: white;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.quickHourActions button:hover {
+  filter: brightness(0.96);
+}
+
+.quickHourActions .quietButton {
+  border-color: #d7d0df;
+  background: white;
+  color: #514a5d;
+}
+
+.individualHours {
+  border-top: 1px solid #ebe6f0;
+  padding-top: 2px;
+}
+
+.individualHours summary {
+  min-height: 46px;
+  padding: 13px 4px;
+  color: #332a47;
+  font-size: 0.9rem;
+  font-weight: 820;
+  cursor: pointer;
+}
+
+.individualHours[open] summary {
+  margin-bottom: 8px;
+}
+
 .hoursGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -272,6 +371,20 @@
     width: 100%;
   }
 
+  .quickFillHeading {
+    display: grid;
+  }
+
+  .quickTimeGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quickHourActions {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
   .hoursGrid {
     grid-template-columns: 1fr;
   }
@@ -294,6 +407,11 @@
   .card {
     border-radius: 16px;
     padding: 14px;
+  }
+
+  .quickTimeGrid,
+  .quickHourActions {
+    grid-template-columns: 1fr;
   }
 
   .hoursGrid fieldset {

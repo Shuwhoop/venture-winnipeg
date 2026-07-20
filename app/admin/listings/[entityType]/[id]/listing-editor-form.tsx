@@ -2,6 +2,7 @@
 
 import {
   useMemo,
+  useRef,
   useState
 } from "react";
 import {
@@ -25,6 +26,9 @@ const DAYS = [
   "saturday",
   "sunday"
 ] as const;
+
+type DayName =
+  typeof DAYS[number];
 
 const STATUS_OPTIONS = [
   "draft",
@@ -220,10 +224,253 @@ export default function ListingEditorForm({
     )
   );
 
+  const formRef =
+    useRef<HTMLFormElement>(
+      null
+    );
+
+  const defaultQuickHours =
+    record.entityType === "place"
+      ? getDayHours(
+          record,
+          "monday"
+        )
+      : {
+          closed: false,
+          open: "",
+          close: ""
+        };
+
+  const [
+    quickOpen,
+    setQuickOpen
+  ] = useState(
+    defaultQuickHours.open ||
+      "09:00"
+  );
+
+  const [
+    quickClose,
+    setQuickClose
+  ] = useState(
+    defaultQuickHours.close ||
+      "17:00"
+  );
+
   const publicPath = useMemo(
     () => `/listings/${record.slug}`,
     [record.slug]
   );
+
+  function getHoursInput(
+    day: DayName,
+    field:
+      "closed" |
+      "open" |
+      "close"
+  ): HTMLInputElement | null {
+    const element =
+      formRef.current
+        ?.elements
+        .namedItem(
+          `hours_${day}_${field}`
+        );
+
+    return element instanceof
+      HTMLInputElement
+      ? element
+      : null;
+  }
+
+  function setDayHours(
+    day: DayName,
+    values: {
+      closed: boolean;
+      open: string;
+      close: string;
+    }
+  ) {
+    const closedInput =
+      getHoursInput(
+        day,
+        "closed"
+      );
+    const openInput =
+      getHoursInput(
+        day,
+        "open"
+      );
+    const closeInput =
+      getHoursInput(
+        day,
+        "close"
+      );
+
+    if (closedInput) {
+      closedInput.checked =
+        values.closed;
+    }
+
+    if (openInput) {
+      openInput.value =
+        values.closed
+          ? ""
+          : values.open;
+      openInput.disabled =
+        values.closed;
+    }
+
+    if (closeInput) {
+      closeInput.value =
+        values.closed
+          ? ""
+          : values.close;
+      closeInput.disabled =
+        values.closed;
+    }
+  }
+
+  function applyQuickHours(
+    days: readonly DayName[],
+    label: string
+  ) {
+    if (
+      !quickOpen ||
+      !quickClose
+    ) {
+      setMessage(
+        "Choose an opening and closing time first."
+      );
+      return;
+    }
+
+    for (const day of days) {
+      setDayHours(
+        day,
+        {
+          closed: false,
+          open: quickOpen,
+          close: quickClose
+        }
+      );
+    }
+
+    setMessage(
+      `${label} updated. Save changes when ready.`
+    );
+  }
+
+  function copyDayHours(
+    sourceDay: DayName,
+    targetDays:
+      readonly DayName[],
+    label: string
+  ) {
+    const closed =
+      getHoursInput(
+        sourceDay,
+        "closed"
+      )?.checked === true;
+    const open =
+      getHoursInput(
+        sourceDay,
+        "open"
+      )?.value ?? "";
+    const close =
+      getHoursInput(
+        sourceDay,
+        "close"
+      )?.value ?? "";
+
+    if (
+      !closed &&
+      !open &&
+      !close
+    ) {
+      setMessage(
+        `Add ${sourceDay}'s hours before copying them.`
+      );
+      return;
+    }
+
+    for (const day of targetDays) {
+      setDayHours(
+        day,
+        {
+          closed,
+          open,
+          close
+        }
+      );
+    }
+
+    setMessage(
+      `${label} copied. Save changes when ready.`
+    );
+  }
+
+  function closeDays(
+    days: readonly DayName[],
+    label: string
+  ) {
+    for (const day of days) {
+      setDayHours(
+        day,
+        {
+          closed: true,
+          open: "",
+          close: ""
+        }
+      );
+    }
+
+    setMessage(
+      `${label} marked closed. Save changes when ready.`
+    );
+  }
+
+  function clearHours() {
+    for (const day of DAYS) {
+      setDayHours(
+        day,
+        {
+          closed: false,
+          open: "",
+          close: ""
+        }
+      );
+    }
+
+    setMessage(
+      "All weekly hours cleared. Save changes when ready."
+    );
+  }
+
+  function handleClosedChange(
+    day: DayName,
+    closed: boolean
+  ) {
+    const openInput =
+      getHoursInput(
+        day,
+        "open"
+      );
+    const closeInput =
+      getHoursInput(
+        day,
+        "close"
+      );
+
+    if (openInput) {
+      openInput.disabled =
+        closed;
+    }
+
+    if (closeInput) {
+      closeInput.disabled =
+        closed;
+    }
+  }
 
   async function handleSubmit(
     event:
@@ -600,6 +847,7 @@ export default function ListingEditorForm({
 
   return (
     <form
+      ref={formRef}
       className={styles.form}
       onSubmit={handleSubmit}
     >
@@ -910,47 +1158,179 @@ export default function ListingEditorForm({
               </label>
             </div>
 
-            <div className={styles.hoursGrid}>
-              {DAYS.map((day) => {
-                const hours =
-                  getDayHours(
-                    record,
-                    day
-                  );
+            <div className={styles.hoursQuickFill}>
+              <div className={styles.quickFillHeading}>
+                <div>
+                  <span>QUICK HOURS</span>
+                  <h3>
+                    Set the time once
+                  </h3>
+                </div>
+                <p>
+                  Apply one schedule to several days,
+                  then adjust only the exceptions.
+                </p>
+              </div>
 
-                return (
-                  <fieldset key={day}>
-                    <legend>
-                      {day.charAt(0).toUpperCase() + day.slice(1)}
-                    </legend>
-                    <label className={styles.closedToggle}>
-                      <input
-                        type="checkbox"
-                        name={`hours_${day}_closed`}
-                        defaultChecked={hours.closed}
-                      />
-                      Closed
-                    </label>
-                    <label>
-                      Opens
-                      <input
-                        type="time"
-                        name={`hours_${day}_open`}
-                        defaultValue={hours.open}
-                      />
-                    </label>
-                    <label>
-                      Closes
-                      <input
-                        type="time"
-                        name={`hours_${day}_close`}
-                        defaultValue={hours.close}
-                      />
-                    </label>
-                  </fieldset>
-                );
-              })}
+              <div className={styles.quickTimeGrid}>
+                <label>
+                  Opens
+                  <input
+                    type="time"
+                    value={quickOpen}
+                    onChange={(event) => {
+                      setQuickOpen(
+                        event.currentTarget.value
+                      );
+                    }}
+                  />
+                </label>
+
+                <label>
+                  Closes
+                  <input
+                    type="time"
+                    value={quickClose}
+                    onChange={(event) => {
+                      setQuickClose(
+                        event.currentTarget.value
+                      );
+                    }}
+                  />
+                </label>
+              </div>
+
+              <div className={styles.quickHourActions}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    applyQuickHours(
+                      DAYS.slice(0, 5),
+                      "Monday to Friday"
+                    );
+                  }}
+                >
+                  Apply Mon–Fri
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    applyQuickHours(
+                      DAYS,
+                      "Every day"
+                    );
+                  }}
+                >
+                  Apply every day
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    copyDayHours(
+                      "monday",
+                      DAYS.slice(1, 5),
+                      "Monday's hours"
+                    );
+                  }}
+                >
+                  Copy Monday to weekdays
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    copyDayHours(
+                      "saturday",
+                      ["sunday"],
+                      "Saturday's hours"
+                    );
+                  }}
+                >
+                  Copy Saturday to Sunday
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeDays(
+                      [
+                        "saturday",
+                        "sunday"
+                      ],
+                      "Weekend"
+                    );
+                  }}
+                >
+                  Close weekend
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.quietButton}
+                  onClick={clearHours}
+                >
+                  Clear all hours
+                </button>
+              </div>
             </div>
+
+            <details className={styles.individualHours}>
+              <summary>
+                Review or adjust individual days
+              </summary>
+
+              <div className={styles.hoursGrid}>
+                {DAYS.map((day) => {
+                  const hours =
+                    getDayHours(
+                      record,
+                      day
+                    );
+
+                  return (
+                    <fieldset key={day}>
+                      <legend>
+                        {day.charAt(0).toUpperCase() + day.slice(1)}
+                      </legend>
+                      <label className={styles.closedToggle}>
+                        <input
+                          type="checkbox"
+                          name={`hours_${day}_closed`}
+                          defaultChecked={hours.closed}
+                          onChange={(event) => {
+                            handleClosedChange(
+                              day,
+                              event.currentTarget.checked
+                            );
+                          }}
+                        />
+                        Closed
+                      </label>
+                      <label>
+                        Opens
+                        <input
+                          type="time"
+                          name={`hours_${day}_open`}
+                          defaultValue={hours.open}
+                          disabled={hours.closed}
+                        />
+                      </label>
+                      <label>
+                        Closes
+                        <input
+                          type="time"
+                          name={`hours_${day}_close`}
+                          defaultValue={hours.close}
+                          disabled={hours.closed}
+                        />
+                      </label>
+                    </fieldset>
+                  );
+                })}
+              </div>
+            </details>
           </section>
         </>
       ) : (
