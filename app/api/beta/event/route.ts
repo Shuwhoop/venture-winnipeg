@@ -11,6 +11,7 @@ import {
   cleanPagePath,
   cleanSessionId,
   cleanVisitorId,
+  getBetaEnvironment,
   getClientAddress,
   isAllowedBetaOrigin
 } from "@/lib/beta/server";
@@ -80,13 +81,22 @@ export async function POST(
   const supabase =
     getSupabaseAdminClient();
 
+  const cleanedProperties =
+    cleanEventProperties(body.properties);
+
   const expandedPayload = {
     session_id: sessionId,
     visitor_id: visitorId,
     event_name: eventName,
     page_path: pagePath,
-    properties:
-      cleanEventProperties(body.properties),
+    properties: {
+      ...cleanedProperties,
+      ingestEnvironment:
+        getBetaEnvironment(),
+      eventSource:
+        cleanedProperties.eventSource ||
+        "client"
+    },
     client_created_at:
       cleanClientCreatedAt(body.clientCreatedAt),
     event_version:
@@ -112,8 +122,14 @@ export async function POST(
           session_id: sessionId,
           event_name: eventName,
           page_path: pagePath,
-          properties:
-            cleanEventProperties(body.properties)
+          properties: {
+            ...cleanedProperties,
+            ingestEnvironment:
+              getBetaEnvironment(),
+            eventSource:
+              cleanedProperties.eventSource ||
+              "client"
+          }
         });
 
     error = fallback.error;

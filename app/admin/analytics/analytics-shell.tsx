@@ -60,6 +60,9 @@ export function AnalyticsShell({
           <Link href="/admin/experiments">
             Experiment Lab
           </Link>
+          <Link href="/admin/data-pipeline">
+            Pipeline
+          </Link>
         </div>
       </header>
 

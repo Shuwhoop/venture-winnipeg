@@ -43,7 +43,8 @@ export const ANALYTICS_EVENT_TAXONOMY = [
       ["newsletter_signup", "Newsletter signup completed or was already active."],
       ["report_submitted", "A listing correction report was submitted."],
       ["feedback_opened", "The beta feedback form was opened."],
-      ["feedback_submitted", "Beta feedback was submitted."]
+      ["feedback_submitted", "Beta feedback was submitted."],
+      ["pipeline_test", "An administrator sent a safe end-to-end analytics test event."]
     ]
   }
 ] as const;

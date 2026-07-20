@@ -20,7 +20,8 @@ export const BETA_EVENT_NAMES = [
   "newsletter_signup",
   "report_submitted",
   "feedback_opened",
-  "feedback_submitted"
+  "feedback_submitted",
+  "pipeline_test"
 ] as const;
 
 export type BetaEventName =

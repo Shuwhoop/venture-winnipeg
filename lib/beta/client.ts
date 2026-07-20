@@ -250,6 +250,31 @@ function getDeviceClass(): string {
   return "desktop";
 }
 
+function getAnalyticsEnvironment(): string {
+  const configured =
+    process.env
+      .NEXT_PUBLIC_ANALYTICS_ENVIRONMENT
+      ?.trim();
+
+  if (configured) {
+    return configured;
+  }
+
+  const host =
+    window.location.hostname;
+
+  if (
+    host === "localhost" ||
+    host === "127.0.0.1"
+  ) {
+    return "development";
+  }
+
+  return host.endsWith(".vercel.app")
+    ? "vercel"
+    : "production";
+}
+
 function getReferrerHost(): string {
   if (!document.referrer) {
     return "direct";
@@ -297,6 +322,9 @@ export function trackBetaEvent({
         getReferrerHost(),
       isNewVisitor:
         identity.isNewVisitor,
+      environment:
+        getAnalyticsEnvironment(),
+      eventSource: "client",
       ...properties
     }
   };

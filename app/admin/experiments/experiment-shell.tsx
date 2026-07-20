@@ -58,6 +58,9 @@ export function ExperimentShell({
           <Link href="/admin/import">
             Import
           </Link>
+          <Link href="/admin/data-pipeline">
+            Pipeline
+          </Link>
         </div>
       </header>
 

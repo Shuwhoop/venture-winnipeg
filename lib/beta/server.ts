@@ -21,6 +21,15 @@ const ANALYTICS_VISITOR_COOKIE =
 const ANALYTICS_SESSION_COOKIE =
   "venture_analytics_session";
 
+export function getBetaEnvironment(): string {
+  return (
+    process.env.VERCEL_ENV ||
+    process.env.NEXT_PUBLIC_ANALYTICS_ENVIRONMENT ||
+    process.env.NODE_ENV ||
+    "unknown"
+  );
+}
+
 type RateLimitEntry = {
   count: number;
   resetAt: number;
@@ -344,7 +353,12 @@ export async function recordServerBetaEvent({
       event_name: eventName,
       page_path: pagePath,
       properties:
-        cleanEventProperties(properties),
+        cleanEventProperties({
+          ...properties,
+          environment:
+            getBetaEnvironment(),
+          eventSource: "server"
+        }),
       event_version: 2,
       client_created_at: null
     };
@@ -368,7 +382,12 @@ export async function recordServerBetaEvent({
           event_name: eventName,
           page_path: pagePath,
           properties:
-            cleanEventProperties(properties)
+            cleanEventProperties({
+              ...properties,
+              environment:
+                getBetaEnvironment(),
+              eventSource: "server"
+            })
         });
 
       return;
