@@ -51,6 +51,9 @@ export function AnalyticsShell({
           <Link href="/admin/data-health">
             Data health
           </Link>
+          <Link href="/admin/inventory-plan">
+            Inventory plan
+          </Link>
           <Link href="/admin/import">
             Import
           </Link>
