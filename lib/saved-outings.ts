@@ -19,6 +19,11 @@ export type OutingStopMix = {
   drinks: number;
 };
 
+export type OutingPlanStatus =
+  | "complete"
+  | "partial"
+  | "empty";
+
 export type GeneratedOutingStop = {
   order: number;
   kind?: OutingStopKind;
@@ -64,6 +69,11 @@ export type GeneratedOutingPlan = {
 
   actualMix?:
     OutingStopMix;
+
+  requestedStopCount?: number;
+  actualStopCount?: number;
+  missingStopCount?: number;
+  planStatus?: OutingPlanStatus;
 
   anchorListingKey?:
     | string

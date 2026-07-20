@@ -3978,6 +3978,39 @@ export async function POST(
     );
   }
 
+  const requestedStopCount =
+    requestedSlots.length;
+
+  const actualStopCount =
+    stops.length;
+
+  const missingStopCount =
+    Math.max(
+      0,
+      requestedStopCount -
+        actualStopCount
+    );
+
+  const planStatus:
+    | "complete"
+    | "partial"
+    | "empty" =
+      actualStopCount === 0
+        ? "empty"
+        : missingStopCount > 0
+          ? "partial"
+          : "complete";
+
+  if (planStatus === "partial") {
+    warnings.unshift(
+      `Venture built ${actualStopCount} of ${requestedStopCount} requested ${
+        requestedStopCount === 1
+          ? "stop"
+          : "stops"
+      }. Widen the area, travel limit, time window, or budget to complete the route.`
+    );
+  }
+
   return NextResponse.json({
     planId:
       crypto.randomUUID(),
@@ -4012,6 +4045,10 @@ export async function POST(
       draft.avoidTerms,
     requestedMix,
     actualMix,
+    requestedStopCount,
+    actualStopCount,
+    missingStopCount,
+    planStatus,
     anchorListingKey:
       draft.anchorListingKey,
     anchorListingName:

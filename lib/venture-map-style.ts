@@ -2,35 +2,19 @@ import type {
   StyleSpecification
 } from "maplibre-gl";
 
-function createRasterStyle():
+function createDevelopmentFallbackStyle():
   StyleSpecification {
   return {
     version: 8,
-
-    sources: {
-      "venture-base-map": {
-        type: "raster",
-
-        tiles: [
-          "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-        ],
-
-        tileSize: 256,
-        minzoom: 0,
-        maxzoom: 19,
-
-        attribution:
-          "© OpenStreetMap contributors"
-      }
-    },
-
+    sources: {},
     layers: [
       {
-        id: "venture-base-map-layer",
-        type: "raster",
-        source: "venture-base-map",
-        minzoom: 0,
-        maxzoom: 19
+        id: "venture-map-background",
+        type: "background",
+        paint: {
+          "background-color":
+            "#efeae4"
+        }
       }
     ]
   };
@@ -43,21 +27,24 @@ export function getVentureMapStyle():
       .NEXT_PUBLIC_MAP_STYLE_URL
       ?.trim();
 
-  /*
-   * Continue using a configured
-   * production map provider later.
-   * Ignore the plain MapLibre demo
-   * style because it currently gives
-   * Venture the blank purple canvas.
-   */
-  if (
-    configuredStyle &&
-    !configuredStyle.includes(
-      "demotiles.maplibre.org"
-    )
-  ) {
+  if (configuredStyle) {
     return configuredStyle;
   }
 
-  return createRasterStyle();
+  /*
+   * Never fall back to the public
+   * OpenStreetMap tile servers.
+   * Venture must use a licensed
+   * MapLibre-compatible provider.
+   */
+  if (
+    process.env.NODE_ENV ===
+    "production"
+  ) {
+    throw new Error(
+      "NEXT_PUBLIC_MAP_STYLE_URL is required in production."
+    );
+  }
+
+  return createDevelopmentFallbackStyle();
 }

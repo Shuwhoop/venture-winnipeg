@@ -6666,6 +6666,66 @@ button { cursor: pointer; }
   text-align: right;
 }
 
+.outing-completeness-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #241f20;
+  border-radius: 16px;
+  background: #e8f7ea;
+  box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.12);
+}
+
+.outing-completeness-card.partial {
+  background: #fff8d8;
+}
+
+.outing-completeness-card.empty {
+  background: #fff0f0;
+}
+
+.outing-completeness-card > div {
+  display: grid;
+  gap: 5px;
+}
+
+.outing-completeness-card span {
+  color: #d01013;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.outing-completeness-card strong {
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.outing-completeness-card p {
+  margin: 0;
+  color: #685f60;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.outing-completeness-card a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 2px solid #241f20;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #241f20;
+  font-size: 0.66rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .outing-action-dock {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -7061,6 +7121,16 @@ button { cursor: pointer; }
   color: #5f520f;
   font-size: 0.7rem;
   line-height: 1.45;
+}
+
+@media (max-width: 390px) {
+  .outing-completeness-card {
+    grid-template-columns: 1fr;
+  }
+
+  .outing-completeness-card a {
+    width: 100%;
+  }
 }
 
 /* ---------- Container breakpoints based on actual app shell ---------- */

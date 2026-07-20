@@ -294,6 +294,22 @@ function formatMixSummary(
     : "Flexible route";
 }
 
+function countRequestedStops(
+  mix:
+    | StopMix
+    | undefined
+): number {
+  if (!mix) {
+    return 0;
+  }
+
+  return (
+    mix.food +
+    mix.events +
+    mix.drinks
+  );
+}
+
 export default function OutingResultsPage() {
   const [
     status,
@@ -496,6 +512,38 @@ export default function OutingResultsPage() {
           20
       )
     );
+
+  const requestedStopCount =
+    plan?.requestedStopCount ??
+    (
+      countRequestedStops(
+        plan?.requestedMix
+      ) ||
+      draft?.totalStops ||
+      plan?.stops.length ||
+      0
+    );
+
+  const actualStopCount =
+    plan?.actualStopCount ??
+    plan?.stops.length ??
+    0;
+
+  const missingStopCount =
+    plan?.missingStopCount ??
+    Math.max(
+      0,
+      requestedStopCount -
+        actualStopCount
+    );
+
+  const planStatus =
+    plan?.planStatus ??
+    (actualStopCount === 0
+      ? "empty"
+      : missingStopCount > 0
+        ? "partial"
+        : "complete");
 
   const preferenceWarnings =
     useMemo(
@@ -1293,15 +1341,65 @@ export default function OutingResultsPage() {
               </strong>
 
               <small>
-                {plan.anchorListingName
-                  ? `Anchored by ${plan.anchorListingName}`
-                  : `${plan.stops.length} verified ${
-                      plan.stops.length === 1
-                        ? "stop"
-                        : "stops"
-                    } connected in itinerary order`}
+                {planStatus ===
+                "partial"
+                  ? `${actualStopCount} of ${requestedStopCount} requested stops fit the current window`
+                  : plan.anchorListingName
+                    ? `Anchored by ${plan.anchorListingName}`
+                    : `${actualStopCount} verified ${
+                        actualStopCount === 1
+                          ? "stop"
+                          : "stops"
+                      } connected in itinerary order`}
               </small>
             </div>
+          </section>
+
+          <section
+            className={`outing-completeness-card ${planStatus}`}
+          >
+            <div>
+              <span>
+                {planStatus ===
+                "complete"
+                  ? "FULL ROUTE READY"
+                  : planStatus ===
+                      "partial"
+                    ? "PARTIAL ROUTE"
+                    : "NO ROUTE YET"}
+              </span>
+
+              <strong>
+                {planStatus ===
+                "complete"
+                  ? `All ${requestedStopCount} requested ${
+                      requestedStopCount === 1
+                        ? "stop is"
+                        : "stops are"
+                    } ready.`
+                  : planStatus ===
+                      "partial"
+                    ? `${actualStopCount} of ${requestedStopCount} stops found.`
+                    : "No verified stops fit yet."}
+              </strong>
+
+              <p>
+                {planStatus ===
+                "complete"
+                  ? "Times, travel, and current listing details were checked before building this route."
+                  : planStatus ===
+                      "partial"
+                    ? "The current filters were too tight to safely fill every slot. Edit the search or add a stop below."
+                    : "Try a wider area, longer outing, larger travel limit, or more flexible budget."}
+              </p>
+            </div>
+
+            {planStatus !==
+            "complete" ? (
+              <Link href="/build-outing">
+                Edit search
+              </Link>
+            ) : null}
           </section>
 
           <section className="outing-action-dock">
@@ -1442,14 +1540,17 @@ export default function OutingResultsPage() {
               </span>
 
               <h2>
-                Add another stop
+                {planStatus ===
+                "partial"
+                  ? "Fill the missing stop"
+                  : "Add another stop"}
               </h2>
 
               <p>
-                Venture will place it in
-                an available gap without
-                breaking the existing
-                route.
+                {planStatus ===
+                "partial"
+                  ? "Try a category below. Venture will keep the current route and use a safe available gap."
+                  : "Venture will place it in an available gap without breaking the existing route."}
               </p>
             </div>
 
@@ -1541,7 +1642,10 @@ export default function OutingResultsPage() {
                   </span>
 
                   <h2>
-                    Your {plan.stops.length}-stop outing
+                    {planStatus ===
+                    "partial"
+                      ? `${actualStopCount} of ${requestedStopCount} stops found`
+                      : `Your ${actualStopCount}-stop outing`}
                   </h2>
 
                   <p>
