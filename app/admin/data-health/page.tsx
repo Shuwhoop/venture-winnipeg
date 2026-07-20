@@ -260,7 +260,7 @@ export default async function DataHealthPage({
                 <th>Readiness</th>
                 <th>Issues</th>
                 <th>Source checked</th>
-                <th>Open</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -324,8 +324,15 @@ export default async function DataHealthPage({
                       </a>
                     ) : null}
                   </td>
-                  <td data-label="Open">
-                    <Link href={record.publicPath}>View listing</Link>
+                  <td data-label="Actions">
+                    <div className={styles.rowActions}>
+                      <Link
+                        href={`/admin/listings/${record.entityType}/${record.id}`}
+                      >
+                        Repair
+                      </Link>
+                      <Link href={record.publicPath}>View</Link>
+                    </div>
                   </td>
                 </tr>
               ))}

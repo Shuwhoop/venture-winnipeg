@@ -273,6 +273,30 @@
   display: block;
 }
 
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.rowActions a {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0 !important;
+  border: 1px solid #ddd7e7;
+  border-radius: 10px;
+  padding: 7px 10px;
+  background: white;
+}
+
+.rowActions a:first-child {
+  border-color: #6d28d9;
+  background: #6d28d9;
+  color: white;
+}
+
 .table td strong {
   color: #1b1722;
   font-size: 0.98rem;
