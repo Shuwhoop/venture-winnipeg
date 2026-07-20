@@ -57,6 +57,9 @@ export function AnalyticsShell({
           <Link href="/admin/beta">
             Beta inbox
           </Link>
+          <Link href="/admin/experiments">
+            Experiment Lab
+          </Link>
         </div>
       </header>
 

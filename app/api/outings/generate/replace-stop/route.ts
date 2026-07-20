@@ -2012,7 +2012,10 @@ export async function POST(
         getListingKey(targetStop.listing),
       replacementListingKey:
         getListingKey(replacement.listing),
-      candidateCount: candidates.length
+      candidateCount: candidates.length,
+      recommendationVersion:
+        plan.recommendationVersion ||
+        "route-score-v1"
     }
   });
 

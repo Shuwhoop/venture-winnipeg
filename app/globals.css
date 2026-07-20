@@ -7636,3 +7636,81 @@ button { cursor: pointer; }
     width: min(220px, calc(100vw - 76px));
   }
 }
+
+
+/* ---------- Venture Experiment Lab: outing presentation ---------- */
+
+.outing-experiment-preview {
+  display: grid;
+  gap: 13px;
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #241f20;
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      145deg,
+      #fff8d8,
+      #ffffff 72%
+    );
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.12);
+}
+
+.outing-experiment-preview-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.outing-experiment-preview-heading > span {
+  color: #d01013;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+}
+
+.outing-experiment-preview-heading > strong {
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+.outing-experiment-preview-heading > small {
+  color: #746a6b;
+  font-size: 0.62rem;
+  line-height: 1.4;
+}
+
+.outing-experiment-preview ol {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.outing-experiment-preview li {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 3px 9px;
+  align-items: center;
+  padding: 10px;
+  border: 1.5px solid #d9cec6;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.outing-experiment-preview li > span {
+  grid-row: 1 / span 2;
+  color: #d01013;
+  font-size: 0.68rem;
+  font-weight: 950;
+}
+
+.outing-experiment-preview li > strong {
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.outing-experiment-preview li > small {
+  color: #746a6b;
+  font-size: 0.61rem;
+}

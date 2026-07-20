@@ -43,6 +43,7 @@ export type GeneratedOutingStop = {
 export type GeneratedOutingPlan = {
   planId: string;
   generatedAt: string;
+  recommendationVersion?: string;
   title: string;
   date: string;
   requestedStartTime: string;

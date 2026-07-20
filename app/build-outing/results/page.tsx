@@ -11,6 +11,13 @@ import {
 } from "@/components/outing-route-map";
 import Link from "next/link";
 
+import {
+  trackBetaEvent
+} from "@/lib/beta/client";
+import {
+  useExperimentAssignment
+} from "@/lib/experiments/client";
+
 import type {
   BudgetPreference
 } from "@/lib/profile-preferences";
@@ -381,6 +388,18 @@ export default function OutingResultsPage() {
       null
     );
 
+  const resultsExperiment =
+    useExperimentAssignment(
+      "outing-results-presentation-v1",
+      status === "ready" &&
+        Boolean(plan)
+    );
+
+  const showSummaryFirst =
+    resultsExperiment.enabled &&
+    resultsExperiment.variant ===
+      "summary_first";
+
   const generateOuting =
     useCallback(async () => {
       const storedDraft =
@@ -659,6 +678,29 @@ export default function OutingResultsPage() {
         plan.planId
       );
 
+      trackBetaEvent({
+        eventName:
+          "outing_unsaved",
+        pagePath:
+          "/build-outing/results",
+        properties: {
+          planId:
+            plan.planId,
+          planStatus:
+            plan.planStatus ||
+            "unknown",
+          recommendationVersion:
+            plan.recommendationVersion ||
+            "legacy",
+          experimentSlug:
+            resultsExperiment
+              .experimentSlug,
+          experimentVariant:
+            resultsExperiment
+              .variant
+        }
+      });
+
       setSaved(false);
       setActionMessage(
         "Outing removed from Saved."
@@ -668,6 +710,32 @@ export default function OutingResultsPage() {
     }
 
     saveOuting(plan);
+
+    trackBetaEvent({
+      eventName:
+        "outing_saved",
+      pagePath:
+        "/build-outing/results",
+      properties: {
+        planId:
+          plan.planId,
+        planStatus:
+          plan.planStatus ||
+          "unknown",
+        stopCount:
+          plan.stops.length,
+        recommendationVersion:
+          plan.recommendationVersion ||
+          "legacy",
+        experimentSlug:
+          resultsExperiment
+            .experimentSlug,
+        experimentVariant:
+          resultsExperiment
+            .variant
+      }
+    });
+
     setSaved(true);
 
     setActionMessage(
@@ -1214,7 +1282,13 @@ export default function OutingResultsPage() {
   }
 }
   return (
-    <main className="outing-results-page outing-results-v3">
+    <main
+      className="outing-results-page outing-results-v3"
+      data-experiment-variant={
+        resultsExperiment.variant ||
+        "unassigned"
+      }
+    >
       <header className="outing-results-heading outing-results-hero-v3">
         <div className="outing-results-hero-copy">
           <span>
@@ -1324,6 +1398,44 @@ export default function OutingResultsPage() {
       {status === "ready" &&
       plan ? (
         <>
+          {showSummaryFirst ? (
+            <section className="outing-experiment-preview">
+              <div className="outing-experiment-preview-heading">
+                <span>
+                  YOUR OUTING AT A GLANCE
+                </span>
+                <strong>
+                  Start with the plan,
+                  then explore the map
+                </strong>
+                <small>
+                  See the order and timing before opening the full route.
+                </small>
+              </div>
+
+              <ol>
+                {plan.stops
+                  .slice(0, 4)
+                  .map((stop) => (
+                    <li
+                      key={`${stop.order}-${stop.listing.id}`}
+                    >
+                      <span>
+                        {stop.startTime}
+                      </span>
+                      <strong>
+                        {stop.listing.name}
+                      </strong>
+                      <small>
+                        {stop.listing.neighbourhood ||
+                          stop.listing.category}
+                      </small>
+                    </li>
+                  ))}
+              </ol>
+            </section>
+          ) : null}
+
           <section className="outing-map-first-stage">
             <OutingRouteMap
               plan={plan}

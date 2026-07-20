@@ -447,7 +447,10 @@ export async function POST(
         planningMode: draft.planningMode,
         stopCount: plan.stops.length,
         estimatedTotalCad:
-          plan.estimatedTotalCad
+          plan.estimatedTotalCad,
+        recommendationVersion:
+          plan.recommendationVersion ||
+          "route-score-v1"
       }
     });
 

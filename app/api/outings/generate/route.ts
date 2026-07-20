@@ -24,6 +24,9 @@ import type {
 const WINNIPEG_TIMEZONE =
   "America/Winnipeg";
 
+const RECOMMENDATION_VERSION =
+  "route-score-v1";
+
 const weekdayOrder = [
   "sunday",
   "monday",
@@ -4015,6 +4018,32 @@ export async function POST(
     );
   }
 
+  const categoryDiversity =
+    new Set(
+      stops.map(
+        (stop) =>
+          stop.listing.category
+      )
+    ).size;
+
+  const neighbourhoodDiversity =
+    new Set(
+      stops
+        .map(
+          (stop) =>
+            stop.listing.neighbourhood
+        )
+        .filter(Boolean)
+    ).size;
+
+  const stopKindDiversity =
+    new Set(
+      stops.map(
+        (stop) =>
+          stop.kind
+      )
+    ).size;
+
   await recordServerBetaEvent({
     request,
     eventName: "outing_generated",
@@ -4029,6 +4058,11 @@ export async function POST(
       actualStopCount,
       missingStopCount,
       candidateCount: candidates.length,
+      categoryDiversity,
+      neighbourhoodDiversity,
+      stopKindDiversity,
+      recommendationVersion:
+        RECOMMENDATION_VERSION,
       alcoholFree: draft.alcoholFree
     }
   });
@@ -4038,6 +4072,8 @@ export async function POST(
       crypto.randomUUID(),
     generatedAt:
       new Date().toISOString(),
+    recommendationVersion:
+      RECOMMENDATION_VERSION,
     title:
       getPlanTitle(
         draft,

@@ -27,7 +27,10 @@ export const ANALYTICS_EVENT_TAXONOMY = [
     group: "Outing builder",
     events: [
       ["outing_builder_opened", "The outing builder was opened."],
+      ["experiment_exposure", "A visitor was shown one experiment variant."],
       ["outing_generated", "The server produced a complete, partial, or empty plan."],
+      ["outing_saved", "A generated outing was saved in the browser."],
+      ["outing_unsaved", "A saved generated outing was removed."],
       ["outing_stop_replaced", "A generated stop was replaced."],
       ["outing_stop_added", "A new stop was added to a generated plan."],
       ["outing_shared", "A shareable outing link was created."],

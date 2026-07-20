@@ -2288,7 +2288,10 @@ export async function POST(
       addedKind: requestedKind,
       addedListingKey:
         getListingKey(selected.listing),
-      candidateCount: candidates.length
+      candidateCount: candidates.length,
+      recommendationVersion:
+        plan.recommendationVersion ||
+        "route-score-v1"
     }
   });
 
