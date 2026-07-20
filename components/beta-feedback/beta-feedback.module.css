@@ -1,0 +1,259 @@
+.launcher {
+  position: fixed;
+  z-index: 45;
+  right: max(14px, calc((100vw - 480px) / 2 + 14px));
+  bottom: calc(92px + env(safe-area-inset-bottom));
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(109, 40, 217, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #5b21b6;
+  box-shadow: 0 12px 30px rgba(43, 31, 74, 0.18);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 850;
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+}
+
+.launcher span {
+  color: #ffb800;
+  font-size: 16px;
+}
+
+.backdrop {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 18px;
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+  background: rgba(22, 16, 38, 0.56);
+  backdrop-filter: blur(7px);
+}
+
+.panel {
+  width: min(100%, 446px);
+  max-height: min(88vh, 760px);
+  overflow-y: auto;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 28px 90px rgba(25, 18, 43, 0.34);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid #eee9f7;
+}
+
+.header p {
+  margin: 0 0 6px;
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.header h2 {
+  margin: 0;
+  color: #201733;
+  font-size: clamp(21px, 6vw, 27px);
+  line-height: 1.08;
+}
+
+.header button {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 50%;
+  background: #f4f0fb;
+  color: #4c1d95;
+  font: inherit;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.form {
+  display: grid;
+  gap: 17px;
+  padding: 20px 22px 24px;
+}
+
+.form label,
+.form fieldset {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #352a49;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.form select,
+.form input,
+.form textarea {
+  width: 100%;
+  border: 1px solid #ddd4ed;
+  border-radius: 14px;
+  background: #fff;
+  color: #201733;
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+}
+
+.form select,
+.form input {
+  min-height: 46px;
+  padding: 0 13px;
+}
+
+.form textarea {
+  resize: vertical;
+  padding: 12px 13px;
+  line-height: 1.45;
+}
+
+.form select:focus,
+.form input:focus,
+.form textarea:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.13);
+}
+
+.ratings {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.ratings button {
+  min-height: 42px;
+  border: 1px solid #ddd4ed;
+  border-radius: 12px;
+  background: #faf8fe;
+  color: #5b4a75;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ratings button.selected {
+  border-color: #7c3aed;
+  background: #7c3aed;
+  color: white;
+}
+
+.form small,
+.privacy {
+  margin: 0;
+  color: #776b89;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.consent {
+  grid-template-columns: 20px 1fr !important;
+  align-items: flex-start;
+  font-weight: 650 !important;
+  line-height: 1.4;
+}
+
+.consent input {
+  width: 18px;
+  min-height: 18px;
+  margin: 1px 0 0;
+}
+
+.submit,
+.success button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 15px;
+  background: #6d28d9;
+  color: white;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(109, 40, 217, 0.24);
+}
+
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.error {
+  margin: 0;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: #fff1f2;
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.success {
+  display: grid;
+  gap: 12px;
+  padding: 28px 22px 24px;
+  text-align: center;
+}
+
+.success strong {
+  color: #2f1b4f;
+  font-size: 22px;
+}
+
+.success p {
+  margin: 0 0 8px;
+  color: #6b5c7f;
+  line-height: 1.5;
+}
+
+.honeypot {
+  position: absolute !important;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+@media (min-width: 820px) {
+  .launcher {
+    bottom: 118px;
+  }
+}
+
+@media (max-width: 360px) {
+  .launcher {
+    right: 10px;
+    padding: 0 11px;
+  }
+
+  .backdrop {
+    padding: 10px;
+  }
+
+  .header,
+  .form {
+    padding-left: 17px;
+    padding-right: 17px;
+  }
+}

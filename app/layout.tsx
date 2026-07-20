@@ -10,6 +10,10 @@ import "./globals.css";
 import "./venture-theme.css";
 
 import {
+  BetaFeedback
+} from "@/components/beta-feedback/beta-feedback";
+
+import {
   BottomNav
 } from "@/components/bottom-nav";
 
@@ -92,6 +96,11 @@ export default function RootLayout({
           <BottomNav />
 
           <ServiceWorkerRegistration />
+
+          {process.env.NEXT_PUBLIC_BETA_FEEDBACK_ENABLED !==
+          "false" ? (
+            <BetaFeedback />
+          ) : null}
         </div>
       </body>
     </html>
