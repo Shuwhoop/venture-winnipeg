@@ -2956,7 +2956,9 @@ export default function BuildOutingPage() {
         </button>
       </div>
 
-      <SubmitListingEntry placement="home" />
+      {currentStep === 0 ? (
+        <SubmitListingEntry placement="home" />
+      ) : null}
     </main>
   );
 }
