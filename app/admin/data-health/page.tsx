@@ -112,6 +112,7 @@ export default async function DataHealthPage({
         <div className={styles.headerActions}>
           <Link href="/admin/analytics">Analytics Lab</Link>
           <Link href="/admin/inventory-plan">Inventory plan</Link>
+          <Link href="/admin/quick-repair?issue=missing-neighbourhood&type=place">Quick repair</Link>
           <Link href="/admin/beta">Beta inbox</Link>
           <Link href="/admin/import">Import inventory</Link>
           <Link href="/admin/submissions">Review submissions</Link>
@@ -164,6 +165,10 @@ export default async function DataHealthPage({
       </section>
 
       <section className={styles.issueSummary} aria-label="Most common issues">
+        <Link href="/admin/quick-repair?issue=missing-neighbourhood&type=place">
+          <strong>{report.issueCounts["missing-neighbourhood"] ?? 0}</strong>
+          <span>Quick-fix neighbourhoods</span>
+        </Link>
         <Link href="?issue=missing-hours">
           <strong>{metrics.missingHours}</strong>
           <span>Missing or invalid hours</span>
