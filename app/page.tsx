@@ -1,4 +1,5 @@
 import NewsletterSignup from "@/components/newsletter-signup/newsletter-signup";
+import SubmitListingEntry from "@/components/submit-listing-entry/submit-listing-entry";
 
 import Link from "next/link";
 
@@ -305,6 +306,8 @@ export default async function HomePage() {
           </Link>
         </section>
       ) : null}
+
+      <SubmitListingEntry placement="home" />
 
       <NewsletterSignup placement="home" />
     </>

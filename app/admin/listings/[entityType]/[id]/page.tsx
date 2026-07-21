@@ -22,18 +22,20 @@ import styles from "./page.module.css";
 export const dynamic =
   "force-dynamic";
 
-export const metadata:
-  Metadata = {
-    title:
-      "Repair Listing | Venture Admin",
-    description:
-      "Private Venture editor for listing quality, trust, and outing eligibility."
-  };
+export const metadata: Metadata = {
+  title:
+    "Repair Listing | Venture Admin",
+  description:
+    "Private Venture editor for listing quality, trust, and outing eligibility."
+};
 
 type PageProps = {
   params: Promise<{
     entityType: string;
     id: string;
+  }>;
+  searchParams: Promise<{
+    returnTo?: string | string[];
   }>;
 };
 
@@ -46,8 +48,27 @@ function isEntityType(
   );
 }
 
+function safeReturnTo(
+  value: string | string[] | undefined
+): string {
+  const raw = Array.isArray(value)
+    ? value[0]
+    : value;
+
+  if (
+    !raw ||
+    !raw.startsWith("/admin/") ||
+    raw.startsWith("//")
+  ) {
+    return "/admin/data-health";
+  }
+
+  return raw;
+}
+
 export default async function AdminListingEditorPage({
-  params
+  params,
+  searchParams
 }: PageProps) {
   await requireVentureAdmin();
 
@@ -73,6 +94,9 @@ export default async function AdminListingEditorPage({
     notFound();
   }
 
+  const returnTo = safeReturnTo(
+    (await searchParams).returnTo
+  );
   const name =
     data.record.entityType === "place"
       ? data.record.name
@@ -83,28 +107,31 @@ export default async function AdminListingEditorPage({
       <header className={styles.header}>
         <div>
           <p className={styles.eyebrow}>
-            VENTURE ADMIN · QUICK REPAIR
+            VENTURE ADMIN · LISTING EDITOR
           </p>
           <h1>{name}</h1>
           <p>
-            Repair the fields that control discovery,
-            trust, and outing eligibility. Saving writes
-            through the server-only administrator client
-            and records an audit entry.
+            Repair the fields that control discovery, trust, and outing eligibility. The primary save button returns you to the exact queue that opened this record.
           </p>
         </div>
 
         <div className={styles.headerActions}>
-          <Link href="/admin/data-health">
-            Back to data health
+          <Link href={returnTo}>
+            Back to previous queue
           </Link>
-          <Link href="/admin/submissions">
-            Review submissions
+          <Link href="/admin/quick-repair">
+            Quick repair
+          </Link>
+          <Link href="/admin/analytics">
+            Analytics
           </Link>
         </div>
       </header>
 
-      <ListingEditorForm data={data} />
+      <ListingEditorForm
+        data={data}
+        returnTo={returnTo}
+      />
     </main>
   );
 }

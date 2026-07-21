@@ -29,92 +29,91 @@ export function ReportIssueForm({
   const [isOpen, setIsOpen] =
     useState(false);
 
-  const [
-    submissionState,
-    setSubmissionState
-  ] = useState<SubmissionState>("idle");
+  const [submissionState, setSubmissionState] =
+    useState<SubmissionState>("idle");
 
   const [message, setMessage] =
     useState("");
 
-    async function submitReport(
+  async function submitReport(
     event: FormEvent<HTMLFormElement>
-    ) {
+  ) {
     event.preventDefault();
 
-    const formElement = event.currentTarget;
-    const form = new FormData(formElement);
+    const formElement =
+      event.currentTarget;
+    const form =
+      new FormData(formElement);
 
     setSubmissionState("submitting");
     setMessage("");
 
     try {
-        const response = await fetch(
+      const response = await fetch(
         "/api/reports",
         {
-            method: "POST",
-            headers: {
+          method: "POST",
+          headers: {
             "Content-Type":
-                "application/json"
-            },
-            body: JSON.stringify({
+              "application/json"
+          },
+          body: JSON.stringify({
             entityId,
             entityType,
             reason: form.get("reason"),
             details: form.get("details"),
+            sourceUrl:
+              form.get("sourceUrl"),
             website: form.get("website")
-            })
+          })
         }
-        );
+      );
 
-        const result = await response.json();
+      const result =
+        await response.json();
 
-        if (!response.ok) {
+      if (!response.ok) {
         setSubmissionState("error");
         setMessage(
-            result.error ??
+          result.error ??
             "The report could not be submitted."
         );
 
         return;
-        }
-        formElement.reset();
+      }
 
-        setSubmissionState("success");
-        setMessage(
+      formElement.reset();
+      setSubmissionState("success");
+      setMessage(
         result.message ??
-            "Thanks. Your report was submitted for review."
-        );
+          "Thanks. Venture will review the information."
+      );
 
-        trackBetaEvent({
-          eventName: "report_submitted",
-          pagePath: window.location.pathname,
-          properties: {
-            entityId,
-            entityType,
-            listingName,
-            reason:
-              String(form.get("reason") || "")
-          }
-        });
-
-        setTimeout(() => {
-        setIsOpen(false);
-        setSubmissionState("idle");
-        setMessage("");
-        }, 1000);
+      trackBetaEvent({
+        eventName: "report_submitted",
+        pagePath:
+          window.location.pathname,
+        properties: {
+          entityId,
+          entityType,
+          listingName,
+          reason: String(
+            form.get("reason") || ""
+          )
+        }
+      });
     } catch (error) {
-        console.error(
+      console.error(
         "Report form error:",
         error
-        );
+      );
 
-        setSubmissionState("error");
-        setMessage(
+      setSubmissionState("error");
+      setMessage(
         "The report could not be submitted. Please try again."
-        );
+      );
     }
-    }
+  }
 
   return (
     <section className="report-panel">
@@ -129,11 +128,12 @@ export function ReportIssueForm({
         <span>!</span>
 
         <div>
-          <strong>Report an issue</strong>
+          <strong>
+            Report incorrect information
+          </strong>
 
           <small>
-            Help correct information about{" "}
-            {listingName}
+            Help Venture keep {listingName} accurate and current.
           </small>
         </div>
 
@@ -146,34 +146,53 @@ export function ReportIssueForm({
           onSubmit={submitReport}
         >
           <label>
-            What is wrong?
+            What should Venture check?
 
             <select
               name="reason"
               required
               defaultValue=""
             >
-              <option
-                value=""
-                disabled
-              >
+              <option value="" disabled>
                 Select a reason
               </option>
 
-              <option value="cancelled">
-                Event cancelled
-              </option>
+              {entityType === "event" ? (
+                <option value="cancelled">
+                  Event cancelled or postponed
+                </option>
+              ) : (
+                <option value="closed_business">
+                  Business closed
+                </option>
+              )}
 
               <option value="incorrect_hours">
                 Incorrect opening hours
               </option>
 
               <option value="wrong_address">
-                Wrong address
+                Wrong address or map point
+              </option>
+
+              <option value="incorrect_price">
+                Incorrect price information
+              </option>
+
+              <option value="broken_link">
+                Broken website, menu, reservation, or ticket link
+              </option>
+
+              <option value="accessibility">
+                Accessibility information needs attention
+              </option>
+
+              <option value="outdated_event">
+                Event information is outdated
               </option>
 
               <option value="incorrect_details">
-                Incorrect information
+                Other incorrect information
               </option>
 
               <option value="duplicate">
@@ -191,13 +210,25 @@ export function ReportIssueForm({
           </label>
 
           <label>
-            Details
+            What is correct?
 
             <textarea
               name="details"
               maxLength={1000}
               rows={4}
               placeholder="Explain what should be checked or corrected."
+            />
+          </label>
+
+          <label>
+            Supporting source, optional
+
+            <input
+              name="sourceUrl"
+              type="url"
+              inputMode="url"
+              maxLength={500}
+              placeholder="https://official-source.example"
             />
           </label>
 
@@ -230,8 +261,7 @@ export function ReportIssueForm({
             <p
               className={`report-message ${submissionState}`}
               role={
-                submissionState ===
-                "error"
+                submissionState === "error"
                   ? "alert"
                   : "status"
               }

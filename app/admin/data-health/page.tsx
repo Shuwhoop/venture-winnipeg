@@ -97,6 +97,35 @@ export default async function DataHealthPage({
 
   const { metrics } = report;
 
+  const returnParams =
+    new URLSearchParams();
+
+  if (entityType !== "all") {
+    returnParams.set("type", entityType);
+  }
+
+  if (issue !== "all") {
+    returnParams.set("issue", issue);
+  }
+
+  if (status !== "all") {
+    returnParams.set("status", status);
+  }
+
+  if (report.appliedFilter.search) {
+    returnParams.set(
+      "search",
+      report.appliedFilter.search
+    );
+  }
+
+  const returnTo =
+    `/admin/data-health${
+      returnParams.size > 0
+        ? `?${returnParams.toString()}`
+        : ""
+    }`;
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -336,7 +365,7 @@ export default async function DataHealthPage({
                   <td data-label="Actions">
                     <div className={styles.rowActions}>
                       <Link
-                        href={`/admin/listings/${record.entityType}/${record.id}`}
+                        href={`/admin/listings/${record.entityType}/${record.id}?returnTo=${encodeURIComponent(returnTo)}`}
                       >
                         Repair
                       </Link>

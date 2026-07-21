@@ -10,16 +10,9 @@ import "./globals.css";
 import "./venture-theme.css";
 
 import {
-  VentureAnalytics
-} from "@/components/analytics/venture-analytics";
-
-import {
-  BetaFeedback
-} from "@/components/beta-feedback/beta-feedback";
-
-import {
-  BottomNav
-} from "@/components/bottom-nav";
+  AdminRouteChrome,
+  PublicRouteChrome
+} from "@/components/app-route-chrome";
 
 import {
   ServiceWorkerRegistration
@@ -93,23 +86,24 @@ export default function RootLayout({
             </Link>
           </header>
 
+          <AdminRouteChrome />
+
           <main className="page-content">
             {children}
           </main>
 
-          <BottomNav />
+          <PublicRouteChrome
+            analyticsEnabled={
+              process.env.NEXT_PUBLIC_ANALYTICS_ENABLED !==
+              "false"
+            }
+            betaFeedbackEnabled={
+              process.env.NEXT_PUBLIC_BETA_FEEDBACK_ENABLED !==
+              "false"
+            }
+          />
 
           <ServiceWorkerRegistration />
-
-          {process.env.NEXT_PUBLIC_ANALYTICS_ENABLED !==
-          "false" ? (
-            <VentureAnalytics />
-          ) : null}
-
-          {process.env.NEXT_PUBLIC_BETA_FEEDBACK_ENABLED !==
-          "false" ? (
-            <BetaFeedback />
-          ) : null}
         </div>
       </body>
     </html>

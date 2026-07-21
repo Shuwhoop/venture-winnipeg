@@ -1,0 +1,130 @@
+.panel {
+  border: 1.5px solid #d9cfc5;
+  border-radius: 22px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.toggle {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 18px;
+  text-align: left;
+  cursor: pointer;
+  color: #17131d;
+}
+
+.icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff2bf;
+  border: 1.5px solid #e7bd00;
+  font-weight: 900;
+}
+
+.toggle strong,
+.toggle small {
+  display: block;
+}
+
+.toggle strong {
+  font-size: 1rem;
+}
+
+.toggle small {
+  margin-top: 3px;
+  color: #685f6d;
+  line-height: 1.4;
+}
+
+.toggle b {
+  font-size: 1.35rem;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+  padding: 0 18px 18px;
+}
+
+.form label {
+  display: grid;
+  gap: 7px;
+  color: #4d4556;
+  font-weight: 800;
+  font-size: 0.86rem;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  border: 1.5px solid #d7cedf;
+  border-radius: 13px;
+  padding: 12px 13px;
+  background: #fff;
+  color: #17131d;
+  font: inherit;
+}
+
+.form textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.form button {
+  border: 2px solid #17131d;
+  border-radius: 13px;
+  padding: 13px 16px;
+  background: #ffcf00;
+  color: #17131d;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #e20f18;
+}
+
+.form button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.note {
+  color: #685f6d;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.message {
+  margin: 0;
+  border-radius: 12px;
+  padding: 11px 12px;
+  font-weight: 750;
+  font-size: 0.86rem;
+}
+
+.success {
+  background: #e8fff1;
+  color: #08773a;
+}
+
+.error {
+  background: #ffe9e9;
+  color: #9e1219;
+}
+
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

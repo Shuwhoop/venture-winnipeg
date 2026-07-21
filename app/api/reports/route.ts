@@ -1,4 +1,6 @@
-import { NextResponse } from "next/server";
+import {
+  NextResponse
+} from "next/server";
 
 import {
   getSupabaseAdminClient
@@ -6,8 +8,13 @@ import {
 
 const allowedReasons = new Set([
   "cancelled",
+  "closed_business",
   "incorrect_hours",
   "wrong_address",
+  "incorrect_price",
+  "broken_link",
+  "accessibility",
+  "outdated_event",
   "incorrect_details",
   "duplicate",
   "inappropriate",
@@ -22,26 +29,69 @@ type ReportRequestBody = {
   entityId?: string;
   reason?: string;
   details?: string;
+  sourceUrl?: string;
   website?: string;
 };
+
+function isSameOrigin(
+  request: Request
+): boolean {
+  const origin =
+    request.headers.get("origin");
+
+  if (!origin) {
+    return true;
+  }
+
+  return origin ===
+    new URL(request.url).origin;
+}
+
+function validOptionalUrl(
+  value: string
+): boolean {
+  if (!value) {
+    return true;
+  }
+
+  try {
+    const parsed = new URL(value);
+
+    return (
+      parsed.protocol === "https:" ||
+      parsed.protocol === "http:"
+    );
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(
   request: Request
 ) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json(
+      {
+        error:
+          "The report came from an unexpected origin."
+      },
+      {
+        status: 403
+      }
+    );
+  }
+
   try {
     const body =
-      (await request.json()) as ReportRequestBody;
+      (await request.json()) as
+        ReportRequestBody;
 
-    /*
-     * Hidden spam field.
-     * Real users never fill this in.
-     */
     if (body.website?.trim()) {
       return NextResponse.json(
         {
           ok: true,
           message:
-            "Thanks. Your report was submitted for review."
+            "Thanks. Venture will review the information."
         },
         {
           status: 201
@@ -51,15 +101,14 @@ export async function POST(
 
     const entityType =
       body.entityType?.trim();
-
     const entityId =
       body.entityId?.trim();
-
     const reason =
       body.reason?.trim();
-
     const details =
       body.details?.trim() ?? "";
+    const sourceUrl =
+      body.sourceUrl?.trim() ?? "";
 
     if (
       entityType !== "event" &&
@@ -106,11 +155,15 @@ export async function POST(
       );
     }
 
-    if (details.length > 1000) {
+    if (
+      details.length > 1000 ||
+      sourceUrl.length > 500 ||
+      !validOptionalUrl(sourceUrl)
+    ) {
       return NextResponse.json(
         {
           error:
-            "Report details must be 1,000 characters or fewer."
+            "Check the report details and supporting source."
         },
         {
           status: 400
@@ -120,16 +173,11 @@ export async function POST(
 
     const supabase =
       getSupabaseAdminClient();
-
     const listingTable =
       entityType === "event"
         ? "events"
         : "places";
 
-    /*
-     * Confirm that the report refers to
-     * an actual published listing.
-     */
     const {
       data: listing,
       error: listingError
@@ -156,10 +204,6 @@ export async function POST(
       );
     }
 
-    /*
-     * status and created_at are supplied
-     * automatically by the database.
-     */
     const { error: reportError } =
       await supabase
         .from("reports")
@@ -169,9 +213,9 @@ export async function POST(
           entity_id: entityId,
           reason,
           details:
-            details.length > 0
-              ? details
-              : null
+            details || null,
+          source_url:
+            sourceUrl || null
         });
 
     if (reportError) {
@@ -182,7 +226,7 @@ export async function POST(
       {
         ok: true,
         message:
-          "Thanks. Your report was submitted for review."
+          "Thanks. Venture will review the information."
       },
       {
         status: 201

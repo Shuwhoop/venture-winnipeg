@@ -333,9 +333,11 @@ function getDayHours(
 }
 
 export default function ListingEditorForm({
-  data
+  data,
+  returnTo
 }: {
   data: AdminListingEditorData;
+  returnTo: string;
 }) {
   const router = useRouter();
   const {
@@ -372,6 +374,11 @@ export default function ListingEditorForm({
   const formRef =
     useRef<HTMLFormElement>(
       null
+    );
+
+  const saveActionRef =
+    useRef<"return" | "stay">(
+      "return"
     );
 
   const defaultQuickHours =
@@ -1080,6 +1087,15 @@ export default function ListingEditorForm({
         result.message ||
           "Listing changes saved."
       );
+
+      if (
+        saveActionRef.current ===
+        "return"
+      ) {
+        router.push(returnTo);
+        return;
+      }
+
       router.refresh();
     } catch (error) {
       setMessage(
@@ -2044,14 +2060,31 @@ export default function ListingEditorForm({
           {message ||
             "Changes are logged to Venture's audit history."}
         </p>
-        <button
-          type="submit"
-          disabled={saving}
-        >
-          {saving
-            ? "Saving..."
-            : "Save listing"}
-        </button>
+        <div className={styles.saveActions}>
+          <button
+            type="submit"
+            disabled={saving}
+            onClick={() => {
+              saveActionRef.current =
+                "return";
+            }}
+          >
+            {saving
+              ? "Saving..."
+              : "Save and return"}
+          </button>
+          <button
+            type="submit"
+            className={styles.secondarySave}
+            disabled={saving}
+            onClick={() => {
+              saveActionRef.current =
+                "stay";
+            }}
+          >
+            Save and keep editing
+          </button>
+        </div>
       </div>
     </form>
   );

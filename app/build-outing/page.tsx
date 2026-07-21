@@ -12,6 +12,8 @@ import {
 
 import NeighbourhoodPicker from "@/components/neighbourhood-picker";
 
+import SubmitListingEntry from "@/components/submit-listing-entry/submit-listing-entry";
+
 import {
   defaultPreferences,
   loadPreferences,
@@ -2953,6 +2955,8 @@ export default function BuildOutingPage() {
           </span>
         </button>
       </div>
+
+      <SubmitListingEntry placement="home" />
     </main>
   );
 }

@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {
+  usePathname,
+  useRouter,
+  useSearchParams
+} from "next/navigation";
 import {
   useEffect,
   useMemo,
@@ -85,6 +89,13 @@ export default function QuickRepairClient({
   categorySuggestions: string[];
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const returnTo = `${pathname}${
+    searchParams.toString()
+      ? `?${searchParams.toString()}`
+      : ""
+  }`;
   const [initial, setInitial] = useState<Record<string, EditableRecord>>(() =>
     Object.fromEntries(records.map((record) => [record.key, createEditable(record)]))
   );
@@ -473,7 +484,7 @@ export default function QuickRepairClient({
                   >
                     {state.tone === "saving" ? "Saving…" : "Save listing"}
                   </button>
-                  <Link href={`/admin/listings/${record.entityType}/${record.id}`}>
+                  <Link href={`/admin/listings/${record.entityType}/${record.id}?returnTo=${encodeURIComponent(returnTo)}`}>
                     Full editor
                   </Link>
                   <Link href={record.publicPath}>View</Link>

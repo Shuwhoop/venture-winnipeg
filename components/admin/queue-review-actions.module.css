@@ -1,0 +1,49 @@
+.form {
+  display: grid;
+  gap: 9px;
+}
+
+.form select,
+.form textarea {
+  width: 100%;
+  border: 1.5px solid #d7cedf;
+  border-radius: 11px;
+  padding: 10px 11px;
+  background: #fff;
+  color: #17131d;
+  font: inherit;
+}
+
+.form textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.form button {
+  border: 1.5px solid #17131d;
+  border-radius: 11px;
+  padding: 10px 12px;
+  background: #ffcf00;
+  color: #17131d;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.message {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.error {
+  color: #a10e18;
+}
+
+.success {
+  color: #087a40;
+}

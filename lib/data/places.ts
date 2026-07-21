@@ -21,8 +21,6 @@ type PlaceRow = {
   verification_status: VerificationStatus;
   warning_message: string | null;
   source_checked_at: string | null;
-  google_rating: number | null;
-  google_rating_count: number | null;
   latitude: number;
   longitude: number;
 };
@@ -500,14 +498,6 @@ function convertPlaceToListing(
         place.source_checked_at
       ),
 
-    rating:
-      place.google_rating ??
-      undefined,
-
-    ratingCount:
-      place.google_rating_count ??
-      undefined,
-
     imageClass: "image-food",
 
     neighbourhood:
@@ -553,8 +543,6 @@ const placeFields = `
   verification_status,
   warning_message,
   source_checked_at,
-  google_rating,
-  google_rating_count,
   latitude,
   longitude
   `;

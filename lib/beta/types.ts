@@ -19,6 +19,7 @@ export const BETA_EVENT_NAMES = [
   "shared_outing_viewed",
   "newsletter_signup",
   "report_submitted",
+  "listing_claim_requested",
   "feedback_opened",
   "feedback_submitted",
   "pipeline_test"
