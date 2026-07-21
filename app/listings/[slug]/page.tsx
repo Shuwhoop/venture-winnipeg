@@ -427,10 +427,29 @@ export default async function ListingPage({
     detail.officialWebsite ||
     detail.primarySourceUrl;
   const today = getTodayName();
+  const currentStatus =
+    detail.entityType === "place"
+      ? getCurrentPlaceStatus(detail)
+      : eventSchedule(detail);
+  const currentPrice =
+    detail.entityType === "place"
+      ? placePrice(detail)
+      : eventPrice(detail);
+  const cuisineOrVenue =
+    detail.entityType === "place"
+      ? detail.cuisinePrimary ||
+        detail.primaryCategory
+      : detail.venueName ||
+        detail.organizerName;
+  const reservationOrTicketUrl =
+    detail.entityType === "place"
+      ? detail.reservationUrl
+      : detail.ticketUrl;
 
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
+        <div className={styles.heroGlow} aria-hidden="true" />
         <div className={styles.heroTop}>
           <div>
             <p className={styles.eyebrow}>
@@ -448,69 +467,115 @@ export default async function ListingPage({
         <p className={styles.shortDescription}>
           {detail.shortDescription}
         </p>
+
+        {detail.neighbourhood || address ? (
+          <div className={styles.heroLocation}>
+            <span aria-hidden="true">⌖</span>
+            <div>
+              <strong>
+                {detail.neighbourhood || detail.city}
+              </strong>
+              {address ? <small>{address}</small> : null}
+            </div>
+          </div>
+        ) : null}
       </section>
 
       <section
         className={styles.factGrid}
         aria-label="Listing summary"
       >
-        <article className={styles.fact}>
-          <strong>
-            {detail.entityType === "place"
-              ? getCurrentPlaceStatus(detail)
-              : eventSchedule(detail)}
-          </strong>
-          <span>
-            {detail.entityType === "place" ? "Current status" : "Schedule"}
-          </span>
+        <article className={`${styles.fact} ${styles.factStatus}`}>
+          <span className={styles.factIcon} aria-hidden="true">◷</span>
+          <div>
+            <strong title={currentStatus}>{currentStatus}</strong>
+            <span>
+              {detail.entityType === "place" ? "Current status" : "Schedule"}
+            </span>
+          </div>
         </article>
 
         <article className={styles.fact}>
-          <strong>
-            {detail.neighbourhood ||
-              "Winnipeg"}
-          </strong>
-          <span>Neighbourhood</span>
+          <span className={styles.factIcon} aria-hidden="true">⌖</span>
+          <div>
+            <strong title={detail.neighbourhood || "Winnipeg"}>
+              {detail.neighbourhood || "Winnipeg"}
+            </strong>
+            <span>Neighbourhood</span>
+          </div>
         </article>
 
         <article className={styles.fact}>
-          <strong>
-            {detail.entityType === "place"
-              ? placePrice(detail)
-              : eventPrice(detail)}
-          </strong>
-          <span>Price</span>
+          <span className={styles.factIcon} aria-hidden="true">$</span>
+          <div>
+            <strong>{currentPrice}</strong>
+            <span>Price</span>
+          </div>
         </article>
 
         <article className={styles.fact}>
-          <strong>
-            {detail.entityType === "place"
-              ? detail.cuisinePrimary ||
-                detail.primaryCategory
-              : detail.venueName ||
-                detail.organizerName}
-          </strong>
-          <span>
-            {detail.entityType === "place" ? "Cuisine" : "Venue"}
-          </span>
+          <span className={styles.factIcon} aria-hidden="true">✦</span>
+          <div>
+            <strong title={cuisineOrVenue || undefined}>
+              {cuisineOrVenue}
+            </strong>
+            <span>
+              {detail.entityType === "place" ? "Cuisine" : "Venue"}
+            </span>
+          </div>
         </article>
       </section>
 
       <section className={styles.actionSection}>
-        <div className={styles.actions}>
+        <div className={styles.sectionHeadingCompact}>
+          <span>QUICK ACTIONS</span>
+          <h2>Make the next move</h2>
+        </div>
+
+        <div className={styles.primaryActions}>
           {address ? (
             <a
+              className={styles.actionPrimary}
               href={directionsUrl(detail)}
               target="_blank"
               rel="noreferrer"
             >
-              Address & directions
+              <span aria-hidden="true">↗</span>
+              <div>
+                <strong>Directions</strong>
+                <small>{detail.neighbourhood || detail.city}</small>
+              </div>
             </a>
           ) : null}
 
+          {reservationOrTicketUrl ? (
+            <a
+              className={styles.actionAccent}
+              href={reservationOrTicketUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span aria-hidden="true">
+                {detail.entityType === "place" ? "R" : "T"}
+              </span>
+              <div>
+                <strong>
+                  {detail.entityType === "place" ? "Reserve" : "Tickets"}
+                </strong>
+                <small>Open official booking</small>
+              </div>
+            </a>
+          ) : null}
+        </div>
+
+        <div className={styles.secondaryActions}>
           {detail.entityType === "place" && detail.officialPhone ? (
-            <a href={`tel:${detail.officialPhone}`}>
-              Call {detail.officialPhone}
+            <a
+              href={`tel:${detail.officialPhone}`}
+              aria-label={`Call ${detail.officialPhone}`}
+            >
+              <span aria-hidden="true">☎</span>
+              <strong>Call</strong>
             </a>
           ) : null}
 
@@ -520,13 +585,8 @@ export default async function ListingPage({
               target="_blank"
               rel="noreferrer"
             >
-              Official website
-            </a>
-          ) : null}
-
-          {detail.entityType === "place" && detail.officialEmail ? (
-            <a href={`mailto:${detail.officialEmail}`}>
-              Email business
+              <span aria-hidden="true">↗</span>
+              <strong>Website</strong>
             </a>
           ) : null}
 
@@ -536,85 +596,94 @@ export default async function ListingPage({
               target="_blank"
               rel="noreferrer"
             >
-              View menu
+              <span aria-hidden="true">≡</span>
+              <strong>Menu</strong>
             </a>
           ) : null}
 
-          {detail.entityType === "place" && detail.reservationUrl ? (
+          {detail.entityType === "place" && detail.officialEmail ? (
             <a
-              href={detail.reservationUrl}
-              target="_blank"
-              rel="noreferrer"
+              href={`mailto:${detail.officialEmail}`}
+              aria-label={`Email ${detail.name}`}
             >
-              Reserve
-            </a>
-          ) : null}
-
-          {detail.entityType === "event" && detail.ticketUrl ? (
-            <a
-              href={detail.ticketUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Tickets
+              <span aria-hidden="true">✉</span>
+              <strong>Email</strong>
             </a>
           ) : null}
         </div>
 
         <p className={styles.compassNote}>
-          Directions may open in Google Maps. Venture uses mapping services as a compass, while listing facts come from official or independently verified sources.
+          Directions may open in Google Maps. Venture uses maps as a compass, while listing facts come from official or independently verified sources.
         </p>
       </section>
 
       {detail.fullDescription ? (
-        <section className={styles.section}>
+        <section className={`${styles.section} ${styles.revealSection}`}>
           <div className={styles.sectionHeading}>
             <span>ABOUT</span>
             <h2>Why it is worth knowing</h2>
           </div>
-          <p className={styles.description}>
-            {detail.fullDescription}
-          </p>
+          <details className={styles.storyDisclosure}>
+            <summary>
+              <span>Read the full story</span>
+              <b aria-hidden="true">＋</b>
+            </summary>
+            <p className={styles.description}>
+              {detail.fullDescription}
+            </p>
+          </details>
         </section>
       ) : null}
 
       {detail.warningMessage ? (
-        <section className={styles.section}>
+        <section className={`${styles.section} ${styles.revealSection}`}>
           <div className={styles.sectionHeading}>
             <span>BEFORE YOU GO</span>
             <h2>Important visitor note</h2>
           </div>
           <div className={styles.warning}>
-            {detail.warningMessage}
+            <span aria-hidden="true">!</span>
+            <p>{detail.warningMessage}</p>
           </div>
         </section>
       ) : null}
 
       {detail.entityType === "place" ? (
-        <section className={styles.section}>
+        <section className={`${styles.section} ${styles.revealSection}`}>
           <div className={styles.sectionHeading}>
             <span>HOURS</span>
-            <h2>Weekly schedule</h2>
+            <h2>When to go</h2>
           </div>
 
-          <div className={styles.hours}>
-            {DAY_ORDER.map((day) => (
-              <div
-                className={`${styles.hourRow} ${
-                  day === today
-                    ? styles.today
-                    : ""
-                }`}
-                key={day}
-              >
-                <strong>{readable(day)}</strong>
-                <span>{getDayHours(detail, day)}</span>
-              </div>
-            ))}
+          <div className={styles.todayHours}>
+            <span>Today</span>
+            <strong>{getDayHours(detail, today)}</strong>
           </div>
+
+          <details className={styles.disclosure}>
+            <summary>
+              <span>View the full weekly schedule</span>
+              <b aria-hidden="true">⌄</b>
+            </summary>
+            <div className={styles.hours}>
+              {DAY_ORDER.map((day) => (
+                <div
+                  className={`${styles.hourRow} ${
+                    day === today
+                      ? styles.today
+                      : ""
+                  }`}
+                  key={day}
+                >
+                  <strong>{readable(day)}</strong>
+                  <span>{getDayHours(detail, day)}</span>
+                </div>
+              ))}
+            </div>
+          </details>
         </section>
       ) : (
-        <section className={styles.section}>
+        <section className={`${styles.section} ${styles.revealSection}`}>
           <div className={styles.sectionHeading}>
             <span>EVENT DETAILS</span>
             <h2>Timing and entry</h2>
@@ -654,46 +723,67 @@ export default async function ListingPage({
       detail.accessibilityNotes ||
       detail.transitNotes ||
       detail.parkingNotes ? (
-        <section className={styles.section}>
+        <section className={`${styles.section} ${styles.revealSection}`}>
           <div className={styles.sectionHeading}>
             <span>PLAN THE VISIT</span>
             <h2>Getting there and access</h2>
           </div>
 
-          <div className={styles.detailList}>
-            {address ? (
-              <article className={styles.detailItem}>
-                <strong>Address</strong>
-                <p>{address}</p>
-              </article>
-            ) : null}
+          {address ? (
+            <a
+              className={styles.addressCard}
+              href={directionsUrl(detail)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span aria-hidden="true">⌖</span>
+              <div>
+                <strong>{address}</strong>
+                <small>Open directions</small>
+              </div>
+              <b aria-hidden="true">↗</b>
+            </a>
+          ) : null}
 
+          <div className={styles.visitDisclosures}>
             {detail.accessibilityNotes ? (
-              <article className={styles.detailItem}>
-                <strong>Accessibility</strong>
+              <details className={styles.disclosureCard}>
+                <summary>
+                  <span aria-hidden="true">♿</span>
+                  <strong>Accessibility</strong>
+                  <b aria-hidden="true">＋</b>
+                </summary>
                 <p>{detail.accessibilityNotes}</p>
-              </article>
+              </details>
             ) : null}
 
             {detail.transitNotes ? (
-              <article className={styles.detailItem}>
-                <strong>Transit</strong>
+              <details className={styles.disclosureCard}>
+                <summary>
+                  <span aria-hidden="true">↔</span>
+                  <strong>Transit</strong>
+                  <b aria-hidden="true">＋</b>
+                </summary>
                 <p>{detail.transitNotes}</p>
-              </article>
+              </details>
             ) : null}
 
             {detail.parkingNotes ? (
-              <article className={styles.detailItem}>
-                <strong>Parking</strong>
+              <details className={styles.disclosureCard}>
+                <summary>
+                  <span aria-hidden="true">P</span>
+                  <strong>Parking</strong>
+                  <b aria-hidden="true">＋</b>
+                </summary>
                 <p>{detail.parkingNotes}</p>
-              </article>
+              </details>
             ) : null}
           </div>
         </section>
       ) : null}
 
       {categories.length > 0 ? (
-        <section className={styles.section}>
+        <section className={`${styles.section} ${styles.revealSection}`}>
           <div className={styles.sectionHeading}>
             <span>GOOD TO KNOW</span>
             <h2>Categories and atmosphere</h2>
@@ -708,7 +798,7 @@ export default async function ListingPage({
         </section>
       ) : null}
 
-      <section className={styles.trustSection}>
+      <section className={`${styles.trustSection} ${styles.revealSection}`}>
         <div className={styles.sectionHeading}>
           <span>SAFE & TRANSPARENT</span>
           <h2>How Venture handles this listing</h2>
