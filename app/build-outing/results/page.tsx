@@ -11,6 +11,8 @@ import {
 } from "@/components/outing-route-map";
 import Link from "next/link";
 
+import styles from "./results-refresh.module.css";
+
 import {
   trackBetaEvent
 } from "@/lib/beta/client";
@@ -388,6 +390,11 @@ export default function OutingResultsPage() {
       null
     );
 
+  const [
+    expandedOrders,
+    setExpandedOrders
+  ] = useState<number[]>([]);
+
   const resultsExperiment =
     useExperimentAssignment(
       "outing-results-presentation-v1",
@@ -488,6 +495,7 @@ export default function OutingResultsPage() {
         setReplacingOrder(null);
         setRefreshingUnlocked(false);
         setAddingKind(null);
+        setExpandedOrders([]);
 
         setStatus("ready");
 
@@ -1148,6 +1156,26 @@ export default function OutingResultsPage() {
     }
   }
 
+  function toggleStopDetails(
+    stopOrder: number
+  ) {
+    setExpandedOrders(
+      (current) =>
+        current.includes(
+          stopOrder
+        )
+          ? current.filter(
+              (order) =>
+                order !==
+                stopOrder
+            )
+          : [
+              ...current,
+              stopOrder
+            ]
+    );
+  }
+
   async function handleShareOuting() {
   if (!plan) {
     return;
@@ -1283,17 +1311,36 @@ export default function OutingResultsPage() {
 }
   return (
     <main
-      className="outing-results-page outing-results-v3"
+      className={`outing-results-page outing-results-v3 ${styles.refreshRoot}`}
       data-experiment-variant={
         resultsExperiment.variant ||
         "unassigned"
       }
+      data-plan-status={
+        status === "ready"
+          ? planStatus
+          : status
+      }
     >
       <header className="outing-results-heading outing-results-hero-v3">
         <div className="outing-results-hero-copy">
-          <span>
-            VENTURE BUILDER
-          </span>
+          <div className={styles.heroEyebrowRow}>
+            <span>
+              VENTURE BUILDER
+            </span>
+
+            {status === "ready" && plan ? (
+              <span
+                className={`${styles.statusPill} ${styles[planStatus]}`}
+              >
+                {planStatus === "complete"
+                  ? "✓ Complete"
+                  : planStatus === "partial"
+                    ? "◒ Partial"
+                    : "! Needs changes"}
+              </span>
+            ) : null}
+          </div>
 
           <h1>
             {plan
@@ -1518,21 +1565,29 @@ export default function OutingResultsPage() {
             <button
               className={
                 saved
-                  ? "saved"
-                  : ""
+                  ? `saved ${styles.primaryAction}`
+                  : styles.primaryAction
               }
               type="button"
               onClick={
                 handleSaveOuting
               }
             >
-              <span aria-hidden="true">
+              <span
+                className={styles.actionIcon}
+                aria-hidden="true"
+              >
                 {saved ? "♥" : "♡"}
               </span>
 
-              {saved
-                ? "Saved"
-                : "Save"}
+              <span className={styles.actionCopy}>
+                <strong>
+                  {saved
+                    ? "Saved"
+                    : "Save outing"}
+                </strong>
+                <small>Keep this route for later</small>
+              </span>
             </button>
 
             <button
@@ -1541,15 +1596,22 @@ export default function OutingResultsPage() {
                 void handleShareOuting();
               }}
             >
-              <span aria-hidden="true">
+              <span
+                className={styles.actionIcon}
+                aria-hidden="true"
+              >
                 ↗
               </span>
 
-              Share
+              <span className={styles.actionCopy}>
+                <strong>Share</strong>
+                <small>Send the plan to your people</small>
+              </span>
             </button>
 
             <button
               type="button"
+              className={styles.refreshAction}
               disabled={
                 refreshingUnlocked ||
                 replacingOrder !== null ||
@@ -1559,13 +1621,21 @@ export default function OutingResultsPage() {
                 void handleRefreshUnlocked();
               }}
             >
-              <span aria-hidden="true">
+              <span
+                className={`${styles.actionIcon} ${refreshingUnlocked ? styles.spinning : ""}`}
+                aria-hidden="true"
+              >
                 ↻
               </span>
 
-              {refreshingUnlocked
-                ? "Refreshing"
-                : "Refresh"}
+              <span className={styles.actionCopy}>
+                <strong>
+                  {refreshingUnlocked
+                    ? "Refreshing"
+                    : "Refresh unlocked"}
+                </strong>
+                <small>Keep locked stops, remix the rest</small>
+              </span>
             </button>
           </section>
 
@@ -1580,7 +1650,7 @@ export default function OutingResultsPage() {
 
           <section className="outing-plan-summary outing-plan-summary-v3">
             <div>
-              <span>DATE</span>
+              <span><i aria-hidden="true">📅</i> DATE</span>
               <strong>
                 {formatPlanDate(
                   plan.date
@@ -1589,28 +1659,28 @@ export default function OutingResultsPage() {
             </div>
 
             <div>
-              <span>START</span>
+              <span><i aria-hidden="true">🕒</i> START</span>
               <strong>
                 {plan.requestedStartTime}
               </strong>
             </div>
 
             <div>
-              <span>PEOPLE</span>
+              <span><i aria-hidden="true">👥</i> PEOPLE</span>
               <strong>
                 {partySize}
               </strong>
             </div>
 
             <div>
-              <span>LENGTH</span>
+              <span><i aria-hidden="true">⌛</i> LENGTH</span>
               <strong>
                 {plan.requestedDuration}
               </strong>
             </div>
 
             <div>
-              <span>TRAVEL</span>
+              <span><i aria-hidden="true">🧭</i> TRAVEL</span>
               <strong>
                 {plan.transportation}
               </strong>
@@ -1622,7 +1692,7 @@ export default function OutingResultsPage() {
 
             <div>
               <span>
-                PER PERSON
+                <i aria-hidden="true">💵</i> PER PERSON
               </span>
               <strong>
                 {formatCost(
@@ -1634,7 +1704,7 @@ export default function OutingResultsPage() {
             {partySize > 1 ? (
               <div>
                 <span>
-                  GROUP ESTIMATE
+                  <i aria-hidden="true">🧾</i> GROUP ESTIMATE
                 </span>
                 <strong>
                   {formatCost(
@@ -1777,6 +1847,11 @@ export default function OutingResultsPage() {
                   const kindDetails =
                     getKindDetails(kind);
 
+                  const expanded =
+                    expandedOrders.includes(
+                      stop.order
+                    );
+
                   return (
                     <div
                       className={`outing-stop-wrapper outing-kind-${kind}`}
@@ -1834,91 +1909,124 @@ export default function OutingResultsPage() {
                             {stop.reason}
                           </p>
 
-                          <div className="outing-stop-details">
+                          <div className={styles.stopQuickFacts}>
                             <span>
-                              {stop.listing.neighbourhood}
+                              <i aria-hidden="true">📍</i>
+                              {stop.listing.neighbourhood || "Winnipeg"}
                             </span>
 
                             <span>
+                              <i aria-hidden="true">💵</i>
                               {formatCost(
                                 stop.estimatedCostCad
                               )}
                             </span>
-
-                            <span>
-                              {stop.listing.timeOrHours}
-                            </span>
                           </div>
 
-                          <div className="outing-stop-controls">
-                            <button
-                              type="button"
-                              className={
-                                lockedOrders.includes(
-                                  stop.order
-                                )
-                                  ? "locked"
-                                  : ""
-                              }
-                              aria-pressed={
-                                lockedOrders.includes(
-                                  stop.order
-                                )
-                              }
-                              onClick={() =>
-                                toggleLock(
-                                  stop.order
-                                )
-                              }
-                            >
-                              <span aria-hidden="true">
-                                {lockedOrders.includes(
-                                  stop.order
-                                )
-                                  ? "🔒"
-                                  : "🔓"}
-                              </span>
-
-                              {lockedOrders.includes(
+                          <button
+                            type="button"
+                            className={styles.detailsToggle}
+                            aria-expanded={expanded}
+                            onClick={() =>
+                              toggleStopDetails(
                                 stop.order
                               )
-                                ? "Locked"
-                                : "Lock"}
-                            </button>
-
-                            <button
-                              type="button"
-                              disabled={
-                                lockedOrders.includes(
-                                  stop.order
-                                ) ||
-                                replacingOrder !== null ||
-                                refreshingUnlocked ||
-                                addingKind !== null
-                              }
-                              onClick={() => {
-                                void handleReplaceStop(
-                                  stop.order
-                                );
-                              }}
-                            >
-                              <span aria-hidden="true">
-                                ↻
-                              </span>
-
-                              {replacingOrder ===
-                              stop.order
-                                ? "Replacing..."
-                                : `Replace ${kind}`}
-                            </button>
-                          </div>
-
-                          <Link
-                            className="outing-stop-link"
-                            href={`/listings/${stop.listing.slug}`}
+                            }
                           >
-                            View full listing
-                          </Link>
+                            <span>
+                              {expanded
+                                ? "Hide details"
+                                : "Show details"}
+                            </span>
+                            <i aria-hidden="true">
+                              {expanded ? "−" : "+"}
+                            </i>
+                          </button>
+
+                          {expanded ? (
+                            <div className={styles.stopDetailsPanel}>
+                              <div className={styles.hoursRow}>
+                                <span aria-hidden="true">🕒</span>
+                                <div>
+                                  <small>Hours or event time</small>
+                                  <strong>
+                                    {stop.listing.timeOrHours}
+                                  </strong>
+                                </div>
+                              </div>
+
+                              <div className="outing-stop-controls">
+                                <button
+                                  type="button"
+                                  className={
+                                    lockedOrders.includes(
+                                      stop.order
+                                    )
+                                      ? "locked"
+                                      : ""
+                                  }
+                                  aria-pressed={
+                                    lockedOrders.includes(
+                                      stop.order
+                                    )
+                                  }
+                                  onClick={() =>
+                                    toggleLock(
+                                      stop.order
+                                    )
+                                  }
+                                >
+                                  <span aria-hidden="true">
+                                    {lockedOrders.includes(
+                                      stop.order
+                                    )
+                                      ? "🔒"
+                                      : "🔓"}
+                                  </span>
+
+                                  {lockedOrders.includes(
+                                    stop.order
+                                  )
+                                    ? "Locked"
+                                    : "Lock stop"}
+                                </button>
+
+                                <button
+                                  type="button"
+                                  disabled={
+                                    lockedOrders.includes(
+                                      stop.order
+                                    ) ||
+                                    replacingOrder !== null ||
+                                    refreshingUnlocked ||
+                                    addingKind !== null
+                                  }
+                                  onClick={() => {
+                                    void handleReplaceStop(
+                                      stop.order
+                                    );
+                                  }}
+                                >
+                                  <span aria-hidden="true">
+                                    ↻
+                                  </span>
+
+                                  {replacingOrder ===
+                                  stop.order
+                                    ? "Replacing..."
+                                    : `Replace ${kind}`}
+                                </button>
+                              </div>
+
+                              <Link
+                                className="outing-stop-link"
+                                href={`/listings/${stop.listing.slug}`}
+                              >
+                                <span>View full listing</span>
+                                <i aria-hidden="true">→</i>
+                              </Link>
+                            </div>
+                          ) : null}
                         </div>
                       </article>
                     </div>
@@ -1956,10 +2064,12 @@ export default function OutingResultsPage() {
                 void generateOuting();
               }}
             >
+              <span aria-hidden="true">↻</span>
               Generate another version
             </button>
 
             <Link href="/build-outing">
+              <span aria-hidden="true">✎</span>
               Change preferences
             </Link>
           </div>

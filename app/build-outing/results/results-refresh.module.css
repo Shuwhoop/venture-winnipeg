@@ -1,0 +1,667 @@
+.refreshRoot {
+  --result-ink: #241f20;
+  --result-red: #d01013;
+  --result-yellow: #ffcf00;
+  --result-cream: #fffaf2;
+  --result-purple: #6d28d9;
+  --result-green: #0f8a4b;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.refreshRoot,
+.refreshRoot * {
+  box-sizing: border-box;
+}
+
+.refreshRoot :global(.outing-results-hero-v3) {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 90% 14%, rgba(255, 207, 0, 0.28), transparent 24%),
+    radial-gradient(circle at 8% 95%, rgba(208, 16, 19, 0.12), transparent 25%),
+    linear-gradient(145deg, #fffef9 0%, #fff4e9 100%);
+}
+
+.heroEyebrowRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 999px;
+  color: var(--result-ink);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.complete {
+  background: #dff8e9;
+  color: #075c31;
+}
+
+.partial {
+  background: #fff0ad;
+  color: #6c4a00;
+}
+
+.empty {
+  background: #ffdadd;
+  color: #8c0b13;
+}
+
+.refreshRoot :global(.outing-results-route-art) {
+  animation: routeBob 3.2s ease-in-out infinite;
+}
+
+@keyframes routeBob {
+  0%,
+  100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.refreshRoot :global(.outing-map-first-stage),
+.refreshRoot :global(.outing-map-first-stage > *),
+.refreshRoot :global(.outing-route-map),
+.refreshRoot :global(.outing-route-map-shell) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.refreshRoot :global(.outing-map-first-stage) {
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.refreshRoot :global(.outing-map-caption-card) {
+  min-width: 0;
+  padding: 15px 16px;
+  background: linear-gradient(135deg, #241f20 0%, #403638 100%);
+  color: #fff;
+}
+
+.refreshRoot :global(.outing-map-caption-card strong),
+.refreshRoot :global(.outing-map-caption-card small) {
+  overflow-wrap: anywhere;
+}
+
+.refreshRoot :global(.outing-completeness-card) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  border-radius: 22px;
+}
+
+.refreshRoot :global(.outing-completeness-card.complete) {
+  background: linear-gradient(135deg, #effcf4 0%, #ddf7e8 100%);
+}
+
+.refreshRoot :global(.outing-completeness-card.partial) {
+  background: linear-gradient(135deg, #fff9d5 0%, #ffedaa 100%);
+}
+
+.refreshRoot :global(.outing-completeness-card.empty) {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffdadd 100%);
+}
+
+.refreshRoot :global(.outing-completeness-card strong),
+.refreshRoot :global(.outing-completeness-card p) {
+  overflow-wrap: anywhere;
+}
+
+.refreshRoot :global(.outing-action-dock) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.refreshRoot :global(.outing-action-dock button) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 72px;
+  padding: 12px;
+  border: 2px solid var(--result-ink);
+  border-radius: 18px;
+  background: #fff;
+  color: var(--result-ink);
+  text-align: left;
+  box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.12);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.refreshRoot :global(.outing-action-dock button:hover:not(:disabled)) {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.14);
+}
+
+.primaryAction {
+  background: linear-gradient(135deg, #ffcf00 0%, #ffe272 100%) !important;
+  box-shadow: 4px 4px 0 #d01013 !important;
+}
+
+.refreshAction {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #f2ebff 0%, #e4d7ff 100%) !important;
+}
+
+.actionIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.actionCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.actionCopy strong {
+  font-size: 0.88rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.actionCopy small {
+  color: #625859;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.spinning {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.refreshRoot :global(.outing-action-message) {
+  border: 1.5px solid #c8b8e9;
+  border-radius: 14px;
+  background: #f7f2ff;
+  color: #4f267e;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div) {
+  min-width: 0;
+  padding: 13px;
+  border: 1.5px solid #d9cdc5;
+  border-radius: 17px;
+  background: linear-gradient(180deg, #fffefb 0%, #fff8ef 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div:nth-child(3n + 1)) {
+  background: linear-gradient(180deg, #fffbe7 0%, #fff2ba 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div:nth-child(3n + 2)) {
+  background: linear-gradient(180deg, #f8f2ff 0%, #eee2ff 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div:nth-child(3n + 3)) {
+  background: linear-gradient(180deg, #eef9ff 0%, #ddf2ff 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 span) {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.62rem;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 span i) {
+  font-style: normal;
+  font-size: 0.92rem;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 strong),
+.refreshRoot :global(.outing-plan-summary-v3 small) {
+  overflow-wrap: anywhere;
+}
+
+.refreshRoot :global(.outing-add-stop-panel) {
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 96% 12%, rgba(255, 207, 0, 0.22), transparent 24%),
+    linear-gradient(145deg, #fffefb 0%, #fff5e9 100%);
+}
+
+.refreshRoot :global(.outing-add-stop-grid) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.refreshRoot :global(.outing-add-stop-grid button) {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 82px;
+  padding: 10px 6px;
+  border-radius: 16px;
+}
+
+.refreshRoot :global(.outing-add-stop-grid button > span) {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 1.15rem;
+}
+
+.refreshRoot :global(.outing-add-stop-grid button strong) {
+  font-size: 0.72rem;
+  line-height: 1.18;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.refreshRoot :global(.outing-warning-list p) {
+  border-radius: 16px;
+  background: #fff6d5;
+}
+
+.refreshRoot :global(.outing-timeline-v3) {
+  min-width: 0;
+}
+
+.refreshRoot :global(.outing-stop-wrapper) {
+  min-width: 0;
+  animation: stopEnter 300ms ease both;
+}
+
+.refreshRoot :global(.outing-stop-wrapper:nth-of-type(2)) { animation-delay: 50ms; }
+.refreshRoot :global(.outing-stop-wrapper:nth-of-type(3)) { animation-delay: 100ms; }
+.refreshRoot :global(.outing-stop-wrapper:nth-of-type(4)) { animation-delay: 150ms; }
+.refreshRoot :global(.outing-stop-wrapper:nth-of-type(5)) { animation-delay: 200ms; }
+
+@keyframes stopEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.refreshRoot :global(.outing-travel-row) {
+  position: relative;
+  width: calc(100% - 28px);
+  margin-left: 28px;
+  border-left: 3px dashed rgba(109, 40, 217, 0.34);
+}
+
+.refreshRoot :global(.outing-travel-row > span) {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #ede4ff;
+  color: #5a20ad;
+  font-weight: 900;
+}
+
+.refreshRoot :global(.outing-stop-card-v3) {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fff 0%, #fffaf5 100%);
+}
+
+.refreshRoot :global(.outing-stop-order) {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: #ffcf00;
+  color: #241f20;
+  box-shadow: 3px 3px 0 #d01013;
+  font-size: 1.05rem;
+}
+
+.refreshRoot :global(.outing-kind-food .outing-stop-order) {
+  background: #ffd5d7;
+}
+
+.refreshRoot :global(.outing-kind-event .outing-stop-order) {
+  background: #e8d8ff;
+}
+
+.refreshRoot :global(.outing-kind-drinks .outing-stop-order) {
+  background: #d8f5ea;
+}
+
+.refreshRoot :global(.outing-stop-content) {
+  min-width: 0;
+}
+
+.refreshRoot :global(.outing-stop-content h2),
+.refreshRoot :global(.outing-stop-subtitle),
+.refreshRoot :global(.outing-stop-reason) {
+  overflow-wrap: anywhere;
+}
+
+.refreshRoot :global(.outing-stop-topline) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.refreshRoot :global(.outing-kind-badge) {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+}
+
+.refreshRoot :global(.outing-kind-badge i) {
+  font-size: 1rem;
+}
+
+.stopQuickFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.stopQuickFacts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid #dfd4ce;
+  border-radius: 999px;
+  background: #fff;
+  color: #544a4c;
+  font-size: 0.69rem;
+  overflow-wrap: anywhere;
+}
+
+.stopQuickFacts i {
+  font-style: normal;
+}
+
+.detailsToggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 12px;
+  padding: 9px 12px;
+  border: 1.5px solid #d1c5bd;
+  border-radius: 13px;
+  background: #fffaf2;
+  color: #241f20;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.detailsToggle i {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #ffcf00;
+  font-style: normal;
+  font-size: 1rem;
+}
+
+.stopDetailsPanel {
+  display: grid;
+  gap: 11px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1.5px solid #ddd0c8;
+  border-radius: 15px;
+  background: #fff;
+  animation: detailsOpen 180ms ease;
+}
+
+@keyframes detailsOpen {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hoursRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.hoursRow > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background: #fff1bd;
+  font-size: 1.1rem;
+}
+
+.hoursRow > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hoursRow small {
+  color: #74696a;
+  font-size: 0.65rem;
+}
+
+.hoursRow strong {
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.refreshRoot :global(.outing-stop-controls) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.refreshRoot :global(.outing-stop-controls button) {
+  min-width: 0;
+  min-height: 44px;
+  border-radius: 13px;
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.refreshRoot :global(.outing-stop-link) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 2px solid var(--result-ink);
+  border-radius: 13px;
+  background: #241f20;
+  color: #fff;
+  text-decoration: none;
+}
+
+.refreshRoot :global(.outing-stop-link i) {
+  font-style: normal;
+  font-size: 1rem;
+}
+
+.refreshRoot :global(.outing-result-actions) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.refreshRoot :global(.outing-result-actions button),
+.refreshRoot :global(.outing-result-actions a) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 50px;
+  border-radius: 15px;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.refreshRoot :global(.outing-result-actions span) {
+  font-size: 1rem;
+}
+
+@media (max-width: 420px) {
+  .refreshRoot {
+    padding-inline: 10px;
+  }
+
+  .refreshRoot :global(.outing-results-hero-v3),
+  .refreshRoot :global(.outing-completeness-card),
+  .refreshRoot :global(.outing-add-stop-panel),
+  .refreshRoot :global(.outing-timeline-v3) {
+    padding: 15px;
+  }
+
+  .refreshRoot :global(.outing-results-hero-v3) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .refreshRoot :global(.outing-results-route-art) {
+    justify-self: start;
+    transform: scale(0.88);
+    transform-origin: left center;
+  }
+
+  .refreshRoot :global(.outing-completeness-card) {
+    grid-template-columns: 1fr;
+  }
+
+  .refreshRoot :global(.outing-completeness-card a) {
+    width: 100%;
+    text-align: center;
+  }
+
+  .refreshRoot :global(.outing-action-dock) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .refreshRoot :global(.outing-action-dock button) {
+    min-height: 76px;
+    padding: 10px;
+  }
+
+  .actionIcon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+
+  .actionCopy strong {
+    font-size: 0.8rem;
+  }
+
+  .actionCopy small {
+    font-size: 0.63rem;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .refreshRoot :global(.outing-add-stop-grid) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .refreshRoot :global(.outing-stop-card-v3) {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 10px;
+    padding: 13px;
+  }
+
+  .refreshRoot :global(.outing-stop-order) {
+    width: 38px;
+    height: 38px;
+    border-radius: 13px;
+  }
+
+  .refreshRoot :global(.outing-stop-controls) {
+    grid-template-columns: 1fr;
+  }
+
+  .refreshRoot :global(.outing-result-actions) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 350px) {
+  .refreshRoot :global(.outing-action-dock) {
+    grid-template-columns: 1fr;
+  }
+
+  .refreshAction {
+    grid-column: auto;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3) {
+    grid-template-columns: 1fr;
+  }
+
+  .refreshRoot :global(.outing-add-stop-grid) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refreshRoot *,
+  .refreshRoot *::before,
+  .refreshRoot *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
