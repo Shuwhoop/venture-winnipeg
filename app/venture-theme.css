@@ -2510,3 +2510,12 @@ h4,
   background:
     var(--venture-cream);
 }
+/* Shared neighbourhood picker theme */
+.neighbourhood-search-row input:focus {
+  border-color: var(--venture-red);
+  outline: 3px solid rgba(208, 16, 19, 0.12);
+}
+
+.neighbourhood-search-row > button {
+  box-shadow: 3px 3px 0 var(--venture-yellow);
+}

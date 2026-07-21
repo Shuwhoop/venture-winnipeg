@@ -16,6 +16,10 @@ import type {
   BudgetPreference
 } from "@/lib/profile-preferences";
 
+import {
+  neighbourhoodMatchesPreference
+} from "@/lib/winnipeg-neighbourhoods";
+
 import type {
   Listing,
   VerificationStatus
@@ -1470,12 +1474,9 @@ function scoreListing(
     const neighbourhoodMatches =
       draft.neighbourhoods.some(
         (neighbourhood) =>
-          normalize(
-            listing.neighbourhood
-          ).includes(
-            normalize(
-              neighbourhood
-            )
+          neighbourhoodMatchesPreference(
+            listing.neighbourhood,
+            neighbourhood
           )
       );
 
@@ -2003,13 +2004,9 @@ function getStopReason(
   if (
     draft.neighbourhoods.some(
       (neighbourhood) =>
-        normalize(
-          candidate.listing
-            .neighbourhood
-        ).includes(
-          normalize(
-            neighbourhood
-          )
+        neighbourhoodMatchesPreference(
+          candidate.listing.neighbourhood,
+          neighbourhood
         )
     )
   ) {

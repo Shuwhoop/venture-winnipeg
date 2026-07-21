@@ -15,6 +15,11 @@ import type {
   AdminPlaceEditorRecord
 } from "@/lib/admin/listing-editor-types";
 
+import {
+  WINNIPEG_NEIGHBOURHOOD_GROUPS,
+  WINNIPEG_NEIGHBOURHOODS
+} from "@/lib/winnipeg-neighbourhoods";
+
 import styles from "./page.module.css";
 
 const DAYS = [
@@ -64,10 +69,150 @@ const PLACE_TYPE_OPTIONS = [
   "attraction"
 ];
 
+const PLACE_CATEGORY_OPTIONS = [
+  "Activity",
+  "Asian Restaurant",
+  "Bakery",
+  "Bar and Grill Restaurant",
+  "Breakfast",
+  "Brunch",
+  "Burger Restaurant",
+  "Cafe",
+  "Cocktail Bar",
+  "Convention Centre",
+  "Diner",
+  "Fast Food Restaurant",
+  "Fine Dining",
+  "Food Hall and Market",
+  "Live Music Venue",
+  "Mexican",
+  "Museum",
+  "Nightlife",
+  "Noodles Restaurant",
+  "Pizza Restaurant",
+  "Pub",
+  "Restaurant",
+  "Sports Bar",
+  "Steakhouse",
+  "Theme Restaurant"
+];
+
+const EVENT_CATEGORY_OPTIONS = [
+  "Arts and Culture",
+  "Comedy",
+  "Community Event",
+  "Convention",
+  "Festival",
+  "Food and Drink",
+  "Gaming",
+  "Live Music",
+  "Market",
+  "Nightlife",
+  "Sports",
+  "Theatre",
+  "Workshop"
+];
+
+const CUISINE_OPTIONS = [
+  "African",
+  "American",
+  "Asian",
+  "Bakery and Desserts",
+  "Bar Food",
+  "Burgers",
+  "Canadian",
+  "Caribbean",
+  "Chinese",
+  "Ethiopian",
+  "Filipino",
+  "French",
+  "Indian",
+  "Italian",
+  "Japanese",
+  "Korean",
+  "Mediterranean",
+  "Mexican",
+  "Middle Eastern",
+  "Pizza",
+  "Seafood",
+  "Steakhouse",
+  "Thai",
+  "Vietnamese"
+];
+
+const TICKET_STATUS_OPTIONS = [
+  "available",
+  "at_door",
+  "registration_required",
+  "sold_out",
+  "cancelled",
+  "unknown"
+];
+
+const AGE_LABEL_OPTIONS = [
+  "All ages",
+  "Family-friendly",
+  "18+",
+  "19+",
+  "21+",
+  "Unknown"
+];
+
 function commaList(
   values: string[]
 ): string {
   return values.join(", ");
+}
+
+function readableOption(
+  value: string
+): string {
+  return value
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (letter) =>
+      letter.toUpperCase()
+    );
+}
+
+function slugify(
+  value: string
+): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function shiftLocalDateTime(
+  value: string,
+  minutes: number
+): string {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (!Number.isFinite(date.getTime())) {
+    return "";
+  }
+
+  date.setMinutes(
+    date.getMinutes() + minutes
+  );
+
+  const local = new Date(
+    date.getTime() -
+      date.getTimezoneOffset() *
+        60_000
+  );
+
+  return local
+    .toISOString()
+    .slice(0, 16);
 }
 
 function toLocalDateTime(
@@ -261,6 +406,108 @@ export default function ListingEditorForm({
     () => `/listings/${record.slug}`,
     [record.slug]
   );
+
+  function getNamedInput(
+    name: string
+  ): HTMLInputElement | null {
+    const element =
+      formRef.current
+        ?.elements
+        .namedItem(name);
+
+    return element instanceof
+      HTMLInputElement
+      ? element
+      : null;
+  }
+
+  function generateSlug() {
+    const sourceName =
+      getNamedInput(
+        record.entityType === "place"
+          ? "name"
+          : "title"
+      )?.value ?? "";
+    const slugInput =
+      getNamedInput("slug");
+
+    if (!sourceName || !slugInput) {
+      setMessage(
+        "Add a listing name before generating the slug."
+      );
+      return;
+    }
+
+    slugInput.value =
+      slugify(sourceName);
+    setMessage(
+      "Slug generated. Save changes when ready."
+    );
+  }
+
+  function setFreshnessDays(
+    days: number
+  ) {
+    const date = new Date();
+    date.setDate(
+      date.getDate() + days
+    );
+    setFreshnessExpiresAt(
+      toLocalDateTime(
+        date.toISOString()
+      )
+    );
+    setMessage(
+      `Freshness set for ${days} days. Save changes when ready.`
+    );
+  }
+
+  function applyEventTimingDefaults() {
+    const startInput =
+      getNamedInput("startAt");
+    const endInput =
+      getNamedInput("endAt");
+    const doorsInput =
+      getNamedInput("doorsAt");
+    const expiresInput =
+      getNamedInput("expiresAt");
+
+    if (!startInput?.value) {
+      setMessage(
+        "Choose the event start time first."
+      );
+      return;
+    }
+
+    if (endInput && !endInput.value) {
+      endInput.value =
+        shiftLocalDateTime(
+          startInput.value,
+          120
+        );
+    }
+
+    if (doorsInput && !doorsInput.value) {
+      doorsInput.value =
+        shiftLocalDateTime(
+          startInput.value,
+          -60
+        );
+    }
+
+    if (expiresInput) {
+      expiresInput.value =
+        shiftLocalDateTime(
+          endInput?.value ||
+            startInput.value,
+          24 * 60
+        );
+    }
+
+    setMessage(
+      "Event timing defaults applied. Review them before saving."
+    );
+  }
 
   function getHoursInput(
     day: DayName,
@@ -888,11 +1135,19 @@ export default function ListingEditorForm({
 
           <label>
             Slug
-            <input
-              name="slug"
-              defaultValue={record.slug}
-              required
-            />
+            <div className={styles.inlineControl}>
+              <input
+                name="slug"
+                defaultValue={record.slug}
+                required
+              />
+              <button
+                type="button"
+                onClick={generateSlug}
+              >
+                Generate
+              </button>
+            </div>
           </label>
 
           {record.entityType === "place" ? (
@@ -908,7 +1163,7 @@ export default function ListingEditorForm({
                       value={option}
                       key={option}
                     >
-                      {option.replaceAll("_", " ")}
+                      {readableOption(option)}
                     </option>
                   )
                 )}
@@ -946,9 +1201,22 @@ export default function ListingEditorForm({
             Primary category
             <input
               name="primaryCategory"
+              list="venture-primary-categories"
               defaultValue={record.primaryCategory}
+              placeholder="Choose or type a category"
               required
             />
+            <datalist id="venture-primary-categories">
+              {(record.entityType === "place"
+                ? PLACE_CATEGORY_OPTIONS
+                : EVENT_CATEGORY_OPTIONS
+              ).map((option) => (
+                <option
+                  value={option}
+                  key={option}
+                />
+              ))}
+            </datalist>
           </label>
 
           <label>
@@ -1022,11 +1290,41 @@ export default function ListingEditorForm({
               </label>
               <label>
                 Neighbourhood
-                <input
+                <select
                   name="neighbourhood"
                   defaultValue={record.neighbourhood}
-                  placeholder="Exchange District"
-                />
+                >
+                  <option value="">
+                    Choose neighbourhood
+                  </option>
+                  {record.neighbourhood &&
+                  !WINNIPEG_NEIGHBOURHOODS.includes(
+                    record.neighbourhood
+                  ) ? (
+                    <option value={record.neighbourhood}>
+                      {record.neighbourhood} · current value
+                    </option>
+                  ) : null}
+                  {WINNIPEG_NEIGHBOURHOOD_GROUPS.map(
+                    (group) => (
+                      <optgroup
+                        label={group.label}
+                        key={group.label}
+                      >
+                        {group.options.map(
+                          (option) => (
+                            <option
+                              value={option}
+                              key={option}
+                            >
+                              {option}
+                            </option>
+                          )
+                        )}
+                      </optgroup>
+                    )
+                  )}
+                </select>
               </label>
               <label>
                 Postal code
@@ -1037,19 +1335,44 @@ export default function ListingEditorForm({
               </label>
               <label>
                 City
-                <input
+                <select
                   name="city"
-                  defaultValue={record.city}
+                  defaultValue={record.city || "Winnipeg"}
                   required
-                />
+                >
+                  {record.city &&
+                  record.city !== "Winnipeg" ? (
+                    <option value={record.city}>
+                      {record.city} · current value
+                    </option>
+                  ) : null}
+                  <option value="Winnipeg">
+                    Winnipeg
+                  </option>
+                </select>
               </label>
               <label>
                 Province
-                <input
+                <select
                   name="province"
-                  defaultValue={record.province}
+                  defaultValue={record.province || "Manitoba"}
                   required
-                />
+                >
+                  {record.province &&
+                  !["Manitoba", "MB"].includes(
+                    record.province
+                  ) ? (
+                    <option value={record.province}>
+                      {record.province} · current value
+                    </option>
+                  ) : null}
+                  <option value="Manitoba">
+                    Manitoba
+                  </option>
+                  <option value="MB">
+                    MB
+                  </option>
+                </select>
               </label>
               <label>
                 Latitude
@@ -1114,8 +1437,20 @@ export default function ListingEditorForm({
                 Cuisine
                 <input
                   name="cuisinePrimary"
+                  list="venture-cuisine-options"
                   defaultValue={record.cuisinePrimary}
+                  placeholder="Choose or type a cuisine"
                 />
+                <datalist id="venture-cuisine-options">
+                  {CUISINE_OPTIONS.map(
+                    (option) => (
+                      <option
+                        value={option}
+                        key={option}
+                      />
+                    )
+                  )}
+                </datalist>
               </label>
               <label>
                 Official website
@@ -1342,6 +1677,22 @@ export default function ListingEditorForm({
             </div>
           </div>
 
+          <div className={styles.quickEditBar}>
+            <div>
+              <strong>Quick event timing</strong>
+              <span>
+                Adds a two-hour end time, doors one hour early,
+                and expiry the following day when those fields are empty.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={applyEventTimingDefaults}
+            >
+              Apply timing defaults
+            </button>
+          </div>
+
           <div className={styles.gridTwo}>
             <label>
               Organizer
@@ -1395,11 +1746,24 @@ export default function ListingEditorForm({
             </label>
             <label>
               Timezone
-              <input
+              <select
                 name="timezone"
-                defaultValue={record.timezone}
+                defaultValue={
+                  record.timezone ||
+                  "America/Winnipeg"
+                }
                 required
-              />
+              >
+                {record.timezone &&
+                record.timezone !== "America/Winnipeg" ? (
+                  <option value={record.timezone}>
+                    {record.timezone} · current value
+                  </option>
+                ) : null}
+                <option value="America/Winnipeg">
+                  America/Winnipeg
+                </option>
+              </select>
             </label>
             <label>
               Price type
@@ -1444,10 +1808,29 @@ export default function ListingEditorForm({
             </label>
             <label>
               Ticket status
-              <input
+              <select
                 name="ticketStatus"
-                defaultValue={record.ticketStatus}
-              />
+                defaultValue={record.ticketStatus || "unknown"}
+              >
+                {record.ticketStatus &&
+                !TICKET_STATUS_OPTIONS.includes(
+                  record.ticketStatus
+                ) ? (
+                  <option value={record.ticketStatus}>
+                    {record.ticketStatus} · current value
+                  </option>
+                ) : null}
+                {TICKET_STATUS_OPTIONS.map(
+                  (option) => (
+                    <option
+                      value={option}
+                      key={option}
+                    >
+                      {readableOption(option)}
+                    </option>
+                  )
+                )}
+              </select>
             </label>
             <label>
               Minimum age
@@ -1460,10 +1843,29 @@ export default function ListingEditorForm({
             </label>
             <label>
               Age label
-              <input
+              <select
                 name="ageLabel"
-                defaultValue={record.ageLabel}
-              />
+                defaultValue={record.ageLabel || "Unknown"}
+              >
+                {record.ageLabel &&
+                !AGE_LABEL_OPTIONS.includes(
+                  record.ageLabel
+                ) ? (
+                  <option value={record.ageLabel}>
+                    {record.ageLabel} · current value
+                  </option>
+                ) : null}
+                {AGE_LABEL_OPTIONS.map(
+                  (option) => (
+                    <option
+                      value={option}
+                      key={option}
+                    >
+                      {option}
+                    </option>
+                  )
+                )}
+              </select>
             </label>
             <label>
               Indoor or outdoor
@@ -1509,7 +1911,7 @@ export default function ListingEditorForm({
                   value={option}
                   key={option}
                 >
-                  {option.replaceAll("_", " ")}
+                  {readableOption(option)}
                 </option>
               ))}
             </select>
@@ -1526,7 +1928,7 @@ export default function ListingEditorForm({
                   value={option}
                   key={option}
                 >
-                  {option.replaceAll("_", " ")}
+                  {readableOption(option)}
                 </option>
               ))}
             </select>
@@ -1572,7 +1974,7 @@ export default function ListingEditorForm({
 
           <label>
             Freshness expires
-            <div className={styles.inlineControl}>
+            <div className={styles.inlineControlWide}>
               <input
                 name="freshnessExpiresAt"
                 type="datetime-local"
@@ -1583,22 +1985,19 @@ export default function ListingEditorForm({
                   )
                 }
               />
-              <button
-                type="button"
-                onClick={() => {
-                  const date = new Date();
-                  date.setDate(
-                    date.getDate() + 30
-                  );
-                  setFreshnessExpiresAt(
-                    toLocalDateTime(
-                      date.toISOString()
-                    )
-                  );
-                }}
-              >
-                +30d
-              </button>
+              <div className={styles.inlineButtonGroup}>
+                {[7, 30, 90].map((days) => (
+                  <button
+                    type="button"
+                    key={days}
+                    onClick={() =>
+                      setFreshnessDays(days)
+                    }
+                  >
+                    +{days}d
+                  </button>
+                ))}
+              </div>
             </div>
           </label>
 

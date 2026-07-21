@@ -2,6 +2,7 @@
 
 
 import NewsletterSignup from "@/components/newsletter-signup/newsletter-signup";
+import NeighbourhoodPicker from "@/components/neighbourhood-picker";
 
 import {
   useEffect,
@@ -31,17 +32,6 @@ const interestOptions = [
   "Gaming",
   "Nightlife",
   "Outdoor activities"
-];
-
-const neighbourhoodOptions = [
-  "Downtown",
-  "The Forks",
-  "Exchange District",
-  "Osborne Village",
-  "St. Boniface",
-  "Corydon",
-  "West End",
-  "South Winnipeg"
 ];
 
 const outingStyleOptions = [
@@ -235,20 +225,30 @@ export default function ProfilePage() {
           }
         />
 
-        <PreferenceGroup
-          title="Preferred neighbourhoods"
-          description="Venture can prioritize these areas when more listings are available."
-          options={neighbourhoodOptions}
-          selected={
-            preferences.neighbourhoods
-          }
-          onToggle={(value) =>
-            togglePreference(
-              "neighbourhoods",
-              value
-            )
-          }
-        />
+        <fieldset className="preference-group">
+          <legend>
+            Preferred neighbourhoods
+          </legend>
+
+          <p>
+            Venture can prioritize these areas
+            when more listings are available.
+            Leave everything blank for anywhere
+            in Winnipeg.
+          </p>
+
+          <NeighbourhoodPicker
+            selected={
+              preferences.neighbourhoods
+            }
+            onToggle={(value) =>
+              togglePreference(
+                "neighbourhoods",
+                value
+              )
+            }
+          />
+        </fieldset>
 
         <PreferenceGroup
           title="Outing styles"

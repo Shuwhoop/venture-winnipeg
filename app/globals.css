@@ -7714,3 +7714,213 @@ button { cursor: pointer; }
   color: #746a6b;
   font-size: 0.61rem;
 }
+
+/* ---------- Shared Winnipeg neighbourhood picker ---------- */
+
+.neighbourhood-picker {
+  display: grid;
+  gap: 12px;
+}
+
+.neighbourhood-popular-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.neighbourhood-popular-grid button,
+.neighbourhood-selected-list button,
+.neighbourhood-group-list button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  border: 2px solid var(--venture-line-dark, #241f20);
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: #ffffff;
+  color: var(--venture-ink, #241f20);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.neighbourhood-popular-grid button > span,
+.neighbourhood-selected-list button > span,
+.neighbourhood-group-list button > span {
+  color: var(--venture-red, #d01013);
+  font-size: 0.68rem;
+}
+
+.neighbourhood-popular-grid button.selected,
+.neighbourhood-selected-list button.selected,
+.neighbourhood-group-list button.selected {
+  background: var(--venture-yellow, #ffd200);
+  box-shadow: 3px 3px 0 var(--venture-ink, #241f20);
+}
+
+.neighbourhood-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.neighbourhood-search-row label {
+  display: grid;
+  gap: 6px;
+  color: var(--venture-ink, #241f20);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.neighbourhood-search-row input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  border: 2px solid var(--venture-line-dark, #241f20);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--venture-ink, #241f20);
+  font: inherit;
+}
+
+.neighbourhood-search-row > button {
+  min-height: 44px;
+  border: 2px solid var(--venture-line-dark, #241f20);
+  border-radius: 12px;
+  padding: 9px 16px;
+  background: var(--venture-red, #d01013);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.neighbourhood-picker-message {
+  margin: -4px 0 0;
+  color: var(--venture-red, #d01013);
+  font-size: 0.74rem;
+  font-weight: 750;
+}
+
+.neighbourhood-selected-list {
+  display: grid;
+  gap: 7px;
+}
+
+.neighbourhood-selected-list > span {
+  color: #706667;
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.neighbourhood-selected-list > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.neighbourhood-all-list {
+  border: 1.5px solid #d9d0c8;
+  border-radius: 14px;
+  background: #fffaf2;
+}
+
+.neighbourhood-all-list > summary {
+  padding: 12px 14px;
+  color: var(--venture-ink, #241f20);
+  font-size: 0.8rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.neighbourhood-all-list[open] > summary {
+  border-bottom: 1px solid #e8ded5;
+}
+
+.neighbourhood-group-list {
+  display: grid;
+  gap: 16px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.neighbourhood-group-list section {
+  display: grid;
+  gap: 8px;
+}
+
+.neighbourhood-group-list h4 {
+  margin: 0;
+  color: var(--venture-red, #d01013);
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.neighbourhood-group-list section > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.neighbourhood-picker-compact .neighbourhood-popular-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.neighbourhood-picker-compact .neighbourhood-popular-grid button {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  min-height: 45px;
+  border-radius: 11px;
+  padding: 7px 9px;
+  text-align: left;
+}
+
+.neighbourhood-picker-compact .neighbourhood-popular-grid strong {
+  font-size: 0.64rem;
+}
+
+.neighbourhood-picker-compact .neighbourhood-search-row label {
+  font-size: 0.64rem;
+}
+
+.neighbourhood-picker-compact .neighbourhood-search-row input,
+.neighbourhood-picker-compact .neighbourhood-search-row > button {
+  min-height: 42px;
+  font-size: 0.7rem;
+}
+
+.neighbourhood-picker-compact .neighbourhood-group-list {
+  max-height: 360px;
+}
+
+.neighbourhood-picker-compact .neighbourhood-group-list button,
+.neighbourhood-picker-compact .neighbourhood-selected-list button {
+  min-height: 34px;
+  padding: 6px 9px;
+  font-size: 0.68rem;
+}
+
+@media (max-width: 390px) {
+  .neighbourhood-search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .neighbourhood-search-row > button {
+    width: 100%;
+  }
+
+  .neighbourhood-picker-compact .neighbourhood-popular-grid {
+    grid-template-columns: 1fr;
+  }
+}

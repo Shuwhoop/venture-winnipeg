@@ -10,6 +10,8 @@ import {
   PlanningModeIllustration
 } from "@/components/planning-mode-illustration";
 
+import NeighbourhoodPicker from "@/components/neighbourhood-picker";
+
 import {
   defaultPreferences,
   loadPreferences,
@@ -313,17 +315,6 @@ const standardInterestOptions = [
   "Gaming",
   "Nightlife",
   "Outdoor activities"
-];
-
-const neighbourhoodOptions = [
-  "Downtown",
-  "Exchange District",
-  "The Forks",
-  "Osborne Village",
-  "Corydon",
-  "St. Boniface",
-  "West End",
-  "South Winnipeg"
 ];
 
 const durationOptions = [
@@ -1151,20 +1142,6 @@ export default function BuildOutingPage() {
         ),
       [
         profilePreferences.interests
-      ]
-    );
-
-  const availableNeighbourhoods =
-    useMemo(
-      () =>
-        Array.from(
-          new Set([
-            ...neighbourhoodOptions,
-            ...profilePreferences.neighbourhoods
-          ])
-        ),
-      [
-        profilePreferences.neighbourhoods
       ]
     );
 
@@ -2647,49 +2624,21 @@ export default function BuildOutingPage() {
                 </strong>
               </div>
 
-              <div className="area-compact-grid">
-                {availableNeighbourhoods.map(
-                  (neighbourhood) => {
-                    const selected =
-                      selectedNeighbourhoods.includes(
+              <NeighbourhoodPicker
+                compact
+                selected={
+                  selectedNeighbourhoods
+                }
+                onToggle={(neighbourhood) =>
+                  setSelectedNeighbourhoods(
+                    (current) =>
+                      toggleValue(
+                        current,
                         neighbourhood
-                      );
-
-                    return (
-                      <button
-                        type="button"
-                        key={neighbourhood}
-                        className={
-                          selected
-                            ? "selected"
-                            : ""
-                        }
-                        onClick={() =>
-                          setSelectedNeighbourhoods(
-                            (current) =>
-                              toggleValue(
-                                current,
-                                neighbourhood
-                              )
-                          )
-                        }
-                      >
-                        <span>●</span>
-
-                        <strong>
-                          {neighbourhood}
-                        </strong>
-
-                        <i>
-                          {selected
-                            ? "✓"
-                            : ""}
-                        </i>
-                      </button>
-                    );
-                  }
-                )}
-              </div>
+                      )
+                  )
+                }
+              />
 
               <p className="wizard-compact-note">
                 Nothing selected means

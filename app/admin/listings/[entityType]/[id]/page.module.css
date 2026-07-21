@@ -426,3 +426,80 @@
     grid-template-columns: 1fr;
   }
 }
+
+.quickEditBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid #d9c9f8;
+  border-radius: 15px;
+  padding: 13px 14px;
+  background: #faf7ff;
+}
+
+.quickEditBar > div {
+  display: grid;
+  gap: 4px;
+}
+
+.quickEditBar strong {
+  color: #332a47;
+  font-size: 0.88rem;
+}
+
+.quickEditBar span {
+  max-width: 620px;
+  color: #6b6474;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.quickEditBar button,
+.inlineButtonGroup button {
+  min-height: 40px;
+  border: 1px solid #6d28d9;
+  border-radius: 10px;
+  padding: 8px 11px;
+  background: #6d28d9;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 820;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.inlineControlWide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+}
+
+.inlineButtonGroup {
+  display: flex;
+  gap: 5px;
+}
+
+.inlineButtonGroup button {
+  min-width: 48px;
+  background: #f3edff;
+  color: #5420ad;
+}
+
+@container (max-width: 760px) {
+  .quickEditBar,
+  .inlineControlWide {
+    display: grid;
+  }
+
+  .quickEditBar button {
+    width: 100%;
+  }
+
+  .inlineButtonGroup {
+    display: grid;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
