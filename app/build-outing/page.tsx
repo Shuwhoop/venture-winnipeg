@@ -121,7 +121,7 @@ const buildMethods = [
   {
     id:
       "surprise" as const,
-    icon: "✦",
+    icon: "✨",
     title: "Surprise me",
     description:
       "Choose the number of stops and let Venture create a balanced route."
@@ -129,7 +129,7 @@ const buildMethods = [
   {
     id:
       "mix" as const,
-    icon: "＋",
+    icon: "🧩",
     title: "Choose my mix",
     description:
       "Pick exactly how many food, event, and drinks stops you want."
@@ -137,7 +137,7 @@ const buildMethods = [
   {
     id:
       "anchor" as const,
-    icon: "⌖",
+    icon: "📍",
     title: "Start with a place",
     description:
       "Choose an existing restaurant, event, or drinks spot and build around it."
@@ -160,7 +160,7 @@ const soloVibes = [
   {
     id:
       "curious-explorer" as const,
-    icon: "◉",
+    icon: "🧭",
     title: "Curious explorer",
     description:
       "Try something new and see a different side of Winnipeg.",
@@ -172,7 +172,7 @@ const soloVibes = [
   {
     id:
       "treat-myself" as const,
-    icon: "◇",
+    icon: "🍰",
     title: "Treat myself",
     description:
       "Good food, a memorable activity, and a little indulgence.",
@@ -184,7 +184,7 @@ const soloVibes = [
   {
     id:
       "social-solo" as const,
-    icon: "♫",
+    icon: "🎶",
     title: "Social solo",
     description:
       "Be around music, comedy, markets, or lively public spaces.",
@@ -223,7 +223,7 @@ const groupVibes = [
   {
     id:
       "friends-night" as const,
-    icon: "☻",
+    icon: "🎉",
     title: "Friends night",
     description:
       "Food, activities, laughs, and easy group energy.",
@@ -235,7 +235,7 @@ const groupVibes = [
   {
     id:
       "date-night" as const,
-    icon: "♡",
+    icon: "💘",
     title: "Date night",
     description:
       "A thoughtful route for two people.",
@@ -247,7 +247,7 @@ const groupVibes = [
   {
     id:
       "celebration" as const,
-    icon: "★",
+    icon: "🥂",
     title: "Celebration",
     description:
       "Birthday, milestone, or a night worth making louder.",
@@ -259,7 +259,7 @@ const groupVibes = [
   {
     id:
       "family-plan" as const,
-    icon: "⌂",
+    icon: "👨‍👩‍👧‍👦",
     title: "Family plan",
     description:
       "Welcoming stops with practical timing.",
@@ -271,7 +271,7 @@ const groupVibes = [
   {
     id:
       "nightlife" as const,
-    icon: "✦",
+    icon: "🌃",
     title: "Nightlife",
     description:
       "Music, drinks, entertainment, and late-night energy.",
@@ -329,25 +329,25 @@ const durationOptions = [
 const transportationOptions = [
   {
     value: "Walking",
-    icon: "●",
+    icon: "🚶",
     description:
       "Keep every stop close"
   },
   {
     value: "Transit",
-    icon: "▣",
+    icon: "🚌",
     description:
       "Use Winnipeg Transit"
   },
   {
     value: "Driving",
-    icon: "▰",
+    icon: "🚗",
     description:
       "Cover more of the city"
   },
   {
     value: "Rideshare",
-    icon: "↗",
+    icon: "🚕",
     description:
       "Flexible door-to-door travel"
   }
@@ -1514,7 +1514,7 @@ export default function BuildOutingPage() {
   }
 
   return (
-    <main className="outing-wizard outing-wizard-v3">
+    <main className="outing-wizard outing-wizard-v3" data-step={currentStep}>
       <div className="outing-wizard-progress">
         <div>
           <span>
@@ -1713,13 +1713,19 @@ export default function BuildOutingPage() {
                         {method.icon}
                       </span>
 
-                      <strong>
-                        {method.title}
-                      </strong>
+                      <div className="outing-build-method-copy">
+                        <strong>
+                          {method.title}
+                        </strong>
 
-                      <small>
-                        {method.description}
-                      </small>
+                        <small>
+                          {method.description}
+                        </small>
+                      </div>
+
+                      <span className="outing-build-method-arrow" aria-hidden="true">
+                        →
+                      </span>
                     </button>
                   );
                 }
@@ -2956,9 +2962,7 @@ export default function BuildOutingPage() {
         </button>
       </div>
 
-      {currentStep === 0 ? (
-        <SubmitListingEntry placement="home" />
-      ) : null}
+      <SubmitListingEntry placement="home" />
     </main>
   );
 }

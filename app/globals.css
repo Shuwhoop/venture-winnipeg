@@ -7924,3 +7924,538 @@ button { cursor: pointer; }
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   Venture Build Outing visual refresh v0.1
+   Makes all wizard steps fit better on mobile, adds color,
+   larger themed icons, and subtle motion.
+   ========================================================= */
+
+.outing-wizard-v3 {
+  --venture-yellow-soft: #fff5c7;
+  --venture-yellow-strong: #ffcf00;
+  --venture-red-soft: #ffd9dc;
+  --venture-red-strong: #d01013;
+  --venture-ink: #241f20;
+  --venture-cream: #fffaf2;
+  --venture-lilac: #efe9ff;
+  --venture-mint: #e6faf1;
+  --venture-sky: #edf7ff;
+  background:
+    radial-gradient(circle at 8% 6%, rgba(255, 207, 0, 0.18), transparent 23%),
+    radial-gradient(circle at 92% 14%, rgba(208, 16, 19, 0.09), transparent 24%),
+    linear-gradient(180deg, #fffdf8 0%, #fff8f3 100%);
+}
+
+.outing-wizard-v3 .outing-wizard-heading {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fffefb 0%, #fff7ef 100%);
+  box-shadow: 4px 4px 0 rgba(208, 16, 19, 0.08);
+}
+
+.outing-wizard-v3 .outing-wizard-heading::before {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: -26px;
+  width: 110px;
+  height: 110px;
+  border: 16px solid rgba(255, 207, 0, 0.2);
+  border-radius: 999px;
+}
+
+.outing-wizard-v3 .outing-wizard-content {
+  animation: outingStepFade 220ms ease;
+}
+
+@keyframes outingStepFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Step 1 and step 2 cards */
+.outing-wizard-v3 .mode-choice-card,
+.outing-build-method-grid button {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  padding: 16px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff 0%, #fffaf6 100%);
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.12);
+}
+
+.outing-wizard-v3 .mode-choice-card > span:first-child,
+.outing-build-method-grid button > span:first-child {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  font-size: 1.5rem;
+  background: linear-gradient(180deg, #fffef8 0%, #fff4bf 100%);
+  box-shadow: inset 0 -2px 0 rgba(255, 207, 0, 0.35);
+  animation: outingIconFloat 2.6s ease-in-out infinite;
+}
+
+@keyframes outingIconFloat {
+  0%,
+  100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.outing-wizard-v3 .mode-choice-card.selected,
+.outing-build-method-grid button.selected {
+  background: linear-gradient(180deg, #fff3b4 0%, #ffe584 100%);
+  box-shadow: 5px 5px 0 #d01013;
+}
+
+.outing-wizard-v3 .mode-choice-card.selected > span:first-child,
+.outing-build-method-grid button.selected > span:first-child {
+  background: #ffffff;
+}
+
+.outing-wizard-v3 .mode-choice-copy strong,
+.outing-build-method-grid .outing-build-method-copy strong {
+  font-size: 1.04rem;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.outing-wizard-v3 .mode-choice-copy small,
+.outing-build-method-grid .outing-build-method-copy small {
+  display: block;
+  max-width: 34ch;
+  color: #625859;
+  font-size: 0.77rem;
+  line-height: 1.45;
+}
+
+.outing-build-method-grid {
+  gap: 14px;
+}
+
+.outing-build-method-grid button {
+  position: relative;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.outing-build-method-grid .outing-build-method-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.outing-build-method-grid .outing-build-method-arrow {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--venture-ink);
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.outing-build-method-grid button:nth-child(1) { background: linear-gradient(180deg, #fffbed 0%, #fff2bf 100%); }
+.outing-build-method-grid button:nth-child(2) { background: linear-gradient(180deg, #f6f0ff 0%, #efe2ff 100%); }
+.outing-build-method-grid button:nth-child(3) { background: linear-gradient(180deg, #eef8ff 0%, #dcf1ff 100%); }
+
+/* Make all the form sections feel richer */
+.outing-shape-panel,
+.outing-personalization-panel,
+.outing-area-travel-panel,
+.outing-review-v3,
+.outing-anchor-builder,
+.outing-wizard-v3 .wizard-compact-panel {
+  background: linear-gradient(180deg, #ffffff 0%, #fffaf6 100%);
+  border-radius: 22px;
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.11);
+}
+
+.outing-wizard-v3 .wizard-compact-panel {
+  display: grid;
+  gap: 14px;
+  padding: 17px;
+  border: 2px solid var(--venture-ink);
+}
+
+.outing-total-stops-card,
+.outing-party-size-card,
+.outing-composition-summary,
+.outing-anchor-selected,
+.outing-travel-limit,
+.outing-custom-preferences label {
+  border-radius: 18px;
+}
+
+.outing-composition-summary {
+  display: grid;
+  gap: 5px;
+  padding: 16px;
+  border: 1.5px solid #d4c8c1;
+  background: linear-gradient(180deg, #fff9d8 0%, #fffdfa 100%);
+}
+
+.outing-composition-summary span,
+.outing-anchor-selected span,
+.outing-personalization-heading span,
+.outing-party-size-card span,
+.outing-total-stops-card span,
+.outing-wizard-v3 .wizard-compact-panel label > span {
+  color: var(--venture-red-strong);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.outing-personalization-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.outing-personalization-heading.secondary {
+  margin-top: 4px;
+}
+
+.outing-choice-strip,
+.outing-experience-grid,
+.outing-kind-toggle-grid,
+.outing-count-grid,
+.outing-anchor-list,
+.outing-anchor-filters,
+.outing-wizard-v3 .wizard-small-grid,
+.outing-wizard-v3 .budget-compact-grid,
+.outing-wizard-v3 .travel-compact-grid,
+.outing-travel-limit-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.outing-kind-toggle-grid button,
+.outing-choice-strip button,
+.outing-experience-grid button,
+.outing-wizard-v3 .wizard-small-grid button,
+.outing-wizard-v3 .budget-compact-grid button,
+.outing-wizard-v3 .travel-compact-grid button,
+.outing-travel-limit-grid button,
+.outing-anchor-filters button,
+.outing-anchor-list > button {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1.5px solid #d4c8c1;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.outing-kind-toggle-grid button.selected,
+.outing-choice-strip button.selected,
+.outing-experience-grid button.selected,
+.outing-wizard-v3 .wizard-small-grid button.selected,
+.outing-wizard-v3 .budget-compact-grid button.selected,
+.outing-wizard-v3 .travel-compact-grid button.selected,
+.outing-travel-limit-grid button.selected,
+.outing-anchor-filters button.selected,
+.outing-anchor-list > button.selected {
+  border: 2px solid var(--venture-ink);
+  background: linear-gradient(180deg, #fff5bf 0%, #ffe998 100%);
+  box-shadow: 3px 3px 0 rgba(208, 16, 19, 0.16);
+}
+
+.outing-kind-toggle-grid button > span:first-child,
+.outing-experience-grid button > span:first-child,
+.outing-wizard-v3 .travel-compact-grid button > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1.5px solid #241f20;
+  border-radius: 14px;
+  background: #fff7cf;
+  font-size: 1.2rem;
+}
+
+.outing-kind-toggle-grid button strong,
+.outing-choice-strip button strong,
+.outing-experience-grid button strong,
+.outing-wizard-v3 .wizard-small-grid button strong,
+.outing-wizard-v3 .budget-compact-grid button strong,
+.outing-wizard-v3 .travel-compact-grid button strong,
+.outing-travel-limit-grid button strong,
+.outing-anchor-list > button strong {
+  font-size: 0.9rem;
+  line-height: 1.18;
+  text-wrap: pretty;
+}
+
+.outing-kind-toggle-grid button small,
+.outing-choice-strip button small,
+.outing-experience-grid button small,
+.outing-wizard-v3 .wizard-small-grid button small,
+.outing-wizard-v3 .budget-compact-grid button small,
+.outing-wizard-v3 .travel-compact-grid button small,
+.outing-travel-limit-grid button small,
+.outing-anchor-list > button small,
+.outing-anchor-list > button i {
+  color: #6c6364;
+  font-size: 0.72rem;
+  line-height: 1.42;
+}
+
+.outing-count-card {
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1.5px #e0d4cd;
+}
+
+.outing-count-card .outing-count-icon {
+  width: 48px;
+  height: 48px;
+  font-size: 1.35rem;
+}
+
+.outing-stepper,
+.outing-count-stepper {
+  background: var(--venture-cream);
+  border-radius: 14px;
+}
+
+.outing-stepper button,
+.outing-count-stepper button {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+}
+
+.outing-stepper output,
+.outing-count-stepper output {
+  min-width: 40px;
+  font-size: 1rem;
+}
+
+.outing-anchor-kind {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  font-size: 1.25rem;
+}
+
+.outing-anchor-list > button {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.outing-anchor-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.outing-wizard-v3 .interest-compact-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.outing-wizard-v3 .interest-compact-grid button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: auto;
+  min-height: 42px;
+  padding: 10px 13px;
+  border: 1.5px solid #d4c8c1;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.outing-wizard-v3 .interest-compact-grid button.selected {
+  border: 2px solid var(--venture-ink);
+  background: #ffcf00;
+}
+
+.outing-wizard-v3 input[type="date"],
+.outing-wizard-v3 input[type="time"],
+.outing-wizard-v3 input[type="search"],
+.outing-wizard-v3 input[type="text"],
+.outing-wizard-v3 select {
+  min-height: 50px;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.alcohol-compact-toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1.5px solid #d1c5bd;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fffaf3 0%, #fff 100%);
+}
+
+.alcohol-compact-toggle input {
+  width: 24px;
+  height: 24px;
+}
+
+.outing-review-v3 .review-compact-hero {
+  background: linear-gradient(135deg, #ffcf00 0%, #ffe17f 53%, #fff5d1 100%);
+}
+
+.outing-review-v3 .review-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.outing-review-v3 .review-compact-grid > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1.5px solid #d5c9c2;
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+.outing-review-v3 .review-compact-grid > .review-wide {
+  grid-column: 1 / -1;
+}
+
+.outing-review-v3 .review-compact-grid span {
+  color: var(--venture-red-strong);
+  font-size: 0.61rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.outing-wizard-v3 .outing-wizard-actions {
+  gap: 10px;
+  border-radius: 18px;
+}
+
+.outing-wizard-v3 .outing-wizard-back,
+.outing-wizard-v3 .outing-wizard-next {
+  min-height: 50px;
+  font-size: 0.82rem;
+}
+
+.outing-wizard-v3 .outing-wizard-next span {
+  margin-left: 4px;
+}
+
+/* Mobile-first fit fixes */
+@media (max-width: 420px) {
+  .outing-wizard-v3 .outing-wizard-screen {
+    padding-inline: 12px;
+  }
+
+  .outing-wizard-v3 .outing-wizard-heading,
+  .outing-shape-panel,
+  .outing-personalization-panel,
+  .outing-area-travel-panel,
+  .outing-review-v3,
+  .outing-anchor-builder,
+  .outing-wizard-v3 .wizard-compact-panel {
+    padding: 14px;
+  }
+
+  .outing-build-method-grid button,
+  .outing-wizard-v3 .mode-choice-card {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .outing-build-method-grid .outing-build-method-arrow {
+    width: 30px;
+    height: 30px;
+    font-size: 0.92rem;
+  }
+
+  .outing-build-method-grid button > span:first-child,
+  .outing-wizard-v3 .mode-choice-card > span:first-child {
+    width: 46px;
+    height: 46px;
+    font-size: 1.35rem;
+  }
+
+  .outing-wizard-v3 .mode-choice-copy strong,
+  .outing-build-method-grid .outing-build-method-copy strong,
+  .outing-kind-toggle-grid button strong,
+  .outing-choice-strip button strong,
+  .outing-experience-grid button strong,
+  .outing-anchor-list > button strong {
+    font-size: 0.9rem;
+  }
+
+  .outing-total-stops-card,
+  .outing-party-size-card {
+    grid-template-columns: 1fr;
+  }
+
+  .outing-review-v3 .review-compact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .outing-anchor-list > button {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .outing-anchor-list > button .outing-anchor-check {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .outing-wizard-v3 .travel-compact-grid,
+  .outing-wizard-v3 .wizard-small-grid,
+  .outing-wizard-v3 .budget-compact-grid,
+  .outing-travel-limit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .outing-wizard-v3 .travel-compact-grid button,
+  .outing-wizard-v3 .wizard-small-grid button,
+  .outing-wizard-v3 .budget-compact-grid button,
+  .outing-travel-limit-grid button {
+    min-height: 74px;
+  }
+}
+
+@media (min-width: 421px) {
+  .outing-build-method-grid,
+  .outing-experience-grid,
+  .outing-choice-strip,
+  .outing-kind-toggle-grid,
+  .outing-count-grid,
+  .outing-wizard-v3 .travel-compact-grid,
+  .outing-wizard-v3 .wizard-small-grid,
+  .outing-wizard-v3 .budget-compact-grid,
+  .outing-travel-limit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Only show submission entry on first build step */
+.outing-wizard-v3[data-step="0"] .submit-listing-entry,
+.outing-wizard-v3[data-step="1"] .submit-listing-entry {
+  display: grid;
+}
+
+.outing-wizard-v3:not([data-step="0"]):not([data-step="1"]) .submit-listing-entry {
+  display: none !important;
+}
