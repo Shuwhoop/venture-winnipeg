@@ -23,6 +23,7 @@ const GROUPS = [
   {
     title: "Analytics and data science",
     links: [
+      ["/admin/beta-readiness", "Beta readiness"],
       ["/admin/analytics", "Analytics overview"],
       ["/admin/analytics/funnels", "Funnels"],
       ["/admin/analytics/retention", "Retention"],
