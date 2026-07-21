@@ -1,0 +1,8 @@
+{
+  "timezone": "America/Winnipeg",
+  "minimum_sessions_for_directional_read": 20,
+  "minimum_exposures_per_experiment_variant": 40,
+  "preferred_neighbourhoods": ["Downtown", "Exchange District", "Osborne Village"],
+  "preferred_categories": ["Restaurant", "Live Music", "Activity"],
+  "analysis_notes": "Copy this file to config.json and customize it. Do not add secrets."
+}
