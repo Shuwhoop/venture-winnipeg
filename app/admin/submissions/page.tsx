@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
@@ -9,6 +11,8 @@ import {
 } from "../restaurants/actions";
 
 import {
+  completeLinkedSubmission,
+  openSubmissionInEditor,
   publishEventSubmission,
   publishRestaurantSubmission,
   rejectSubmission,
@@ -42,6 +46,10 @@ type SubmissionRow = {
   source_url: string | null;
   submitter_notes: string | null;
   review_notes: string | null;
+  linked_entity_type: "place" | "event" | null;
+  linked_entity_id: string | null;
+  approved_entity_type: "place" | "event" | null;
+  approved_entity_id: string | null;
   created_at: string;
 };
 
@@ -259,6 +267,10 @@ const supabase =
             source_url,
             submitter_notes,
             review_notes,
+            linked_entity_type,
+            linked_entity_id,
+            approved_entity_type,
+            approved_entity_id,
             created_at
           `
         )
@@ -544,6 +556,7 @@ const supabase =
                     venues={
                       venues
                     }
+                    returnTo="/admin/submissions#restaurant-submissions"
                   />
                 )
               )
@@ -607,6 +620,7 @@ const supabase =
                     venues={
                       venues
                     }
+                    returnTo="/admin/submissions#event-submissions"
                   />
                 )
               )
@@ -822,6 +836,15 @@ const supabase =
                           styles.actions
                         }
                       >
+                        <Link
+                          className={
+                            styles.edit
+                          }
+                          href={`/admin/listings/place/${restaurant.id}?returnTo=${encodeURIComponent("/admin/submissions#imported-restaurants")}`}
+                        >
+                          Edit full listing
+                        </Link>
+
                         <button
                           className={
                             styles.save
@@ -870,12 +893,15 @@ const supabase =
 
 function SubmissionCard({
   submission,
-  venues
+  venues,
+  returnTo
 }: {
   submission:
     SubmissionRow;
   venues:
     VenueOption[];
+  returnTo:
+    string;
 }) {
   const payload =
     submission.payload;
@@ -894,6 +920,18 @@ function SubmissionCard({
           payload,
           "title"
         );
+
+  const linkedEntityType =
+    submission.linked_entity_type ??
+    submission.approved_entity_type;
+  const linkedEntityId =
+    submission.linked_entity_id ??
+    submission.approved_entity_id;
+  const hasLinkedListing =
+    Boolean(
+      linkedEntityType &&
+      linkedEntityId
+    );
 
   return (
     <article
@@ -992,6 +1030,29 @@ function SubmissionCard({
           }
         />
 
+        <input
+          name="returnTo"
+          type="hidden"
+          value={
+            returnTo
+          }
+        />
+
+        {hasLinkedListing ? (
+          <div
+            className={
+              styles.linkedNotice
+            }
+          >
+            <strong>
+              Full listing connected
+            </strong>
+            <span>
+              Continue detailed editing in the linked {linkedEntityType}. The submission remains in this queue until the public listing is published and marked complete.
+            </span>
+          </div>
+        ) : null}
+
         {isRestaurant ? (
           <RestaurantFields
             payload={
@@ -1069,6 +1130,44 @@ function SubmissionCard({
             styles.actions
           }
         >
+          {hasLinkedListing &&
+          linkedEntityType &&
+          linkedEntityId ? (
+            <>
+              <Link
+                className={
+                  styles.edit
+                }
+                href={`/admin/listings/${linkedEntityType}/${linkedEntityId}?returnTo=${encodeURIComponent(returnTo)}`}
+              >
+                Edit full listing
+              </Link>
+
+              <button
+                className={
+                  styles.approve
+                }
+                formAction={
+                  completeLinkedSubmission
+                }
+                formNoValidate
+              >
+                Mark complete after publishing
+              </button>
+            </>
+          ) : (
+            <button
+              className={
+                styles.edit
+              }
+              formAction={
+                openSubmissionInEditor
+              }
+            >
+              Create draft & edit full listing
+            </button>
+          )}
+
           <button
             className={
               styles.save
@@ -1091,31 +1190,35 @@ function SubmissionCard({
             Needs changes
           </button>
 
-          <button
-            className={
-              styles.approve
-            }
-            formAction={
-              isRestaurant
-                ? publishRestaurantSubmission
-                : publishEventSubmission
-            }
-          >
-            {isRestaurant
-              ? "Publish restaurant"
-              : "Publish event"}
-          </button>
+          {!hasLinkedListing ? (
+            <>
+              <button
+                className={
+                  styles.approve
+                }
+                formAction={
+                  isRestaurant
+                    ? publishRestaurantSubmission
+                    : publishEventSubmission
+                }
+              >
+                {isRestaurant
+                  ? "Publish basic restaurant"
+                  : "Publish basic event"}
+              </button>
 
-          <button
-            className={
-              styles.reject
-            }
-            formAction={
-              rejectSubmission
-            }
-          >
-            Reject
-          </button>
+              <button
+                className={
+                  styles.reject
+                }
+                formAction={
+                  rejectSubmission
+                }
+              >
+                Reject
+              </button>
+            </>
+          ) : null}
         </div>
       </form>
     </article>
@@ -1200,7 +1303,12 @@ function RestaurantFields({
           </span>
 
           <select
-            defaultValue="restaurant"
+            defaultValue={
+              textValue(
+                payload,
+                "placeType"
+              ) || "restaurant"
+            }
             name="placeType"
           >
             {
@@ -1253,7 +1361,12 @@ function RestaurantFields({
           name="latitude"
           type="number"
           placeholder="Example: 49.8951"
-          value=""
+          value={
+            textValue(
+              payload,
+              "latitude"
+            )
+          }
           required
         />
 
@@ -1262,7 +1375,12 @@ function RestaurantFields({
           name="longitude"
           type="number"
           placeholder="Example: -97.1384"
-          value=""
+          value={
+            textValue(
+              payload,
+              "longitude"
+            )
+          }
           required
         />
 
@@ -1404,7 +1522,12 @@ function EventFields({
           </span>
 
           <select
-            defaultValue=""
+            defaultValue={
+              textValue(
+                payload,
+                "existingVenueId"
+              )
+            }
             name="existingVenueId"
           >
             <option value="">
@@ -1439,7 +1562,12 @@ function EventFields({
           name="venueLatitude"
           type="number"
           placeholder="Only needed for a new venue"
-          value=""
+          value={
+            textValue(
+              payload,
+              "venueLatitude"
+            )
+          }
         />
 
         <Field
@@ -1447,7 +1575,12 @@ function EventFields({
           name="venueLongitude"
           type="number"
           placeholder="Only needed for a new venue"
-          value=""
+          value={
+            textValue(
+              payload,
+              "venueLongitude"
+            )
+          }
         />
 
         <Field
