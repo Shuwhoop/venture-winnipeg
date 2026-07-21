@@ -16,6 +16,9 @@ import {
 import {
   BottomNav
 } from "@/components/bottom-nav";
+import {
+  PublicFooter
+} from "@/components/public-footer";
 
 const ADMIN_AUTH_PATHS = [
   "/admin/login",
@@ -67,6 +70,7 @@ export function PublicRouteChrome({
 
   return (
     <>
+      <PublicFooter />
       <BottomNav />
       {analyticsEnabled ? (
         <VentureAnalytics />
