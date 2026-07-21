@@ -163,6 +163,7 @@ export function BetaFeedback() {
         className={styles.launcher}
         onClick={openFeedback}
         aria-haspopup="dialog"
+        aria-label="Give Venture feedback"
       >
         <span aria-hidden="true">✦</span>
         Feedback

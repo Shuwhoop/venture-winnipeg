@@ -29,6 +29,108 @@ type PageProps = {
   }>;
 };
 
+
+
+type IconName =
+  | "clock"
+  | "pin"
+  | "price"
+  | "spark"
+  | "directions"
+  | "phone"
+  | "globe"
+  | "menu"
+  | "mail"
+  | "reserve"
+  | "ticket";
+
+function Icon({
+  name
+}: {
+  name: IconName;
+}) {
+  const paths: Record<IconName, React.ReactNode> = {
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="8" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+    pin: (
+      <>
+        <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" />
+        <circle cx="12" cy="10" r="2" />
+      </>
+    ),
+    price: (
+      <>
+        <path d="M12 3v18" />
+        <path d="M16 7.5c0-1.7-1.8-3-4-3s-4 1.3-4 3 1.3 2.5 4 3 4 1.3 4 3-1.8 3-4 3-4-1.3-4-3" />
+      </>
+    ),
+    spark: (
+      <>
+        <path d="m12 3 1.4 4.1L17.5 8.5l-4.1 1.4L12 14l-1.4-4.1L6.5 8.5l4.1-1.4L12 3Z" />
+        <path d="m18.5 14 .8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2Z" />
+      </>
+    ),
+    directions: (
+      <>
+        <path d="m4 12 16-8-7 16-2.2-6.8L4 12Z" />
+      </>
+    ),
+    phone: (
+      <>
+        <path d="M7 4h3l1.4 4-2 1.4a14 14 0 0 0 5.2 5.2l1.4-2L20 14v3c0 1.7-1.3 3-3 3C9.8 20 4 14.2 4 7c0-1.7 1.3-3 3-3Z" />
+      </>
+    ),
+    globe: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18M12 3c2.2 2.5 3.3 5.5 3.3 9S14.2 18.5 12 21c-2.2-2.5-3.3-5.5-3.3-9S9.8 5.5 12 3Z" />
+      </>
+    ),
+    menu: (
+      <>
+        <path d="M5 5h14M5 9h14M5 13h9" />
+        <path d="M6 18h12" />
+      </>
+    ),
+    mail: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m4 7 8 6 8-6" />
+      </>
+    ),
+    reserve: (
+      <>
+        <rect x="4" y="5" width="16" height="15" rx="2" />
+        <path d="M8 3v4M16 3v4M4 9h16M9 14h6" />
+      </>
+    ),
+    ticket: (
+      <>
+        <path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4V7Z" />
+        <path d="M12 8.5v7" />
+      </>
+    )
+  };
+
+  return (
+    <svg
+      className={styles.iconSvg}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
 const DAY_ORDER = [
   "monday",
   "tuesday",
@@ -470,7 +572,7 @@ export default async function ListingPage({
 
         {detail.neighbourhood || address ? (
           <div className={styles.heroLocation}>
-            <span aria-hidden="true">⌖</span>
+            <span aria-hidden="true"><Icon name="pin" /></span>
             <div>
               <strong>
                 {detail.neighbourhood || detail.city}
@@ -486,7 +588,7 @@ export default async function ListingPage({
         aria-label="Listing summary"
       >
         <article className={`${styles.fact} ${styles.factStatus}`}>
-          <span className={styles.factIcon} aria-hidden="true">◷</span>
+          <span className={styles.factIcon}><Icon name="clock" /></span>
           <div>
             <strong title={currentStatus}>{currentStatus}</strong>
             <span>
@@ -495,8 +597,8 @@ export default async function ListingPage({
           </div>
         </article>
 
-        <article className={styles.fact}>
-          <span className={styles.factIcon} aria-hidden="true">⌖</span>
+        <article className={`${styles.fact} ${styles.factNeighbourhood}`}>
+          <span className={styles.factIcon}><Icon name="pin" /></span>
           <div>
             <strong title={detail.neighbourhood || "Winnipeg"}>
               {detail.neighbourhood || "Winnipeg"}
@@ -505,16 +607,16 @@ export default async function ListingPage({
           </div>
         </article>
 
-        <article className={styles.fact}>
-          <span className={styles.factIcon} aria-hidden="true">$</span>
+        <article className={`${styles.fact} ${styles.factPrice}`}>
+          <span className={styles.factIcon}><Icon name="price" /></span>
           <div>
             <strong>{currentPrice}</strong>
             <span>Price</span>
           </div>
         </article>
 
-        <article className={styles.fact}>
-          <span className={styles.factIcon} aria-hidden="true">✦</span>
+        <article className={`${styles.fact} ${styles.factCuisine}`}>
+          <span className={styles.factIcon}><Icon name="spark" /></span>
           <div>
             <strong title={cuisineOrVenue || undefined}>
               {cuisineOrVenue}
@@ -540,7 +642,7 @@ export default async function ListingPage({
               target="_blank"
               rel="noreferrer"
             >
-              <span aria-hidden="true">↗</span>
+              <span className={styles.actionIcon}><Icon name="directions" /></span>
               <div>
                 <strong>Directions</strong>
                 <small>{detail.neighbourhood || detail.city}</small>
@@ -555,8 +657,10 @@ export default async function ListingPage({
               target="_blank"
               rel="noreferrer"
             >
-              <span aria-hidden="true">
-                {detail.entityType === "place" ? "R" : "T"}
+              <span className={styles.actionIcon}>
+                <Icon
+                  name={detail.entityType === "place" ? "reserve" : "ticket"}
+                />
               </span>
               <div>
                 <strong>
@@ -571,42 +675,46 @@ export default async function ListingPage({
         <div className={styles.secondaryActions}>
           {detail.entityType === "place" && detail.officialPhone ? (
             <a
+              className={`${styles.secondaryAction} ${styles.secondaryCall}`}
               href={`tel:${detail.officialPhone}`}
               aria-label={`Call ${detail.officialPhone}`}
             >
-              <span aria-hidden="true">☎</span>
+              <span className={styles.secondaryActionIcon}><Icon name="phone" /></span>
               <strong>Call</strong>
             </a>
           ) : null}
 
           {officialUrl ? (
             <a
+              className={`${styles.secondaryAction} ${styles.secondaryWebsite}`}
               href={officialUrl}
               target="_blank"
               rel="noreferrer"
             >
-              <span aria-hidden="true">↗</span>
+              <span className={styles.secondaryActionIcon}><Icon name="globe" /></span>
               <strong>Website</strong>
             </a>
           ) : null}
 
           {detail.entityType === "place" && detail.menuUrl ? (
             <a
+              className={`${styles.secondaryAction} ${styles.secondaryMenu}`}
               href={detail.menuUrl}
               target="_blank"
               rel="noreferrer"
             >
-              <span aria-hidden="true">≡</span>
+              <span className={styles.secondaryActionIcon}><Icon name="menu" /></span>
               <strong>Menu</strong>
             </a>
           ) : null}
 
           {detail.entityType === "place" && detail.officialEmail ? (
             <a
+              className={`${styles.secondaryAction} ${styles.secondaryEmail}`}
               href={`mailto:${detail.officialEmail}`}
               aria-label={`Email ${detail.name}`}
             >
-              <span aria-hidden="true">✉</span>
+              <span className={styles.secondaryActionIcon}><Icon name="mail" /></span>
               <strong>Email</strong>
             </a>
           ) : null}
