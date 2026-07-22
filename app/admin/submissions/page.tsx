@@ -20,6 +20,8 @@ import {
   saveSubmissionReview
 } from "./actions";
 
+import ModerationQueueTools from "./moderation-queue-tools";
+
 import styles from "./page.module.css";
 
 
@@ -64,6 +66,18 @@ type ImportedRestaurant = {
   official_website: string | null;
   official_phone: string | null;
   short_description: string;
+};
+
+
+type ImportedEvent = {
+  id: string;
+  title: string;
+  primary_category: string;
+  start_at: string;
+  status: string;
+  verification_status: string;
+  organizer_name: string;
+  venue_id: string | null;
 };
 
 
@@ -248,6 +262,7 @@ const supabase =
   const [
     submissionsResult,
     importsResult,
+    importedEventsResult,
     venuesResult
   ] =
     await Promise.all([
@@ -321,7 +336,34 @@ const supabase =
               true
           }
         )
-        .limit(100),
+        .limit(500),
+
+      supabase
+        .from("events")
+        .select(
+          `
+            id,
+            title,
+            primary_category,
+            start_at,
+            status,
+            verification_status,
+            organizer_name,
+            venue_id
+          `
+        )
+        .eq(
+          "status",
+          "draft"
+        )
+        .order(
+          "start_at",
+          {
+            ascending:
+              true
+          }
+        )
+        .limit(500),
 
       supabase
         .from("places")
@@ -366,6 +408,14 @@ const supabase =
   }
 
   if (
+    importedEventsResult.error
+  ) {
+    throw new Error(
+      `Could not load imported events: ${importedEventsResult.error.message}`
+    );
+  }
+
+  if (
     venuesResult.error
   ) {
     throw new Error(
@@ -385,11 +435,52 @@ const supabase =
       []
     ) as ImportedRestaurant[];
 
+  const importedEvents =
+    (
+      importedEventsResult.data ??
+      []
+    ) as ImportedEvent[];
+
   const venues =
     (
       venuesResult.data ??
       []
     ) as VenueOption[];
+
+  const linkedEventIds =
+    new Set(
+      submissions
+        .map(
+          (submission) =>
+            submission.linked_entity_type === "event"
+              ? submission.linked_entity_id
+              : submission.approved_entity_type === "event"
+                ? submission.approved_entity_id
+                : null
+        )
+        .filter(
+          (id): id is string =>
+            Boolean(id)
+        )
+    );
+
+  const standaloneImportedEvents =
+    importedEvents.filter(
+      (event) =>
+        !linkedEventIds.has(
+          event.id
+        )
+    );
+
+  const venueById =
+    new Map(
+      venues.map(
+        (venue) => [
+          venue.id,
+          venue
+        ]
+      )
+    );
 
   const restaurantSubmissions =
     submissions.filter(
@@ -440,7 +531,8 @@ const supabase =
           <strong>
             {
               submissions.length +
-              imports.length
+              imports.length +
+              standaloneImportedEvents.length
             }
           </strong>
 
@@ -449,6 +541,14 @@ const supabase =
           </small>
         </div>
       </header>
+
+      <ModerationQueueTools
+        totalCount={
+          submissions.length +
+          imports.length +
+          standaloneImportedEvents.length
+        }
+      />
 
       <nav
         className={
@@ -474,10 +574,19 @@ const supabase =
         </a>
 
         <a href="#imported-restaurants">
-          Imports
+          Place imports
           <strong>
             {
               imports.length
+            }
+          </strong>
+        </a>
+
+        <a href="#imported-events">
+          Event drafts
+          <strong>
+            {
+              standaloneImportedEvents.length
             }
           </strong>
         </a>
@@ -668,17 +777,22 @@ const supabase =
             {
               imports.map(
                 (restaurant) => (
-                  <article
+                  <details
                     className={
                       styles.card
                     }
+                    data-kind="restaurant"
+                    data-moderation-card="true"
+                    data-search={`${restaurant.name} ${restaurant.address_line1} ${restaurant.neighbourhood ?? ""} ${restaurant.primary_category} ${restaurant.place_type}`.toLowerCase()}
+                    data-source="import"
+                    data-status="draft"
                     key={
                       restaurant.id
                     }
                   >
-                    <header
+                    <summary
                       className={
-                        styles.cardHeader
+                        styles.cardSummary
                       }
                     >
                       <div>
@@ -698,7 +812,10 @@ const supabase =
                           }
                         </p>
                       </div>
-                    </header>
+                      <span className={styles.expandHint}>
+                        Expand
+                      </span>
+                    </summary>
 
                     <form
                       className={
@@ -712,6 +829,24 @@ const supabase =
                           restaurant.id
                         }
                       />
+
+                      <div className={styles.quickActionBar}>
+                        <Link
+                          className={styles.edit}
+                          href={`/admin/listings/place/${restaurant.id}?returnTo=${encodeURIComponent("/admin/submissions#imported-restaurants")}`}
+                        >
+                          Edit full listing
+                        </Link>
+
+                        <span>
+                          Best for hours, sources, menus, parking, transit, and publishing checks.
+                        </span>
+                      </div>
+
+                      <details className={styles.inlineEditor}>
+                        <summary>
+                          Show quick-edit fields
+                        </summary>
 
                       <div
                         className={
@@ -830,21 +965,13 @@ const supabase =
                           />
                         </label>
                       </div>
+                      </details>
 
                       <div
                         className={
                           styles.actions
                         }
                       >
-                        <Link
-                          className={
-                            styles.edit
-                          }
-                          href={`/admin/listings/place/${restaurant.id}?returnTo=${encodeURIComponent("/admin/submissions#imported-restaurants")}`}
-                        >
-                          Edit full listing
-                        </Link>
-
                         <button
                           className={
                             styles.save
@@ -879,8 +1006,154 @@ const supabase =
                         </button>
                       </div>
                     </form>
-                  </article>
+                  </details>
                 )
+              )
+            }
+          </div>
+        )}
+      </section>
+
+      <section
+        className={
+          styles.section
+        }
+        id="imported-events"
+      >
+        <header
+          className={
+            styles.sectionHeading
+          }
+        >
+          <span>
+            INVENTORY DRAFTS
+          </span>
+
+          <h2>
+            Events
+          </h2>
+
+          <p>
+            Search and expand an event,
+            then open the full editor for
+            schedules, tickets, sources,
+            parking, and transit details.
+          </p>
+        </header>
+
+        {standaloneImportedEvents.length ===
+        0 ? (
+          <p
+            className={
+              styles.empty
+            }
+          >
+            No event drafts are waiting.
+          </p>
+        ) : (
+          <div
+            className={
+              styles.list
+            }
+          >
+            {
+              standaloneImportedEvents.map(
+                (event) => {
+                  const venue =
+                    event.venue_id
+                      ? venueById.get(
+                          event.venue_id
+                        )
+                      : null;
+
+                  return (
+                    <details
+                      className={
+                        styles.card
+                      }
+                      data-kind="event"
+                      data-moderation-card="true"
+                      data-search={`${event.title} ${event.primary_category} ${event.organizer_name} ${venue?.name ?? ""} ${venue?.address_line1 ?? ""}`.toLowerCase()}
+                      data-source="import"
+                      data-status="draft"
+                      key={
+                        event.id
+                      }
+                    >
+                      <summary
+                        className={
+                          styles.cardSummary
+                        }
+                      >
+                        <div>
+                          <span>
+                            EVENT DRAFT
+                          </span>
+
+                          <h3>
+                            {event.title}
+                          </h3>
+
+                          <p>
+                            {event.primary_category}
+                            {venue
+                              ? ` · ${venue.name}`
+                              : ""}
+                          </p>
+                        </div>
+
+                        <div className={styles.summaryMeta}>
+                          <strong>
+                            {formattedDate(
+                              event.start_at
+                            )}
+                          </strong>
+
+                          <small>
+                            {event.organizer_name}
+                          </small>
+                        </div>
+
+                        <span className={styles.expandHint}>
+                          Expand
+                        </span>
+                      </summary>
+
+                      <div className={styles.compactBody}>
+                        <div className={styles.quickFacts}>
+                          <div>
+                            <span>Category</span>
+                            <strong>{event.primary_category}</strong>
+                          </div>
+
+                          <div>
+                            <span>Venue</span>
+                            <strong>{venue?.name ?? "No venue linked"}</strong>
+                          </div>
+
+                          <div>
+                            <span>Status</span>
+                            <strong>{event.status}</strong>
+                          </div>
+
+                          <div>
+                            <span>Verification</span>
+                            <strong>{event.verification_status}</strong>
+                          </div>
+                        </div>
+
+                        <div className={styles.actions}>
+                          <Link
+                            className={styles.edit}
+                            href={`/admin/listings/event/${event.id}?returnTo=${encodeURIComponent("/admin/submissions#imported-events")}`}
+                          >
+                            Edit full listing
+                          </Link>
+                        </div>
+                      </div>
+                    </details>
+                  );
+                }
               )
             }
           </div>
@@ -934,14 +1207,25 @@ function SubmissionCard({
     );
 
   return (
-    <article
+    <details
       className={
         styles.card
       }
+      data-kind={
+        submission.submission_type === "event"
+          ? "event"
+          : "restaurant"
+      }
+      data-moderation-card="true"
+      data-search={`${title} ${textValue(payload, "addressLine1")} ${textValue(payload, "venueName")} ${textValue(payload, "venueAddress")} ${textValue(payload, "organizerName")} ${textValue(payload, "neighbourhood")} ${textValue(payload, "category")} ${submission.submitter_name} ${submission.submitter_email}`.toLowerCase()}
+      data-source="public"
+      data-status={
+        submission.status
+      }
     >
-      <header
+      <summary
         className={
-          styles.cardHeader
+          styles.cardSummary
         }
       >
         <div>
@@ -1007,7 +1291,11 @@ function SubmissionCard({
             }
           </small>
         </div>
-      </header>
+
+        <span className={styles.expandHint}>
+          Expand
+        </span>
+      </summary>
 
       <form
         className={
@@ -1037,6 +1325,35 @@ function SubmissionCard({
             returnTo
           }
         />
+
+        <div className={styles.quickActionBar}>
+          {hasLinkedListing &&
+          linkedEntityType &&
+          linkedEntityId ? (
+            <Link
+              className={styles.edit}
+              href={`/admin/listings/${linkedEntityType}/${linkedEntityId}?returnTo=${encodeURIComponent(returnTo)}`}
+            >
+              Edit full listing
+            </Link>
+          ) : (
+            <button
+              className={styles.edit}
+              formAction={openSubmissionInEditor}
+            >
+              Create draft & edit full listing
+            </button>
+          )}
+
+          <span>
+            Open the complete Venture editor, or use the queue actions below for a faster decision.
+          </span>
+        </div>
+
+        <details className={styles.inlineEditor}>
+          <summary>
+            Show submission details and quick-edit fields
+          </summary>
 
         {hasLinkedListing ? (
           <div
@@ -1124,6 +1441,7 @@ function SubmissionCard({
               : null
           }
         </div>
+        </details>
 
         <div
           className={
@@ -1221,7 +1539,7 @@ function SubmissionCard({
           ) : null}
         </div>
       </form>
-    </article>
+    </details>
   );
 }
 
