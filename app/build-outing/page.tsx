@@ -513,6 +513,25 @@ const stopKindDetails: Record<
   }
 };
 
+function getInterestIcon(interest: string): string {
+  const normalized = interest.trim().toLowerCase();
+
+  const icons: Record<string, string> = {
+    food: "🍜",
+    "live music": "🎵",
+    "date nights": "💘",
+    comedy: "🎤",
+    sports: "🏀",
+    markets: "🛍️",
+    arts: "🎨",
+    gaming: "🎮",
+    nightlife: "🌙",
+    "outdoor activities": "🌿"
+  };
+
+  return icons[normalized] ?? "✨";
+}
+
 function getTodayInputValue(): string {
   const currentDate =
     new Date();
@@ -2346,7 +2365,7 @@ export default function BuildOutingPage() {
           {currentStep === 4 &&
           planningMode ===
             "solo" ? (
-            <section className="outing-personalization-panel">
+            <section className="outing-personalization-panel mood-stage-panel">
               <div className="outing-personalization-heading">
                 <span>
                   SOLO MOOD
@@ -2381,13 +2400,15 @@ export default function BuildOutingPage() {
                         {option.icon}
                       </span>
 
-                      <strong>
-                        {option.title}
-                      </strong>
+                      <span className="outing-experience-copy">
+                        <strong>
+                          {option.title}
+                        </strong>
 
-                      <small>
-                        {option.description}
-                      </small>
+                        <small>
+                          {option.description}
+                        </small>
+                      </span>
                     </button>
                   )
                 )}
@@ -2421,13 +2442,15 @@ export default function BuildOutingPage() {
                         )
                       }
                     >
-                      <strong>
-                        {option.title}
-                      </strong>
+                      <span className="outing-experience-copy">
+                        <strong>
+                          {option.title}
+                        </strong>
 
-                      <small>
-                        {option.description}
-                      </small>
+                        <small>
+                          {option.description}
+                        </small>
+                      </span>
                     </button>
                   )
                 )}
@@ -2438,7 +2461,7 @@ export default function BuildOutingPage() {
           {currentStep === 4 &&
           planningMode ===
             "group" ? (
-            <section className="outing-personalization-panel">
+            <section className="outing-personalization-panel mood-stage-panel">
               <div className="outing-party-size-card">
                 <div>
                   <span>
@@ -2537,13 +2560,15 @@ export default function BuildOutingPage() {
                         {option.icon}
                       </span>
 
-                      <strong>
-                        {option.title}
-                      </strong>
+                      <span className="outing-experience-copy">
+                        <strong>
+                          {option.title}
+                        </strong>
 
-                      <small>
-                        {option.description}
-                      </small>
+                        <small>
+                          {option.description}
+                        </small>
+                      </span>
                     </button>
                   )
                 )}
@@ -2577,13 +2602,15 @@ export default function BuildOutingPage() {
                         )
                       }
                     >
-                      <strong>
-                        {option.title}
-                      </strong>
+                      <span className="outing-experience-copy">
+                        <strong>
+                          {option.title}
+                        </strong>
 
-                      <small>
-                        {option.description}
-                      </small>
+                        <small>
+                          {option.description}
+                        </small>
+                      </span>
                     </button>
                   )
                 )}
@@ -2592,7 +2619,7 @@ export default function BuildOutingPage() {
           ) : null}
 
           {currentStep === 5 ? (
-            <section className="wizard-compact-panel">
+            <section className="wizard-compact-panel interest-stage-panel">
               <div className="profile-default-row">
                 <p>
                   Starting with{" "}
@@ -2609,6 +2636,15 @@ export default function BuildOutingPage() {
                 >
                   Reset
                 </button>
+              </div>
+
+              <div className="interest-stage-note">
+                <span aria-hidden="true">✨</span>
+
+                <div>
+                  <strong>Build your flavour</strong>
+                  <small>Pick as many interests as you like. Venture will use them to shape the route.</small>
+                </div>
               </div>
 
               <div className="interest-compact-grid">
@@ -2638,9 +2674,15 @@ export default function BuildOutingPage() {
                           )
                         }
                       >
-                        {interest}
+                        <span className="interest-chip-icon" aria-hidden="true">
+                          {getInterestIcon(interest)}
+                        </span>
 
-                        <span>
+                        <span className="interest-chip-label">
+                          {interest}
+                        </span>
+
+                        <span className="interest-chip-check" aria-hidden="true">
                           {selected
                             ? "✓"
                             : ""}
