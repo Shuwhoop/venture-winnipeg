@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useMemo,
@@ -377,7 +377,7 @@ export default function ListingEditorForm({
     );
 
   const saveActionRef =
-    useRef<"return" | "stay">(
+    useRef<"publish" | "return" | "stay">(
       "return"
     );
 
@@ -737,7 +737,11 @@ export default function ListingEditorForm({
     }
 
     setSaving(true);
-    setMessage("Saving changes...");
+    setMessage(
+      saveActionRef.current === "publish"
+        ? "Publishing listing..."
+        : "Saving changes..."
+    );
 
     const form =
       event.currentTarget;
@@ -773,10 +777,13 @@ export default function ListingEditorForm({
         formData,
         "tags"
       ),
-      status: stringValue(
-        formData,
-        "status"
-      ),
+      status:
+        saveActionRef.current === "publish"
+          ? "published"
+          : stringValue(
+              formData,
+              "status"
+            ),
       verificationStatus:
         stringValue(
           formData,
@@ -1089,8 +1096,8 @@ export default function ListingEditorForm({
       );
 
       if (
-        saveActionRef.current ===
-        "return"
+        saveActionRef.current === "return" ||
+        saveActionRef.current === "publish"
       ) {
         router.push(returnTo);
         return;
@@ -1202,10 +1209,10 @@ export default function ListingEditorForm({
                   >
                     {venue.name}
                     {venue.neighbourhood
-                      ? ` · ${venue.neighbourhood}`
+                      ? ` Â· ${venue.neighbourhood}`
                       : ""}
                     {venue.status !== "published"
-                      ? ` · ${venue.status}`
+                      ? ` Â· ${venue.status}`
                       : ""}
                   </option>
                 ))}
@@ -1318,7 +1325,7 @@ export default function ListingEditorForm({
                     record.neighbourhood
                   ) ? (
                     <option value={record.neighbourhood}>
-                      {record.neighbourhood} · current value
+                      {record.neighbourhood} Â· current value
                     </option>
                   ) : null}
                   {WINNIPEG_NEIGHBOURHOOD_GROUPS.map(
@@ -1359,7 +1366,7 @@ export default function ListingEditorForm({
                   {record.city &&
                   record.city !== "Winnipeg" ? (
                     <option value={record.city}>
-                      {record.city} · current value
+                      {record.city} Â· current value
                     </option>
                   ) : null}
                   <option value="Winnipeg">
@@ -1379,7 +1386,7 @@ export default function ListingEditorForm({
                     record.province
                   ) ? (
                     <option value={record.province}>
-                      {record.province} · current value
+                      {record.province} Â· current value
                     </option>
                   ) : null}
                   <option value="Manitoba">
@@ -1561,7 +1568,7 @@ export default function ListingEditorForm({
                     );
                   }}
                 >
-                  Apply Mon–Fri
+                  Apply Monâ€“Fri
                 </button>
 
                 <button
@@ -1773,7 +1780,7 @@ export default function ListingEditorForm({
                 {record.timezone &&
                 record.timezone !== "America/Winnipeg" ? (
                   <option value={record.timezone}>
-                    {record.timezone} · current value
+                    {record.timezone} Â· current value
                   </option>
                 ) : null}
                 <option value="America/Winnipeg">
@@ -1833,7 +1840,7 @@ export default function ListingEditorForm({
                   record.ticketStatus
                 ) ? (
                   <option value={record.ticketStatus}>
-                    {record.ticketStatus} · current value
+                    {record.ticketStatus} Â· current value
                   </option>
                 ) : null}
                 {TICKET_STATUS_OPTIONS.map(
@@ -1868,7 +1875,7 @@ export default function ListingEditorForm({
                   record.ageLabel
                 ) ? (
                   <option value={record.ageLabel}>
-                    {record.ageLabel} · current value
+                    {record.ageLabel} Â· current value
                   </option>
                 ) : null}
                 {AGE_LABEL_OPTIONS.map(
@@ -2062,14 +2069,31 @@ export default function ListingEditorForm({
         </p>
         <div className={styles.saveActions}>
           <button
+            type="button"
+            className={styles.publishAction}
+            disabled={saving}
+            onClick={() => {
+              saveActionRef.current =
+                "publish";
+              formRef.current?.requestSubmit();
+            }}
+          >
+            {saving &&
+            saveActionRef.current === "publish"
+              ? "Publishing..."
+              : "Publish and return"}
+          </button>
+          <button
             type="submit"
+            className={styles.secondarySave}
             disabled={saving}
             onClick={() => {
               saveActionRef.current =
                 "return";
             }}
           >
-            {saving
+            {saving &&
+            saveActionRef.current === "return"
               ? "Saving..."
               : "Save and return"}
           </button>
@@ -2082,10 +2106,14 @@ export default function ListingEditorForm({
                 "stay";
             }}
           >
-            Save and keep editing
+            {saving &&
+            saveActionRef.current === "stay"
+              ? "Saving..."
+              : "Save and keep editing"}
           </button>
         </div>
       </div>
     </form>
   );
 }
+

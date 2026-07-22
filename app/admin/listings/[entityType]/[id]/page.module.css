@@ -1,4 +1,4 @@
-.page {
+﻿.page {
   container-type: inline-size;
   min-height: 100vh;
   padding: 24px clamp(14px, 4cqi, 56px) 150px;
@@ -524,5 +524,23 @@
 @media (min-width: 620px) {
   .saveActions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Direct publishing from the full listing editor */
+.publishAction {
+  background: #ffd200 !important;
+  color: #17131d !important;
+  box-shadow: 4px 4px 0 #e10e17 !important;
+}
+
+.publishAction:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: saturate(1.04);
+}
+
+@container (min-width: 560px) {
+  .saveActions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
