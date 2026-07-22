@@ -49,6 +49,14 @@ export async function POST(request: Request) {
       ? body.filename.trim().slice(0, 250)
       : "venture-import.csv";
   const csvText = typeof body.csvText === "string" ? body.csvText : "";
+  const targetArea =
+    typeof body.targetArea === "string"
+      ? body.targetArea.trim().slice(0, 160) || null
+      : null;
+  const importSource =
+    typeof body.importSource === "string"
+      ? body.importSource.trim().slice(0, 160) || "csv_inventory_import"
+      : "csv_inventory_import";
 
   if (!entityType || !csvText.trim()) {
     return NextResponse.json(
@@ -62,7 +70,9 @@ export async function POST(request: Request) {
       admin,
       entityType,
       filename,
-      csvText
+      csvText,
+      targetArea,
+      importSource
     });
 
     return NextResponse.json(result, {

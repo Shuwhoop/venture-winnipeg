@@ -15,7 +15,6 @@ import type {
 
 const MAX_CSV_BYTES = 750_000;
 const MAX_IMPORT_ROWS = 250;
-const IMPORT_SOURCE_NAME = "Venture CSV inventory import";
 
 const PLACE_TYPES = new Set([
   "restaurant",
@@ -49,6 +48,7 @@ type ExistingInventory = {
   placeIdentityKeys: Set<string>;
   eventIdentityKeys: Set<string>;
   sourceUrls: Set<string>;
+  overturePlaceIds: Set<string>;
   venueBySlug: Map<string, string>;
   venueByName: Map<string, string>;
 };
@@ -319,7 +319,7 @@ async function loadExistingInventory(): Promise<ExistingInventory> {
   const [placesResult, eventsResult, sourcesResult] = await Promise.all([
     supabase
       .from("places")
-      .select("id, slug, name, address_line1")
+      .select("id, slug, name, address_line1, overture_place_id")
       .limit(5000),
     supabase
       .from("events")
@@ -347,12 +347,16 @@ async function loadExistingInventory(): Promise<ExistingInventory> {
   const eventSlugs = new Set<string>();
   const placeIdentityKeys = new Set<string>();
   const eventIdentityKeys = new Set<string>();
+  const overturePlaceIds = new Set<string>();
   const venueBySlug = new Map<string, string>();
   const venueByName = new Map<string, string>();
 
   for (const place of placesResult.data ?? []) {
     placeSlugs.add(place.slug.toLowerCase());
     placeIdentityKeys.add(placeIdentityKey(place.name, place.address_line1));
+    if (place.overture_place_id) {
+      overturePlaceIds.add(String(place.overture_place_id));
+    }
     venueBySlug.set(place.slug.toLowerCase(), place.id);
     venueByName.set(normalizeText(place.name), place.id);
   }
@@ -374,6 +378,7 @@ async function loadExistingInventory(): Promise<ExistingInventory> {
     placeIdentityKeys,
     eventIdentityKeys,
     sourceUrls,
+    overturePlaceIds,
     venueBySlug,
     venueByName
   };
@@ -413,6 +418,8 @@ function analyzePlaceRow(
   const identityKey = placeIdentityKey(name, addressLine1);
   const placeType = cleanText(record.place_type || "restaurant", 80);
   const weeklyHours = parseWeeklyHours(record.weekly_hours_json);
+  const overturePlaceId = cleanText(record.overture_place_id, 200);
+  const importedAt = new Date().toISOString();
   let duplicate = false;
 
   if (!name) messages.push("ERROR: name is required.");
@@ -440,16 +447,25 @@ function analyzePlaceRow(
     messages.push("A place with this name and address already exists.");
   }
 
+  if (overturePlaceId && existing.overturePlaceIds.has(overturePlaceId)) {
+    duplicate = true;
+    messages.push("This Overture place ID already exists in Venture.");
+  }
+
   const sourceKey = sourceUrlKey(sourceUrl);
 
-  if (sourceKey && (existing.sourceUrls.has(sourceKey) || seenSources.has(sourceKey))) {
+  if (
+    sourceKey &&
+    !overturePlaceId &&
+    (existing.sourceUrls.has(sourceKey) || seenSources.has(sourceKey))
+  ) {
     duplicate = true;
     messages.push("This source URL is already attached to a Venture listing or another CSV row.");
   }
 
   if (slug) seenSlugs.add(slug);
   if (name && addressLine1) seenIdentity.add(identityKey);
-  if (sourceKey) seenSources.add(sourceKey);
+  if (sourceKey && !overturePlaceId) seenSources.add(sourceKey);
 
   const priceLevel = parseInteger(record.price_level, 1, 4);
 
@@ -470,6 +486,15 @@ function analyzePlaceRow(
       status === "error" || status === "duplicate" || latitude === null || longitude === null
         ? null
         : {
+            ...(overturePlaceId
+              ? {
+                  overture_place_id: overturePlaceId,
+                  import_source: "overture_maps",
+                  imported_at: importedAt,
+                  source_refreshed_at: importedAt,
+                  review_status: "needs_review"
+                }
+              : {}),
             slug,
             place_type: placeType,
             name,
@@ -504,7 +529,9 @@ function analyzePlaceRow(
             transit_notes: nullableText(record.transit_notes, 3000),
             status: "draft",
             verification_status: "unverified",
-            warning_message: "Imported from CSV as a draft. Verify every field before publishing.",
+            warning_message: overturePlaceId
+              ? "Imported from Overture Maps as a draft. Verify hours, operating status, official links, neighbourhood, and all descriptive fields before publishing."
+              : "Imported from CSV as a draft. Verify every field before publishing.",
             source_checked_at: null,
             freshness_expires_at: null,
             published_at: null
@@ -736,18 +763,81 @@ export async function previewInventoryImport({
   return summarizePreview(entityType, filename, rows);
 }
 
-async function getImportSourceId(): Promise<string> {
+type ImportSourceProfile = {
+  name: string;
+  sourceType:
+    | "official_website"
+    | "licensed_api"
+    | "open_data"
+    | "manual_research";
+  baseUrl: string | null;
+  rightsBasis: string;
+  termsUrl: string | null;
+  attributionText: string;
+  cachingLimit: string;
+  retentionNotes: string;
+  deletionObligations: string;
+};
+
+function getImportSourceProfile(importSource: string | null): ImportSourceProfile {
+  if (importSource === "overture_maps") {
+    return {
+      name: "Overture Maps Foundation",
+      sourceType: "open_data",
+      baseUrl: "https://overturemaps.org",
+      rightsBasis: "open_licence",
+      termsUrl: "https://docs.overturemaps.org/attribution/",
+      attributionText: "Overture Maps Foundation and data contributors",
+      cachingLimit: "Store factual place fields and preserve source attribution.",
+      retentionNotes: "Refresh imported records from newer Overture releases.",
+      deletionObligations:
+        "Review current Overture attribution and removal requirements before public display."
+    };
+  }
+
+  if (importSource === "official_event_sources") {
+    return {
+      name: "Official event source imports",
+      sourceType: "official_website",
+      baseUrl: null,
+      rightsBasis: "link_only",
+      termsUrl: null,
+      attributionText: "Official organizer or venue page supplied with each event row.",
+      cachingLimit: "Store factual event fields only. Do not copy protected descriptions or images.",
+      retentionNotes: "Recheck every event before publication and expiry.",
+      deletionObligations: "Correct or remove an event when the official source changes."
+    };
+  }
+
+  return {
+    name:
+      importSource === "partner_feed"
+        ? "Venture partner inventory import"
+        : "Venture targeted CSV inventory import",
+    sourceType: "manual_research",
+    baseUrl: null,
+    rightsBasis: "link_only",
+    termsUrl: null,
+    attributionText: "Source URLs supplied during a private Venture inventory import.",
+    cachingLimit: "Store factual listing fields only.",
+    retentionNotes: "Imported records remain drafts until individually verified.",
+    deletionObligations: "Correct or remove records when their source changes."
+  };
+}
+
+async function getImportSourceId(importSource: string | null): Promise<string> {
   const supabase = getSupabaseAdminClient();
+  const profile = getImportSourceProfile(importSource);
   const existing = await supabase
     .from("sources")
     .select("id")
-    .eq("name", IMPORT_SOURCE_NAME)
-    .eq("source_type", "manual_research")
+    .eq("name", profile.name)
+    .eq("source_type", profile.sourceType)
     .limit(1)
     .maybeSingle();
 
   if (existing.error) {
-    throw new Error(`Venture could not inspect the CSV import source: ${existing.error.message}`);
+    throw new Error(`Venture could not inspect the import source: ${existing.error.message}`);
   }
 
   if (existing.data?.id) {
@@ -757,13 +847,15 @@ async function getImportSourceId(): Promise<string> {
   const created = await supabase
     .from("sources")
     .insert({
-      name: IMPORT_SOURCE_NAME,
-      source_type: "manual_research",
-      rights_basis: "link_only",
-      attribution_text: "Source URLs supplied during a private Venture CSV import.",
-      caching_limit: "Store factual listing fields only.",
-      retention_notes: "Imported records remain drafts until individually verified.",
-      deletion_obligations: "Correct or remove records when their source changes.",
+      name: profile.name,
+      source_type: profile.sourceType,
+      base_url: profile.baseUrl,
+      rights_basis: profile.rightsBasis,
+      terms_url: profile.termsUrl,
+      attribution_text: profile.attributionText,
+      caching_limit: profile.cachingLimit,
+      retention_notes: profile.retentionNotes,
+      deletion_obligations: profile.deletionObligations,
       active: true,
       reviewed_at: new Date().toISOString()
     })
@@ -771,7 +863,7 @@ async function getImportSourceId(): Promise<string> {
     .single();
 
   if (created.error || !created.data) {
-    throw new Error(`Venture could not create the CSV import source: ${created.error?.message ?? "No row returned."}`);
+    throw new Error(`Venture could not create the import source: ${created.error?.message ?? "No row returned."}`);
   }
 
   return created.data.id;
@@ -781,12 +873,14 @@ async function attachSource({
   entityType,
   entityId,
   sourceId,
-  sourceUrl
+  sourceUrl,
+  importSource
 }: {
   entityType: InventoryImportEntityType;
   entityId: string;
   sourceId: string;
   sourceUrl: string;
+  importSource: string | null;
 }): Promise<void> {
   const supabase = getSupabaseAdminClient();
   const result = await supabase.from("listing_sources").insert({
@@ -796,12 +890,15 @@ async function attachSource({
     source_url: sourceUrl,
     is_primary: true,
     field_coverage: {
-      import: "CSV draft",
+      import: importSource ?? "csv_inventory_import",
       review_required: true
     },
     extracted_at: new Date().toISOString(),
     last_checked_at: null,
-    legal_notes: "Imported as link-only draft data. Verify the official source before publishing."
+    legal_notes:
+      importSource === "overture_maps"
+        ? "Imported from Overture Maps as a draft. Preserve attribution and verify current factual details before publishing."
+        : "Imported as link-only draft data. Verify the official source before publishing."
   });
 
   if (result.error) {
@@ -815,7 +912,9 @@ async function logImportedEntity({
   entityType,
   entityId,
   filename,
-  rowNumber
+  rowNumber,
+  targetArea,
+  importSource
 }: {
   admin: VentureAdmin;
   batchId: string;
@@ -823,6 +922,8 @@ async function logImportedEntity({
   entityId: string;
   filename: string;
   rowNumber: number;
+  targetArea: string | null;
+  importSource: string | null;
 }): Promise<void> {
   const supabase = getSupabaseAdminClient();
   const result = await supabase.from("audit_log").insert({
@@ -835,6 +936,8 @@ async function logImportedEntity({
       batchId,
       filename,
       rowNumber,
+      targetArea,
+      importSource,
       status: "draft",
       verificationStatus: "unverified",
       adminEmail: admin.email
@@ -855,7 +958,9 @@ async function logImportBatch({
   totalRows,
   importedRows,
   skippedRows,
-  failedRows
+  failedRows,
+  targetArea,
+  importSource
 }: {
   admin: VentureAdmin;
   batchId: string;
@@ -865,6 +970,8 @@ async function logImportBatch({
   importedRows: number;
   skippedRows: number;
   failedRows: number;
+  targetArea: string | null;
+  importSource: string | null;
 }): Promise<void> {
   const supabase = getSupabaseAdminClient();
   const result = await supabase.from("audit_log").insert({
@@ -881,6 +988,8 @@ async function logImportBatch({
       importedRows,
       skippedRows,
       failedRows,
+      targetArea,
+      importSource,
       adminEmail: admin.email
     },
     source: "admin_csv_import"
@@ -895,15 +1004,19 @@ export async function commitInventoryImport({
   admin,
   entityType,
   filename,
-  csvText
+  csvText,
+  targetArea = null,
+  importSource = "csv_inventory_import"
 }: {
   admin: VentureAdmin;
   entityType: InventoryImportEntityType;
   filename: string;
   csvText: string;
+  targetArea?: string | null;
+  importSource?: string | null;
 }): Promise<InventoryImportCommitResult> {
   const analyzedRows = await analyzeRows(entityType, csvText);
-  const sourceId = await getImportSourceId();
+  const sourceId = await getImportSourceId(importSource);
   const supabase = getSupabaseAdminClient();
   const batchId = randomUUID();
   const results: InventoryImportCommitResult["rows"] = [];
@@ -945,7 +1058,8 @@ export async function commitInventoryImport({
         entityType,
         entityId,
         sourceId,
-        sourceUrl: row.sourceUrl
+        sourceUrl: row.sourceUrl,
+        importSource
       });
 
       await logImportedEntity({
@@ -954,7 +1068,9 @@ export async function commitInventoryImport({
         entityType,
         entityId,
         filename,
-        rowNumber: row.rowNumber
+        rowNumber: row.rowNumber,
+        targetArea,
+        importSource
       });
 
       results.push({
@@ -993,7 +1109,9 @@ export async function commitInventoryImport({
     totalRows: analyzedRows.length,
     importedRows,
     skippedRows,
-    failedRows
+    failedRows,
+    targetArea,
+    importSource
   });
 
   return {
@@ -1006,6 +1124,8 @@ export async function commitInventoryImport({
     skippedRows,
     failedRows,
     rows: results,
+    targetArea,
+    importSource,
     message:
       importedRows > 0
         ? `${importedRows} ${entityType === "place" ? "place" : "event"}${importedRows === 1 ? "" : "s"} imported as drafts.`
@@ -1043,7 +1163,9 @@ export async function getInventoryImportHistory(
       totalRows: Number(value.totalRows ?? 0),
       importedRows: Number(value.importedRows ?? 0),
       skippedRows: Number(value.skippedRows ?? 0),
-      failedRows: Number(value.failedRows ?? 0)
+      failedRows: Number(value.failedRows ?? 0),
+      targetArea: cleanText(value.targetArea, 160) || null,
+      importSource: cleanText(value.importSource, 160) || null
     };
   });
 }

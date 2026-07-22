@@ -11,10 +11,31 @@ import type {
   InventoryImportEntityType,
   InventoryImportPreview
 } from "@/lib/admin/inventory-import-types";
+import {
+  INVENTORY_IMPORT_TARGET_AREAS
+} from "@/lib/admin/inventory-import-types";
 
 import styles from "./page.module.css";
 
 const MAX_CLIENT_BYTES = 750_000;
+
+const FILE_AREA_HINTS = [
+  ["exchange-district", "Exchange District"],
+  ["the-forks", "The Forks"],
+  ["osborne-village", "Osborne Village"],
+  ["wellington-crescent", "Wellington Crescent"],
+  ["st-boniface", "St. Boniface"],
+  ["university-of-manitoba-fort-garry", "University of Manitoba / Fort Garry"],
+  ["university-of-winnipeg-west-broadway", "University of Winnipeg / West Broadway"],
+  ["bridgwater", "Bridgwater"],
+  ["downtown", "Downtown"],
+  ["corydon", "Corydon"]
+] as const;
+
+function inferTargetAreaFromFilename(filename: string): string | null {
+  const normalized = filename.toLowerCase();
+  return FILE_AREA_HINTS.find(([key]) => normalized.includes(key))?.[1] ?? null;
+}
 
 function statusLabel(status: string): string {
   if (status === "ready") return "Ready";
@@ -28,6 +49,8 @@ export default function InventoryImportWorkbench() {
     useState<InventoryImportEntityType>("place");
   const [filename, setFilename] = useState("");
   const [csvText, setCsvText] = useState("");
+  const [targetArea, setTargetArea] = useState("Multiple priority areas");
+  const [importSource, setImportSource] = useState("targeted_csv");
   const [preview, setPreview] =
     useState<InventoryImportPreview | null>(null);
   const [commitResult, setCommitResult] =
@@ -85,6 +108,16 @@ export default function InventoryImportWorkbench() {
       const content = await file.text();
       setFilename(file.name);
       setCsvText(content);
+      setTargetArea(
+        inferTargetAreaFromFilename(file.name) ?? "Multiple priority areas"
+      );
+      setImportSource(
+        file.name.toLowerCase().includes("overture")
+          ? "overture_maps"
+          : entityType === "event"
+            ? "official_event_sources"
+            : "targeted_csv"
+      );
       setMessage(`${file.name} is ready for a dry-run preview.`);
     } catch {
       setMessage("The browser could not read that CSV file.");
@@ -162,7 +195,9 @@ export default function InventoryImportWorkbench() {
         body: JSON.stringify({
           entityType,
           filename,
-          csvText
+          csvText,
+          targetArea,
+          importSource
         })
       });
 
@@ -237,9 +272,57 @@ export default function InventoryImportWorkbench() {
           </button>
         </div>
 
-        <a className={styles.templateLink} href={templateHref} download>
-          Download {entityType} CSV template
-        </a>
+        <div className={styles.importMetadata}>
+          <label>
+            Target area
+            <select
+              value={targetArea}
+              onChange={(event) => setTargetArea(event.target.value)}
+            >
+              {INVENTORY_IMPORT_TARGET_AREAS.map((area) => (
+                <option value={area} key={area}>
+                  {area}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Import source
+            <select
+              value={importSource}
+              onChange={(event) => setImportSource(event.target.value)}
+            >
+              <option value="overture_maps">Overture Maps</option>
+              <option value="official_event_sources">Official event sources</option>
+              <option value="targeted_csv">Targeted research CSV</option>
+              <option value="partner_feed">Partner feed</option>
+            </select>
+          </label>
+        </div>
+
+        <div className={styles.templateActions}>
+          <a className={styles.templateLink} href={templateHref} download>
+            Download {entityType} CSV template
+          </a>
+          {entityType === "place" ? (
+            <a
+              className={styles.secondaryTemplateLink}
+              href="/templates/venture-targeted-place-import.csv"
+              download
+            >
+              Priority-area place template
+            </a>
+          ) : (
+            <a
+              className={styles.secondaryTemplateLink}
+              href="/templates/venture-targeted-event-import.csv"
+              download
+            >
+              Priority-area event template
+            </a>
+          )}
+        </div>
 
         <label className={styles.filePicker}>
           <span>Choose {entityType} CSV</span>
@@ -347,6 +430,7 @@ export default function InventoryImportWorkbench() {
           <p>
             Batch {commitResult.batchId.slice(0, 8)} imported {commitResult.importedRows},
             skipped {commitResult.skippedRows}, and failed {commitResult.failedRows}.
+            {commitResult.targetArea ? ` Target: ${commitResult.targetArea}.` : ""}
           </p>
           <div className={styles.resultActions}>
             <Link href="/admin/data-health">Open repair queue</Link>
