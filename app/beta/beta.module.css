@@ -1,0 +1,351 @@
+.page {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  padding: 12px 14px 122px;
+  color: #241f20;
+  background:
+    radial-gradient(circle at 10% 2%, rgba(255, 207, 0, 0.18), transparent 25%),
+    radial-gradient(circle at 94% 18%, rgba(109, 40, 217, 0.09), transparent 24%);
+}
+
+.hero,
+.introCard,
+.feedbackSection,
+.trustCard {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 2px solid #241f20;
+  border-radius: 24px;
+  background: #fffdf8;
+  box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.12);
+}
+
+.hero {
+  display: grid;
+  gap: 16px;
+  padding: 23px 19px 20px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 215, 0.96));
+}
+
+.heroGlowOne,
+.heroGlowTwo {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.heroGlowOne {
+  top: -42px;
+  right: -35px;
+  width: 135px;
+  height: 135px;
+  border: 22px solid rgba(255, 207, 0, 0.26);
+}
+
+.heroGlowTwo {
+  right: 42px;
+  bottom: -55px;
+  width: 110px;
+  height: 110px;
+  background: rgba(208, 16, 19, 0.08);
+}
+
+.badge,
+.eyebrow {
+  position: relative;
+  z-index: 1;
+  color: #c51013;
+  font-size: 0.67rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1.5px solid #241f20;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.badge span {
+  color: #19a15f;
+  font-size: 0.72rem;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.82); }
+}
+
+.hero h1,
+.introCard h2,
+.sectionHeading h2,
+.trustCard h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-weight: 950;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.hero h1 {
+  max-width: 12ch;
+  font-size: clamp(2.45rem, 11vw, 3.7rem);
+  line-height: 0.93;
+}
+
+.hero > p,
+.introCard > p,
+.sectionHeading > p,
+.trustCard p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #655b5d;
+  font-size: 0.91rem;
+  line-height: 1.58;
+}
+
+.heroActions {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+
+.primaryAction,
+.secondaryAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  border: 2px solid #241f20;
+  border-radius: 16px;
+  color: #241f20;
+  font-size: 0.84rem;
+  font-weight: 950;
+  text-decoration: none;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.primaryAction {
+  justify-content: space-between;
+  padding: 0 16px;
+  background: #ffcf00;
+  box-shadow: 4px 4px 0 #d01013;
+}
+
+.primaryAction span {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border: 1.5px solid #241f20;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.secondaryAction {
+  background: #ffffff;
+}
+
+.primaryAction:hover,
+.secondaryAction:hover {
+  transform: translateY(-2px);
+}
+
+.heroFacts {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.heroFacts span {
+  padding: 7px 10px;
+  border: 1px solid rgba(36, 31, 32, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #5f5657;
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+.introCard,
+.feedbackSection,
+.trustCard {
+  padding: 19px;
+}
+
+.introCard {
+  display: grid;
+  gap: 8px;
+  background: linear-gradient(145deg, #f7f1ff, #fff);
+}
+
+.introCard h2,
+.sectionHeading h2,
+.trustCard h2 {
+  font-size: clamp(1.55rem, 7vw, 2.15rem);
+  line-height: 1.02;
+}
+
+.feedbackSection {
+  display: grid;
+  gap: 16px;
+}
+
+.sectionHeading {
+  display: grid;
+  gap: 8px;
+}
+
+.signalGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.signalCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 13px;
+  border: 1.5px solid #d8ccc5;
+  border-radius: 17px;
+  background: #ffffff;
+}
+
+.signalCard:nth-child(1) { background: #fff2f3; }
+.signalCard:nth-child(2) { background: #f5f0ff; }
+.signalCard:nth-child(3) { background: #eafaf2; }
+.signalCard:nth-child(4) { background: #fff8d8; }
+
+.signalIcon,
+.trustIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1.5px solid #241f20;
+  background: #ffffff;
+}
+
+.signalIcon {
+  width: 43px;
+  height: 43px;
+  border-radius: 14px;
+}
+
+.signalIcon svg,
+.trustIcon svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.signalCard h3 {
+  margin: 1px 0 4px;
+  font-size: 0.92rem;
+  line-height: 1.15;
+}
+
+.signalCard p {
+  margin: 0;
+  color: #6b6162;
+  font-size: 0.74rem;
+  line-height: 1.47;
+}
+
+.trustCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 13px;
+  background: linear-gradient(145deg, #ebfbf3, #fff);
+}
+
+.trustIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  color: #148552;
+}
+
+.trustCard > div:last-child {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.trustLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trustLinks a {
+  padding: 7px 10px;
+  border: 1px solid rgba(36, 31, 32, 0.2);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #241f20;
+  font-size: 0.7rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+@media (min-width: 430px) {
+  .heroActions {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+
+  .signalGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 350px) {
+  .page {
+    padding-inline: 10px;
+  }
+
+  .hero,
+  .introCard,
+  .feedbackSection,
+  .trustCard {
+    border-radius: 20px;
+  }
+
+  .trustCard {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge span,
+  .primaryAction,
+  .secondaryAction {
+    animation: none;
+    transition: none;
+  }
+}

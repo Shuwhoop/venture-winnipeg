@@ -71,6 +71,31 @@ export function BetaFeedback() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open]);
 
+  useEffect(() => {
+    function handleExternalOpen() {
+      setOpen(true);
+      setStatus("idle");
+      setResponseMessage("");
+
+      trackBetaEvent({
+        eventName: "feedback_opened",
+        pagePath: pathname
+      });
+    }
+
+    window.addEventListener(
+      "venture:open-feedback",
+      handleExternalOpen
+    );
+
+    return () => {
+      window.removeEventListener(
+        "venture:open-feedback",
+        handleExternalOpen
+      );
+    };
+  }, [pathname]);
+
   if (isAdmin) {
     return null;
   }
