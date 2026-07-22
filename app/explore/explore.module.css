@@ -1156,3 +1156,133 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   Venture map reliability patch v0.1
+   ========================================================= */
+
+.mapShell {
+  isolation: isolate;
+}
+
+.cityMap {
+  min-width: 0;
+  min-height: 100%;
+  background:
+    linear-gradient(135deg, #edf7ff 0%, #efe9ff 55%, #fff8d8 100%);
+}
+
+.cityMap :global(.maplibregl-canvas),
+.cityMap :global(.maplibregl-canvas-container) {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.cityMap :global(.maplibregl-ctrl-top-right) {
+  top: 10px;
+  right: 10px;
+}
+
+.cityMap :global(.maplibregl-ctrl-group) {
+  overflow: hidden;
+  border: 1.5px solid #241f20;
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 rgba(255, 207, 0, 0.85);
+}
+
+.cityMap :global(.maplibregl-ctrl-attrib) {
+  max-width: calc(100% - 24px);
+  border-radius: 9px 0 0 0;
+  font-size: 9px;
+}
+
+.mapStatus {
+  position: absolute;
+  z-index: 9;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 7px;
+  padding: 28px;
+  background:
+    linear-gradient(135deg, rgba(237, 247, 255, 0.97), rgba(239, 233, 255, 0.97));
+  color: #241f20;
+  text-align: center;
+}
+
+.mapStatus > span {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 2px solid #241f20;
+  border-radius: 18px;
+  background: #ffcf00;
+  box-shadow: 3px 3px 0 #d01013;
+  font-size: 1.45rem;
+  animation: ventureMapPulse 1.35s ease-in-out infinite;
+}
+
+.mapStatus strong {
+  font-size: 0.96rem;
+}
+
+.mapStatus small {
+  max-width: 31ch;
+  color: #675d5e;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.mapStatus button {
+  min-height: 42px;
+  margin-top: 4px;
+  padding: 9px 14px;
+  border: 2px solid #241f20;
+  border-radius: 13px;
+  background: #d01013;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 900;
+  box-shadow: 3px 3px 0 #ffcf00;
+  cursor: pointer;
+}
+
+.mapStatusError > span {
+  background: #ffffff;
+}
+
+.fitMapButton:disabled {
+  cursor: wait;
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+@keyframes ventureMapPulse {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.03);
+  }
+}
+
+@media (max-width: 420px) {
+  .mapStatus {
+    padding: 20px;
+  }
+
+  .mapStatus > span {
+    width: 46px;
+    height: 46px;
+    font-size: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapStatus > span {
+    animation: none;
+  }
+}

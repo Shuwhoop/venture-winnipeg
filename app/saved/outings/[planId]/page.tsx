@@ -13,6 +13,10 @@ import {
 } from "next/navigation";
 
 import {
+  OutingDetailExperience
+} from "@/components/outing-detail-experience";
+
+import {
   getSavedOutings,
   removeSavedOuting,
   type GeneratedOutingPlan
@@ -22,68 +26,6 @@ type PageStatus =
   | "loading"
   | "ready"
   | "missing";
-
-function formatPlanDate(
-  dateValue: string
-): string {
-  const [
-    year,
-    month,
-    day
-  ] = dateValue
-    .split("-")
-    .map(Number);
-
-  if (
-    !year ||
-    !month ||
-    !day
-  ) {
-    return dateValue;
-  }
-
-  return new Intl.DateTimeFormat(
-    "en-CA",
-    {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-      timeZone:
-        "America/Winnipeg"
-    }
-  ).format(
-    new Date(
-      Date.UTC(
-        year,
-        month - 1,
-        day,
-        12
-      )
-    )
-  );
-}
-
-function formatCost(
-  value: number | null
-): string {
-  if (value === null) {
-    return "Price not confirmed";
-  }
-
-  if (value === 0) {
-    return "Free";
-  }
-
-  return new Intl.NumberFormat(
-    "en-CA",
-    {
-      style: "currency",
-      currency: "CAD",
-      maximumFractionDigits: 0
-    }
-  ).format(value);
-}
 
 export default function SavedOutingPage() {
   const params = useParams();
@@ -148,11 +90,15 @@ export default function SavedOutingPage() {
   if (status === "loading") {
     return (
       <section className="empty-state">
-        <div>✦</div>
+        <div>✨</div>
 
         <h1>
           Opening your outing
         </h1>
+
+        <p>
+          Pulling your saved route back onto the map.
+        </p>
       </section>
     );
   }
@@ -170,8 +116,7 @@ export default function SavedOutingPage() {
         </h1>
 
         <p>
-          It may have been removed or
-          saved in a different browser.
+          It may have been removed or saved in a different browser.
         </p>
 
         <Link href="/saved">
@@ -182,206 +127,26 @@ export default function SavedOutingPage() {
   }
 
   return (
-    <main className="saved-outing-detail-page">
-      <Link
-        className="saved-outing-back-link"
-        href="/saved"
-      >
-        ← Back to Saved
-      </Link>
+    <OutingDetailExperience
+      plan={plan}
+      eyebrow="SAVED VENTURE ROUTE"
+      intro="Your route is back, map and all. Check the order, timing, and each stop before heading out."
+      backHref="/saved"
+      backLabel="Back to Saved"
+      actions={
+        <>
+          <Link href="/build-outing">
+            Build another outing
+          </Link>
 
-      <header className="saved-outing-detail-heading">
-        <span>SAVED OUTING</span>
-
-        <h1>{plan.title}</h1>
-
-        <p>
-          {formatPlanDate(
-            plan.date
-          )}
-        </p>
-      </header>
-
-      <section className="outing-plan-summary">
-        <div>
-          <span>START</span>
-
-          <strong>
-            {plan.requestedStartTime}
-          </strong>
-        </div>
-
-        <div>
-          <span>LENGTH</span>
-
-          <strong>
-            {plan.requestedDuration}
-          </strong>
-        </div>
-
-        <div>
-          <span>TRAVEL</span>
-
-          <strong>
-            {plan.transportation}
-          </strong>
-        </div>
-
-        <div>
-          <span>STOPS</span>
-
-          <strong>
-            {plan.stops.length}
-          </strong>
-        </div>
-
-        <div>
-          <span>
-            ESTIMATED TOTAL
-          </span>
-
-          <strong>
-            {formatCost(
-              plan.estimatedTotalCad
-            )}
-          </strong>
-        </div>
-      </section>
-
-      {plan.warnings.length >
-      0 ? (
-        <section className="outing-warning-list">
-          {plan.warnings.map(
-            (warning) => (
-              <p key={warning}>
-                <span
-                  aria-hidden="true"
-                >
-                  !
-                </span>
-
-                {warning}
-              </p>
-            )
-          )}
-        </section>
-      ) : null}
-
-      <section className="outing-timeline">
-        <div className="section-heading">
-          <div>
-            <span>YOUR PLAN</span>
-
-            <h2>
-              {plan.stops.length}{" "}
-              {plan.stops.length === 1
-                ? "stop"
-                : "stops"}
-            </h2>
-          </div>
-        </div>
-
-        {plan.stops.map(
-          (stop) => (
-            <div
-              className="outing-stop-wrapper"
-              key={`${stop.listing.type}-${stop.listing.id}`}
-            >
-              {stop.travelFromPreviousMinutes !==
-              null ? (
-                <div className="outing-travel-row">
-                  <span
-                    aria-hidden="true"
-                  >
-                    ↓
-                  </span>
-
-                  <p>
-                    About{" "}
-                    {
-                      stop.travelFromPreviousMinutes
-                    }{" "}
-                    minutes by{" "}
-                    {plan.transportation.toLowerCase()}
-                  </p>
-                </div>
-              ) : null}
-
-              <article className="outing-stop-card">
-                <div className="outing-stop-order">
-                  {stop.order}
-                </div>
-
-                <div className="outing-stop-content">
-                  <div className="outing-stop-topline">
-                    <span>
-                      {stop.startTime}–
-                      {stop.endTime}
-                    </span>
-
-                    <small>
-                      {stop.listing.type ===
-                      "event"
-                        ? "EVENT"
-                        : "PLACE"}
-                    </small>
-                  </div>
-
-                  <h2>
-                    {stop.listing.name}
-                  </h2>
-
-                  <p className="outing-stop-subtitle">
-                    {
-                      stop.listing
-                        .subtitle
-                    }
-                  </p>
-
-                  <p className="outing-stop-reason">
-                    {stop.reason}
-                  </p>
-
-                  <div className="outing-stop-details">
-                    <span>
-                      {
-                        stop.listing
-                          .neighbourhood
-                      }
-                    </span>
-
-                    <span>
-                      {formatCost(
-                        stop.estimatedCostCad
-                      )}
-                    </span>
-                  </div>
-
-                  <Link
-                    className="outing-stop-link"
-                    href={`/listings/${stop.listing.slug}`}
-                  >
-                    View listing
-                  </Link>
-                </div>
-              </article>
-            </div>
-          )
-        )}
-      </section>
-
-      <div className="saved-outing-detail-actions">
-        <Link href="/build-outing">
-          Build another outing
-        </Link>
-
-        <button
-          type="button"
-          onClick={handleRemove}
-        >
-          Remove saved outing
-        </button>
-      </div>
-    </main>
+          <button
+            type="button"
+            onClick={handleRemove}
+          >
+            Remove saved outing
+          </button>
+        </>
+      }
+    />
   );
 }

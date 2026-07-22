@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import {
-  getVentureMapStyle
+  getVentureMapConfiguration
 } from "@/lib/venture-map-style";
 
 import maplibregl from "maplibre-gl";
@@ -36,6 +36,11 @@ type MarkerRecord = {
   popup: maplibregl.Popup;
   listing: Listing;
 };
+
+type MapStatus =
+  | "loading"
+  | "ready"
+  | "error";
 
 const WINNIPEG_CENTER: [
   number,
@@ -173,6 +178,18 @@ export function CityMap({
     setMappedCount
   ] = useState(0);
 
+  const [
+    mapStatus,
+    setMapStatus
+  ] = useState<MapStatus>(
+    "loading"
+  );
+
+  const [
+    retryVersion,
+    setRetryVersion
+  ] = useState(0);
+
   const fitAll =
     useCallback(() => {
       const map = mapRef.current;
@@ -181,6 +198,8 @@ export function CityMap({
       if (!map) {
         return;
       }
+
+      map.resize();
 
       if (!bounds || bounds.isEmpty()) {
         map.easeTo({
@@ -193,38 +212,41 @@ export function CityMap({
 
       map.fitBounds(bounds, {
         padding: {
-          top: 64,
-          right: 42,
-          bottom: 74,
-          left: 42
+          top: 72,
+          right: 46,
+          bottom: 84,
+          left: 46
         },
-        maxZoom: 13,
+        maxZoom: 13.5,
         duration: 550
       });
     }, []);
 
   useEffect(() => {
-    if (
-      !mapContainerRef.current ||
-      mapRef.current
-    ) {
+    const container =
+      mapContainerRef.current;
+
+    if (!container) {
       return;
     }
 
-    const mapStyle =
-      getVentureMapStyle();
+    setMapStatus("loading");
+
+    const mapConfiguration =
+      getVentureMapConfiguration();
 
     const map =
       new maplibregl.Map({
-        container:
-          mapContainerRef.current,
-        style: mapStyle,
+        container,
+        style:
+          mapConfiguration.style,
         center: WINNIPEG_CENTER,
         zoom: 10.5,
         scrollZoom: false,
         dragRotate: false,
         pitchWithRotate: false,
-        cooperativeGestures: true
+        cooperativeGestures: true,
+        attributionControl: false
       });
 
     map.addControl(
@@ -236,14 +258,72 @@ export function CityMap({
       "top-right"
     );
 
+    map.addControl(
+      new maplibregl.AttributionControl({
+        compact: true
+      }),
+      "bottom-right"
+    );
+
     mapRef.current = map;
 
+    let mapReady = false;
+
+    const loadTimeout =
+      window.setTimeout(() => {
+        if (!mapReady) {
+          setMapStatus("error");
+        }
+      }, 12000);
+
+    const handleLoad = () => {
+      mapReady = true;
+      window.clearTimeout(
+        loadTimeout
+      );
+      map.resize();
+      setMapStatus("ready");
+    };
+
+    const handleError = (
+      event: maplibregl.ErrorEvent
+    ) => {
+      console.error(
+        "Venture Explore map error",
+        event.error
+      );
+
+      if (!mapReady) {
+        setMapStatus("error");
+      }
+    };
+
+    map.on("load", handleLoad);
+    map.on("error", handleError);
+
+    const resizeObserver =
+      new ResizeObserver(() => {
+        map.resize();
+      });
+
+    resizeObserver.observe(container);
+
+    const resizeFrame =
+      window.requestAnimationFrame(
+        () => map.resize()
+      );
+
     return () => {
+      window.clearTimeout(
+        loadTimeout
+      );
+      window.cancelAnimationFrame(
+        resizeFrame
+      );
+      resizeObserver.disconnect();
+
       markersRef.current.forEach(
-        ({
-          marker,
-          popup
-        }) => {
+        ({ marker, popup }) => {
           popup.remove();
           marker.remove();
         }
@@ -251,25 +331,34 @@ export function CityMap({
 
       markersRef.current.clear();
 
+      map.off("load", handleLoad);
+      map.off("error", handleError);
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [retryVersion]);
 
   useEffect(() => {
     if (!isVisible) {
       return;
     }
 
-    const frame =
+    const firstFrame =
       window.requestAnimationFrame(() => {
         mapRef.current?.resize();
+
+        window.setTimeout(() => {
+          mapRef.current?.resize();
+          fitAll();
+        }, 120);
       });
 
     return () => {
-      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(
+        firstFrame
+      );
     };
-  }, [isVisible]);
+  }, [fitAll, isVisible]);
 
   useEffect(() => {
     const currentMap =
@@ -284,10 +373,7 @@ export function CityMap({
 
     function displayMarkers() {
       markersRef.current.forEach(
-        ({
-          marker,
-          popup
-        }) => {
+        ({ marker, popup }) => {
           popup.remove();
           marker.remove();
         }
@@ -390,7 +476,10 @@ export function CityMap({
           : null;
 
       setMappedCount(markerCount);
-      fitAll();
+      window.setTimeout(
+        fitAll,
+        80
+      );
     }
 
     if (activeMap.loaded()) {
@@ -411,7 +500,8 @@ export function CityMap({
   }, [
     fitAll,
     listings,
-    onSelectListing
+    onSelectListing,
+    retryVersion
   ]);
 
   useEffect(() => {
@@ -427,10 +517,7 @@ export function CityMap({
 
     function updateSelection() {
       markersRef.current.forEach(
-        ({
-          marker,
-          popup
-        }) => {
+        ({ marker, popup }) => {
           marker
             .getElement()
             .classList.remove(
@@ -454,10 +541,8 @@ export function CityMap({
         return;
       }
 
-      const {
-        marker,
-        popup
-      } = selectedRecord;
+      const { marker, popup } =
+        selectedRecord;
 
       marker
         .getElement()
@@ -500,7 +585,8 @@ export function CityMap({
   }, [
     selectedListingKey,
     selectionVersion,
-    listings
+    listings,
+    retryVersion
   ]);
 
   return (
@@ -511,6 +597,53 @@ export function CityMap({
         role="region"
         aria-label="Map of Winnipeg listings"
       />
+
+      {mapStatus !== "ready" ? (
+        <div
+          className={`${styles.mapStatus} ${
+            mapStatus === "error"
+              ? styles.mapStatusError
+              : ""
+          }`}
+          role={
+            mapStatus === "error"
+              ? "alert"
+              : "status"
+          }
+        >
+          <span aria-hidden="true">
+            {mapStatus === "error"
+              ? "🗺"
+              : "⌖"}
+          </span>
+
+          <strong>
+            {mapStatus === "error"
+              ? "The map could not load"
+              : "Loading Winnipeg map"}
+          </strong>
+
+          <small>
+            {mapStatus === "error"
+              ? "Check your connection, then try again. The listings below still work."
+              : "Bringing the streets and listings into view."}
+          </small>
+
+          {mapStatus === "error" ? (
+            <button
+              type="button"
+              onClick={() =>
+                setRetryVersion(
+                  (current) =>
+                    current + 1
+                )
+              }
+            >
+              Retry map
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className={styles.mapLegend}>
         <span>
@@ -528,6 +661,7 @@ export function CityMap({
         type="button"
         className={styles.fitMapButton}
         onClick={fitAll}
+        disabled={mapStatus !== "ready"}
       >
         <span aria-hidden="true">⌗</span>
         Fit all

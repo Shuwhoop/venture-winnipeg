@@ -3,7 +3,8 @@
 import {
   useEffect,
   useMemo,
-  useState
+  useState,
+  type CSSProperties
 } from "react";
 
 import {
@@ -12,7 +13,9 @@ import {
 
 import NeighbourhoodPicker from "@/components/neighbourhood-picker";
 
-import SubmitListingEntry from "@/components/submit-listing-entry/submit-listing-entry";
+import { OutingResultTransition } from "@/components/outing-result-transition";
+
+import styles from "./build-outing-experience.module.css";
 
 import {
   defaultPreferences,
@@ -25,6 +28,63 @@ const OUTING_DRAFT_KEY =
   "venture:outing-draft:v1";
 
 const TOTAL_STEPS = 9;
+
+const STEP_VISUALS = [
+  {
+    icon: "👤",
+    label: "Choose your crew",
+    accent: "#d01013",
+    soft: "#ffd9dc"
+  },
+  {
+    icon: "🧩",
+    label: "Pick a build style",
+    accent: "#6d28d9",
+    soft: "#eee3ff"
+  },
+  {
+    icon: "🗓️",
+    label: "Set the time",
+    accent: "#dc7a00",
+    soft: "#fff0c4"
+  },
+  {
+    icon: "🗺️",
+    label: "Shape the route",
+    accent: "#0f7b67",
+    soft: "#ddf7ef"
+  },
+  {
+    icon: "🎭",
+    label: "Choose the mood",
+    accent: "#b62572",
+    soft: "#ffe1f0"
+  },
+  {
+    icon: "✨",
+    label: "Add your interests",
+    accent: "#1f65a8",
+    soft: "#dff1ff"
+  },
+  {
+    icon: "💸",
+    label: "Set the budget",
+    accent: "#9a5b00",
+    soft: "#fff0bc"
+  },
+  {
+    icon: "🚌",
+    label: "Pick the area",
+    accent: "#39791d",
+    soft: "#e8f7dc"
+  },
+  {
+    icon: "🚀",
+    label: "Review and launch",
+    accent: "#d01013",
+    soft: "#fff0b9"
+  }
+] as const;
 
 type PlanningMode =
   | "solo"
@@ -772,6 +832,11 @@ export default function BuildOutingPage() {
   ] = useState(0);
 
   const [
+    isLaunchingResults,
+    setIsLaunchingResults
+  ] = useState(false);
+
+  const [
     planningMode,
     setPlanningMode
   ] =
@@ -1251,6 +1316,9 @@ export default function BuildOutingPage() {
       buildMethod
     );
 
+  const stepVisual =
+    STEP_VISUALS[currentStep];
+
   const progress =
     ((currentStep + 1) /
       TOTAL_STEPS) *
@@ -1508,13 +1576,34 @@ export default function BuildOutingPage() {
       JSON.stringify(draft)
     );
 
-    window.location.assign(
-      "/build-outing/results"
+    setIsLaunchingResults(true);
+
+    const prefersReducedMotion =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+    window.setTimeout(
+      () => {
+        window.location.assign(
+          "/build-outing/results"
+        );
+      },
+      prefersReducedMotion
+        ? 220
+        : 1800
     );
   }
 
   return (
-    <main className="outing-wizard outing-wizard-v3" data-step={currentStep}>
+    <main
+      className={`outing-wizard outing-wizard-v3 ${styles.wizardV4}`}
+      data-step={currentStep}
+      style={{
+        "--outing-accent": stepVisual.accent,
+        "--outing-soft": stepVisual.soft
+      } as CSSProperties}
+    >
       <div className="outing-wizard-progress">
         <div>
           <span>
@@ -1538,6 +1627,16 @@ export default function BuildOutingPage() {
 
       <section className="outing-wizard-screen">
         <header className="outing-wizard-heading">
+          <div className={styles.stepBadge}>
+            <span aria-hidden="true">
+              {stepVisual.icon}
+            </span>
+
+            <small>
+              {stepVisual.label}
+            </small>
+          </div>
+
           <span>
             {content.eyebrow}
           </span>
@@ -1549,6 +1648,24 @@ export default function BuildOutingPage() {
           <p>
             {content.description}
           </p>
+
+          <div
+            className={styles.stepDots}
+            aria-label={`Step ${currentStep + 1} of ${TOTAL_STEPS}`}
+          >
+            {Array.from({
+              length: TOTAL_STEPS
+            }).map((_, index) => (
+              <i
+                key={index}
+                className={
+                  index <= currentStep
+                    ? styles.completeDot
+                    : ""
+                }
+              />
+            ))}
+          </div>
         </header>
 
         <div
@@ -2948,13 +3065,18 @@ export default function BuildOutingPage() {
         <button
           type="button"
           className="outing-wizard-next"
-          disabled={!canContinue}
+          disabled={
+            !canContinue ||
+            isLaunchingResults
+          }
           onClick={goForward}
         >
-          {currentStep ===
-          TOTAL_STEPS - 1
-            ? "Create my outing"
-            : "Continue"}
+          {isLaunchingResults
+            ? "Building your route"
+            : currentStep ===
+                TOTAL_STEPS - 1
+              ? "Create my outing"
+              : "Continue"}
 
           <span aria-hidden="true">
             →
@@ -2962,7 +3084,9 @@ export default function BuildOutingPage() {
         </button>
       </div>
 
-      <SubmitListingEntry placement="home" />
+      <OutingResultTransition
+        active={isLaunchingResults}
+      />
     </main>
   );
 }

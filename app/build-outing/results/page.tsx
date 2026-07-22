@@ -303,6 +303,40 @@ function formatMixSummary(
     : "Flexible route";
 }
 
+function getRecipeItems(
+  mix:
+    | StopMix
+    | undefined
+): {
+  key: string;
+  icon: string;
+  label: string;
+}[] {
+  if (!mix) {
+    return [
+      { key: "flexible", icon: "✦", label: "Flexible" }
+    ];
+  }
+
+  const items: { key: string; icon: string; label: string }[] = [];
+
+  for (let index = 0; index < mix.food; index += 1) {
+    items.push({ key: `food-${index}`, icon: "🍽", label: "Food" });
+  }
+
+  for (let index = 0; index < mix.events; index += 1) {
+    items.push({ key: `event-${index}`, icon: "🎟", label: "Event" });
+  }
+
+  for (let index = 0; index < mix.drinks; index += 1) {
+    items.push({ key: `drinks-${index}`, icon: "🍸", label: "Drinks" });
+  }
+
+  return items.length > 0
+    ? items
+    : [{ key: "flexible", icon: "✦", label: "Flexible" }];
+}
+
 function countRequestedStops(
   mix:
     | StopMix
@@ -555,6 +589,11 @@ export default function OutingResultsPage() {
     plan?.actualStopCount ??
     plan?.stops.length ??
     0;
+
+  const recipeItems =
+    getRecipeItems(
+      plan?.actualMix
+    );
 
   const missingStopCount =
     plan?.missingStopCount ??
@@ -1488,29 +1527,37 @@ export default function OutingResultsPage() {
               plan={plan}
             />
 
-            <div className="outing-map-caption-card">
-              <span>
-                YOUR ROUTE RECIPE
-              </span>
+            <div className={styles.routeRecipeCard}>
+              <div className={styles.routeRecipeCopy}>
+                <span>TONIGHT&apos;S ROUTE RECIPE</span>
 
-              <strong>
-                {formatMixSummary(
-                  plan.actualMix
-                )}
-              </strong>
+                <strong>
+                  {formatMixSummary(plan.actualMix)}
+                </strong>
 
-              <small>
-                {planStatus ===
-                "partial"
-                  ? `${actualStopCount} of ${requestedStopCount} requested stops fit the current window`
-                  : plan.anchorListingName
-                    ? `Anchored by ${plan.anchorListingName}`
-                    : `${actualStopCount} verified ${
-                        actualStopCount === 1
-                          ? "stop"
-                          : "stops"
-                      } connected in itinerary order`}
-              </small>
+                <small>
+                  {planStatus === "partial"
+                    ? `${actualStopCount} of ${requestedStopCount} requested stops fit the current window`
+                    : plan.anchorListingName
+                      ? `Built around ${plan.anchorListingName}`
+                      : `${actualStopCount} verified ${actualStopCount === 1 ? "stop" : "stops"} connected in itinerary order`}
+                </small>
+              </div>
+
+              <div
+                className={styles.routeRecipeIcons}
+                aria-label={formatMixSummary(plan.actualMix)}
+              >
+                {recipeItems.map((item, index) => (
+                  <span
+                    key={item.key}
+                    title={item.label}
+                    style={{ animationDelay: `${index * 90}ms` }}
+                  >
+                    {item.icon}
+                  </span>
+                ))}
+              </div>
             </div>
           </section>
 
@@ -1648,71 +1695,52 @@ export default function OutingResultsPage() {
             </p>
           ) : null}
 
-          <section className="outing-plan-summary outing-plan-summary-v3">
-            <div>
-              <span><i aria-hidden="true">📅</i> DATE</span>
-              <strong>
-                {formatPlanDate(
-                  plan.date
-                )}
-              </strong>
+          <section className={styles.snapshotSection}>
+            <div className={styles.snapshotHeading}>
+              <span>ADVENTURE SNAPSHOT</span>
+              <h2>The night, at a glance</h2>
+              <p>Everything Venture used to shape the route.</p>
             </div>
 
-            <div>
-              <span><i aria-hidden="true">🕒</i> START</span>
-              <strong>
-                {plan.requestedStartTime}
-              </strong>
-            </div>
-
-            <div>
-              <span><i aria-hidden="true">👥</i> PEOPLE</span>
-              <strong>
-                {partySize}
-              </strong>
-            </div>
-
-            <div>
-              <span><i aria-hidden="true">⌛</i> LENGTH</span>
-              <strong>
-                {plan.requestedDuration}
-              </strong>
-            </div>
-
-            <div>
-              <span><i aria-hidden="true">🧭</i> TRAVEL</span>
-              <strong>
-                {plan.transportation}
-              </strong>
-              <small>
-                Max {maxTravelMinutes} min
-                per leg
-              </small>
-            </div>
-
-            <div>
-              <span>
-                <i aria-hidden="true">💵</i> PER PERSON
-              </span>
-              <strong>
-                {formatCost(
-                  plan.estimatedTotalCad
-                )}
-              </strong>
-            </div>
-
-            {partySize > 1 ? (
-              <div>
-                <span>
-                  <i aria-hidden="true">🧾</i> GROUP ESTIMATE
-                </span>
-                <strong>
-                  {formatCost(
-                    estimatedGroupTotal
-                  )}
-                </strong>
+            <div className="outing-plan-summary outing-plan-summary-v3">
+              <div className={`${styles.statCard} ${styles.dateCard}`}>
+                <span><i className={styles.statIcon} aria-hidden="true">📅</i> DATE</span>
+                <strong>{formatPlanDate(plan.date)}</strong>
               </div>
-            ) : null}
+
+              <div className={`${styles.statCard} ${styles.startCard}`}>
+                <span><i className={styles.statIcon} aria-hidden="true">🕒</i> START</span>
+                <strong>{plan.requestedStartTime}</strong>
+              </div>
+
+              <div className={`${styles.statCard} ${styles.peopleCard}`}>
+                <span><i className={styles.statIcon} aria-hidden="true">👥</i> PEOPLE</span>
+                <strong>{partySize}</strong>
+              </div>
+
+              <div className={`${styles.statCard} ${styles.lengthCard}`}>
+                <span><i className={styles.statIcon} aria-hidden="true">⌛</i> LENGTH</span>
+                <strong>{plan.requestedDuration}</strong>
+              </div>
+
+              <div className={`${styles.statCard} ${styles.travelCard}`}>
+                <span><i className={styles.statIcon} aria-hidden="true">🧭</i> TRAVEL</span>
+                <strong>{plan.transportation}</strong>
+                <small>Max {maxTravelMinutes} min per leg</small>
+              </div>
+
+              <div className={`${styles.statCard} ${styles.priceCard}`}>
+                <span><i className={styles.statIcon} aria-hidden="true">💵</i> PER PERSON</span>
+                <strong>{formatCost(plan.estimatedTotalCad)}</strong>
+              </div>
+
+              {partySize > 1 ? (
+                <div className={`${styles.statCard} ${styles.groupCard}`}>
+                  <span><i className={styles.statIcon} aria-hidden="true">🧾</i> GROUP ESTIMATE</span>
+                  <strong>{formatCost(estimatedGroupTotal)}</strong>
+                </div>
+              ) : null}
+            </div>
           </section>
 
           <section className="outing-add-stop-panel">

@@ -1,0 +1,474 @@
+.wizardV4 {
+  --outing-accent: #d01013;
+  --outing-soft: #ffd9dc;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  background:
+    radial-gradient(circle at 8% 5%, color-mix(in srgb, var(--outing-soft) 78%, transparent), transparent 24%),
+    radial-gradient(circle at 92% 24%, rgba(255, 207, 0, 0.16), transparent 22%),
+    linear-gradient(180deg, #fffdf8 0%, #fff8f2 100%);
+}
+
+.wizardV4,
+.wizardV4 * {
+  box-sizing: border-box;
+}
+
+.wizardV4 :global(.outing-wizard-progress) {
+  width: calc(100% - 24px);
+  margin: 12px auto 0;
+  border: 2px solid #241f20;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.11);
+}
+
+.wizardV4 :global(.outing-wizard-progress-track span) {
+  background: linear-gradient(90deg, var(--outing-accent), #ffcf00);
+}
+
+.wizardV4 :global(.outing-wizard-screen) {
+  width: 100%;
+  padding: 14px 12px 24px;
+}
+
+.wizardV4 :global(.outing-wizard-heading) {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 17px;
+  overflow: hidden;
+  border: 2px solid #241f20;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 93% 15%, color-mix(in srgb, var(--outing-soft) 78%, white), transparent 24%),
+    linear-gradient(145deg, #ffffff 0%, #fff8ef 100%);
+  box-shadow: 5px 5px 0 #ffcf00;
+}
+
+.wizardV4 :global(.outing-wizard-heading)::after {
+  right: -24px;
+  bottom: -32px;
+  width: 104px;
+  height: 104px;
+  border-color: color-mix(in srgb, var(--outing-accent) 13%, transparent);
+}
+
+.stepBadge {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 10px 6px 6px;
+  border: 1.5px solid #241f20;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 2px 2px 0 color-mix(in srgb, var(--outing-accent) 25%, transparent);
+}
+
+.stepBadge > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 1.5px solid #241f20;
+  border-radius: 999px;
+  background: var(--outing-soft);
+  font-size: 1rem;
+}
+
+.stepBadge small {
+  min-width: 0;
+  color: #443a3c;
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.wizardV4 :global(.outing-wizard-heading > span) {
+  position: relative;
+  z-index: 2;
+  color: var(--outing-accent);
+}
+
+.wizardV4 :global(.outing-wizard-heading h1) {
+  position: relative;
+  z-index: 2;
+  max-width: 13ch;
+  margin: 0;
+  color: #241f20;
+  font-size: clamp(2rem, 9.4vw, 2.9rem);
+  line-height: 0.96;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.wizardV4 :global(.outing-wizard-heading p) {
+  position: relative;
+  z-index: 2;
+  max-width: 40ch;
+  margin: 0;
+  color: #665c5e;
+  font-size: 0.79rem;
+  line-height: 1.48;
+}
+
+.stepDots {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.stepDots i {
+  height: 5px;
+  border-radius: 999px;
+  background: #e8ddd7;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.stepDots i.completeDot {
+  background: linear-gradient(90deg, var(--outing-accent), #ffcf00);
+  transform: scaleY(1.25);
+}
+
+.wizardV4 :global(.outing-wizard-content) {
+  width: 100%;
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.wizardV4 :global(.mode-choice-stage),
+.wizardV4 :global(.outing-build-method-grid),
+.wizardV4 :global(.outing-experience-grid),
+.wizardV4 :global(.outing-choice-strip),
+.wizardV4 :global(.outing-kind-toggle-grid),
+.wizardV4 :global(.outing-count-grid) {
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 1fr;
+  gap: 11px;
+}
+
+.wizardV4 :global(.mode-choice-card),
+.wizardV4 :global(.outing-build-method-grid button),
+.wizardV4 :global(.outing-experience-grid button),
+.wizardV4 :global(.outing-choice-strip button),
+.wizardV4 :global(.outing-kind-toggle-grid button) {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 2px solid #241f20;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.1);
+}
+
+.wizardV4 :global(.mode-choice-card),
+.wizardV4 :global(.outing-build-method-grid button) {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: none;
+  align-items: center;
+  gap: 12px;
+  min-height: 92px;
+  padding: 14px;
+}
+
+.wizardV4 :global(.mode-choice-card > :nth-child(1)),
+.wizardV4 :global(.mode-choice-card > :nth-child(2)),
+.wizardV4 :global(.mode-choice-card > :nth-child(3)) {
+  grid-area: auto;
+}
+
+.wizardV4 :global(.planning-mode-illustration) {
+  width: 68px;
+  min-width: 68px;
+  min-height: 68px;
+  max-height: 76px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.wizardV4 :global(.mode-choice-copy),
+.wizardV4 :global(.outing-build-method-copy) {
+  min-width: 0;
+}
+
+.wizardV4 :global(.mode-choice-copy strong),
+.wizardV4 :global(.outing-build-method-copy strong) {
+  display: block;
+  color: #241f20;
+  font-size: 1rem;
+  line-height: 1.08;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.wizardV4 :global(.mode-choice-copy small),
+.wizardV4 :global(.outing-build-method-copy small) {
+  display: block;
+  margin-top: 4px;
+  color: #665c5e;
+  font-size: 0.71rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.wizardV4 :global(.mode-choice-card.selected),
+.wizardV4 :global(.outing-build-method-grid button.selected),
+.wizardV4 :global(.outing-experience-grid button.selected),
+.wizardV4 :global(.outing-choice-strip button.selected),
+.wizardV4 :global(.outing-kind-toggle-grid button.selected) {
+  background: linear-gradient(145deg, var(--outing-soft), #ffffff);
+  box-shadow: 5px 5px 0 var(--outing-accent);
+}
+
+.wizardV4 :global(.outing-build-method-grid button:nth-child(1)) {
+  background: linear-gradient(145deg, #fff4ae, #fffdf2);
+}
+
+.wizardV4 :global(.outing-build-method-grid button:nth-child(2)) {
+  background: linear-gradient(145deg, #eadcff, #fffaff);
+}
+
+.wizardV4 :global(.outing-build-method-grid button:nth-child(3)) {
+  background: linear-gradient(145deg, #dff3ff, #fbfdff);
+}
+
+.wizardV4 :global(.outing-build-method-grid button > span:first-child),
+.wizardV4 :global(.outing-experience-grid button > span:first-child),
+.wizardV4 :global(.outing-kind-toggle-grid button > span:first-child) {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border: 1.5px solid #241f20;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 1.25rem;
+}
+
+.wizardV4 :global(.wizard-compact-panel),
+.wizardV4 :global(.outing-shape-panel),
+.wizardV4 :global(.outing-personalization-panel),
+.wizardV4 :global(.outing-area-travel-panel),
+.wizardV4 :global(.outing-review-v3),
+.wizardV4 :global(.outing-anchor-builder) {
+  width: 100%;
+  min-width: 0;
+  padding: 14px;
+  border: 2px solid #241f20;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 94% 8%, color-mix(in srgb, var(--outing-soft) 55%, transparent), transparent 22%),
+    linear-gradient(180deg, #ffffff 0%, #fffaf5 100%);
+  box-shadow: 4px 4px 0 color-mix(in srgb, var(--outing-accent) 20%, transparent);
+}
+
+.wizardV4 :global(.wizard-date-grid),
+.wizardV4 :global(.wizard-small-grid),
+.wizardV4 :global(.budget-compact-grid),
+.wizardV4 :global(.travel-compact-grid),
+.wizardV4 :global(.outing-travel-limit-grid),
+.wizardV4 :global(.review-compact-grid) {
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.wizardV4 :global(.wizard-date-grid label),
+.wizardV4 :global(.outing-custom-preferences label) {
+  min-width: 0;
+}
+
+.wizardV4 :global(input),
+.wizardV4 :global(select),
+.wizardV4 :global(textarea) {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.wizardV4 :global(.outing-count-card),
+.wizardV4 :global(.outing-total-stops-card),
+.wizardV4 :global(.outing-party-size-card),
+.wizardV4 :global(.outing-travel-limit),
+.wizardV4 :global(.alcohol-compact-toggle) {
+  min-width: 0;
+  border: 1.5px solid #d2c5bd;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.wizardV4 :global(.outing-count-card) {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 11px;
+  padding: 13px;
+}
+
+.wizardV4 :global(.outing-count-stepper) {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  display: grid;
+  grid-template-columns: 44px minmax(44px, 1fr) 44px;
+  width: 100%;
+}
+
+.wizardV4 :global(.outing-count-stepper button),
+.wizardV4 :global(.outing-stepper button) {
+  min-width: 42px;
+  min-height: 42px;
+}
+
+.wizardV4 :global(.interest-compact-grid) {
+  width: 100%;
+  min-width: 0;
+}
+
+.wizardV4 :global(.interest-compact-grid button) {
+  min-height: 42px;
+}
+
+.wizardV4 :global(.review-compact-grid > div) {
+  min-width: 0;
+  overflow: hidden;
+  border: 1.5px solid #d2c5bd;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.wizardV4 :global(.review-compact-grid strong),
+.wizardV4 :global(.review-compact-grid small) {
+  overflow-wrap: anywhere;
+}
+
+.wizardV4 :global(.outing-wizard-actions) {
+  position: sticky;
+  z-index: 24;
+  bottom: 76px;
+  width: calc(100% - 24px);
+  margin: 0 auto;
+  padding: 9px;
+  border: 2px solid #241f20;
+  border-radius: 18px;
+  background: rgba(255, 250, 242, 0.96);
+  box-shadow: 0 -8px 28px rgba(36, 31, 32, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.wizardV4 :global(.outing-wizard-next) {
+  background: linear-gradient(135deg, var(--outing-accent), #e8232b);
+  box-shadow: 3px 3px 0 #ffcf00;
+}
+
+.wizardV4 :global(.submit-listing-entry) {
+  display: none !important;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.wizardV4 :global(.outing-wizard-content > *) {
+  animation: cardIn 260ms ease both;
+}
+
+@media (max-width: 390px) {
+  .wizardV4 :global(.outing-wizard-screen) {
+    padding-inline: 10px;
+  }
+
+  .wizardV4 :global(.outing-wizard-heading) {
+    padding: 15px;
+    border-radius: 21px;
+  }
+
+  .wizardV4 :global(.outing-wizard-heading h1) {
+    max-width: 14ch;
+    font-size: clamp(1.85rem, 9.8vw, 2.35rem);
+  }
+
+  .wizardV4 :global(.mode-choice-card),
+  .wizardV4 :global(.outing-build-method-grid button) {
+    grid-template-columns: 52px minmax(0, 1fr) 30px;
+    gap: 9px;
+    padding: 12px;
+  }
+
+  .wizardV4 :global(.planning-mode-illustration) {
+    width: 52px;
+    min-width: 52px;
+    min-height: 54px;
+    max-height: 58px;
+  }
+
+  .wizardV4 :global(.outing-build-method-grid button > span:first-child) {
+    width: 44px;
+    height: 44px;
+  }
+
+  .wizardV4 :global(.wizard-date-grid),
+  .wizardV4 :global(.review-compact-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .wizardV4 :global(.wizard-small-grid),
+  .wizardV4 :global(.budget-compact-grid),
+  .wizardV4 :global(.travel-compact-grid),
+  .wizardV4 :global(.outing-travel-limit-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wizardV4 :global(.outing-wizard-actions) {
+    width: calc(100% - 20px);
+  }
+}
+
+@media (max-width: 340px) {
+  .wizardV4 :global(.wizard-small-grid),
+  .wizardV4 :global(.budget-compact-grid),
+  .wizardV4 :global(.travel-compact-grid),
+  .wizardV4 :global(.outing-travel-limit-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .wizardV4 :global(.outing-wizard-actions) {
+    grid-template-columns: 1fr;
+  }
+
+  .wizardV4 :global(.outing-wizard-back) {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizardV4 *,
+  .wizardV4 *::before,
+  .wizardV4 *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

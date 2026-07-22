@@ -665,3 +665,573 @@
     transition: none !important;
   }
 }
+
+/* =========================================================
+   Venture results celebration refresh v0.2
+   ========================================================= */
+
+.refreshRoot {
+  position: relative;
+  padding-bottom: 132px;
+  background:
+    radial-gradient(circle at 8% 9%, rgba(255, 207, 0, 0.18), transparent 22%),
+    radial-gradient(circle at 94% 34%, rgba(208, 16, 19, 0.08), transparent 24%),
+    linear-gradient(180deg, #fffdf8 0%, #fff7f1 100%);
+  animation: resultsArrival 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes resultsArrival {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.routeRecipeCard {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 18px;
+  overflow: hidden;
+  border: 2px solid var(--result-ink);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 90% 12%, rgba(109, 40, 217, 0.15), transparent 24%),
+    linear-gradient(135deg, #fff2ad 0%, #ffd8b5 50%, #f2e7ff 100%);
+  box-shadow: 5px 5px 0 var(--result-red);
+}
+
+.routeRecipeCard::before {
+  position: absolute;
+  right: -28px;
+  bottom: -38px;
+  width: 110px;
+  height: 110px;
+  border: 16px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  content: "";
+}
+
+.routeRecipeCopy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.routeRecipeCopy > span {
+  color: var(--result-red);
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.routeRecipeCopy strong {
+  color: var(--result-ink);
+  font-size: clamp(1.18rem, 5vw, 1.6rem);
+  line-height: 1.04;
+  overflow-wrap: anywhere;
+}
+
+.routeRecipeCopy small {
+  max-width: 38ch;
+  color: #62575a;
+  font-size: 0.72rem;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+}
+
+.routeRecipeIcons {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 76px;
+  padding-right: 5px;
+}
+
+.routeRecipeIcons span {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  margin-left: -12px;
+  border: 2px solid var(--result-ink);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.16);
+  font-size: 1.12rem;
+  animation: recipePop 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.routeRecipeIcons span:first-child {
+  margin-left: 0;
+}
+
+@keyframes recipePop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) rotate(-10deg) scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+.snapshotSection {
+  display: grid;
+  gap: 13px;
+  width: 100%;
+}
+
+.snapshotHeading {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 4px 2px 0;
+}
+
+.snapshotHeading span {
+  color: var(--result-red);
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+}
+
+.snapshotHeading h2 {
+  margin: 0;
+  color: var(--result-ink);
+  font-size: clamp(1.45rem, 6vw, 2rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.snapshotHeading p {
+  margin: 0;
+  color: #6d6264;
+  font-size: 0.74rem;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3) {
+  gap: 11px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 126px;
+  padding: 14px;
+  overflow: hidden;
+  border: 2px solid var(--result-ink);
+  border-radius: 21px;
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.14);
+  animation: statCardEnter 470ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard:hover {
+  transform: translateY(-3px) rotate(-0.3deg);
+  box-shadow: 6px 6px 0 rgba(36, 31, 32, 0.14);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard::after {
+  position: absolute;
+  right: -22px;
+  bottom: -27px;
+  width: 82px;
+  height: 82px;
+  border: 13px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  content: "";
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div:nth-child(2)).statCard {
+  animation-delay: 60ms;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div:nth-child(3)).statCard {
+  animation-delay: 120ms;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div:nth-child(4)).statCard {
+  animation-delay: 180ms;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div:nth-child(5)).statCard {
+  animation-delay: 240ms;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div:nth-child(6)).statCard {
+  animation-delay: 300ms;
+}
+
+@keyframes statCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).dateCard {
+  background: linear-gradient(145deg, #fff1a8 0%, #ffdc5c 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).startCard {
+  background: linear-gradient(145deg, #ffd8d5 0%, #ffaaa5 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).peopleCard {
+  background: linear-gradient(145deg, #dff4ff 0%, #a8dcf4 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).lengthCard {
+  background: linear-gradient(145deg, #e7f8d8 0%, #bfe79e 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).travelCard {
+  background: linear-gradient(145deg, #eee4ff 0%, #cdb5ff 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).priceCard {
+  background: linear-gradient(145deg, #ffe3bd 0%, #ffb874 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).groupCard {
+  grid-column: 1 / -1;
+  min-height: 108px;
+  background: linear-gradient(145deg, #fff1a8 0%, #ffd5ad 50%, #e9dcff 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard > span {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--result-red);
+  font-size: 0.61rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.statIcon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 2px 2px 0 rgba(36, 31, 32, 0.11);
+  font-size: 1rem !important;
+  font-style: normal;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard strong {
+  position: relative;
+  z-index: 1;
+  color: var(--result-ink);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard small {
+  position: relative;
+  z-index: 1;
+  color: #554b4d;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.refreshRoot :global(.outing-action-dock button) {
+  overflow: hidden;
+}
+
+.refreshRoot :global(.outing-action-dock button)::after {
+  position: absolute;
+  top: -35%;
+  left: -60%;
+  width: 35%;
+  height: 170%;
+  background: rgba(255, 255, 255, 0.32);
+  transform: rotate(18deg);
+  content: "";
+  animation: actionShine 4.4s ease-in-out infinite;
+}
+
+.refreshRoot :global(.outing-action-dock button) {
+  position: relative;
+}
+
+@keyframes actionShine {
+  0%,
+  72% {
+    left: -60%;
+  }
+  100% {
+    left: 135%;
+  }
+}
+
+@media (max-width: 390px) {
+  .routeRecipeCard {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .routeRecipeIcons {
+    justify-content: flex-start;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+    min-height: 116px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refreshRoot,
+  .routeRecipeIcons span,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).statCard,
+  .refreshRoot :global(.outing-action-dock button)::after {
+    animation: none !important;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3 > div).statCard:hover {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   Venture outing finale v0.3
+   Brighter route recipe, playful snapshot, and clear
+   Google Maps handoff.
+   ========================================================= */
+
+.routeRecipeCard {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 19px;
+  border-radius: 24px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.32) 0 12%, transparent 12% 24%, rgba(255, 255, 255, 0.24) 24% 36%, transparent 36% 48%, rgba(255, 255, 255, 0.22) 48% 60%, transparent 60%),
+    linear-gradient(135deg, #ffcf00 0%, #ffe87f 62%, #fff4c0 100%);
+  box-shadow: 6px 6px 0 #d01013;
+  animation: recipeArrival 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.routeRecipeCard::before {
+  top: -42px;
+  right: -34px;
+  bottom: auto;
+  width: 130px;
+  height: 130px;
+  border: 18px solid rgba(208, 16, 19, 0.12);
+}
+
+.routeRecipeCard::after {
+  position: absolute;
+  left: 18px;
+  bottom: 13px;
+  width: min(42%, 150px);
+  border-top: 3px dashed rgba(208, 16, 19, 0.45);
+  content: "";
+}
+
+.routeRecipeCopy > span {
+  color: #9f0c10;
+  font-size: 0.64rem;
+}
+
+.routeRecipeCopy strong {
+  max-width: 18ch;
+  font-size: clamp(1.35rem, 5.8vw, 1.9rem);
+  letter-spacing: -0.04em;
+}
+
+.routeRecipeCopy small {
+  max-width: 34ch;
+  padding-bottom: 11px;
+  color: #574b3e;
+}
+
+.routeRecipeIcons {
+  align-self: stretch;
+  display: grid;
+  grid-auto-flow: column;
+  align-content: center;
+  justify-content: end;
+  min-width: 82px;
+}
+
+.routeRecipeIcons span {
+  width: 47px;
+  height: 47px;
+  border-radius: 16px;
+  background: #fffaf2;
+  box-shadow: 3px 3px 0 rgba(208, 16, 19, 0.25);
+  font-size: 1.2rem;
+}
+
+@keyframes recipeArrival {
+  from {
+    opacity: 0;
+    transform: translateY(10px) rotate(-0.4deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+}
+
+.snapshotSection {
+  gap: 14px;
+  padding: 16px;
+  border: 2px solid var(--result-ink);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 91% 7%, rgba(255, 207, 0, 0.2), transparent 22%),
+    linear-gradient(180deg, #fffefb 0%, #fff7ee 100%);
+  box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.11);
+}
+
+.snapshotHeading {
+  padding: 0;
+}
+
+.snapshotHeading h2 {
+  font-size: clamp(1.6rem, 6.8vw, 2.2rem);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3) {
+  gap: 10px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+  min-height: 132px;
+  padding: 14px;
+  border-radius: 22px;
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.16);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard:nth-child(even) {
+  transform: rotate(0.35deg);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard:nth-child(odd) {
+  transform: rotate(-0.35deg);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard:hover {
+  transform: translateY(-3px) rotate(0);
+}
+
+.statIcon {
+  width: 39px;
+  height: 39px;
+  flex-basis: 39px;
+  border-radius: 13px;
+  font-size: 1.12rem !important;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard > span {
+  align-items: center;
+  font-size: 0.63rem;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard strong {
+  margin-top: 2px;
+  font-size: 1.04rem;
+}
+
+.refreshRoot :global(.outing-route-heading a) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  max-width: 190px;
+  min-height: 46px;
+  padding: 9px 11px;
+  border: 2px solid #241f20;
+  border-radius: 14px;
+  background: #d01013;
+  color: #ffffff;
+  font-size: 0.67rem;
+  font-weight: 950;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 3px 3px 0 #ffcf00;
+}
+
+.refreshRoot :global(.outing-route-heading a > span) {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #4285f4;
+  font-weight: 950;
+}
+
+.refreshRoot :global(.outing-route-heading a > b) {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 390px) {
+  .routeRecipeCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .routeRecipeIcons {
+    grid-auto-flow: column;
+    justify-content: start;
+  }
+
+  .snapshotSection {
+    padding: 13px;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+    min-height: 120px;
+  }
+
+  .refreshRoot :global(.outing-route-heading) {
+    grid-template-columns: 1fr;
+  }
+
+  .refreshRoot :global(.outing-route-heading a) {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .routeRecipeCard {
+    animation: none !important;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3 > div).statCard:nth-child(even),
+  .refreshRoot :global(.outing-plan-summary-v3 > div).statCard:nth-child(odd) {
+    transform: none;
+  }
+}

@@ -3,7 +3,8 @@
 import {
   useEffect,
   useMemo,
-  useRef
+  useRef,
+  useState
 } from "react";
 
 import maplibregl from "maplibre-gl";
@@ -11,7 +12,11 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import {
-  getVentureMapStyle
+  buildGoogleMapsRouteUrl
+} from "@/lib/google-maps-route";
+
+import {
+  getVentureMapConfiguration
 } from "@/lib/venture-map-style";
 
 import type {
@@ -29,6 +34,11 @@ type CoordinateStop = {
   longitude: number;
 };
 
+type MapStatus =
+  | "loading"
+  | "ready"
+  | "error";
+
 const WINNIPEG_CENTER: [
   number,
   number
@@ -40,9 +50,8 @@ const WINNIPEG_CENTER: [
 function createPopupContent(
   coordinateStop: CoordinateStop
 ): HTMLDivElement {
-  const {
-    stop
-  } = coordinateStop;
+  const { stop } =
+    coordinateStop;
 
   const popup =
     document.createElement(
@@ -97,152 +106,18 @@ function createPopupContent(
   return popup;
 }
 
-function getGoogleMapsTravelMode(
-  transportation: string
-): string {
-  const normalized =
-    transportation
-      .trim()
-      .toLowerCase();
-
-  if (
-    normalized === "walking"
-  ) {
-    return "walking";
-  }
-
-  if (
-    normalized === "transit"
-  ) {
-    return "transit";
-  }
-
-  return "driving";
-}
-
-function getGoogleMapsStopQuery(
-  stop:
-    GeneratedOutingPlan["stops"][number]
-): string {
-  const latitude =
-    Number(
-      stop.listing.latitude
-    );
-
-  const longitude =
-    Number(
-      stop.listing.longitude
-    );
-
-  if (
-    Number.isFinite(latitude) &&
-    Number.isFinite(longitude)
-  ) {
-    return `${latitude},${longitude}`;
-  }
-
-  if (stop.listing.address) {
-    return `${stop.listing.address}, Winnipeg, Manitoba`;
-  }
-
-  return [
-    stop.listing.name,
-    stop.listing.neighbourhood,
-    "Winnipeg",
-    "Manitoba"
-  ]
-    .filter(Boolean)
-    .join(", ");
-}
-
-function buildGoogleMapsUrl(
-  plan: GeneratedOutingPlan
-): string | null {
-  const orderedStops =
-    [...plan.stops].sort(
-      (first, second) =>
-        first.order -
-        second.order
-    );
-
-  const stopQueries =
-    orderedStops.map(
-      getGoogleMapsStopQuery
-    );
-
-  if (
-    stopQueries.length === 0
-  ) {
-    return null;
-  }
-
-  if (
-    stopQueries.length === 1
-  ) {
-    const parameters =
-      new URLSearchParams({
-        api: "1",
-        query:
-          stopQueries[0]
-      });
-
-    return (
-      "https://www.google.com/maps/search/?" +
-      parameters.toString()
-    );
-  }
-
-  const parameters =
-    new URLSearchParams({
-      api: "1",
-      origin:
-        stopQueries[0],
-      destination:
-        stopQueries[
-          stopQueries.length - 1
-        ],
-      travelmode:
-        getGoogleMapsTravelMode(
-          plan.transportation
-        )
-    });
-
-  const waypoints =
-    stopQueries.slice(
-      1,
-      -1
-    );
-
-  if (
-    waypoints.length > 0
-  ) {
-    parameters.set(
-      "waypoints",
-      waypoints.join("|")
-    );
-  }
-
-  return (
-    "https://www.google.com/maps/dir/?" +
-    parameters.toString()
-  );
-}
-
 function getStopIcon(
   stop:
     GeneratedOutingPlan["stops"][number]
 ): string {
   if (
     stop.kind === "event" ||
-    stop.listing.type ===
-      "event"
+    stop.listing.type === "event"
   ) {
     return "🎟";
   }
 
-  if (
-    stop.kind === "drinks"
-  ) {
+  if (stop.kind === "drinks") {
     return "🍸";
   }
 
@@ -255,15 +130,12 @@ function getStopKindLabel(
 ): string {
   if (
     stop.kind === "event" ||
-    stop.listing.type ===
-      "event"
+    stop.listing.type === "event"
   ) {
     return "Event";
   }
 
-  if (
-    stop.kind === "drinks"
-  ) {
+  if (stop.kind === "drinks") {
     return "Drinks";
   }
 
@@ -276,15 +148,12 @@ function getStopKindClassName(
 ): string {
   if (
     stop.kind === "event" ||
-    stop.listing.type ===
-      "event"
+    stop.listing.type === "event"
   ) {
     return "event";
   }
 
-  if (
-    stop.kind === "drinks"
-  ) {
+  if (stop.kind === "drinks") {
     return "drinks";
   }
 
@@ -295,14 +164,24 @@ export function OutingRouteMap({
   plan
 }: OutingRouteMapProps) {
   const containerRef =
-    useRef<HTMLDivElement>(
-      null
-    );
+    useRef<HTMLDivElement>(null);
 
   const mapRef =
     useRef<maplibregl.Map | null>(
       null
     );
+
+  const [
+    mapStatus,
+    setMapStatus
+  ] = useState<MapStatus>(
+    "loading"
+  );
+
+  const [
+    retryVersion,
+    setRetryVersion
+  ] = useState(0);
 
   const orderedStops =
     useMemo(
@@ -358,37 +237,36 @@ export function OutingRouteMap({
   const googleMapsUrl =
     useMemo(
       () =>
-        buildGoogleMapsUrl(
+        buildGoogleMapsRouteUrl(
           plan
         ),
       [plan]
     );
 
   useEffect(() => {
-    if (
-      !containerRef.current
-    ) {
-      return;
-    }
+    const container =
+      containerRef.current;
 
     if (
+      !container ||
       coordinateStops.length === 0
     ) {
       return;
     }
 
-    const mapStyle =
-      getVentureMapStyle();
+    setMapStatus("loading");
+
+    const mapConfiguration =
+      getVentureMapConfiguration();
 
     const firstStop =
       coordinateStops[0];
 
     const map =
       new maplibregl.Map({
-        container:
-          containerRef.current,
+        container,
         style:
-          mapStyle,
+          mapConfiguration.style,
         center:
           firstStop
             ? [
@@ -397,20 +275,30 @@ export function OutingRouteMap({
               ]
             : WINNIPEG_CENTER,
         zoom:
-          coordinateStops.length ===
-          1
+          coordinateStops.length === 1
             ? 13
-            : 11
+            : 11,
+        dragRotate: false,
+        pitchWithRotate: false,
+        cooperativeGestures: true,
+        attributionControl: false
       });
 
     mapRef.current = map;
 
     map.addControl(
       new maplibregl.NavigationControl({
-        showCompass: true,
+        showCompass: false,
         showZoom: true
       }),
       "top-right"
+    );
+
+    map.addControl(
+      new maplibregl.AttributionControl({
+        compact: true
+      }),
+      "bottom-right"
     );
 
     const bounds =
@@ -428,17 +316,13 @@ export function OutingRouteMap({
           "button"
         );
 
-      element.type =
-        "button";
-
+      element.type = "button";
       element.className =
         "outing-route-marker";
 
       element.textContent =
         String(
-          coordinateStop
-            .stop
-            .order
+          coordinateStop.stop.order
         );
 
       element.setAttribute(
@@ -477,99 +361,169 @@ export function OutingRouteMap({
       ]);
     }
 
-    map.once(
-      "load",
-      () => {
-        if (
-          coordinateStops.length >
-          1
-        ) {
-          const coordinates =
-            coordinateStops.map(
-              (coordinateStop) => [
-                coordinateStop.longitude,
-                coordinateStop.latitude
-              ]
-            );
+    let mapReady = false;
 
-          map.addSource(
-            "venture-outing-route",
-            {
-              type: "geojson",
-              data: {
-                type: "Feature",
-                properties: {},
-                geometry: {
-                  type: "LineString",
-                  coordinates
-                }
+    const loadTimeout =
+      window.setTimeout(() => {
+        if (!mapReady) {
+          setMapStatus("error");
+        }
+      }, 12000);
+
+    const fitRoute = () => {
+      map.resize();
+
+      if (coordinateStops.length === 1) {
+        map.easeTo({
+          center: [
+            coordinateStops[0].longitude,
+            coordinateStops[0].latitude
+          ],
+          zoom: 14,
+          duration: 500
+        });
+        return;
+      }
+
+      map.fitBounds(bounds, {
+        padding: {
+          top: 66,
+          right: 54,
+          bottom: 72,
+          left: 54
+        },
+        maxZoom: 14,
+        duration: 700
+      });
+    };
+
+    const handleLoad = () => {
+      mapReady = true;
+      window.clearTimeout(
+        loadTimeout
+      );
+
+      if (coordinateStops.length > 1) {
+        const coordinates =
+          coordinateStops.map(
+            (coordinateStop) => [
+              coordinateStop.longitude,
+              coordinateStop.latitude
+            ]
+          );
+
+        map.addSource(
+          "venture-outing-route",
+          {
+            type: "geojson",
+            data: {
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "LineString",
+                coordinates
               }
             }
-          );
+          }
+        );
 
-          map.addLayer({
-            id:
-              "venture-outing-route-halo",
-            type: "line",
-            source:
-              "venture-outing-route",
-            layout: {
-              "line-cap": "round",
-              "line-join": "round"
-            },
-            paint: {
-              "line-color":
-                "#ffcf00",
-              "line-width": 10,
-              "line-opacity": 0.8
-            }
-          });
+        map.addLayer({
+          id:
+            "venture-outing-route-halo",
+          type: "line",
+          source:
+            "venture-outing-route",
+          layout: {
+            "line-cap": "round",
+            "line-join": "round"
+          },
+          paint: {
+            "line-color": "#ffcf00",
+            "line-width": 10,
+            "line-opacity": 0.82
+          }
+        });
 
-          map.addLayer({
-            id:
-              "venture-outing-route-line",
-            type: "line",
-            source:
-              "venture-outing-route",
-            layout: {
-              "line-cap": "round",
-              "line-join": "round"
-            },
-            paint: {
-              "line-color":
-                "#d01013",
-              "line-width": 4,
-              "line-opacity": 0.95,
-              "line-dasharray": [
-                1.2,
-                1.1
-              ]
-            }
-          });
-
-          map.fitBounds(
-            bounds,
-            {
-              padding: 58,
-              maxZoom: 14,
-              duration: 700
-            }
-          );
-        }
+        map.addLayer({
+          id:
+            "venture-outing-route-line",
+          type: "line",
+          source:
+            "venture-outing-route",
+          layout: {
+            "line-cap": "round",
+            "line-join": "round"
+          },
+          paint: {
+            "line-color": "#d01013",
+            "line-width": 4,
+            "line-opacity": 0.96,
+            "line-dasharray": [
+              1.2,
+              1.1
+            ]
+          }
+        });
       }
-    );
+
+      window.requestAnimationFrame(
+        () => {
+          fitRoute();
+          setMapStatus("ready");
+        }
+      );
+    };
+
+    const handleError = (
+      event: maplibregl.ErrorEvent
+    ) => {
+      console.error(
+        "Venture outing map error",
+        event.error
+      );
+
+      if (!mapReady) {
+        setMapStatus("error");
+      }
+    };
+
+    map.on("load", handleLoad);
+    map.on("error", handleError);
+
+    const resizeObserver =
+      new ResizeObserver(() => {
+        map.resize();
+      });
+
+    resizeObserver.observe(container);
+
+    const resizeFrame =
+      window.requestAnimationFrame(
+        () => map.resize()
+      );
 
     return () => {
+      window.clearTimeout(
+        loadTimeout
+      );
+      window.cancelAnimationFrame(
+        resizeFrame
+      );
+      resizeObserver.disconnect();
+      map.off("load", handleLoad);
+      map.off("error", handleError);
+
       markers.forEach(
-        (marker) =>
-          marker.remove()
+        (marker) => marker.remove()
       );
 
       map.remove();
-      mapRef.current =
-        null;
+      mapRef.current = null;
     };
-  }, [coordinateStops]);
+  }, [
+    coordinateStops,
+    retryVersion
+  ]);
 
   return (
     <section className="outing-route-panel outing-route-panel-featured">
@@ -595,10 +549,13 @@ export function OutingRouteMap({
             target="_blank"
             rel="noreferrer"
           >
-            Open route
             <span aria-hidden="true">
-              ↗
+              G
             </span>
+            Open full route in Google Maps
+            <b aria-hidden="true">
+              ↗
+            </b>
           </a>
         ) : null}
       </div>
@@ -616,9 +573,7 @@ export function OutingRouteMap({
                 className={`outing-map-stop-pill outing-map-stop-pill-${kindClassName}`}
                 key={`${stop.listing.type}-${stop.listing.id}-${stop.order}`}
               >
-                <b>
-                  {stop.order}
-                </b>
+                <b>{stop.order}</b>
 
                 <i aria-hidden="true">
                   {getStopIcon(stop)}
@@ -644,14 +599,62 @@ export function OutingRouteMap({
         )}
       </div>
 
-      {coordinateStops.length >
-      0 ? (
-        <div
-          ref={containerRef}
-          className="outing-route-map outing-route-map-featured"
-          role="region"
-          aria-label="Map showing the generated outing route"
-        />
+      {coordinateStops.length > 0 ? (
+        <div className="outing-route-map-shell">
+          <div
+            ref={containerRef}
+            className="outing-route-map outing-route-map-featured"
+            role="region"
+            aria-label="Map showing the generated outing route"
+          />
+
+          {mapStatus !== "ready" ? (
+            <div
+              className={`outing-route-map-status ${
+                mapStatus === "error"
+                  ? "error"
+                  : ""
+              }`}
+              role={
+                mapStatus === "error"
+                  ? "alert"
+                  : "status"
+              }
+            >
+              <span aria-hidden="true">
+                {mapStatus === "error"
+                  ? "🗺"
+                  : "⌖"}
+              </span>
+
+              <strong>
+                {mapStatus === "error"
+                  ? "The route map could not load"
+                  : "Loading your route map"}
+              </strong>
+
+              <small>
+                {mapStatus === "error"
+                  ? "Your itinerary is still available below. Check your connection and retry."
+                  : "Adding streets, stops, and route order."}
+              </small>
+
+              {mapStatus === "error" ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRetryVersion(
+                      (current) =>
+                        current + 1
+                    )
+                  }
+                >
+                  Retry map
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       ) : (
         <div className="outing-route-unavailable">
           <span aria-hidden="true">
