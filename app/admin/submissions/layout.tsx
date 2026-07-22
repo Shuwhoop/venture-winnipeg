@@ -64,6 +64,12 @@ export default async function SubmissionAdminLayout({
           </Link>
 
           <Link
+            href="/admin/submissions/requests"
+          >
+            Search requests
+          </Link>
+
+          <Link
             href="/submit"
           >
             Public form

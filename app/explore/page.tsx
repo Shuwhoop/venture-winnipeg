@@ -235,6 +235,14 @@ export default async function ExplorePage({
         )?.label.toUpperCase() ??
         "RESULTS";
 
+  const requestType =
+    activeFilter === "events"
+      ? "event"
+      : activeFilter === "food" ||
+          activeFilter === "open"
+        ? "restaurant"
+        : "other";
+
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
@@ -356,6 +364,8 @@ export default async function ExplorePage({
       <ExploreExperience
         listings={filteredListings}
         eyebrow={resultsEyebrow}
+        searchQuery={q.trim()}
+        requestType={requestType}
       />
     </main>
   );

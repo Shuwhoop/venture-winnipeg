@@ -17,6 +17,10 @@ import {
 } from "@/components/explore-map-card";
 
 import {
+  ExploreMissingListingRequest
+} from "@/components/explore-missing-listing-request";
+
+import {
   PersonalizedExploreResults
 } from "@/components/personalized-explore-results";
 
@@ -29,6 +33,13 @@ import styles from "@/app/explore/explore.module.css";
 type ExploreExperienceProps = {
   listings: Listing[];
   eyebrow: string;
+  searchQuery: string;
+  requestType?:
+    | "restaurant"
+    | "event"
+    | "bar"
+    | "place"
+    | "other";
 };
 
 type ExploreView =
@@ -43,7 +54,9 @@ function getListingKey(
 
 export function ExploreExperience({
   listings,
-  eyebrow
+  eyebrow,
+  searchQuery,
+  requestType = "other"
 }: ExploreExperienceProps) {
   const workbenchRef =
     useRef<HTMLElement>(null);
@@ -238,14 +251,22 @@ export function ExploreExperience({
       </div>
 
       {listings.length === 0 ? (
-        <section className={styles.emptyState}>
-          <div aria-hidden="true">⌕</div>
-          <h2>No matches yet</h2>
-          <p>
-            Try a broader neighbourhood,
-            category, venue, or search term.
-          </p>
-        </section>
+        <div className={styles.emptyRequestStack}>
+          <section className={styles.emptyState}>
+            <div aria-hidden="true">⌕</div>
+            <h2>No matches yet</h2>
+            <p>
+              Try a broader neighbourhood,
+              category, venue, or search term, or
+              send Venture the missing listing below.
+            </p>
+          </section>
+
+          <ExploreMissingListingRequest
+            initialQuery={searchQuery}
+            initialType={requestType}
+          />
+        </div>
       ) : view === "map" ? (
         <div className={styles.mapMode}>
           <div className={styles.mapFrame}>
@@ -303,6 +324,14 @@ export function ExploreExperience({
           className={styles.listResults}
         />
       )}
+
+      {listings.length > 0 ? (
+        <ExploreMissingListingRequest
+          compact
+          initialQuery={searchQuery}
+          initialType={requestType}
+        />
+      ) : null}
     </section>
   );
 }
