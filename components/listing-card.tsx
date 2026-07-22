@@ -138,7 +138,7 @@ export function ListingCard({
             <span>
               {selected
                 ? "Shown on map"
-                : "Tap card to show on map"}
+                : "Show on map"}
             </span>
 
             <Link

@@ -25,6 +25,8 @@ type PersonalizedExploreResultsProps = {
   eyebrow: string;
   selectedListingKey?: string | null;
   onSelectListing?: (listing: Listing) => void;
+  showHeading?: boolean;
+  className?: string;
 };
 const interestKeywords: Record<
   string,
@@ -398,7 +400,9 @@ export function PersonalizedExploreResults({
   listings,
   eyebrow,
   selectedListingKey = null,
-  onSelectListing
+  onSelectListing,
+  showHeading = true,
+  className = ""
 }: PersonalizedExploreResultsProps) {
   const [
     preferences,
@@ -495,19 +499,21 @@ export function PersonalizedExploreResults({
     ]);
 
   return (
-    <section className="section-block">
-      <div className="section-heading">
-        <div>
-          <span>{eyebrow}</span>
+    <section className={`section-block ${className}`}>
+      {showHeading ? (
+        <div className="section-heading">
+          <div>
+            <span>{eyebrow}</span>
 
-          <h2>
-            {rankedListings.length}{" "}
-            {rankedListings.length === 1
-              ? "listing"
-              : "listings"}
-          </h2>
+            <h2>
+              {rankedListings.length}{" "}
+              {rankedListings.length === 1
+                ? "listing"
+                : "listings"}
+            </h2>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {personalizationActive &&
       preferences ? (

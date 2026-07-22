@@ -1,12 +1,16 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
-  useRef
+  useRef,
+  useState
 } from "react";
+
 import {
   getVentureMapStyle
 } from "@/lib/venture-map-style";
+
 import maplibregl from "maplibre-gl";
 
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -15,10 +19,13 @@ import type {
   Listing
 } from "@/lib/types";
 
+import styles from "@/app/explore/explore.module.css";
+
 type CityMapProps = {
   listings?: Listing[];
   selectedListingKey?: string | null;
   selectionVersion?: number;
+  isVisible?: boolean;
   onSelectListing?: (
     listing: Listing
   ) => void;
@@ -66,6 +73,36 @@ function getCoordinates(
   ];
 }
 
+function getMarkerIcon(
+  listing: Listing
+): string {
+  if (listing.type === "event") {
+    return "🎟";
+  }
+
+  const text = `${listing.name} ${listing.category}`
+    .toLowerCase();
+
+  if (
+    text.includes("bar") ||
+    text.includes("pub") ||
+    text.includes("cocktail") ||
+    text.includes("brew")
+  ) {
+    return "🍸";
+  }
+
+  if (
+    text.includes("cafe") ||
+    text.includes("coffee") ||
+    text.includes("bakery")
+  ) {
+    return "☕";
+  }
+
+  return "🍴";
+}
+
 function createPopupContent(
   listing: Listing
 ): HTMLDivElement {
@@ -73,7 +110,15 @@ function createPopupContent(
     document.createElement("div");
 
   popupContent.className =
-    "venture-map-popup";
+    styles.mapPopup;
+
+  const eyebrow =
+    document.createElement("span");
+
+  eyebrow.textContent =
+    listing.type === "event"
+      ? "EVENT"
+      : listing.category.toUpperCase();
 
   const heading =
     document.createElement("strong");
@@ -82,24 +127,17 @@ function createPopupContent(
     listing.name;
 
   const description =
-    document.createElement("span");
+    document.createElement("small");
 
   description.textContent =
-    listing.subtitle;
-
-  const detailsLink =
-    document.createElement("a");
-
-  detailsLink.href =
-    `/listings/${listing.slug}`;
-
-  detailsLink.textContent =
-    "View details";
+    listing.neighbourhood ||
+    listing.address ||
+    "Winnipeg";
 
   popupContent.append(
+    eyebrow,
     heading,
-    description,
-    detailsLink
+    description
   );
 
   return popupContent;
@@ -109,6 +147,7 @@ export function CityMap({
   listings = [],
   selectedListingKey = null,
   selectionVersion = 0,
+  isVisible = true,
   onSelectListing
 }: CityMapProps) {
   const mapContainerRef =
@@ -124,6 +163,46 @@ export function CityMap({
       Map<string, MarkerRecord>
     >(new Map());
 
+  const boundsRef =
+    useRef<maplibregl.LngLatBounds | null>(
+      null
+    );
+
+  const [
+    mappedCount,
+    setMappedCount
+  ] = useState(0);
+
+  const fitAll =
+    useCallback(() => {
+      const map = mapRef.current;
+      const bounds = boundsRef.current;
+
+      if (!map) {
+        return;
+      }
+
+      if (!bounds || bounds.isEmpty()) {
+        map.easeTo({
+          center: WINNIPEG_CENTER,
+          zoom: 10.5,
+          duration: 450
+        });
+        return;
+      }
+
+      map.fitBounds(bounds, {
+        padding: {
+          top: 64,
+          right: 42,
+          bottom: 74,
+          left: 42
+        },
+        maxZoom: 13,
+        duration: 550
+      });
+    }, []);
+
   useEffect(() => {
     if (
       !mapContainerRef.current ||
@@ -132,8 +211,8 @@ export function CityMap({
       return;
     }
 
-  const mapStyle =
-    getVentureMapStyle();
+    const mapStyle =
+      getVentureMapStyle();
 
     const map =
       new maplibregl.Map({
@@ -141,13 +220,18 @@ export function CityMap({
           mapContainerRef.current,
         style: mapStyle,
         center: WINNIPEG_CENTER,
-        zoom: 10.5
+        zoom: 10.5,
+        scrollZoom: false,
+        dragRotate: false,
+        pitchWithRotate: false,
+        cooperativeGestures: true
       });
 
     map.addControl(
       new maplibregl.NavigationControl({
-        showCompass: true,
-        showZoom: true
+        showCompass: false,
+        showZoom: true,
+        visualizePitch: false
       }),
       "top-right"
     );
@@ -173,6 +257,21 @@ export function CityMap({
   }, []);
 
   useEffect(() => {
+    if (!isVisible) {
+      return;
+    }
+
+    const frame =
+      window.requestAnimationFrame(() => {
+        mapRef.current?.resize();
+      });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [isVisible]);
+
+  useEffect(() => {
     const currentMap =
       mapRef.current;
 
@@ -181,8 +280,7 @@ export function CityMap({
     }
 
     const activeMap:
-      maplibregl.Map =
-        currentMap;
+      maplibregl.Map = currentMap;
 
     function displayMarkers() {
       markersRef.current.forEach(
@@ -202,10 +300,7 @@ export function CityMap({
 
       let markerCount = 0;
 
-      for (
-        const listing
-        of listings
-      ) {
+      for (const listing of listings) {
         const coordinates =
           getCoordinates(listing);
 
@@ -216,75 +311,65 @@ export function CityMap({
         const listingKey =
           getListingKey(listing);
 
-        const markerColor =
-          listing.type === "event"
-            ? "#7c3aed"
-            : "#169447";
+        const markerButton =
+          document.createElement("button");
 
-        const popup =
-          new maplibregl.Popup({
-            offset: 28,
-            closeButton: false,
-            closeOnClick: false
-          })
-            .setLngLat(coordinates)
-            .setDOMContent(
-              createPopupContent(
-                listing
-              )
-            );
+        markerButton.type = "button";
+        markerButton.className =
+          `${styles.mapMarker} ${
+            listing.type === "event"
+              ? styles.eventMarker
+              : styles.placeMarker
+          }`;
 
-        const marker =
-          new maplibregl.Marker({
-            color: markerColor
-          })
-            .setLngLat(coordinates)
-            .addTo(activeMap);
+        const markerIcon =
+          document.createElement("span");
 
-        const markerElement =
-          marker.getElement();
+        markerIcon.textContent =
+          getMarkerIcon(listing);
 
-        markerElement.setAttribute(
-          "role",
-          "button"
+        markerIcon.setAttribute(
+          "aria-hidden",
+          "true"
         );
 
-        markerElement.setAttribute(
+        markerButton.append(
+          markerIcon
+        );
+
+        markerButton.setAttribute(
           "aria-label",
           `Show ${listing.name}`
         );
 
-        markerElement.tabIndex = 0;
-
-        markerElement.addEventListener(
+        markerButton.addEventListener(
           "click",
           (event) => {
             event.stopPropagation();
-
-            onSelectListing?.(
-              listing
-            );
+            onSelectListing?.(listing);
           }
         );
 
-        markerElement.addEventListener(
-          "keydown",
-          (event) => {
-            if (
-              event.key !== "Enter" &&
-              event.key !== " "
-            ) {
-              return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-
-            onSelectListing?.(
-              listing
+        const popup =
+          new maplibregl.Popup({
+            offset: 24,
+            closeButton: false,
+            closeOnClick: false,
+            className:
+              styles.mapPopupShell
+          })
+            .setLngLat(coordinates)
+            .setDOMContent(
+              createPopupContent(listing)
             );
-          }
-        );
+
+        const marker =
+          new maplibregl.Marker({
+            element: markerButton,
+            anchor: "bottom"
+          })
+            .setLngLat(coordinates)
+            .addTo(activeMap);
 
         markersRef.current.set(
           listingKey,
@@ -299,25 +384,13 @@ export function CityMap({
         markerCount += 1;
       }
 
-      if (markerCount === 1) {
-        activeMap.easeTo({
-          center:
-            bounds.getCenter(),
-          zoom: 13,
-          duration: 600
-        });
-      }
+      boundsRef.current =
+        markerCount > 0
+          ? bounds
+          : null;
 
-      if (markerCount > 1) {
-        activeMap.fitBounds(
-          bounds,
-          {
-            padding: 55,
-            maxZoom: 13,
-            duration: 600
-          }
-        );
-      }
+      setMappedCount(markerCount);
+      fitAll();
     }
 
     if (activeMap.loaded()) {
@@ -336,6 +409,7 @@ export function CityMap({
       );
     };
   }, [
+    fitAll,
     listings,
     onSelectListing
   ]);
@@ -349,8 +423,7 @@ export function CityMap({
     }
 
     const activeMap:
-      maplibregl.Map =
-        currentMap;
+      maplibregl.Map = currentMap;
 
     function updateSelection() {
       markersRef.current.forEach(
@@ -361,7 +434,7 @@ export function CityMap({
           marker
             .getElement()
             .classList.remove(
-              "venture-marker-selected"
+              styles.selectedMarker
             );
 
           popup.remove();
@@ -389,7 +462,7 @@ export function CityMap({
       marker
         .getElement()
         .classList.add(
-          "venture-marker-selected"
+          styles.selectedMarker
         );
 
       popup
@@ -399,10 +472,12 @@ export function CityMap({
         .addTo(activeMap);
 
       activeMap.flyTo({
-        center:
-          marker.getLngLat(),
-        zoom: 14,
-        duration: 700,
+        center: marker.getLngLat(),
+        zoom: Math.max(
+          activeMap.getZoom(),
+          14
+        ),
+        duration: 650,
         essential: true
       });
     }
@@ -429,11 +504,38 @@ export function CityMap({
   ]);
 
   return (
-    <div
-      ref={mapContainerRef}
-      className="city-map"
-      role="region"
-      aria-label="Map of Winnipeg listings"
-    />
+    <div className={styles.mapShell}>
+      <div
+        ref={mapContainerRef}
+        className={styles.cityMap}
+        role="region"
+        aria-label="Map of Winnipeg listings"
+      />
+
+      <div className={styles.mapLegend}>
+        <span>
+          <i className={styles.legendEvent} />
+          Events
+        </span>
+
+        <span>
+          <i className={styles.legendPlace} />
+          Places
+        </span>
+      </div>
+
+      <button
+        type="button"
+        className={styles.fitMapButton}
+        onClick={fitAll}
+      >
+        <span aria-hidden="true">⌗</span>
+        Fit all
+      </button>
+
+      <div className={styles.mapCount}>
+        {mappedCount} mapped
+      </div>
+    </div>
   );
 }

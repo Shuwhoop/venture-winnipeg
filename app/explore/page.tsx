@@ -16,6 +16,8 @@ import type {
   Listing
 } from "@/lib/types";
 
+import styles from "./explore.module.css";
+
 export const dynamic = "force-dynamic";
 
 type ExploreFilter =
@@ -83,6 +85,31 @@ function isVerified(
   );
 }
 
+function matchesFilter(
+  listing: Listing,
+  filter: ExploreFilter
+): boolean {
+  switch (filter) {
+    case "events":
+      return listing.type === "event";
+
+    case "food":
+      return listing.type === "restaurant";
+
+    case "open":
+      return (
+        listing.type === "restaurant" &&
+        listing.isOpenNow === true
+      );
+
+    case "verified":
+      return isVerified(listing);
+
+    default:
+      return true;
+  }
+}
+
 export default async function ExplorePage({
   searchParams
 }: ExplorePageProps) {
@@ -98,8 +125,8 @@ export default async function ExplorePage({
     databaseEvents,
     databasePlaces
   ] = await Promise.all([
-    getPublishedEventListings(25),
-    getPublishedPlaceListings(25)
+    getPublishedEventListings(60),
+    getPublishedPlaceListings(60)
   ]);
 
   const combinedListings: Listing[] = [
@@ -122,7 +149,8 @@ export default async function ExplorePage({
               listing.neighbourhood,
               listing.description,
               listing.venueName ?? "",
-              listing.address ?? ""
+              listing.address ?? "",
+              ...(listing.searchTerms ?? [])
             ]
               .join(" ")
               .toLowerCase();
@@ -135,118 +163,200 @@ export default async function ExplorePage({
 
   const filteredListings =
     searchedListings.filter(
-      (listing) => {
-        switch (activeFilter) {
-          case "events":
-            return listing.type === "event";
-
-          case "food":
-            return listing.type === "restaurant";
-
-          case "open":
-            return (
-              listing.type === "restaurant" &&
-              listing.isOpenNow === true
-            );
-
-          case "verified":
-            return isVerified(listing);
-
-          default:
-            return true;
-        }
-      }
+      (listing) =>
+        matchesFilter(
+          listing,
+          activeFilter
+        )
     );
 
   const filters: {
     label: string;
     value: ExploreFilter;
+    count: number;
   }[] = [
     {
       label: "All",
-      value: "all"
+      value: "all",
+      count: searchedListings.length
     },
     {
       label: "Events",
-      value: "events"
+      value: "events",
+      count: searchedListings.filter(
+        (listing) =>
+          matchesFilter(
+            listing,
+            "events"
+          )
+      ).length
     },
     {
-      label: "Food",
-      value: "food"
+      label: "Food & drink",
+      value: "food",
+      count: searchedListings.filter(
+        (listing) =>
+          matchesFilter(
+            listing,
+            "food"
+          )
+      ).length
     },
     {
       label: "Open now",
-      value: "open"
+      value: "open",
+      count: searchedListings.filter(
+        (listing) =>
+          matchesFilter(
+            listing,
+            "open"
+          )
+      ).length
     },
     {
-      label: "Verified only",
-      value: "verified"
+      label: "Verified",
+      value: "verified",
+      count: searchedListings.filter(
+        (listing) =>
+          matchesFilter(
+            listing,
+            "verified"
+          )
+      ).length
     }
   ];
 
   const resultsEyebrow =
     activeFilter === "all"
-      ? "RESULTS"
-      : activeFilter.toUpperCase();
+      ? "WINNIPEG PICKS"
+      : filters.find(
+          (filter) =>
+            filter.value === activeFilter
+        )?.label.toUpperCase() ??
+        "RESULTS";
 
   return (
-    <>
-      <div className="page-heading">
-        <span>CITYWIDE</span>
+    <main className={styles.page}>
+      <section className={styles.hero}>
+        <div className={styles.heroCopy}>
+          <span className={styles.eyebrow}>
+            DISCOVER YOUR CITY
+          </span>
 
-        <h1>Explore Winnipeg</h1>
-      </div>
+          <h1>Explore Winnipeg</h1>
 
-      <form
-        className="search-field"
-        action="/explore"
+          <p>
+            Search trusted places and upcoming
+            events, then switch between a clean
+            list and a map whenever location
+            matters.
+          </p>
+        </div>
+
+        <div
+          className={styles.heroBadge}
+          aria-label={`${filteredListings.length} matching listings`}
+        >
+          <strong>
+            {filteredListings.length}
+          </strong>
+
+          <span>
+            {filteredListings.length === 1
+              ? "MATCH"
+              : "MATCHES"}
+          </span>
+        </div>
+      </section>
+
+      <section
+        className={styles.discoveryControls}
+        aria-label="Explore search and filters"
       >
-        <label htmlFor="search">
-          Search
-        </label>
-
-        <input
-          id="search"
-          name="q"
-          defaultValue={q}
-          placeholder="Try anime downtown"
-        />
-
-        {activeFilter !== "all" ? (
-          <input
-            type="hidden"
-            name="filter"
-            value={activeFilter}
-          />
-        ) : null}
-      </form>
-
-      <div
-        className="chips"
-        aria-label="Explore filters"
-      >
-        {filters.map((filter) => (
-          <Link
-            className={`filter-chip ${
-              activeFilter === filter.value
-                ? "active"
-                : ""
-            }`}
-            href={buildExploreHref(
-              filter.value,
-              q
-            )}
-            key={filter.value}
+        <form
+          className={styles.searchForm}
+          action="/explore"
+        >
+          <label
+            className={styles.srOnly}
+            htmlFor="explore-search"
           >
-            {filter.label}
-          </Link>
-        ))}
-      </div>
+            Search Winnipeg listings
+          </label>
+
+          <span
+            className={styles.searchIcon}
+            aria-hidden="true"
+          >
+            ⌕
+          </span>
+
+          <input
+            id="explore-search"
+            name="q"
+            defaultValue={q}
+            placeholder="Restaurant, event, area..."
+            autoComplete="off"
+          />
+
+          {activeFilter !== "all" ? (
+            <input
+              type="hidden"
+              name="filter"
+              value={activeFilter}
+            />
+          ) : null}
+
+          <button type="submit">
+            Search
+          </button>
+        </form>
+
+        {q.trim() ? (
+          <div className={styles.searchSummary}>
+            <span>
+              Results for <strong>“{q.trim()}”</strong>
+            </span>
+
+            <Link href="/explore">
+              Clear search
+            </Link>
+          </div>
+        ) : null}
+
+        <div
+          className={styles.filterRail}
+          aria-label="Explore filters"
+        >
+          {filters.map((filter) => (
+            <Link
+              className={`${styles.filterChip} ${
+                activeFilter === filter.value
+                  ? styles.activeFilter
+                  : ""
+              }`}
+              href={buildExploreHref(
+                filter.value,
+                q
+              )}
+              key={filter.value}
+              aria-current={
+                activeFilter === filter.value
+                  ? "page"
+                  : undefined
+              }
+            >
+              <span>{filter.label}</span>
+              <strong>{filter.count}</strong>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <ExploreExperience
         listings={filteredListings}
         eyebrow={resultsEyebrow}
       />
-    </>
+    </main>
   );
 }
