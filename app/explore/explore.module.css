@@ -1,4 +1,4 @@
-.page {
+﻿.page {
   display: grid;
   gap: 16px;
   width: 100%;
@@ -494,7 +494,6 @@
   cursor: pointer;
   transform: rotate(-45deg);
   transition:
-    transform 150ms ease,
     box-shadow 150ms ease,
     filter 150ms ease;
 }
@@ -1286,3 +1285,4 @@
     animation: none;
   }
 }
+

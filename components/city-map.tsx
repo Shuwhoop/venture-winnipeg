@@ -401,6 +401,7 @@ export function CityMap({
           document.createElement("button");
 
         markerButton.type = "button";
+        markerButton.draggable = false;
         markerButton.className =
           `${styles.mapMarker} ${
             listing.type === "event"
@@ -452,7 +453,8 @@ export function CityMap({
         const marker =
           new maplibregl.Marker({
             element: markerButton,
-            anchor: "bottom"
+            anchor: "bottom",
+            draggable: false
           })
             .setLngLat(coordinates)
             .addTo(activeMap);

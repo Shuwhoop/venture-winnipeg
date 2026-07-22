@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --purple: #6d28d9;
   --purple-dark: #4c1d95;
   --purple-soft: #ede9fe;
@@ -8594,3 +8594,22 @@ button { cursor: pointer; }
     animation: none;
   }
 }
+/* VENTURE MAP PIN ANCHOR LOCK v0.1 */
+/* MapLibre updates marker coordinates through an inline transform while the map moves.
+   Never animate that transform, or pins visually trail behind their real locations. */
+.maplibregl-marker {
+  transition-property: box-shadow, filter, opacity !important;
+  transition-duration: 150ms !important;
+  transition-timing-function: ease !important;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.maplibregl-marker > button,
+.maplibregl-marker button {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* END VENTURE MAP PIN ANCHOR LOCK v0.1 */
+

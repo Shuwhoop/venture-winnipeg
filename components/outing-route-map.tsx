@@ -317,6 +317,7 @@ export function OutingRouteMap({
         );
 
       element.type = "button";
+      element.draggable = false;
       element.className =
         "outing-route-marker";
 
@@ -344,7 +345,8 @@ export function OutingRouteMap({
       const marker =
         new maplibregl.Marker({
           element,
-          anchor: "bottom"
+          anchor: "bottom",
+          draggable: false
         })
           .setLngLat([
             coordinateStop.longitude,
