@@ -37,6 +37,7 @@ function useRouteKind() {
     );
 
   return {
+    pathname,
     isAdmin,
     isAdminAuth
   };
@@ -62,7 +63,10 @@ export function PublicRouteChrome({
   analyticsEnabled: boolean;
   betaFeedbackEnabled: boolean;
 }) {
-  const { isAdmin } = useRouteKind();
+  const {
+    pathname,
+    isAdmin
+  } = useRouteKind();
 
   if (isAdmin) {
     return null;
@@ -70,12 +74,15 @@ export function PublicRouteChrome({
 
   return (
     <>
-      <PublicFooter />
+      {pathname === "/" ? (
+        <PublicFooter />
+      ) : null}
       <BottomNav />
       {analyticsEnabled ? (
         <VentureAnalytics />
       ) : null}
-      {betaFeedbackEnabled ? (
+      {betaFeedbackEnabled &&
+      pathname === "/" ? (
         <BetaFeedback />
       ) : null}
     </>
