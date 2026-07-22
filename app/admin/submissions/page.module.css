@@ -948,3 +948,343 @@
     width: 100%;
   }
 }
+
+/* =========================================================
+   Venture submissions queue phone-fit refresh v0.1
+   Uses the actual admin shell width rather than browser width.
+   ========================================================= */
+
+.page {
+  container-type: inline-size;
+  container-name: submissionsPage;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.page *,
+.page *::before,
+.page *::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.hero,
+.queueTools,
+.nav,
+.notice,
+.section,
+.list,
+.card {
+  width: 100%;
+  max-width: 100%;
+}
+
+.hero h1,
+.sectionHeading h2,
+.cardSummary h3,
+.cardHeader h3 {
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+
+.queueFilters select,
+.queueFilters input {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@container submissionsPage (max-width: 760px) {
+  .page {
+    width: 100%;
+    padding: 14px 12px 132px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 14px;
+    padding: 20px;
+    border-radius: 22px;
+    box-shadow: 5px 5px 0 #edb200;
+  }
+
+  .hero > div:first-child {
+    min-width: 0;
+  }
+
+  .hero h1 {
+    max-width: 11ch;
+    margin-top: 7px;
+    font-size: clamp(2.25rem, 11cqw, 3.35rem);
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+
+  .hero p {
+    max-width: 34ch;
+    margin-top: 13px;
+    font-size: 0.83rem;
+    line-height: 1.48;
+  }
+
+  .counter {
+    min-width: 92px;
+    padding: 13px 10px;
+    border-radius: 17px;
+  }
+
+  .counter strong {
+    font-size: 2rem;
+  }
+
+  .counter small {
+    font-size: 0.65rem;
+  }
+
+  .queueTools {
+    gap: 15px;
+    margin: 20px 0;
+    padding: 17px;
+    border-radius: 21px;
+  }
+
+  .queueToolsHeading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .queueToolsHeading strong {
+    font-size: 1.16rem;
+    line-height: 1.15;
+  }
+
+  .queueToolsHeading p {
+    max-width: 33ch;
+    font-size: 0.78rem;
+    line-height: 1.43;
+  }
+
+  .resultCount {
+    min-width: 88px;
+    padding: 10px;
+    border-radius: 15px;
+  }
+
+  .resultCount strong {
+    font-size: 1.55rem;
+  }
+
+  .resultCount small {
+    font-size: 0.56rem;
+  }
+
+  .queueFilters {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .searchField {
+    grid-column: auto;
+  }
+
+  .queueFilters input,
+  .queueFilters select,
+  .searchField > div {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .queueToolActions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .queueToolActions button {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 9px;
+  }
+
+  .queueToolActions button:first-child:last-child,
+  .queueToolActions button:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 20px;
+  }
+
+  .nav a {
+    align-items: center;
+    min-height: 56px;
+    padding: 11px 12px;
+    font-size: 0.76rem;
+  }
+
+  .nav strong {
+    min-width: 25px;
+    height: 25px;
+  }
+
+  .notice {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 14px 15px;
+  }
+
+  .section {
+    margin-top: 34px;
+  }
+
+  .sectionHeading h2 {
+    font-size: clamp(1.65rem, 8.5cqw, 2.35rem);
+  }
+
+  .list {
+    gap: 14px;
+  }
+
+  .card {
+    border-radius: 20px;
+    box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.12);
+  }
+
+  .cardSummary {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .cardSummary h3 {
+    font-size: clamp(1.08rem, 5.4cqw, 1.35rem);
+    line-height: 1.08;
+  }
+
+  .cardSummary p {
+    font-size: 0.73rem;
+  }
+
+  .summaryMeta,
+  .submitter {
+    grid-column: 1 / -1;
+    justify-items: start;
+    max-width: none;
+    text-align: left;
+  }
+
+  .expandHint {
+    grid-column: 2;
+    grid-row: 1;
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .card[open] .expandHint::before {
+    content: "";
+    font-size: 0;
+  }
+
+  .compactBody,
+  .form {
+    padding: 14px;
+  }
+
+  .quickFacts,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .actions button,
+  .actions a,
+  .actions .edit {
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .reject {
+    margin-left: 0;
+  }
+}
+
+@container submissionsPage (max-width: 430px) {
+  .page {
+    padding-inline: 9px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 17px;
+  }
+
+  .hero h1 {
+    max-width: 9.5ch;
+    font-size: clamp(2.15rem, 13cqw, 2.85rem);
+  }
+
+  .counter {
+    grid-template-columns: auto auto;
+    align-items: center;
+    justify-content: start;
+    gap: 8px;
+    width: fit-content;
+    min-width: 0;
+    padding: 10px 13px;
+    text-align: left;
+  }
+
+  .counter strong {
+    font-size: 1.55rem;
+  }
+
+  .counter small {
+    margin-top: 0;
+  }
+
+  .queueToolsHeading {
+    grid-template-columns: 1fr;
+  }
+
+  .resultCount {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    justify-content: start;
+    gap: 7px;
+    width: fit-content;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .queueToolActions,
+  .nav,
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .queueToolActions button:nth-child(3) {
+    grid-column: auto;
+  }
+
+  .nav a {
+    min-height: 48px;
+  }
+}
