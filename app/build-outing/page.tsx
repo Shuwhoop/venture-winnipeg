@@ -444,35 +444,49 @@ const budgetOptions: {
   value: BudgetPreference;
   label: string;
   amount: string;
+  icon: string;
   description: string;
+  helper: string;
 }[] = [
   {
     value: "free",
     label: "Free",
     amount: "$0",
+    icon: "🌱",
     description:
-      "No admission cost"
+      "No admission cost",
+    helper:
+      "Big plans, no spend."
   },
   {
     value: "under-40",
     label: "Under $40",
     amount: "$40",
+    icon: "🎟️",
     description:
-      "Affordable per person"
+      "Affordable per person",
+    helper:
+      "A flexible everyday outing."
   },
   {
     value: "under-80",
     label: "Under $80",
     amount: "$80",
+    icon: "🍽️",
     description:
-      "More food and ticket choices"
+      "More food and ticket choices",
+    helper:
+      "Room for a fuller experience."
   },
   {
     value: "flexible",
     label: "Flexible",
     amount: "∞",
+    icon: "✨",
     description:
-      "Prioritize the experience"
+      "Prioritize the experience",
+    helper:
+      "Venture can use the best fit."
   }
 ];
 
@@ -2744,44 +2758,93 @@ export default function BuildOutingPage() {
           ) : null}
 
           {currentStep === 6 ? (
-            <section className="budget-compact-grid">
-              {budgetOptions.map(
-                (option) => (
-                  <button
-                    type="button"
-                    key={option.value}
-                    className={
+            <section className="budget-experience-panel">
+              <div className="budget-stage-note">
+                <span aria-hidden="true">💡</span>
+
+                <div>
+                  <strong>Keep it realistic</strong>
+                  <small>
+                    This estimate is per person. Venture will show the group total after building the route.
+                  </small>
+                </div>
+              </div>
+
+              <div className="budget-compact-grid">
+                {budgetOptions.map(
+                  (option) => {
+                    const selected =
                       budget ===
-                      option.value
-                        ? "selected"
-                        : ""
-                    }
-                    onClick={() =>
-                      setBudget(
-                        option.value
-                      )
-                    }
-                  >
-                    <span>
-                      {option.amount}
-                    </span>
+                      option.value;
 
-                    <strong>
-                      {option.label}
-                    </strong>
+                    return (
+                      <button
+                        type="button"
+                        key={option.value}
+                        className={`${selected ? "selected" : ""} budget-option budget-option-${option.value}`}
+                        aria-pressed={selected}
+                        onClick={() =>
+                          setBudget(
+                            option.value
+                          )
+                        }
+                      >
+                        <span className="budget-option-icon" aria-hidden="true">
+                          {option.icon}
+                        </span>
 
-                    <small>
-                      {option.description}
-                    </small>
-                  </button>
-                )
-              )}
+                        <span className="budget-option-amount">
+                          {option.amount}
+                        </span>
+
+                        <strong>
+                          {option.label}
+                        </strong>
+
+                        <small>
+                          {option.description}
+                        </small>
+
+                        <i>
+                          {option.helper}
+                        </i>
+
+                        <span className="budget-option-check" aria-hidden="true">
+                          {selected ? "✓" : ""}
+                        </span>
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+
+              <div className="budget-stage-footer">
+                <span aria-hidden="true">🔒</span>
+                <small>Budget changes recommendations, never the quality of your experience.</small>
+              </div>
             </section>
           ) : null}
 
           {currentStep === 7 ? (
-            <section className="outing-area-travel-panel">
-              <div className="outing-personalization-heading">
+            <section className="outing-area-travel-panel area-experience-panel">
+              <div className="area-stage-intro">
+                <span aria-hidden="true">📍</span>
+
+                <div>
+                  <strong>Choose your Winnipeg radius</strong>
+                  <small>
+                    Pick one area for a tighter plan, or select a few for a bigger city adventure.
+                  </small>
+                </div>
+
+                <b>
+                  {selectedNeighbourhoods.length > 0
+                    ? `${selectedNeighbourhoods.length} selected`
+                    : "Citywide"}
+                </b>
+              </div>
+
+              <div className="outing-personalization-heading area-heading">
                 <span>
                   NEIGHBOURHOODS
                 </span>
@@ -2791,28 +2854,30 @@ export default function BuildOutingPage() {
                 </strong>
               </div>
 
-              <NeighbourhoodPicker
-                compact
-                selected={
-                  selectedNeighbourhoods
-                }
-                onToggle={(neighbourhood) =>
-                  setSelectedNeighbourhoods(
-                    (current) =>
-                      toggleValue(
-                        current,
-                        neighbourhood
-                      )
-                  )
-                }
-              />
+              <div className="neighbourhood-experience-shell">
+                <NeighbourhoodPicker
+                  compact
+                  selected={
+                    selectedNeighbourhoods
+                  }
+                  onToggle={(neighbourhood) =>
+                    setSelectedNeighbourhoods(
+                      (current) =>
+                        toggleValue(
+                          current,
+                          neighbourhood
+                        )
+                    )
+                  }
+                />
+              </div>
 
-              <p className="wizard-compact-note">
-                Nothing selected means
-                anywhere in Winnipeg.
+              <p className="wizard-compact-note area-anywhere-note">
+                <span aria-hidden="true">🧭</span>
+                Nothing selected means Venture can search anywhere in Winnipeg.
               </p>
 
-              <div className="outing-personalization-heading secondary">
+              <div className="outing-personalization-heading secondary travel-heading">
                 <span>
                   TRANSPORTATION
                 </span>
