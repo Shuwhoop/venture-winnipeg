@@ -2101,10 +2101,10 @@ export default function OutingResultsPage() {
                       </strong>
                       <small>
                         {option.kind === "food"
-                          ? "A bite worth the detour"
+                          ? "Find a bite near the route"
                           : option.kind === "event"
-                            ? "Give the night a headline"
-                            : "Finish with a proper toast"}
+                            ? "Add something happening"
+                            : "Finish with a relaxed drink"}
                       </small>
                     </span>
 
