@@ -353,6 +353,161 @@ function countRequestedStops(
   );
 }
 
+function SaveRouteIcon({
+  filled = false
+}: {
+  filled?: boolean;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M6.75 4.5h10.5a1.5 1.5 0 0 1 1.5 1.5v14.25l-6.75-3.9-6.75 3.9V6a1.5 1.5 0 0 1 1.5-1.5Z"
+        fill={filled ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m9.2 10.9 1.65 1.65 3.95-4.1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ShareRouteIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="18" cy="5" r="2.25" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="6" cy="12" r="2.25" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="18" cy="19" r="2.25" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="m8 10.95 7.8-4.7M8 13.05l7.8 4.7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function RefreshRouteIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M19.25 8.25A7.75 7.75 0 1 0 19 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+      <path
+        d="M15.5 8.25h3.75V4.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m10.1 9.2 1.15 2.35 2.6.38-1.88 1.83.44 2.59-2.31-1.22-2.32 1.22.45-2.59-1.89-1.83 2.61-.38L10.1 9.2Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function DetailChevron({
+  expanded
+}: {
+  expanded: boolean;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d={expanded ? "m7 14 5-5 5 5" : "m7 10 5 5 5-5"}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function TravelModeIcon({
+  mode
+}: {
+  mode: string;
+}) {
+  const normalized = mode.toLowerCase();
+
+  if (normalized.includes("walk")) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="13" cy="4.5" r="2" fill="currentColor" />
+        <path d="m11.5 8 3 2 2.2 3.1M11.5 8 9 12l3 2.2-2 5.3M12 14.2l4 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (normalized.includes("transit") || normalized.includes("bus")) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <rect x="5" y="3.5" width="14" height="15" rx="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M8 7h8M7.5 13.5h9M8 18.5v2M16 18.5v2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="8.5" cy="15.5" r="1" fill="currentColor" />
+        <circle cx="15.5" cy="15.5" r="1" fill="currentColor" />
+      </svg>
+    );
+  }
+
+  if (normalized.includes("ride")) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="m5 14 2-5h10l2 5v4H5v-4Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M8 9 9.2 6.5h5.6L16 9M7 18v2M17 18v2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="8" cy="15" r="1" fill="currentColor" />
+        <circle cx="16" cy="15" r="1" fill="currentColor" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="m4.5 14 2.2-5.25h10.6L19.5 14v4.25h-15V14Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M7.8 8.75 9 5.8h6l1.2 2.95M7 18.25v1.95M17 18.25v1.95" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="8" cy="15" r="1.15" fill="currentColor" />
+      <circle cx="16" cy="15" r="1.15" fill="currentColor" />
+    </svg>
+  );
+}
+
 export default function OutingResultsPage() {
   const [
     status,
@@ -1621,10 +1776,10 @@ export default function OutingResultsPage() {
               }
             >
               <span
-                className={styles.actionIcon}
+                className={`${styles.actionIcon} ${styles.saveIcon}`}
                 aria-hidden="true"
               >
-                {saved ? "♥" : "♡"}
+                <SaveRouteIcon filled={saved} />
               </span>
 
               <span className={styles.actionCopy}>
@@ -1639,15 +1794,16 @@ export default function OutingResultsPage() {
 
             <button
               type="button"
+              className={styles.shareAction}
               onClick={() => {
                 void handleShareOuting();
               }}
             >
               <span
-                className={styles.actionIcon}
+                className={`${styles.actionIcon} ${styles.shareIcon}`}
                 aria-hidden="true"
               >
-                ↗
+                <ShareRouteIcon />
               </span>
 
               <span className={styles.actionCopy}>
@@ -1669,10 +1825,10 @@ export default function OutingResultsPage() {
               }}
             >
               <span
-                className={`${styles.actionIcon} ${refreshingUnlocked ? styles.spinning : ""}`}
+                className={`${styles.actionIcon} ${styles.refreshIcon} ${refreshingUnlocked ? styles.spinning : ""}`}
                 aria-hidden="true"
               >
-                ↻
+                <RefreshRouteIcon />
               </span>
 
               <span className={styles.actionCopy}>
@@ -1848,7 +2004,7 @@ export default function OutingResultsPage() {
               <div className="section-heading">
                 <div>
                   <span>
-                    PLAN DETAILS
+                    YOUR NIGHT, SCENE BY SCENE
                   </span>
 
                   <h2>
@@ -1859,10 +2015,7 @@ export default function OutingResultsPage() {
                   </h2>
 
                   <p>
-                    Lock favourites, replace
-                    anything uncertain, or
-                    open each listing for
-                    full details.
+                    Follow the route, open each stop, and tune the night without rebuilding everything.
                   </p>
                 </div>
               </div>
@@ -1889,17 +2042,23 @@ export default function OutingResultsPage() {
                       null ? (
                         <div className="outing-travel-row">
                           <span
+                            className="outing-travel-icon"
                             aria-hidden="true"
                           >
-                            ↓
+                            <TravelModeIcon mode={plan.transportation} />
                           </span>
 
-                          <p>
-                            About{" "}
-                            {stop.travelFromPreviousMinutes}{" "}
-                            minutes by{" "}
-                            {plan.transportation.toLowerCase()}
-                          </p>
+                          <div className="outing-travel-copy">
+                            <strong>Next stop</strong>
+                            <p>
+                              About{" "}
+                              {stop.travelFromPreviousMinutes}{" "}
+                              minutes by{" "}
+                              {plan.transportation.toLowerCase()}
+                            </p>
+                          </div>
+
+                          <i className="outing-travel-pulse" aria-hidden="true" />
                         </div>
                       ) : null}
 
@@ -1967,7 +2126,7 @@ export default function OutingResultsPage() {
                                 : "Show details"}
                             </span>
                             <i aria-hidden="true">
-                              {expanded ? "−" : "+"}
+                              <DetailChevron expanded={expanded} />
                             </i>
                           </button>
 

@@ -1235,3 +1235,428 @@
     transform: none;
   }
 }
+
+/* =========================================================
+   Venture route story refresh v0.1
+   Makes the itinerary feel like a journey instead of a form.
+   ========================================================= */
+
+.actionIcon svg {
+  width: 23px;
+  height: 23px;
+  display: block;
+}
+
+.saveIcon {
+  color: #8f0c10;
+  background: linear-gradient(145deg, #fff8cf 0%, #ffffff 100%);
+}
+
+.shareAction {
+  background:
+    radial-gradient(circle at 88% 10%, rgba(255, 255, 255, 0.8), transparent 27%),
+    linear-gradient(135deg, #ffd8df 0%, #ffc0cd 100%) !important;
+  box-shadow: 4px 4px 0 #6d28d9 !important;
+}
+
+.shareIcon {
+  color: #5b21b6;
+  background: linear-gradient(145deg, #f8f2ff 0%, #ffffff 100%);
+}
+
+.refreshIcon {
+  color: #4c1d95;
+  background: linear-gradient(145deg, #ffffff 0%, #eee5ff 100%);
+}
+
+.refreshRoot :global(.outing-action-dock button) .actionIcon {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.refreshRoot :global(.outing-action-dock button:hover:not(:disabled)) .actionIcon,
+.refreshRoot :global(.outing-action-dock button:focus-visible) .actionIcon {
+  transform: translateY(-2px) rotate(-3deg) scale(1.06);
+  box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.15);
+}
+
+.refreshRoot :global(.outing-timeline-v3) {
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding: 17px;
+  overflow: hidden;
+  border: 2px solid var(--result-ink);
+  border-radius: 25px;
+  background:
+    radial-gradient(circle at 94% 2%, rgba(255, 207, 0, 0.2), transparent 23%),
+    radial-gradient(circle at 2% 48%, rgba(109, 40, 217, 0.08), transparent 20%),
+    linear-gradient(180deg, #fffefb 0%, #fff7f1 100%);
+  box-shadow: 6px 6px 0 rgba(36, 31, 32, 0.11);
+}
+
+.refreshRoot :global(.outing-timeline-v3)::before {
+  position: absolute;
+  top: 96px;
+  bottom: 30px;
+  left: 39px;
+  width: 4px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #d01013 0 13px,
+      #ffcf00 13px 25px,
+      #6d28d9 25px 37px
+    );
+  opacity: 0.3;
+  content: "";
+  animation: routeRailMove 5s linear infinite;
+}
+
+@keyframes routeRailMove {
+  to {
+    background-position-y: 37px;
+  }
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading) {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 15px;
+  padding: 17px;
+  border: 2px solid var(--result-ink);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 90% 15%, rgba(255, 255, 255, 0.55), transparent 25%),
+    linear-gradient(135deg, #ffcf00 0%, #ffe270 55%, #fff4bd 100%);
+  box-shadow: 4px 4px 0 #d01013;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading span) {
+  color: #9f0c10;
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading h2) {
+  max-width: 18ch;
+  margin-top: 4px;
+  font-size: clamp(1.6rem, 7vw, 2.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading p) {
+  max-width: 40ch;
+  margin-top: 8px;
+  color: #5f5147;
+}
+
+.refreshRoot :global(.outing-stop-wrapper) {
+  position: relative;
+  z-index: 2;
+  margin-top: 0;
+  padding-bottom: 14px;
+}
+
+.refreshRoot :global(.outing-stop-card-v3) {
+  position: relative;
+  border: 2px solid var(--result-ink);
+  box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.13);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.refreshRoot :global(.outing-stop-card-v3:hover) {
+  transform: translateY(-3px);
+  box-shadow: 7px 7px 0 rgba(36, 31, 32, 0.13);
+}
+
+.refreshRoot :global(.outing-kind-food .outing-stop-card-v3) {
+  background:
+    radial-gradient(circle at 94% 10%, rgba(255, 207, 0, 0.2), transparent 26%),
+    linear-gradient(180deg, #fffdf7 0%, #fff2c8 100%);
+}
+
+.refreshRoot :global(.outing-kind-event .outing-stop-card-v3) {
+  background:
+    radial-gradient(circle at 94% 10%, rgba(109, 40, 217, 0.15), transparent 26%),
+    linear-gradient(180deg, #fff 0%, #f1e8ff 100%);
+}
+
+.refreshRoot :global(.outing-kind-drinks .outing-stop-card-v3) {
+  background:
+    radial-gradient(circle at 94% 10%, rgba(15, 138, 75, 0.14), transparent 26%),
+    linear-gradient(180deg, #fff 0%, #e8f8f0 100%);
+}
+
+.refreshRoot :global(.outing-stop-card-v3)::after {
+  position: absolute;
+  top: -45%;
+  left: -35%;
+  width: 25%;
+  height: 190%;
+  background: rgba(255, 255, 255, 0.42);
+  transform: rotate(18deg);
+  pointer-events: none;
+  content: "";
+  animation: stopCardGleam 5.8s ease-in-out infinite;
+}
+
+@keyframes stopCardGleam {
+  0%,
+  75% { left: -35%; }
+  100% { left: 125%; }
+}
+
+.refreshRoot :global(.outing-stop-order) {
+  position: relative;
+  z-index: 2;
+  border: 2px solid var(--result-ink);
+  animation: stopNumberPop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes stopNumberPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+.refreshRoot :global(.outing-stop-topline > span) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #241f20;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+
+.refreshRoot :global(.outing-stop-content h2) {
+  margin-top: 9px;
+  font-size: clamp(1.18rem, 5.4vw, 1.62rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.refreshRoot :global(.outing-stop-reason) {
+  position: relative;
+  margin-top: 10px;
+  padding: 11px 12px 11px 16px;
+  overflow: hidden;
+  border-radius: 0 13px 13px 0;
+  background: rgba(255, 255, 255, 0.72);
+  color: #5e5354;
+}
+
+.refreshRoot :global(.outing-stop-reason)::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, #d01013, #ffcf00);
+  content: "";
+}
+
+.refreshRoot :global(.outing-travel-row) {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 28px);
+  min-height: 76px;
+  margin: 0 0 0 28px;
+  padding: 12px 13px 12px 9px;
+  overflow: hidden;
+  border: 1.5px solid rgba(109, 40, 217, 0.22);
+  border-left: 4px dashed #d01013;
+  border-radius: 0 18px 18px 0;
+  background:
+    radial-gradient(circle at 88% 30%, rgba(255, 255, 255, 0.6), transparent 28%),
+    linear-gradient(135deg, #eee6ff 0%, #ddd0ff 100%);
+}
+
+.refreshRoot :global(.outing-travel-row)::after {
+  position: absolute;
+  right: -18px;
+  bottom: -28px;
+  width: 75px;
+  height: 75px;
+  border: 12px solid rgba(255, 207, 0, 0.26);
+  border-radius: 999px;
+  content: "";
+}
+
+.refreshRoot :global(.outing-travel-icon) {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--result-ink);
+  border-radius: 14px;
+  background: #fffaf2;
+  color: #5b21b6;
+  box-shadow: 3px 3px 0 #ffcf00;
+}
+
+.refreshRoot :global(.outing-travel-icon svg) {
+  width: 23px;
+  height: 23px;
+}
+
+.refreshRoot :global(.outing-travel-copy) {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.refreshRoot :global(.outing-travel-copy strong) {
+  color: #5b21b6;
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.refreshRoot :global(.outing-travel-copy p) {
+  margin: 0;
+  color: #4d405d;
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.refreshRoot :global(.outing-travel-pulse) {
+  position: relative;
+  z-index: 2;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #d01013;
+  box-shadow: 0 0 0 0 rgba(208, 16, 19, 0.42);
+  animation: travelPulse 1.8s ease-out infinite;
+}
+
+@keyframes travelPulse {
+  0% { box-shadow: 0 0 0 0 rgba(208, 16, 19, 0.42); }
+  70% { box-shadow: 0 0 0 11px rgba(208, 16, 19, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(208, 16, 19, 0); }
+}
+
+.detailsToggle {
+  position: relative;
+  z-index: 3;
+  min-height: 46px;
+  overflow: hidden;
+  border: 2px solid var(--result-ink);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.12);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.detailsToggle:hover,
+.detailsToggle:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.13);
+}
+
+.detailsToggle i {
+  color: #241f20;
+  transition: transform 180ms ease;
+}
+
+.detailsToggle[aria-expanded="true"] i {
+  transform: rotate(180deg);
+}
+
+.detailsToggle i svg {
+  width: 17px;
+  height: 17px;
+}
+
+.stopDetailsPanel {
+  position: relative;
+  z-index: 3;
+  box-shadow: inset 0 0 0 1px rgba(255, 207, 0, 0.18);
+}
+
+@media (max-width: 420px) {
+  .refreshRoot :global(.outing-timeline-v3) {
+    padding: 13px;
+  }
+
+  .refreshRoot :global(.outing-timeline-v3)::before {
+    left: 32px;
+  }
+
+  .refreshRoot :global(.outing-timeline-v3 .section-heading) {
+    padding: 15px;
+  }
+
+  .refreshRoot :global(.outing-travel-row) {
+    width: calc(100% - 20px);
+    margin-left: 20px;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .refreshRoot :global(.outing-travel-pulse) {
+    display: none;
+  }
+
+  .refreshRoot :global(.outing-stop-card-v3) {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .refreshRoot :global(.outing-stop-content h2) {
+    font-size: 1.15rem;
+  }
+}
+
+@media (max-width: 350px) {
+  .refreshRoot :global(.outing-action-dock button) {
+    min-height: 68px;
+  }
+
+  .refreshRoot :global(.outing-travel-row) {
+    grid-template-columns: 1fr;
+    margin-left: 15px;
+    width: calc(100% - 15px);
+  }
+
+  .refreshRoot :global(.outing-travel-icon) {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refreshRoot :global(.outing-timeline-v3)::before,
+  .refreshRoot :global(.outing-stop-card-v3)::after,
+  .refreshRoot :global(.outing-stop-order),
+  .refreshRoot :global(.outing-travel-pulse) {
+    animation: none !important;
+  }
+
+  .refreshRoot :global(.outing-stop-card-v3:hover),
+  .detailsToggle:hover {
+    transform: none;
+  }
+}
