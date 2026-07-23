@@ -437,6 +437,106 @@ function RefreshRouteIcon() {
   );
 }
 
+
+function SnapshotIcon({
+  kind
+}: {
+  kind:
+    | "date"
+    | "start"
+    | "people"
+    | "length"
+    | "travel"
+    | "price"
+    | "group";
+}) {
+  const common = {
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const
+  };
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      {kind === "date" ? (
+        <>
+          <rect x="4" y="5.5" width="16" height="14" rx="3" {...common} />
+          <path d="M8 3.8v3.4M16 3.8v3.4M4 9.5h16" {...common} />
+          <path d="M8 13h2M14 13h2M8 16.5h2" {...common} />
+        </>
+      ) : null}
+      {kind === "start" ? (
+        <>
+          <circle cx="12" cy="12" r="8" {...common} />
+          <path d="M12 7.5V12l3.2 2" {...common} />
+        </>
+      ) : null}
+      {kind === "people" ? (
+        <>
+          <circle cx="9" cy="9" r="3" {...common} />
+          <circle cx="16.5" cy="10" r="2.3" {...common} />
+          <path d="M4.8 19c.4-3.3 2.1-5 4.2-5s3.8 1.7 4.2 5M13.2 15.2c.8-.8 1.8-1.2 3-1.2 1.9 0 3.2 1.5 3.5 4" {...common} />
+        </>
+      ) : null}
+      {kind === "length" ? (
+        <>
+          <path d="M8 4h8M8 20h8M9 4c0 3.4 1.3 5.4 3 6.4 1.7 1 3 3 3 5.6M15 4c0 3.4-1.3 5.4-3 6.4-1.7 1-3 3-3 5.6" {...common} />
+        </>
+      ) : null}
+      {kind === "travel" ? (
+        <>
+          <circle cx="12" cy="12" r="8" {...common} />
+          <path d="m15.8 8.2-2.1 5.5-5.5 2.1 2.1-5.5 5.5-2.1Z" {...common} />
+          <circle cx="12" cy="12" r="1.2" fill="currentColor" />
+        </>
+      ) : null}
+      {kind === "price" ? (
+        <>
+          <rect x="3.5" y="6" width="17" height="12" rx="2.5" {...common} />
+          <circle cx="12" cy="12" r="3" {...common} />
+          <path d="M6.5 9.5h.01M17.5 14.5h.01" {...common} />
+        </>
+      ) : null}
+      {kind === "group" ? (
+        <>
+          <path d="M5 5.5h14v13H5z" {...common} />
+          <path d="M8 9h8M8 12h5M8 15h4" {...common} />
+        </>
+      ) : null}
+    </svg>
+  );
+}
+
+function AddStopIcon({
+  kind
+}: {
+  kind: StopKind;
+}) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      {kind === "food" ? (
+        <>
+          <path d="M7 3.5v7M4.5 3.5v4.2c0 1.6 1 2.8 2.5 2.8s2.5-1.2 2.5-2.8V3.5M7 10.5v10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M15 3.5c2.8 1.4 3.8 4.3 2.8 7.1-.6 1.6-1.8 2.8-3.3 3.4V20.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ) : null}
+      {kind === "event" ? (
+        <>
+          <path d="M4.5 7.5h15v9h-15z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+          <path d="M8 7.5V5.2M16 7.5V5.2M8.2 11h2.2M13.6 11h2.2M8.2 14h2.2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </>
+      ) : null}
+      {kind === "drinks" ? (
+        <>
+          <path d="M6 4h12l-5 7v8M9 20h6M8.1 7h7.8" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ) : null}
+    </svg>
+  );
+}
+
 function DetailChevron({
   expanded
 }: {
@@ -1853,74 +1953,91 @@ export default function OutingResultsPage() {
 
           <section className={styles.snapshotSection}>
             <div className={styles.snapshotHeading}>
-              <span>ADVENTURE SNAPSHOT</span>
-              <h2>The night, at a glance</h2>
-              <p>Everything Venture used to shape the route.</p>
+              <div className={styles.snapshotBadge}>
+                <span className={styles.snapshotSpark} aria-hidden="true">✦</span>
+                <span>ADVENTURE SNAPSHOT</span>
+              </div>
+              <h2>Your night&apos;s little blueprint</h2>
+              <p>The useful details, dressed for the occasion.</p>
+            </div>
+
+            <div className={styles.snapshotRouteLine} aria-hidden="true">
+              <span />
+              <span />
+              <span />
+              <span />
             </div>
 
             <div className="outing-plan-summary outing-plan-summary-v3">
               <div className={`${styles.statCard} ${styles.dateCard}`}>
-                <span><i className={styles.statIcon} aria-hidden="true">📅</i> DATE</span>
+                <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="date" /></i> DATE</span>
                 <strong>{formatPlanDate(plan.date)}</strong>
+                <small>Your Venture day</small>
               </div>
 
               <div className={`${styles.statCard} ${styles.startCard}`}>
-                <span><i className={styles.statIcon} aria-hidden="true">🕒</i> START</span>
+                <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="start" /></i> START</span>
                 <strong>{plan.requestedStartTime}</strong>
+                <small>Meet-up time</small>
               </div>
 
               <div className={`${styles.statCard} ${styles.peopleCard}`}>
-                <span><i className={styles.statIcon} aria-hidden="true">👥</i> PEOPLE</span>
+                <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="people" /></i> PEOPLE</span>
                 <strong>{partySize}</strong>
+                <small>{partySize === 1 ? "Solo mission" : "Adventure crew"}</small>
               </div>
 
               <div className={`${styles.statCard} ${styles.lengthCard}`}>
-                <span><i className={styles.statIcon} aria-hidden="true">⌛</i> LENGTH</span>
+                <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="length" /></i> LENGTH</span>
                 <strong>{plan.requestedDuration}</strong>
+                <small>Time carved out</small>
               </div>
 
               <div className={`${styles.statCard} ${styles.travelCard}`}>
-                <span><i className={styles.statIcon} aria-hidden="true">🧭</i> TRAVEL</span>
+                <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="travel" /></i> TRAVEL</span>
                 <strong>{plan.transportation}</strong>
-                <small>Max {maxTravelMinutes} min per leg</small>
+                <small>Up to {maxTravelMinutes} min between stops</small>
               </div>
 
               <div className={`${styles.statCard} ${styles.priceCard}`}>
-                <span><i className={styles.statIcon} aria-hidden="true">💵</i> PER PERSON</span>
+                <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="price" /></i> PER PERSON</span>
                 <strong>{formatCost(plan.estimatedTotalCad)}</strong>
+                <small>Estimated route total</small>
               </div>
 
               {partySize > 1 ? (
                 <div className={`${styles.statCard} ${styles.groupCard}`}>
-                  <span><i className={styles.statIcon} aria-hidden="true">🧾</i> GROUP ESTIMATE</span>
+                  <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="group" /></i> GROUP ESTIMATE</span>
                   <strong>{formatCost(estimatedGroupTotal)}</strong>
+                  <small>For the whole crew</small>
                 </div>
               ) : null}
             </div>
           </section>
 
-          <section className="outing-add-stop-panel">
-            <div>
-              <span>
-                KEEP BUILDING
-              </span>
+          <section className={`outing-add-stop-panel ${styles.addStopPanel}`}>
+            <div className={styles.addStopIntro}>
+              <span className={styles.addStopSpark} aria-hidden="true">+</span>
+              <div>
+                <span>KEEP THE NIGHT GOING</span>
 
-              <h2>
-                {planStatus ===
-                "partial"
-                  ? "Fill the missing stop"
-                  : "Add another stop"}
-              </h2>
+                <h2>
+                  {planStatus ===
+                  "partial"
+                    ? "Complete the story"
+                    : "One more memory?"}
+                </h2>
 
-              <p>
-                {planStatus ===
-                "partial"
-                  ? "Try a category below. Venture will keep the current route and use a safe available gap."
-                  : "Venture will place it in an available gap without breaking the existing route."}
-              </p>
+                <p>
+                  {planStatus ===
+                  "partial"
+                    ? "Pick a category and Venture will fill the safest available gap."
+                    : "Drop in one more stop without unravelling the route you already love."}
+                </p>
+              </div>
             </div>
 
-            <div className="outing-add-stop-grid">
+            <div className={`outing-add-stop-grid ${styles.addStopGrid}`}>
               {(
                 [
                   {
@@ -1947,6 +2064,13 @@ export default function OutingResultsPage() {
                   <button
                     type="button"
                     key={option.kind}
+                    className={`${styles.addStopChoice} ${
+                      option.kind === "food"
+                        ? styles.foodChoice
+                        : option.kind === "event"
+                          ? styles.eventChoice
+                          : styles.drinksChoice
+                    }`}
                     disabled={
                       addingKind !== null ||
                       replacingOrder !== null ||
@@ -1964,18 +2088,27 @@ export default function OutingResultsPage() {
                       );
                     }}
                   >
-                    <span
-                      aria-hidden="true"
-                    >
-                      {option.icon}
+                    <span className={styles.addStopIcon} aria-hidden="true">
+                      <AddStopIcon kind={option.kind} />
                     </span>
 
-                    <strong>
-                      {addingKind ===
-                      option.kind
-                        ? "Adding..."
-                        : `Add ${option.label}`}
-                    </strong>
+                    <span className={styles.addStopCopy}>
+                      <strong>
+                        {addingKind ===
+                        option.kind
+                          ? "Adding..."
+                          : `Add ${option.label}`}
+                      </strong>
+                      <small>
+                        {option.kind === "food"
+                          ? "A bite worth the detour"
+                          : option.kind === "event"
+                            ? "Give the night a headline"
+                            : "Finish with a proper toast"}
+                      </small>
+                    </span>
+
+                    <span className={styles.addStopArrow} aria-hidden="true">→</span>
                   </button>
                 )
               )}

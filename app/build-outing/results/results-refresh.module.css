@@ -1660,3 +1660,483 @@
     transform: none;
   }
 }
+
+/* =========================================================
+   Venture snapshot + encore refresh v0.1
+   Gives the final route details a stronger visual story.
+   ========================================================= */
+
+.snapshotSection {
+  position: relative;
+  overflow: hidden;
+  gap: 15px;
+  padding: 17px;
+  border: 2px solid var(--result-ink);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 92% 9%, rgba(255, 207, 0, 0.32), transparent 24%),
+    radial-gradient(circle at 8% 96%, rgba(177, 221, 255, 0.38), transparent 26%),
+    linear-gradient(145deg, #fffdf8 0%, #fff2dc 54%, #f5efff 100%);
+  box-shadow: 6px 6px 0 rgba(36, 31, 32, 0.12);
+  isolation: isolate;
+}
+
+.snapshotSection::before {
+  position: absolute;
+  top: -40px;
+  right: -42px;
+  width: 128px;
+  height: 128px;
+  border: 18px solid rgba(255, 255, 255, 0.38);
+  border-radius: 999px;
+  content: "";
+  z-index: -1;
+  animation: snapshotOrbit 7s ease-in-out infinite;
+}
+
+.snapshotSection::after {
+  position: absolute;
+  left: 16px;
+  bottom: 11px;
+  width: 42px;
+  height: 42px;
+  background:
+    radial-gradient(circle, #d01013 0 3px, transparent 4px),
+    radial-gradient(circle at 100% 0%, #ffcf00 0 3px, transparent 4px),
+    radial-gradient(circle at 100% 100%, #7654d8 0 3px, transparent 4px);
+  content: "";
+  opacity: 0.45;
+  z-index: -1;
+}
+
+@keyframes snapshotOrbit {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(9deg) scale(1.06); }
+}
+
+.snapshotHeading {
+  gap: 5px;
+}
+
+.snapshotBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 2px 2px 0 #ffcf00;
+}
+
+.snapshotBadge > span:last-child {
+  color: var(--result-red);
+  font-size: 0.61rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.snapshotSpark {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #ffcf00;
+  color: #241f20 !important;
+  font-size: 0.75rem !important;
+  animation: snapshotSpark 2.2s ease-in-out infinite;
+}
+
+@keyframes snapshotSpark {
+  0%, 100% { transform: rotate(0) scale(1); }
+  50% { transform: rotate(15deg) scale(1.12); }
+}
+
+.snapshotHeading h2 {
+  max-width: 12ch;
+  font-size: clamp(1.7rem, 7vw, 2.25rem);
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+.snapshotHeading p {
+  max-width: 36ch;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.snapshotRouteLine {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.snapshotRouteLine span {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e4dcda;
+}
+
+.snapshotRouteLine span::after {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d01013, #ffcf00);
+  content: "";
+  transform-origin: left;
+  animation: snapshotLine 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.snapshotRouteLine span:nth-child(2)::after { animation-delay: 90ms; }
+.snapshotRouteLine span:nth-child(3)::after { animation-delay: 180ms; }
+.snapshotRouteLine span:nth-child(4)::after { animation-delay: 270ms; }
+
+@keyframes snapshotLine {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.refreshRoot :global(.outing-plan-summary-v3) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+  min-height: 118px;
+  padding: 13px;
+  border-radius: 20px;
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.16);
+  transform: none !important;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: var(--stat-accent, #ffcf00);
+  content: "";
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard:hover {
+  transform: translateY(-3px) !important;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).dateCard,
+.refreshRoot :global(.outing-plan-summary-v3 > div).travelCard,
+.refreshRoot :global(.outing-plan-summary-v3 > div).groupCard {
+  grid-column: 1 / -1;
+  min-height: 102px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).dateCard {
+  --stat-accent: #edb200;
+  background: linear-gradient(135deg, #fff5be 0%, #ffdf6d 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).startCard {
+  --stat-accent: #d01013;
+  background: linear-gradient(145deg, #ffe3e1 0%, #ffb8b2 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).peopleCard {
+  --stat-accent: #1682b5;
+  background: linear-gradient(145deg, #e4f7ff 0%, #b9e5f7 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).lengthCard {
+  --stat-accent: #5d9d32;
+  background: linear-gradient(145deg, #eefce4 0%, #c9eba8 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).travelCard {
+  --stat-accent: #7654d8;
+  background: linear-gradient(145deg, #f2ecff 0%, #d8c7ff 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).priceCard {
+  --stat-accent: #dc7416;
+  background: linear-gradient(145deg, #fff0d8 0%, #ffc486 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).groupCard {
+  --stat-accent: #d01013;
+  background: linear-gradient(120deg, #fff1aa 0%, #ffd6cb 48%, #e7ddff 100%);
+}
+
+.statIcon {
+  width: 42px;
+  height: 42px;
+  flex-basis: 42px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 2px 2px 0 rgba(36, 31, 32, 0.13);
+}
+
+.statIcon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard > span {
+  gap: 9px;
+  font-size: 0.62rem;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard strong {
+  font-size: 1.06rem;
+  line-height: 1.15;
+  text-wrap: pretty;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard small {
+  font-size: 0.66rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.addStopPanel {
+  position: relative;
+  display: grid;
+  gap: 15px;
+  padding: 17px !important;
+  overflow: hidden;
+  border: 2px solid var(--result-ink) !important;
+  border-radius: 25px !important;
+  background:
+    radial-gradient(circle at 94% 9%, rgba(255, 207, 0, 0.34), transparent 23%),
+    linear-gradient(145deg, #fffdf8 0%, #fff2dd 100%) !important;
+  box-shadow: 6px 6px 0 rgba(36, 31, 32, 0.13) !important;
+}
+
+.addStopPanel::after {
+  position: absolute;
+  right: -32px;
+  bottom: -38px;
+  width: 116px;
+  height: 116px;
+  border: 17px solid rgba(208, 16, 19, 0.08);
+  border-radius: 999px;
+  content: "";
+}
+
+.addStopIntro {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.addStopSpark {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 45px;
+  border: 2px solid var(--result-ink);
+  border-radius: 15px;
+  background: #ffcf00;
+  color: #241f20;
+  box-shadow: 3px 3px 0 #d01013;
+  font-size: 1.35rem;
+  font-weight: 950;
+  animation: addStopBob 2.5s ease-in-out infinite;
+}
+
+@keyframes addStopBob {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-3px) rotate(4deg); }
+}
+
+.addStopIntro > div {
+  display: grid;
+  gap: 3px;
+}
+
+.addStopIntro > div > span {
+  color: var(--result-red);
+  font-size: 0.61rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.addStopIntro h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 5.8vw, 1.8rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.addStopIntro p {
+  margin: 2px 0 0;
+  color: #665c5e;
+  font-size: 0.72rem;
+  line-height: 1.42;
+}
+
+.addStopGrid {
+  grid-template-columns: 1fr !important;
+  gap: 9px !important;
+  position: relative;
+  z-index: 1;
+}
+
+.addStopChoice {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  justify-items: stretch !important;
+  gap: 11px !important;
+  min-height: 78px !important;
+  padding: 11px 12px !important;
+  overflow: hidden;
+  border: 2px solid var(--result-ink) !important;
+  border-radius: 18px !important;
+  text-align: left;
+  box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.13);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.addStopChoice:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.14);
+}
+
+.addStopChoice::after {
+  position: absolute;
+  top: -35%;
+  left: -45%;
+  width: 28%;
+  height: 180%;
+  background: rgba(255, 255, 255, 0.38);
+  transform: rotate(16deg);
+  content: "";
+  animation: addChoiceShine 4.8s ease-in-out infinite;
+}
+
+@keyframes addChoiceShine {
+  0%, 76% { left: -45%; }
+  100% { left: 130%; }
+}
+
+.foodChoice {
+  background: linear-gradient(135deg, #fff2b7 0%, #ffdc67 100%) !important;
+}
+
+.eventChoice {
+  background: linear-gradient(135deg, #ffdeda 0%, #ffb7b0 100%) !important;
+}
+
+.drinksChoice {
+  background: linear-gradient(135deg, #eee5ff 0%, #d3c0ff 100%) !important;
+}
+
+.addStopIcon {
+  display: grid !important;
+  place-items: center !important;
+  width: 47px !important;
+  height: 47px !important;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 15px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 2px 2px 0 rgba(36, 31, 32, 0.12);
+}
+
+.addStopIcon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.addStopCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.addStopCopy strong {
+  font-size: 0.86rem !important;
+  text-align: left !important;
+}
+
+.addStopCopy small {
+  color: #665c5e;
+  font-size: 0.65rem;
+  line-height: 1.32;
+}
+
+.addStopArrow {
+  display: grid !important;
+  place-items: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  font-size: 0.9rem !important;
+  font-weight: 950;
+}
+
+@media (max-width: 390px) {
+  .snapshotSection,
+  .addStopPanel {
+    padding: 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .snapshotHeading h2 {
+    max-width: 14ch;
+    font-size: 1.65rem;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+    min-height: 108px;
+    padding: 12px;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3 > div).dateCard,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).travelCard,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).groupCard {
+    min-height: 96px;
+  }
+
+  .statIcon {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .statIcon svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .addStopIntro {
+    grid-template-columns: 1fr;
+  }
+
+  .addStopSpark {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snapshotSection::before,
+  .snapshotSpark,
+  .snapshotRouteLine span::after,
+  .addStopSpark,
+  .addStopChoice::after {
+    animation: none !important;
+  }
+
+  .addStopChoice:hover:not(:disabled) {
+    transform: none;
+  }
+}
