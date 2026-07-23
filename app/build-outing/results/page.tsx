@@ -2225,9 +2225,6 @@ export default function OutingResultsPage() {
                             {stop.listing.subtitle}
                           </p>
 
-                          <p className="outing-stop-reason">
-                            {stop.reason}
-                          </p>
 
                           <div className={styles.stopQuickFacts}>
                             <span>

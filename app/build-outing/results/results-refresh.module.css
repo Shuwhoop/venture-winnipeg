@@ -2140,3 +2140,93 @@
     transform: none;
   }
 }
+
+/* =========================================================
+   Venture results cleanup v0.1
+   Removes recommendation-reason callouts and keeps the
+   additional-stop choices readable inside the phone shell.
+   ========================================================= */
+
+.addStopChoice {
+  grid-template-columns: 50px minmax(0, 1fr) 34px !important;
+  gap: 12px !important;
+  min-width: 0;
+  width: 100%;
+  min-height: 86px !important;
+  padding: 13px 14px !important;
+}
+
+.addStopCopy {
+  align-content: center;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.addStopCopy strong,
+.addStopCopy small {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  text-align: left !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: none !important;
+}
+
+.addStopCopy strong {
+  font-size: 0.96rem !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.01em;
+  white-space: normal;
+}
+
+.addStopCopy small {
+  margin-top: 3px;
+  font-size: 0.7rem !important;
+  line-height: 1.35 !important;
+  color: #584e50;
+}
+
+.addStopIcon {
+  width: 50px !important;
+  height: 50px !important;
+  flex: 0 0 50px;
+}
+
+.addStopArrow {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px;
+}
+
+@media (max-width: 370px) {
+  .addStopChoice {
+    grid-template-columns: 44px minmax(0, 1fr) 30px !important;
+    gap: 9px !important;
+    padding: 11px !important;
+  }
+
+  .addStopIcon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .addStopIcon svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .addStopArrow {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .addStopCopy strong {
+    font-size: 0.9rem !important;
+  }
+
+  .addStopCopy small {
+    font-size: 0.66rem !important;
+  }
+}
