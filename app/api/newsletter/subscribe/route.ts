@@ -3,11 +3,10 @@ import {
 } from "next/server";
 
 import {
-  buildWelcomeEmail
+  buildConfirmationEmail
 } from "@/lib/newsletter/emails";
 
 import {
-  createOrReactivateResendContact,
   sendNewsletterEmail
 } from "@/lib/newsletter/resend";
 
@@ -183,7 +182,7 @@ export async function POST(
       ok:
         true,
       message:
-        "Thanks for joining Venture."
+        "Check your inbox to confirm your subscription."
     });
   }
 
@@ -205,9 +204,7 @@ export async function POST(
           .slice(0, 254)
       : "";
 
-  if (
-    firstName.length < 1
-  ) {
+  if (firstName.length < 1) {
     return NextResponse.json(
       {
         error:
@@ -237,7 +234,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "Please agree to receive the Thursday newsletter."
+          "Please agree to receive The Thursday Venture."
       },
       {
         status:
@@ -248,12 +245,13 @@ export async function POST(
 
   if (
     !process.env.RESEND_API_KEY ||
-    !process.env.NEWSLETTER_TOKEN_SECRET
+    !process.env.NEWSLETTER_TOKEN_SECRET ||
+    !process.env.SUPABASE_SECRET_KEY
   ) {
     return NextResponse.json(
       {
         error:
-          "The newsletter service has not been configured yet."
+          "The newsletter service is not fully configured yet."
       },
       {
         status:
@@ -271,7 +269,7 @@ export async function POST(
         "newsletter_subscribers"
       )
       .select(
-        "id, status, welcome_sent_at"
+        "id, status, confirmed_at"
       )
       .eq(
         "email_normalized",
@@ -282,16 +280,7 @@ export async function POST(
   if (normalizedLookup.error) {
     console.error(
       "Newsletter normalized lookup failed",
-      {
-        code:
-          normalizedLookup.error.code,
-        message:
-          normalizedLookup.error.message,
-        details:
-          normalizedLookup.error.details,
-        hint:
-          normalizedLookup.error.hint
-      }
+      normalizedLookup.error
     );
 
     return NextResponse.json(
@@ -309,14 +298,6 @@ export async function POST(
   let existing =
     normalizedLookup.data;
 
-  /*
-   * The original Venture schema stored
-   * email but not email_normalized.
-   * Fall back to the legacy column so
-   * an older subscriber is reactivated
-   * instead of colliding with the unique
-   * email constraint.
-   */
   if (!existing) {
     const legacyLookup =
       await supabase
@@ -324,7 +305,7 @@ export async function POST(
           "newsletter_subscribers"
         )
         .select(
-          "id, status, welcome_sent_at"
+          "id, status, confirmed_at"
         )
         .eq(
           "email",
@@ -335,16 +316,7 @@ export async function POST(
     if (legacyLookup.error) {
       console.error(
         "Newsletter legacy lookup failed",
-        {
-          code:
-            legacyLookup.error.code,
-          message:
-            legacyLookup.error.message,
-          details:
-            legacyLookup.error.details,
-          hint:
-            legacyLookup.error.hint
-        }
+        legacyLookup.error
       );
 
       return NextResponse.json(
@@ -365,7 +337,8 @@ export async function POST(
 
   if (
     existing?.status ===
-      "active"
+      "active" &&
+    existing.confirmed_at
   ) {
     return NextResponse.json({
       ok:
@@ -381,49 +354,52 @@ export async function POST(
     new Date().toISOString();
 
   const consentText =
-    "I agree to receive the Venture by Boogie Bangers Thursday newsletter and understand that I can unsubscribe at any time.";
+    "I agree to receive The Thursday Venture from Venture by Boogie Bangers and understand that I can unsubscribe at any time.";
+
+  const subscriberValues = {
+    first_name:
+      firstName,
+    email,
+    email_normalized:
+      email,
+    status:
+      "pending",
+    consent_source:
+      cleanSource(
+        body.source
+      ),
+    consent_version:
+      "2026-07-22-v2",
+    consent_text_version:
+      "2026-07-22-v2",
+    consent_text:
+      consentText,
+    consented_at:
+      now,
+    last_signup_at:
+      now,
+    confirmed_at:
+      null,
+    unsubscribed_at:
+      null,
+    confirmation_error:
+      null,
+    updated_at:
+      now
+  };
 
   let subscriberId:
     string;
 
   if (existing) {
-    const {
-      data,
-      error
-    } =
+    const result =
       await supabase
         .from(
           "newsletter_subscribers"
         )
-        .update({
-          first_name:
-            firstName,
-          email,
-          email_normalized:
-            email,
-          status:
-            "active",
-          consent_source:
-            cleanSource(
-              body.source
-            ),
-          consent_version:
-            "2026-07-18-v1",
-          consent_text_version:
-            "2026-07-18-v1",
-          consent_text:
-            consentText,
-          consented_at:
-            now,
-          last_signup_at:
-            now,
-          unsubscribed_at:
-            null,
-          welcome_error:
-            null,
-          updated_at:
-            now
-        })
+        .update(
+          subscriberValues
+        )
         .eq(
           "id",
           existing.id
@@ -431,26 +407,19 @@ export async function POST(
         .select("id")
         .single();
 
-    if (error || !data) {
+    if (
+      result.error ||
+      !result.data
+    ) {
       console.error(
-        "Newsletter reactivation failed",
-        error
-          ? {
-              code: error.code,
-              message: error.message,
-              details: error.details,
-              hint: error.hint
-            }
-          : {
-              message:
-                "No subscriber row was returned."
-            }
+        "Newsletter pending update failed",
+        result.error
       );
 
       return NextResponse.json(
         {
           error:
-            "Venture could not reactivate this subscription."
+            "Venture could not update this subscription request."
         },
         {
           status:
@@ -460,38 +429,15 @@ export async function POST(
     }
 
     subscriberId =
-      data.id;
+      result.data.id;
   } else {
-    const {
-      data,
-      error
-    } =
+    const result =
       await supabase
         .from(
           "newsletter_subscribers"
         )
         .insert({
-          first_name:
-            firstName,
-          email,
-          email_normalized:
-            email,
-          status:
-            "active",
-          consent_source:
-            cleanSource(
-              body.source
-            ),
-          consent_version:
-            "2026-07-18-v1",
-          consent_text_version:
-            "2026-07-18-v1",
-          consent_text:
-            consentText,
-          consented_at:
-            now,
-          last_signup_at:
-            now,
+          ...subscriberValues,
           signup_ip:
             getClientAddress(
               request
@@ -500,31 +446,26 @@ export async function POST(
             request.headers
               .get("user-agent")
               ?.slice(0, 500) ||
-            null
+            null,
+          created_at:
+            now
         })
         .select("id")
         .single();
 
-    if (error || !data) {
+    if (
+      result.error ||
+      !result.data
+    ) {
       console.error(
-        "Newsletter insert failed",
-        error
-          ? {
-              code: error.code,
-              message: error.message,
-              details: error.details,
-              hint: error.hint
-            }
-          : {
-              message:
-                "No subscriber row was returned."
-            }
+        "Newsletter pending insert failed",
+        result.error
       );
 
       return NextResponse.json(
         {
           error:
-            "Venture could not save this subscription."
+            "Venture could not save this subscription request."
         },
         {
           status:
@@ -534,7 +475,7 @@ export async function POST(
     }
 
     subscriberId =
-      data.id;
+      result.data.id;
   }
 
   const appUrl =
@@ -545,30 +486,22 @@ export async function POST(
       ).origin
     ).replace(/\/$/, "");
 
-  const unsubscribeToken =
+  const confirmToken =
     createNewsletterToken({
       email,
       purpose:
-        "unsubscribe"
+        "confirm",
+      lifetimeDays:
+        2
     });
 
-  const unsubscribeUrl =
-    `${appUrl}/newsletter/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
+  const confirmUrl =
+    `${appUrl}/newsletter/confirm?token=${encodeURIComponent(confirmToken)}`;
 
-  const oneClickUnsubscribeUrl =
-    `${appUrl}/api/newsletter/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
-
-  const welcomeEmail =
-    buildWelcomeEmail({
+  const confirmationEmail =
+    buildConfirmationEmail({
       firstName,
-      appUrl,
-      unsubscribeUrl
-    });
-
-  const contactResult =
-    await createOrReactivateResendContact({
-      email,
-      firstName
+      confirmUrl
     });
 
   const emailResult =
@@ -576,13 +509,11 @@ export async function POST(
       to:
         email,
       subject:
-        welcomeEmail.subject,
+        confirmationEmail.subject,
       html:
-        welcomeEmail.html,
+        confirmationEmail.html,
       text:
-        welcomeEmail.text,
-      unsubscribeUrl,
-      oneClickUnsubscribeUrl
+        confirmationEmail.text
     });
 
   await supabase
@@ -590,20 +521,18 @@ export async function POST(
       "newsletter_subscribers"
     )
     .update({
-      resend_contact_id:
-        contactResult.id ||
-        null,
-      welcome_email_id:
+      confirmation_email_id:
         emailResult.id ||
         null,
-      welcome_sent_at:
+      confirmation_sent_at:
         emailResult.id
           ? now
           : null,
-      welcome_error:
+      confirmation_error:
         emailResult.error ||
-        contactResult.error ||
         null,
+      last_delivery_attempt_at:
+        now,
       updated_at:
         now
     })
@@ -612,16 +541,25 @@ export async function POST(
       subscriberId
     );
 
+  if (!emailResult.id) {
+    return NextResponse.json(
+      {
+        error:
+          "Your request was saved, but Venture could not send the confirmation email. Check the sender setup, then submit again."
+      },
+      {
+        status:
+          502
+      }
+    );
+  }
+
   return NextResponse.json({
     ok:
       true,
-    welcomeSent:
-      Boolean(
-        emailResult.id
-      ),
+    pendingConfirmation:
+      true,
     message:
-      emailResult.id
-        ? "Welcome to Venture. Check your inbox for a little hello."
-        : "You are subscribed. The welcome email could not be delivered yet, but you are on the list."
+      "Check your inbox and confirm your subscription. The link expires in 48 hours."
   });
 }

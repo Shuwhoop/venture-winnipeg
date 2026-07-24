@@ -18,43 +18,40 @@ export const metadata:
 
 export default function NewsletterPage() {
   return (
-    <main
-      className={
-        styles.page
-      }
-    >
-      <header
-        className={
-          styles.hero
-        }
-      >
+    <main className={styles.page}>
+      <header className={styles.hero}>
         <span>
           THE THURSDAY VENTURE
         </span>
 
         <h1>
-          Your weekend starts
-          before Friday.
+          Your weekend starts before Friday.
         </h1>
 
         <p>
-          A thoughtful Winnipeg roundup
-          from Venture by Boogie Bangers,
-          built to help people meet up,
-          try more local places, and make
-          better memories.
+          A focused Winnipeg roundup built to help people meet up, try more local places, and turn “what should we do?” into an actual plan.
         </p>
+
+        <div className={styles.heroBadges}>
+          <span>
+            Thursday delivery
+          </span>
+
+          <span>
+            Confirmed subscribers only
+          </span>
+
+          <span>
+            Unsubscribe anytime
+          </span>
+        </div>
       </header>
 
       <NewsletterSignup
         placement="page"
       />
 
-      <section
-        className={
-          styles.promise
-        }
-      >
+      <section className={styles.promise}>
         <div>
           <span>
             🎟️
@@ -65,8 +62,7 @@ export default function NewsletterPage() {
           </strong>
 
           <p>
-            Major city moments and
-            smaller local gems.
+            Major city moments and smaller local gems.
           </p>
         </div>
 
@@ -80,14 +76,13 @@ export default function NewsletterPage() {
           </strong>
 
           <p>
-            Restaurants, drinks, and
-            places worth supporting.
+            Restaurants, drinks, and places worth supporting.
           </p>
         </div>
 
         <div>
           <span>
-            ✦
+            🗺️
           </span>
 
           <strong>
@@ -95,9 +90,50 @@ export default function NewsletterPage() {
           </strong>
 
           <p>
-            Outing combinations that
-            make planning feel lighter.
+            Outing combinations that make planning feel lighter.
           </p>
+        </div>
+      </section>
+
+      <section className={styles.howItWorks}>
+        <span>
+          HOW IT WORKS
+        </span>
+
+        <h2>
+          Two taps, then Thursdays.
+        </h2>
+
+        <div>
+          <article>
+            <strong>
+              1
+            </strong>
+
+            <p>
+              Enter your name and email.
+            </p>
+          </article>
+
+          <article>
+            <strong>
+              2
+            </strong>
+
+            <p>
+              Confirm through the email Venture sends you.
+            </p>
+          </article>
+
+          <article>
+            <strong>
+              3
+            </strong>
+
+            <p>
+              Receive the city edit each Thursday.
+            </p>
+          </article>
         </div>
       </section>
     </main>

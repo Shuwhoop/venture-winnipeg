@@ -17,8 +17,11 @@ import {
   BottomNav
 } from "@/components/bottom-nav";
 import {
-  PublicFooter
-} from "@/components/public-footer";
+  AppFoundationRuntime
+} from "@/components/app-foundation/app-foundation";
+import {
+  AccountSyncRuntime
+} from "@/components/account-sync/account-sync";
 
 const ADMIN_AUTH_PATHS = [
   "/admin/login",
@@ -74,9 +77,8 @@ export function PublicRouteChrome({
 
   return (
     <>
-      {pathname === "/" ? (
-        <PublicFooter />
-      ) : null}
+      <AppFoundationRuntime showInstall={pathname === "/"} />
+      <AccountSyncRuntime />
       <BottomNav />
       {analyticsEnabled ? (
         <VentureAnalytics />

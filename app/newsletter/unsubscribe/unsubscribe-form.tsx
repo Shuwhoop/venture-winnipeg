@@ -6,6 +6,8 @@ import {
 
 import Link from "next/link";
 
+import styles from "../page.module.css";
+
 
 type UnsubscribeFormProps = {
   token: string;
@@ -85,7 +87,15 @@ export default function UnsubscribeForm({
 
   if (state === "done") {
     return (
-      <div>
+      <div className={styles.preferencePanel}>
+        <div className={styles.confirmedMark} aria-hidden="true">
+          ✓
+        </div>
+
+        <h2>
+          Your preferences are updated.
+        </h2>
+
         <p>
           {message}
         </p>
@@ -98,10 +108,9 @@ export default function UnsubscribeForm({
   }
 
   return (
-    <div>
+    <div className={styles.preferencePanel}>
       <p>
-        Stop receiving the Thursday
-        newsletter at this email address.
+        Stop receiving The Thursday Venture at this email address.
       </p>
 
       <button
@@ -121,7 +130,14 @@ export default function UnsubscribeForm({
       </button>
 
       {message ? (
-        <p role="status">
+        <p
+          className={
+            state === "error"
+              ? styles.inlineError
+              : styles.inlineNotice
+          }
+          role="status"
+        >
           {message}
         </p>
       ) : null}

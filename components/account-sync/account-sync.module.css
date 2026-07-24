@@ -1,0 +1,379 @@
+.guestCard,
+.accountCard {
+  position: relative;
+  overflow: hidden;
+  margin: 18px 0;
+  border: 1px solid rgba(22, 16, 41, 0.12);
+  border-radius: 26px;
+  box-shadow: 0 18px 50px rgba(40, 28, 64, 0.1);
+}
+
+.guestCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(255, 207, 0, 0.42), transparent 32%),
+    linear-gradient(145deg, #fff8dc, #fffdf7 68%);
+}
+
+.accountMark {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border-radius: 19px;
+  background: #201432;
+  color: white;
+  font-size: 28px;
+  font-weight: 900;
+  box-shadow: 0 12px 26px rgba(32, 20, 50, 0.2);
+}
+
+.accountMark i {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #201432;
+  border-radius: 999px;
+  background: #ffcf00;
+}
+
+.guestCopy,
+.accountHeader > div {
+  min-width: 0;
+}
+
+.guestCopy > span,
+.accountHeader span:first-child {
+  color: #70538f;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.guestCopy h2,
+.accountHeader h2 {
+  margin: 5px 0 7px;
+  color: #211630;
+  font-size: clamp(1.35rem, 5vw, 1.75rem);
+  line-height: 1.02;
+}
+
+.guestCopy p,
+.accountHeader p {
+  margin: 0;
+  color: #655c6e;
+  line-height: 1.5;
+}
+
+.primaryAction {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  border-radius: 16px;
+  background: #7b46ad;
+  color: white;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.privacyNote {
+  grid-column: 1 / -1;
+  color: #786f7f;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.accountCard {
+  padding: 22px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(138, 85, 190, 0.2), transparent 38%),
+    #fffdf8;
+}
+
+.accountHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.phaseDot {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  margin-top: 5px;
+  border-radius: 999px;
+  background: #9c94a3;
+  box-shadow: 0 0 0 6px rgba(156, 148, 163, 0.14);
+}
+
+.phaseDot.synced,
+.phaseDot.idle {
+  background: #2ea46f;
+  box-shadow: 0 0 0 6px rgba(46, 164, 111, 0.14);
+}
+
+.phaseDot.syncing {
+  background: #7b46ad;
+  box-shadow: 0 0 0 6px rgba(123, 70, 173, 0.14);
+  animation: syncPulse 1.25s ease-in-out infinite;
+}
+
+.phaseDot.offline,
+.phaseDot.error {
+  background: #d56d3b;
+  box-shadow: 0 0 0 6px rgba(213, 109, 59, 0.14);
+}
+
+.accountIdentity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 14px;
+  padding: 13px;
+  border: 1px solid rgba(32, 20, 50, 0.09);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.accountIdentity > div {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #ffcf00;
+  color: #281737;
+  font-weight: 950;
+}
+
+.accountIdentity span {
+  min-width: 0;
+}
+
+.accountIdentity small,
+.accountIdentity strong {
+  display: block;
+}
+
+.accountIdentity small {
+  color: #857c8b;
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.accountIdentity strong {
+  overflow: hidden;
+  margin-top: 3px;
+  color: #291d34;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.syncStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.syncStats article {
+  min-width: 0;
+  padding: 13px 9px;
+  border-radius: 16px;
+  background: #f4edf8;
+  text-align: center;
+}
+
+.syncStats strong,
+.syncStats span {
+  display: block;
+}
+
+.syncStats strong {
+  color: #58317d;
+  font-size: 1.25rem;
+}
+
+.syncStats span {
+  margin-top: 3px;
+  color: #756b7d;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+
+.syncFooter {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.syncFooter > span {
+  color: #817787;
+  font-size: 0.72rem;
+}
+
+.syncFooter > span strong {
+  display: block;
+  margin-top: 3px;
+  color: #35263f;
+  font-size: 0.8rem;
+}
+
+.syncFooter > div {
+  display: flex;
+  gap: 8px;
+}
+
+.syncFooter button,
+.savedBanner button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 13px;
+  padding: 0 14px;
+  background: #71409f;
+  color: white;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.syncFooter button:disabled,
+.savedBanner button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.syncFooter .secondaryAction {
+  background: #ece5ef;
+  color: #473552;
+}
+
+.savedBanner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 18px;
+  padding: 13px 14px;
+  border: 1px solid rgba(92, 53, 127, 0.12);
+  border-radius: 18px;
+  background: #f5eef9;
+}
+
+.savedBanner > span {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 12px;
+  background: white;
+  color: #6a3b92;
+  font-weight: 950;
+}
+
+.savedBanner div {
+  min-width: 0;
+}
+
+.savedBanner strong,
+.savedBanner small {
+  display: block;
+}
+
+.savedBanner strong {
+  color: #35203f;
+  font-size: 0.84rem;
+}
+
+.savedBanner small {
+  margin-top: 2px;
+  color: #776d7d;
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.savedBanner a {
+  color: #63378d;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.bannerError {
+  border-color: rgba(190, 89, 45, 0.2);
+  background: #fff1e8;
+}
+
+@keyframes syncPulse {
+  50% {
+    transform: scale(0.75);
+    opacity: 0.55;
+  }
+}
+
+@media (max-width: 390px) {
+  .guestCard,
+  .accountCard {
+    border-radius: 22px;
+  }
+
+  .guestCard {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .accountMark {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    font-size: 23px;
+  }
+
+  .accountCard {
+    padding: 18px;
+  }
+
+  .syncStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .syncFooter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .syncFooter > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .savedBanner {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .savedBanner > a,
+  .savedBanner > button {
+    grid-column: 1 / -1;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phaseDot.syncing {
+    animation: none;
+  }
+}

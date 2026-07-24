@@ -12,6 +12,9 @@ import {
   ReportIssueForm
 } from "@/components/report-issue-form";
 import {
+  VisitButton
+} from "@/components/visit-button";
+import {
   getPublishedListingDetailBySlug,
   type PublicEventDetail,
   type PublicListingDetail,
@@ -548,6 +551,99 @@ export default async function ListingPage({
       ? detail.reservationUrl
       : detail.ticketUrl;
 
+  const listingSnapshot = {
+    id: detail.id,
+    slug: detail.slug,
+    type:
+      detail.entityType === "place"
+        ? "restaurant" as const
+        : "event" as const,
+    name: detail.name,
+    category: detail.primaryCategory,
+    subtitle: detail.shortDescription,
+    description:
+      detail.fullDescription ??
+      detail.shortDescription,
+    statusLabel: currentStatus,
+    statusTone:
+      detail.entityType === "place" &&
+      currentStatus.toLowerCase().includes("open")
+        ? "green" as const
+        : "purple" as const,
+    timeOrHours: currentStatus,
+    price: currentPrice,
+    distance:
+      detail.neighbourhood ?? "Winnipeg",
+    verification:
+      detail.verificationStatus,
+    lastChecked:
+      detail.sourceCheckedAt ?? "",
+    imageClass: "listing-detail",
+    neighbourhood:
+      detail.neighbourhood ?? "Winnipeg",
+    venueName:
+      detail.entityType === "event"
+        ? detail.venueName ?? undefined
+        : undefined,
+    address:
+      address || undefined,
+    officialUrl:
+      officialUrl ?? undefined,
+    ticketUrl:
+      detail.entityType === "event"
+        ? detail.ticketUrl ?? undefined
+        : undefined,
+    latitude:
+      detail.latitude ?? undefined,
+    longitude:
+      detail.longitude ?? undefined,
+    startAt:
+      detail.entityType === "event"
+        ? detail.startAt
+        : undefined,
+    endAt:
+      detail.entityType === "event"
+        ? detail.endAt ?? undefined
+        : undefined,
+    doorsAt:
+      detail.entityType === "event"
+        ? detail.doorsAt ?? undefined
+        : undefined,
+    timezone:
+      detail.entityType === "event"
+        ? detail.timezone
+        : undefined,
+    weeklyHours:
+      detail.entityType === "place"
+        ? detail.weeklyHours
+        : undefined,
+    placeType:
+      detail.entityType === "place"
+        ? detail.placeType
+        : undefined,
+    minimumPriceCad:
+      detail.entityType === "event"
+        ? detail.minimumPriceCad
+        : undefined,
+    maximumPriceCad:
+      detail.entityType === "event"
+        ? detail.maximumPriceCad
+        : undefined,
+    priceLevel:
+      detail.entityType === "place"
+        ? detail.priceLevel
+        : undefined,
+    ageLabel:
+      detail.entityType === "event"
+        ? detail.ageLabel
+        : undefined,
+    indoorOutdoor:
+      detail.entityType === "event"
+        ? detail.indoorOutdoor
+        : undefined,
+    searchTerms: categories
+  };
+
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
@@ -670,6 +766,10 @@ export default async function ListingPage({
               </div>
             </a>
           ) : null}
+
+          <VisitButton
+            listing={listingSnapshot}
+          />
         </div>
 
         <div className={styles.secondaryActions}>

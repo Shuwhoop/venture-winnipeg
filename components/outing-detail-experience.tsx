@@ -188,11 +188,18 @@ export function OutingDetailExperience({
           className={styles.heroRoute}
           aria-hidden="true"
         >
-          <b>1</b>
-          <i />
-          <b>2</b>
-          <i />
-          <b>3</b>
+          {orderedStops
+            .slice(0, 5)
+            .map((stop, index, routeStops) => (
+              <span
+                key={`${stop.listing.type}-${stop.listing.id}-${stop.order}`}
+              >
+                <b>{index + 1}</b>
+                {index < routeStops.length - 1 ? (
+                  <i />
+                ) : null}
+              </span>
+            ))}
         </div>
       </header>
 
@@ -203,7 +210,7 @@ export function OutingDetailExperience({
           <span>ADVENTURE SNAPSHOT</span>
           <h2>Your plan at a glance</h2>
           <p>
-            The important details, without the spreadsheet fog.
+            The key details before you head out.
           </p>
         </div>
 
@@ -296,13 +303,13 @@ export function OutingDetailExperience({
             , one smooth route
           </h2>
           <p>
-            Tap into each listing when you need the finer details.
+            Open a listing when you need hours, directions, or the full description.
           </p>
         </div>
 
         <div className={styles.timeline}>
           {orderedStops.map(
-            (stop) => {
+            (stop, stopIndex) => {
               const kind =
                 getStopKind(stop);
 
@@ -310,6 +317,9 @@ export function OutingDetailExperience({
                 <div
                   className={styles.stopWrapper}
                   key={`${stop.listing.type}-${stop.listing.id}-${stop.order}`}
+                  style={{
+                    animationDelay: `${Math.min(stopIndex, 6) * 90}ms`
+                  }}
                 >
                   {stop.travelFromPreviousMinutes !==
                   null ? (
@@ -357,10 +367,6 @@ export function OutingDetailExperience({
                           {stop.listing.subtitle}
                         </p>
                       ) : null}
-
-                      <p className={styles.reason}>
-                        {stop.reason}
-                      </p>
 
                       <div className={styles.stopFacts}>
                         <span>

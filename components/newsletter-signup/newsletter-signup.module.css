@@ -1,13 +1,9 @@
 .card {
-  container-type:
-    inline-size;
+  container-type: inline-size;
   position: relative;
   display: grid;
   gap: 18px;
-  width: min(
-    100% - 18px,
-    720px
-  );
+  width: min(100% - 18px, 720px);
   max-width: 100%;
   margin: 24px auto;
   padding: 22px;
@@ -15,14 +11,10 @@
   border: 2px solid #241f20;
   border-radius: 24px;
   background:
-    linear-gradient(
-      135deg,
-      #fff8d8,
-      #ffffff 70%
-    );
+    radial-gradient(circle at 88% 12%, rgba(208, 16, 19, 0.1), transparent 28%),
+    linear-gradient(135deg, #fff8d8, #ffffff 70%);
   color: #241f20;
-  box-shadow:
-    6px 6px 0 #edb200;
+  box-shadow: 6px 6px 0 #edb200;
 }
 
 .card,
@@ -37,8 +29,7 @@
   bottom: -50px;
   width: 150px;
   height: 150px;
-  border: 24px solid
-    rgba(208, 16, 19, 0.07);
+  border: 24px solid rgba(208, 16, 19, 0.07);
   border-radius: 999px;
   content: "";
   pointer-events: none;
@@ -55,41 +46,33 @@
 .graphics span {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border: 2px solid #241f20;
   border-radius: 14px;
   background: #ffffff;
-  box-shadow:
-    3px 3px 0
-    rgba(36, 31, 32, 0.12);
-  font-size: 1.15rem;
-  animation:
-    newsletter-float
-    3.2s ease-in-out
-    infinite;
+  box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.12);
+  font-size: 1.2rem;
+  animation: newsletter-float 3.2s ease-in-out infinite;
 }
 
 .graphics span:nth-child(2) {
-  animation-delay:
-    -0.6s;
+  animation-delay: -0.6s;
 }
 
 .graphics span:nth-child(3) {
-  animation-delay:
-    -1.2s;
+  animation-delay: -1.2s;
 }
 
 .graphics i {
   flex: 1;
   height: 2px;
   margin-left: 4px;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #d01013 0 10px,
-      transparent 10px 17px
-    );
+  background: repeating-linear-gradient(
+    90deg,
+    #d01013 0 10px,
+    transparent 10px 17px
+  );
 }
 
 .copy {
@@ -109,11 +92,7 @@
 .copy h2 {
   max-width: 100%;
   margin: 0;
-  font-size: clamp(
-    2rem,
-    9cqw,
-    3.2rem
-  );
+  font-size: clamp(2rem, 9cqw, 3.2rem);
   line-height: 0.97;
   letter-spacing: -0.052em;
   overflow-wrap: normal;
@@ -130,12 +109,27 @@
   overflow-wrap: anywhere;
 }
 
+.promiseRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 3px;
+}
+
+.promiseRow span {
+  padding: 7px 10px;
+  border: 1.5px solid #241f20;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
 .form {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -155,7 +149,7 @@
 .form input[type="text"],
 .form input[type="email"] {
   width: 100%;
-  min-height: 48px;
+  min-height: 50px;
   padding: 11px 12px;
   border: 1.5px solid #a99d96;
   border-radius: 13px;
@@ -163,6 +157,12 @@
   color: #241f20;
   font: inherit;
   font-size: 0.84rem;
+}
+
+.form input:focus-visible {
+  outline: 3px solid rgba(208, 16, 19, 0.2);
+  outline-offset: 2px;
+  border-color: #d01013;
 }
 
 .consent {
@@ -196,6 +196,11 @@
   overflow-wrap: anywhere;
 }
 
+.consent a {
+  color: #8e1013;
+  font-weight: 900;
+}
+
 .form button {
   grid-column: 1 / -1;
   display: flex;
@@ -203,7 +208,7 @@
   justify-content: space-between;
   gap: 14px;
   width: 100%;
-  min-height: 52px;
+  min-height: 54px;
   padding: 11px 14px;
   border: 2px solid #241f20;
   border-radius: 14px;
@@ -213,18 +218,13 @@
   font-size: 0.84rem;
   font-weight: 900;
   cursor: pointer;
-  box-shadow:
-    4px 4px 0 #edb200;
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease;
+  box-shadow: 4px 4px 0 #edb200;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
 .form button:hover:not(:disabled) {
-  transform:
-    translateY(-2px);
-  box-shadow:
-    5px 5px 0 #edb200;
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 #edb200;
 }
 
 .form button:disabled {
@@ -243,14 +243,20 @@
 .message {
   position: relative;
   z-index: 1;
+  display: grid;
+  gap: 4px;
   margin: 0;
-  padding: 11px 13px;
-  border-radius: 12px;
+  padding: 13px;
+  border: 1.5px solid #241f20;
+  border-radius: 14px;
   background: #fff1b8;
   color: #574400;
   font-size: 0.76rem;
-  font-weight: 800;
   line-height: 1.45;
+}
+
+.message strong {
+  font-size: 0.78rem;
 }
 
 .success {
@@ -292,26 +298,22 @@
 @keyframes newsletter-float {
   0%,
   100% {
-    transform:
-      translateY(0)
-      rotate(-1deg);
+    transform: translateY(0) rotate(-1deg);
   }
 
   50% {
-    transform:
-      translateY(-5px)
-      rotate(1deg);
+    transform: translateY(-5px) rotate(1deg);
   }
 }
 
 @container (max-width: 430px) {
   .card {
+    width: calc(100% - 16px);
     padding: 18px;
   }
 
   .form {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
   .consent,
@@ -320,18 +322,16 @@
   }
 
   .copy h2 {
-    font-size: clamp(
-      2rem,
-      11cqw,
-      2.75rem
-    );
+    font-size: clamp(2rem, 11cqw, 2.75rem);
+  }
+
+  .promiseRow {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 }
 
-@media (
-  prefers-reduced-motion:
-    reduce
-) {
+@media (prefers-reduced-motion: reduce) {
   .graphics span,
   .form button {
     animation: none;

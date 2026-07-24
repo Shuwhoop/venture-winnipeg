@@ -26,6 +26,25 @@ type ResendEmailResult = {
 };
 
 
+export function isNewsletterDeliveryConfigured(): boolean {
+  return Boolean(
+    process.env.RESEND_API_KEY &&
+    process.env.VENTURE_EMAIL_FROM
+  );
+}
+
+
+export function isUsingResendTestSender(): boolean {
+  const from =
+    process.env.VENTURE_EMAIL_FROM ||
+    "Venture by Boogie Bangers <onboarding@resend.dev>";
+
+  return from.includes(
+    "onboarding@resend.dev"
+  );
+}
+
+
 function getResendApiKey(): string {
   const apiKey =
     process.env.RESEND_API_KEY;
@@ -52,67 +71,84 @@ async function resendRequest<T>({
   data: T | null;
   error: string;
 }> {
-  const response =
-    await fetch(
-      `${RESEND_API_BASE}${path}`,
-      {
-        method:
-          options.method ??
-          "POST",
-        headers: {
-          Authorization:
-            `Bearer ${getResendApiKey()}`,
-          "Content-Type":
-            "application/json",
-          "User-Agent":
-            "Venture-by-Boogie-Bangers/1.0"
-        },
-        body:
-          JSON.stringify(
-            options.body
-          )
+  try {
+    const response =
+      await fetch(
+        `${RESEND_API_BASE}${path}`,
+        {
+          method:
+            options.method ??
+            "POST",
+          headers: {
+            Authorization:
+              `Bearer ${getResendApiKey()}`,
+            "Content-Type":
+              "application/json",
+            "User-Agent":
+              "Venture-by-Boogie-Bangers/1.0"
+          },
+          body:
+            JSON.stringify(
+              options.body
+            ),
+          cache:
+            "no-store"
+        }
+      );
+
+    const responseText =
+      await response.text();
+
+    let data:
+      T | null = null;
+
+    if (responseText) {
+      try {
+        data =
+          JSON.parse(
+            responseText
+          ) as T;
+      } catch {
+        data = null;
       }
-    );
-
-  const responseText =
-    await response.text();
-
-  let data:
-    T | null = null;
-
-  if (responseText) {
-    try {
-      data =
-        JSON.parse(
-          responseText
-        ) as T;
-    } catch {
-      data = null;
     }
+
+    const error =
+      response.ok
+        ? ""
+        : (
+            data &&
+            typeof data ===
+              "object" &&
+            "message" in data &&
+            typeof data.message ===
+              "string"
+              ? data.message
+              : `Resend request failed with status ${response.status}.`
+          );
+
+    return {
+      ok:
+        response.ok,
+      status:
+        response.status,
+      data,
+      error
+    };
+  } catch (error) {
+    return {
+      ok:
+        false,
+      status:
+        0,
+      data:
+        null,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Resend could not be reached."
+    };
   }
-
-  const error =
-    response.ok
-      ? ""
-      : (
-          data &&
-          typeof data ===
-            "object" &&
-          "message" in data &&
-          typeof data.message ===
-            "string"
-            ? data.message
-            : `Resend request failed with status ${response.status}.`
-        );
-
-  return {
-    ok:
-      response.ok,
-    status:
-      response.status,
-    data,
-    error
-  };
 }
 
 
@@ -128,8 +164,8 @@ export async function sendNewsletterEmail({
   subject: string;
   html: string;
   text: string;
-  unsubscribeUrl: string;
-  oneClickUnsubscribeUrl: string;
+  unsubscribeUrl?: string;
+  oneClickUnsubscribeUrl?: string;
 }): Promise<ResendEmailResult> {
   const from =
     process.env.VENTURE_EMAIL_FROM ||
@@ -138,6 +174,22 @@ export async function sendNewsletterEmail({
   const replyTo =
     process.env.VENTURE_EMAIL_REPLY_TO ||
     ventureBrand.replyToEmail;
+
+  const headers:
+    Record<string, string> = {};
+
+  if (
+    unsubscribeUrl &&
+    oneClickUnsubscribeUrl
+  ) {
+    headers[
+      "List-Unsubscribe"
+    ] = `<${oneClickUnsubscribeUrl}>`;
+
+    headers[
+      "List-Unsubscribe-Post"
+    ] = "List-Unsubscribe=One-Click";
+  }
 
   const result =
     await resendRequest<{
@@ -155,12 +207,9 @@ export async function sendNewsletterEmail({
           text,
           reply_to:
             replyTo,
-          headers: {
-            "List-Unsubscribe":
-              `<${oneClickUnsubscribeUrl}>`,
-            "List-Unsubscribe-Post":
-              "List-Unsubscribe=One-Click"
-          }
+          ...(Object.keys(headers).length > 0
+            ? { headers }
+            : {})
         }
       }
     });
@@ -189,6 +238,13 @@ export async function createOrReactivateResendContact({
   id?: string;
   error?: string;
 }> {
+  if (!process.env.RESEND_API_KEY) {
+    return {
+      error:
+        "RESEND_API_KEY is not configured."
+    };
+  }
+
   const createResult =
     await resendRequest<{
       id?: string;
@@ -251,6 +307,10 @@ export async function createOrReactivateResendContact({
 export async function unsubscribeResendContact(
   email: string
 ): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    return;
+  }
+
   try {
     await resendRequest({
       path:
@@ -265,9 +325,6 @@ export async function unsubscribeResendContact(
       }
     });
   } catch {
-    /*
-     * Supabase remains the source of
-     * truth if Resend syncing fails.
-     */
+    /* Supabase remains the source of truth. */
   }
 }

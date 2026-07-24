@@ -1,0 +1,339 @@
+.panel {
+  overflow: hidden;
+  border: 1.5px solid #ddcfeb;
+  border-radius: 26px;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(255, 207, 0, 0.22), transparent 32%),
+    linear-gradient(145deg, #f7f0ff 0%, #fffaf2 70%);
+  box-shadow: 0 18px 45px rgba(54, 38, 63, 0.08);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+}
+
+.header > div:first-child > span {
+  color: #7c3aed;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.header h2 {
+  margin: 5px 0 6px;
+  color: #3f3244;
+  font-size: clamp(1.35rem, 6vw, 2rem);
+  line-height: 1.02;
+}
+
+.header p {
+  max-width: 40rem;
+  margin: 0;
+  color: #736878;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.passportMark {
+  display: grid;
+  width: 58px;
+  height: 70px;
+  place-items: center;
+  align-content: center;
+  border: 1.5px solid #7c3aed;
+  border-radius: 16px 16px 20px 20px;
+  background: #7c3aed;
+  color: white;
+  box-shadow: inset 0 0 0 4px #eee3ff;
+  transform: rotate(4deg);
+}
+
+.passportMark strong {
+  font-size: 1.35rem;
+}
+
+.passportMark small {
+  margin-top: -2px;
+  color: #ffdf52;
+  font-size: 0.48rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 17px;
+}
+
+.stats article {
+  min-width: 0;
+  border: 1px solid rgba(124, 58, 237, 0.13);
+  border-radius: 16px;
+  padding: 11px 8px;
+  background: rgba(255, 255, 255, 0.72);
+  text-align: center;
+}
+
+.stats strong,
+.stats span {
+  display: block;
+}
+
+.stats strong {
+  color: #6d28d9;
+  font-size: 1.25rem;
+}
+
+.stats span {
+  margin-top: 2px;
+  color: #786d7d;
+  font-size: 0.61rem;
+  line-height: 1.2;
+}
+
+.empty {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin-top: 15px;
+  border: 1px dashed #cbb5dc;
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.empty > span {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 13px;
+  background: #ffcf00;
+  color: #3f3244;
+  font-weight: 900;
+}
+
+.empty strong {
+  color: #3f3244;
+  font-size: 0.8rem;
+}
+
+.empty p {
+  margin: 3px 0 0;
+  color: #756b79;
+  font-size: 0.67rem;
+  line-height: 1.38;
+}
+
+.empty a,
+.newToMeNote a {
+  border-radius: 13px;
+  padding: 9px 11px;
+  background: #7c3aed;
+  color: white;
+  font-size: 0.67rem;
+  font-weight: 850;
+  text-decoration: none;
+  text-align: center;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+}
+
+.filters button {
+  min-height: 34px;
+  border: 1px solid #d9cae5;
+  border-radius: 999px;
+  padding: 0 11px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #65596b;
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.filters .active {
+  border-color: #7c3aed;
+  background: #7c3aed;
+  color: white;
+}
+
+.toolbar > span {
+  color: #0f7b67;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+.historyList {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.historyItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #e2d7e8;
+  border-radius: 17px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.typeMark {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.place {
+  background: #fff0bc;
+}
+
+.event {
+  background: #eee3ff;
+}
+
+.historyCopy {
+  min-width: 0;
+}
+
+.historyCopy a,
+.historyCopy span,
+.historyCopy small {
+  display: block;
+}
+
+.historyCopy a {
+  overflow: hidden;
+  color: #3f3244;
+  font-size: 0.76rem;
+  font-weight: 850;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.historyCopy span {
+  margin-top: 2px;
+  color: #716775;
+  font-size: 0.62rem;
+}
+
+.historyCopy small {
+  margin-top: 2px;
+  color: #928793;
+  font-size: 0.56rem;
+}
+
+.remove {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 11px;
+  background: #f7edf0;
+  color: #b51f42;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.expand {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 9px;
+  border: 1px solid #d7c6e5;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+  color: #6d28d9;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.newToMeNote {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  margin-top: 15px;
+  border-radius: 18px;
+  padding: 13px;
+  background: #3f3244;
+  color: white;
+}
+
+.newToMeNote > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 11px;
+  background: #ffcf00;
+}
+
+.newToMeNote strong {
+  font-size: 0.75rem;
+}
+
+.newToMeNote p {
+  margin: 3px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.62rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 520px) {
+  .panel {
+    padding: 15px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .empty,
+  .newToMeNote {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .empty a,
+  .newToMeNote a {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .passportMark {
+    transform: none;
+  }
+}

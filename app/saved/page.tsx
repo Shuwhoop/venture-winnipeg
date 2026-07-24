@@ -9,15 +9,28 @@ import {
 } from "react";
 
 import {
+  SavedSyncBanner
+} from "@/components/account-sync/account-sync";
+
+import {
   ListingCard
 } from "@/components/listing-card";
 
-import VentureSavedEmptyState from "@/components/saved-empty-state/saved-empty-state";
+import VentureSavedEmptyState from
+  "@/components/saved-empty-state/saved-empty-state";
 
 import {
-  SAVED_OUTINGS_EVENT,
+  enrichSavedListingSnapshots,
+  getSavedListingReferences,
+  isListingSnapshot,
+  SAVED_LISTINGS_EVENT,
+  savedListingKey
+} from "@/lib/saved-listings";
+
+import {
   getSavedOutings,
   removeSavedOuting,
+  SAVED_OUTINGS_EVENT,
   type GeneratedOutingPlan
 } from "@/lib/saved-outings";
 
@@ -25,249 +38,21 @@ import type {
   Listing
 } from "@/lib/types";
 
+function formatPlanDate(dateValue: string) {
+  const [year, month, day] =
+    dateValue.split("-").map(Number);
 
-const SAVED_LISTING_EVENTS = [
-  "venture:saved-listings-updated",
-  "venture:saved-listings-changed",
-  "venture:saves-updated"
-];
-
-
-function isListing(
-  value: unknown
-): value is Listing {
-  if (
-    !value ||
-    typeof value !==
-      "object"
-  ) {
-    return false;
-  }
-
-  const listing =
-    value as Record<
-      string,
-      unknown
-    >;
-
-  return (
-    typeof listing.id ===
-      "string" &&
-    typeof listing.slug ===
-      "string" &&
-    typeof listing.name ===
-      "string" &&
-    (
-      listing.type ===
-        "event" ||
-      listing.type ===
-        "restaurant"
-    )
-  );
-}
-
-
-function extractListings(
-  value: unknown
-): Listing[] {
-  if (
-    Array.isArray(value)
-  ) {
-    return value.filter(
-      isListing
-    );
-  }
-
-  if (
-    !value ||
-    typeof value !==
-      "object"
-  ) {
-    return [];
-  }
-
-  const record =
-    value as Record<
-      string,
-      unknown
-    >;
-
-  const possibleCollections = [
-    record.listings,
-    record.savedListings,
-    record.items,
-    record.data
-  ];
-
-  return possibleCollections.flatMap(
-    (collection) =>
-      Array.isArray(
-        collection
-      )
-        ? collection.filter(
-            isListing
-          )
-        : []
-  );
-}
-
-
-function deduplicateListings(
-  listings: Listing[]
-): Listing[] {
-  const seen =
-    new Set<string>();
-
-  return listings.filter(
-    (listing) => {
-      const key =
-        `${listing.type}-${listing.id}`;
-
-      if (
-        seen.has(key)
-      ) {
-        return false;
-      }
-
-      seen.add(key);
-
-      return true;
-    }
-  );
-}
-
-
-function readBrowserSavedListings():
-  Listing[] {
-  if (
-    typeof window ===
-    "undefined"
-  ) {
-    return [];
-  }
-
-  const collected:
-    Listing[] = [];
-
-  for (
-    let index = 0;
-    index <
-      window.localStorage.length;
-    index += 1
-  ) {
-    const key =
-      window.localStorage.key(
-        index
-      );
-
-    if (
-      !key ||
-      !key
-        .toLowerCase()
-        .includes("saved")
-    ) {
-      continue;
-    }
-
-    const rawValue =
-      window.localStorage.getItem(
-        key
-      );
-
-    if (!rawValue) {
-      continue;
-    }
-
-    try {
-      const parsed =
-        JSON.parse(
-          rawValue
-        );
-
-      collected.push(
-        ...extractListings(
-          parsed
-        )
-      );
-    } catch {
-      /*
-       * Ignore unrelated browser
-       * values that are not JSON.
-       */
-    }
-  }
-
-  return deduplicateListings(
-    collected
-  );
-}
-
-
-async function readApiSavedListings():
-  Promise<Listing[]> {
-  try {
-    const response =
-      await fetch(
-        "/api/saved-listings",
-        {
-          cache:
-            "no-store"
-        }
-      );
-
-    if (!response.ok) {
-      return [];
-    }
-
-    const result:
-      unknown =
-        await response.json();
-
-    return deduplicateListings(
-      extractListings(
-        result
-      )
-    );
-  } catch {
-    return [];
-  }
-}
-
-
-function formatPlanDate(
-  dateValue: string
-): string {
-  const [
-    year,
-    month,
-    day
-  ] =
-    dateValue
-      .split("-")
-      .map(Number);
-
-  if (
-    !year ||
-    !month ||
-    !day
-  ) {
+  if (!year || !month || !day) {
     return dateValue;
   }
 
   return new Intl.DateTimeFormat(
     "en-CA",
     {
-      month:
-        "short",
-
-      day:
-        "numeric",
-
-      year:
-        "numeric",
-
-      timeZone:
-        "America/Winnipeg"
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "America/Winnipeg"
     }
   ).format(
     new Date(
@@ -281,547 +66,375 @@ function formatPlanDate(
   );
 }
 
-
-function formatCost(
-  value:
-    number |
-    null
-): string {
-  if (
-    value === null
-  ) {
+function formatCost(value: number | null) {
+  if (value === null) {
     return "Price not confirmed";
   }
 
-  if (
-    value === 0
-  ) {
+  if (value === 0) {
     return "Free";
   }
 
   return new Intl.NumberFormat(
     "en-CA",
     {
-      style:
-        "currency",
-
-      currency:
-        "CAD",
-
-      maximumFractionDigits:
-        0
+      style: "currency",
+      currency: "CAD",
+      maximumFractionDigits: 0
     }
   ).format(value);
 }
 
+async function loadSavedListings() {
+  const references =
+    getSavedListingReferences();
+
+  if (references.length === 0) {
+    return [];
+  }
+
+  const listingsByKey = new Map<
+    string,
+    Listing
+  >();
+
+  for (const reference of references) {
+    if (isListingSnapshot(reference.snapshot)) {
+      listingsByKey.set(
+        savedListingKey(reference),
+        reference.snapshot
+      );
+    }
+  }
+
+  const missingReferences = references.filter(
+    (reference) =>
+      !listingsByKey.has(
+        savedListingKey(reference)
+      )
+  );
+
+  if (
+    missingReferences.length > 0 &&
+    window.navigator.onLine
+  ) {
+    try {
+      const response = await fetch(
+        "/api/saved-listings",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            items: missingReferences.map(
+              (reference) => ({
+                slug: reference.slug,
+                type: reference.type
+              })
+            )
+          }),
+          cache: "no-store"
+        }
+      );
+
+      const result: unknown =
+        await response.json();
+
+      if (response.ok) {
+        const possibleListings =
+          result &&
+          typeof result === "object" &&
+          Array.isArray(
+            (result as Record<string, unknown>)
+              .listings
+          )
+            ? (result as {
+                listings: unknown[];
+              }).listings
+            : [];
+
+        const resolvedListings =
+          possibleListings.filter(
+            isListingSnapshot
+          );
+
+        enrichSavedListingSnapshots(
+          resolvedListings
+        );
+
+        for (const listing of
+          resolvedListings) {
+          listingsByKey.set(
+            savedListingKey(listing),
+            listing
+          );
+        }
+      }
+    } catch {
+      // Existing snapshots keep Saved useful during weak connections.
+    }
+  }
+
+  return references
+    .map((reference) =>
+      listingsByKey.get(
+        savedListingKey(reference)
+      )
+    )
+    .filter(isListingSnapshot);
+}
 
 export default function SavedPage() {
-  const [
-    ready,
-    setReady
-  ] =
+  const [ready, setReady] =
     useState(false);
+  const [listings, setListings] =
+    useState<Listing[]>([]);
+  const [outings, setOutings] =
+    useState<GeneratedOutingPlan[]>([]);
 
-  const [
-    listings,
-    setListings
-  ] =
-    useState<Listing[]>(
-      []
+  const refreshSaved = useCallback(
+    async () => {
+      setListings(
+        await loadSavedListings()
+      );
+      setOutings(getSavedOutings());
+      setReady(true);
+    },
+    []
+  );
+
+  useEffect(() => {
+    const refresh = () => {
+      void refreshSaved();
+    };
+
+    const refreshWhenVisible = () => {
+      if (
+        document.visibilityState ===
+        "visible"
+      ) {
+        refresh();
+      }
+    };
+
+    refresh();
+
+    window.addEventListener("storage", refresh);
+    window.addEventListener("focus", refresh);
+    window.addEventListener(
+      SAVED_LISTINGS_EVENT,
+      refresh
+    );
+    window.addEventListener(
+      SAVED_OUTINGS_EVENT,
+      refresh
+    );
+    document.addEventListener(
+      "visibilitychange",
+      refreshWhenVisible
     );
 
-  const [
-    outings,
-    setOutings
-  ] =
-    useState<
-      GeneratedOutingPlan[]
-    >(
-      []
-    );
-
-
-  const refreshSaved =
-    useCallback(
-      async () => {
-        const browserListings =
-          readBrowserSavedListings();
-
-        const apiListings =
-          await readApiSavedListings();
-
-        setListings(
-          deduplicateListings([
-            ...browserListings,
-            ...apiListings
-          ])
-        );
-
-        setOutings(
-          getSavedOutings()
-        );
-
-        setReady(true);
-      },
-      []
-    );
-
-
-  useEffect(
-    () => {
-      const refresh =
-        () => {
-          void refreshSaved();
-        };
-
-      const refreshWhenVisible =
-        () => {
-          if (
-            document.visibilityState ===
-            "visible"
-          ) {
-            refresh();
-          }
-        };
-
-      refresh();
-
-      window.addEventListener(
+    return () => {
+      window.removeEventListener(
         "storage",
         refresh
       );
-
-      window.addEventListener(
+      window.removeEventListener(
         "focus",
         refresh
       );
-
-      window.addEventListener(
+      window.removeEventListener(
+        SAVED_LISTINGS_EVENT,
+        refresh
+      );
+      window.removeEventListener(
         SAVED_OUTINGS_EVENT,
         refresh
       );
-
-      for (
-        const eventName
-        of SAVED_LISTING_EVENTS
-      ) {
-        window.addEventListener(
-          eventName,
-          refresh
-        );
-      }
-
-      document.addEventListener(
+      document.removeEventListener(
         "visibilitychange",
         refreshWhenVisible
       );
+    };
+  }, [refreshSaved]);
 
-      return () => {
-        window.removeEventListener(
-          "storage",
-          refresh
-        );
-
-        window.removeEventListener(
-          "focus",
-          refresh
-        );
-
-        window.removeEventListener(
-          SAVED_OUTINGS_EVENT,
-          refresh
-        );
-
-        for (
-          const eventName
-          of SAVED_LISTING_EVENTS
-        ) {
-          window.removeEventListener(
-            eventName,
-            refresh
-          );
-        }
-
-        document.removeEventListener(
-          "visibilitychange",
-          refreshWhenVisible
-        );
-      };
-    },
-    [
-      refreshSaved
-    ]
-  );
-
-
-  function handleRemoveOuting(
-    planId: string
-  ) {
-    removeSavedOuting(
-      planId
-    );
-
-    setOutings(
-      (
-        currentOutings
-      ) =>
-        currentOutings.filter(
-          (outing) =>
-            outing.planId !==
-            planId
-        )
+  function handleRemoveOuting(planId: string) {
+    removeSavedOuting(planId);
+    setOutings((current) =>
+      current.filter(
+        (outing) =>
+          outing.planId !== planId
+      )
     );
   }
 
-
   if (!ready) {
     return (
-      <section
-        className="empty-state"
-      >
-        <div
-          aria-hidden="true"
-        >
-          ♡
-        </div>
-
-        <h1>
-          Opening your saves
-        </h1>
-
+      <section className="empty-state">
+        <div aria-hidden="true">♡</div>
+        <h1>Opening your saves</h1>
         <p>
-          Gathering your listings
-          and complete outings.
+          Gathering your listings and complete outings.
         </p>
       </section>
     );
   }
 
-
-  if (
-    listings.length ===
-      0 &&
-    outings.length ===
-      0
-  ) {
-    return (
-      <VentureSavedEmptyState />
-    );
-  }
-
+  const isEmpty =
+    listings.length === 0 &&
+    outings.length === 0;
 
   return (
-    <main
-      className="saved-page"
-    >
-      <header
-        className="section-heading"
-      >
-        <div>
-          <span>
-            YOUR COLLECTION
-          </span>
+    <main className="saved-page">
+      <SavedSyncBanner />
 
-          <h1>
-            Saved
-          </h1>
+      {isEmpty ? (
+        <VentureSavedEmptyState />
+      ) : (
+        <>
+          <header className="section-heading">
+            <div>
+              <span>YOUR COLLECTION</span>
+              <h1>Saved</h1>
+              <p>
+                Restaurants, events, and complete Winnipeg outings you kept
+                for later.
+              </p>
+            </div>
+          </header>
 
-          <p>
-            Restaurants, events,
-            and complete Winnipeg
-            outings you kept for
-            later.
-          </p>
-        </div>
-      </header>
+          <section className="section-block">
+            <div className="section-heading">
+              <div>
+                <span>COMPLETE PLANS</span>
+                <h2>
+                  {outings.length} {outings.length === 1
+                    ? "outing"
+                    : "outings"}
+                </h2>
+              </div>
+              <Link href="/build-outing">
+                Build another
+              </Link>
+            </div>
 
-      <section
-        className="section-block"
-      >
-        <div
-          className="section-heading"
-        >
-          <div>
-            <span>
-              COMPLETE PLANS
-            </span>
+            {outings.length > 0 ? (
+              <div className="saved-outing-grid">
+                {outings.map((outing) => (
+                  <article
+                    className="saved-outing-card"
+                    key={outing.planId}
+                  >
+                    <div className="saved-outing-card-top">
+                      <div>
+                        <span>SAVED OUTING</span>
+                        <h3>{outing.title}</h3>
+                      </div>
+                      <span className="saved-outing-stop-badge">
+                        {outing.stops.length} {outing.stops.length === 1
+                          ? "stop"
+                          : "stops"}
+                      </span>
+                    </div>
 
-            <h2>
-              {outings.length}{" "}
-              {
-                outings.length ===
-                1
-                  ? "outing"
-                  : "outings"
-              }
-            </h2>
-          </div>
+                    <div className="saved-outing-meta">
+                      <span>{formatPlanDate(outing.date)}</span>
+                      <span>{outing.requestedStartTime}</span>
+                      <span>{outing.transportation}</span>
+                      <span>{formatCost(outing.estimatedTotalCad)}</span>
+                    </div>
 
-          <Link
-            href="/build-outing"
-          >
-            Build another
-          </Link>
-        </div>
+                    {outing.stops.length > 0 ? (
+                      <div className="saved-outing-stop-preview">
+                        {outing.stops.slice(0, 3).map((stop) => (
+                          <div
+                            key={`${stop.listing.type}-${stop.listing.id}`}
+                          >
+                            <b>{stop.order}</b>
+                            <span>
+                              <small>{stop.startTime}</small>
+                              <strong>{stop.listing.name}</strong>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="saved-outing-no-stops">
+                        No stops are stored in this outing.
+                      </p>
+                    )}
 
-        {
-          outings.length >
-          0
-            ? (
-              <div
-                className="saved-outing-grid"
-              >
-                {
-                  outings.map(
-                    (outing) => (
-                      <article
-                        className="saved-outing-card"
-                        key={
+                    <div className="saved-outing-actions">
+                      <Link
+                        href={`/saved/outings/${encodeURIComponent(
                           outing.planId
+                        )}`}
+                      >
+                        Open outing
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleRemoveOuting(
+                            outing.planId
+                          )
                         }
                       >
-                        <div
-                          className="saved-outing-card-top"
-                        >
-                          <div>
-                            <span>
-                              SAVED OUTING
-                            </span>
-
-                            <h3>
-                              {
-                                outing.title
-                              }
-                            </h3>
-                          </div>
-
-                          <span
-                            className="saved-outing-stop-badge"
-                          >
-                            {
-                              outing.stops
-                                .length
-                            }{" "}
-                            {
-                              outing.stops
-                                .length ===
-                              1
-                                ? "stop"
-                                : "stops"
-                            }
-                          </span>
-                        </div>
-
-                        <div
-                          className="saved-outing-meta"
-                        >
-                          <span>
-                            {
-                              formatPlanDate(
-                                outing.date
-                              )
-                            }
-                          </span>
-
-                          <span>
-                            {
-                              outing
-                                .requestedStartTime
-                            }
-                          </span>
-
-                          <span>
-                            {
-                              outing
-                                .transportation
-                            }
-                          </span>
-
-                          <span>
-                            {
-                              formatCost(
-                                outing
-                                  .estimatedTotalCad
-                              )
-                            }
-                          </span>
-                        </div>
-
-                        {
-                          outing.stops
-                            .length >
-                          0
-                            ? (
-                              <div
-                                className="saved-outing-stop-preview"
-                              >
-                                {
-                                  outing.stops
-                                    .slice(
-                                      0,
-                                      3
-                                    )
-                                    .map(
-                                      (
-                                        stop
-                                      ) => (
-                                        <div
-                                          key={`${stop.listing.type}-${stop.listing.id}`}
-                                        >
-                                          <b>
-                                            {
-                                              stop.order
-                                            }
-                                          </b>
-
-                                          <span>
-                                            <small>
-                                              {
-                                                stop.startTime
-                                              }
-                                            </small>
-
-                                            <strong>
-                                              {
-                                                stop.listing
-                                                  .name
-                                              }
-                                            </strong>
-                                          </span>
-                                        </div>
-                                      )
-                                    )
-                                }
-                              </div>
-                            )
-                            : (
-                              <p
-                                className="saved-outing-no-stops"
-                              >
-                                No stops are stored
-                                in this outing.
-                              </p>
-                            )
-                        }
-
-                        <div
-                          className="saved-outing-actions"
-                        >
-                          <Link
-                            href={`/saved/outings/${encodeURIComponent(
-                              outing.planId
-                            )}`}
-                          >
-                            Open outing
-                          </Link>
-
-                          <button
-                            type="button"
-                            onClick={
-                              () =>
-                                handleRemoveOuting(
-                                  outing.planId
-                                )
-                            }
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </article>
-                    )
-                  )
-                }
+                        Remove
+                      </button>
+                    </div>
+                  </article>
+                ))}
               </div>
-            )
-            : (
-              <div
-                className="saved-inline-state"
-              >
-                <p>
-                  No complete outings
-                  saved yet.
-                </p>
-
-                <Link
-                  href="/build-outing"
-                >
+            ) : (
+              <div className="saved-inline-state">
+                <p>No complete outings saved yet.</p>
+                <Link href="/build-outing">
                   Build an outing
                 </Link>
               </div>
-            )
-        }
-      </section>
+            )}
+          </section>
 
-      <section
-        className="section-block"
-      >
-        <div
-          className="section-heading"
-        >
-          <div>
-            <span>
-              INDIVIDUAL PICKS
-            </span>
-
-            <h2>
-              {listings.length}{" "}
-              {
-                listings.length ===
-                1
-                  ? "listing"
-                  : "listings"
-              }
-            </h2>
-          </div>
-
-          <Link
-            href="/explore"
-          >
-            Explore more
-          </Link>
-        </div>
-
-        {
-          listings.length >
-          0
-            ? (
-              <div
-                className="vertical-list"
-              >
-                {
-                  listings.map(
-                    (listing) => (
-                      <ListingCard
-                        key={`${listing.type}-${listing.id}`}
-                        listing={
-                          listing
-                        }
-                      />
-                    )
-                  )
-                }
+          <section className="section-block">
+            <div className="section-heading">
+              <div>
+                <span>INDIVIDUAL PICKS</span>
+                <h2>
+                  {listings.length} {listings.length === 1
+                    ? "listing"
+                    : "listings"}
+                </h2>
               </div>
-            )
-            : (
-              <div
-                className="saved-inline-state"
-              >
-                <p>
-                  Tap the heart on
-                  any event or food
-                  listing to keep it
-                  here.
-                </p>
+              <Link href="/explore">
+                Explore more
+              </Link>
+            </div>
 
-                <Link
-                  href="/explore"
-                >
+            {listings.length > 0 ? (
+              <div className="vertical-list">
+                {listings.map((listing) => (
+                  <ListingCard
+                    key={`${listing.type}-${listing.id}`}
+                    listing={listing}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="saved-inline-state">
+                <p>
+                  Tap the heart on any event or food listing to keep it here.
+                </p>
+                <Link href="/explore">
                   Explore Winnipeg
                 </Link>
               </div>
-            )
-        }
-      </section>
+            )}
+          </section>
+        </>
+      )}
     </main>
   );
 }

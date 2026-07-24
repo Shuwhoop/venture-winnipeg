@@ -43,3 +43,4 @@ out/
 
 # Operating-system clutter
 Thumbs.db
+*.backup-*

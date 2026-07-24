@@ -1,0 +1,317 @@
+.installCard,
+.statusCard,
+.connectionBanner,
+.updatePrompt {
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.installCard {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  width: calc(100% - 28px);
+  margin: 18px auto 8px;
+  padding: 17px;
+  overflow: hidden;
+  border: 2px solid #241f20;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(255, 207, 0, 0.36), transparent 28%),
+    linear-gradient(135deg, #fffaf2 0%, #fff3be 100%);
+  box-shadow: 5px 5px 0 #d01013;
+}
+
+.installCard::after {
+  position: absolute;
+  right: -28px;
+  bottom: -40px;
+  width: 112px;
+  height: 112px;
+  border: 17px solid rgba(109, 40, 217, 0.12);
+  border-radius: 999px;
+  content: "";
+}
+
+.installMark {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 3px solid #241f20;
+  border-radius: 18px;
+  background: #ffcf00;
+  box-shadow: 4px 4px 0 #d01013;
+  transform: rotate(-4deg);
+}
+
+.installMark span {
+  font-size: 1.65rem;
+  font-weight: 950;
+}
+
+.installCopy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.installCopy > span,
+.statusCard header > span {
+  color: #d01013;
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+}
+
+.installCopy h2,
+.statusCard h2 {
+  margin: 4px 0 5px;
+  color: #241f20;
+  font-size: 1.3rem;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.installCopy p,
+.statusCard p {
+  margin: 0;
+  color: #655b5c;
+  font-size: 0.78rem;
+  line-height: 1.46;
+}
+
+.installActions {
+  position: relative;
+  z-index: 1;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.installActions button,
+.iosHint {
+  min-height: 44px;
+  border: 2px solid #241f20;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 0.77rem;
+  font-weight: 900;
+}
+
+.installActions > button:first-child {
+  flex: 1;
+  padding: 10px 14px;
+  background: #d01013;
+  color: #fff;
+  box-shadow: 3px 3px 0 #ffcf00;
+}
+
+.iosHint {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  padding: 9px 12px;
+  background: #fff;
+}
+
+.installActions .laterButton {
+  padding: 9px 12px;
+  background: #fff;
+  color: #241f20;
+}
+
+.connectionBanner,
+.updatePrompt {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: 86px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: min(440px, calc(100vw - 24px));
+  padding: 11px 12px;
+  border: 2px solid #241f20;
+  border-radius: 17px;
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.2);
+}
+
+.connectionBanner {
+  background: #fff0b6;
+}
+
+.updatePrompt {
+  background: #e9ddff;
+}
+
+.connectionBanner > span,
+.updateIcon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #241f20;
+  border-radius: 12px;
+  background: #fff;
+  font-weight: 900;
+}
+
+.connectionBanner div,
+.updatePrompt div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.connectionBanner strong,
+.updatePrompt strong {
+  font-size: 0.77rem;
+}
+
+.connectionBanner small,
+.updatePrompt small {
+  color: #675d5e;
+  font-size: 0.66rem;
+  line-height: 1.3;
+}
+
+.connectionBanner a,
+.updatePrompt > button:not(.dismissIcon) {
+  padding: 8px 10px;
+  border: 2px solid #241f20;
+  border-radius: 11px;
+  background: #d01013;
+  color: #fff;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.dismissIcon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border: 2px solid #241f20;
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-weight: 900;
+}
+
+.statusCard {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0;
+  padding: 18px;
+  border: 2px solid #241f20;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 90% 7%, rgba(255, 207, 0, 0.28), transparent 28%),
+    linear-gradient(180deg, #fffaf2, #fff);
+  box-shadow: 5px 5px 0 rgba(109, 40, 217, 0.18);
+}
+
+.statusGrid {
+  display: grid;
+  gap: 9px;
+}
+
+.statusGrid article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 11px;
+  border: 1.5px solid #d7cbc4;
+  border-radius: 15px;
+  background: #fff;
+}
+
+.statusGrid article > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid #241f20;
+  border-radius: 13px;
+  background: #ffefaa;
+  font-weight: 900;
+}
+
+.statusGrid article div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statusGrid strong {
+  font-size: 0.84rem;
+}
+
+.statusGrid small {
+  color: #6c6263;
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 390px) {
+  .installCard {
+    width: calc(100% - 20px);
+    padding: 14px;
+  }
+
+  .installMark {
+    width: 50px;
+    height: 50px;
+  }
+
+  .installActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .installActions > * {
+    width: 100%;
+  }
+
+  .connectionBanner,
+  .updatePrompt {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .connectionBanner a,
+  .updatePrompt > button:not(.dismissIcon) {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .installMark {
+    animation: ventureInstallRock 3.6s ease-in-out infinite;
+  }
+
+  .updateIcon {
+    animation: ventureUpdateTurn 2.4s linear infinite;
+  }
+}
+
+@keyframes ventureInstallRock {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50% { transform: rotate(2deg) translateY(-3px); }
+}
+
+@keyframes ventureUpdateTurn {
+  to { transform: rotate(360deg); }
+}

@@ -18,6 +18,7 @@ type ListingCardProps = {
   listing: Listing;
   selected?: boolean;
   onSelect?: (listing: Listing) => void;
+  mapIndex?: number;
 };
 
 const verificationCopy: Record<
@@ -34,7 +35,8 @@ const verificationCopy: Record<
 export function ListingCard({
   listing,
   selected = false,
-  onSelect
+  onSelect,
+  mapIndex
 }: ListingCardProps) {
   const warning =
     listing.verification === "community_reported" ||
@@ -46,6 +48,15 @@ export function ListingCard({
         selected ? "is-selected" : ""
       }`}
     >
+      {typeof mapIndex === "number" ? (
+        <span
+          className="listing-map-number"
+          aria-label={`Map marker ${mapIndex + 1}`}
+        >
+          {mapIndex + 1}
+        </span>
+      ) : null}
+
       {onSelect ? (
         <button
           className="listing-card-link listing-card-map-target"

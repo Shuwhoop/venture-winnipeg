@@ -1,0 +1,38 @@
+{
+  "input": "data\\overture-winnipeg-food-candidates.json",
+  "selectedAreas": [
+    "downtown",
+    "exchange-district",
+    "the-forks",
+    "osborne-village",
+    "corydon",
+    "wellington-crescent",
+    "st-boniface",
+    "university-of-manitoba-fort-garry",
+    "university-of-winnipeg-west-broadway",
+    "bridgwater"
+  ],
+  "selectedTypes": [
+    "bakery_dessert",
+    "bar_pub",
+    "brewery",
+    "cafe",
+    "fast_casual",
+    "restaurant"
+  ],
+  "limitPerArea": 35,
+  "totalRows": 350,
+  "areaCounts": {
+    "Downtown": 35,
+    "Exchange District": 35,
+    "The Forks": 35,
+    "Osborne Village": 35,
+    "Corydon": 35,
+    "Wellington Crescent": 35,
+    "St. Boniface": 35,
+    "University of Manitoba / Fort Garry": 35,
+    "University of Winnipeg / West Broadway": 35,
+    "Bridgwater": 35
+  },
+  "note": "Upload one area CSV at a time through /admin/import. All rows remain drafts."
+}

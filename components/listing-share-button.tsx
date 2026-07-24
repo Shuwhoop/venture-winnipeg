@@ -1,0 +1,128 @@
+"use client";
+
+import {
+  useEffect,
+  useState
+} from "react";
+
+import {
+  trackBetaEvent
+} from "@/lib/beta/client";
+
+import type {
+  Listing
+} from "@/lib/types";
+
+import styles from "./listing-share-button.module.css";
+
+type ListingShareButtonProps = {
+  listing: Listing;
+  className?: string;
+};
+
+export function ListingShareButton({
+  listing,
+  className = ""
+}: ListingShareButtonProps) {
+  const [message, setMessage] =
+    useState("");
+
+  useEffect(() => {
+    if (!message) {
+      return;
+    }
+
+    const timeout =
+      window.setTimeout(
+        () => setMessage(""),
+        2200
+      );
+
+    return () =>
+      window.clearTimeout(timeout);
+  }, [message]);
+
+  async function handleShare() {
+    const url =
+      new URL(
+        `/listings/${listing.slug}`,
+        window.location.origin
+      ).toString();
+
+    const shareData = {
+      title: listing.name,
+      text: `${listing.name} on Venture`,
+      url
+    };
+
+    try {
+      if (
+        typeof navigator.share ===
+        "function"
+      ) {
+        await navigator.share(
+          shareData
+        );
+
+        setMessage("Share sheet opened.");
+      } else {
+        await navigator.clipboard.writeText(
+          url
+        );
+
+        setMessage("Link copied.");
+      }
+
+      trackBetaEvent({
+        eventName: "listing_shared",
+        pagePath:
+          window.location.pathname,
+        properties: {
+          listingId: listing.id,
+          listingSlug: listing.slug,
+          listingType: listing.type,
+          listingName: listing.name,
+          source: "explore-map-card"
+        }
+      });
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        error.name === "AbortError"
+      ) {
+        return;
+      }
+
+      setMessage(
+        "Could not share this listing."
+      );
+    }
+  }
+
+  return (
+    <span
+      className={`${styles.wrap} ${className}`}
+    >
+      <button
+        type="button"
+        className={styles.button}
+        aria-label={`Share ${listing.name}`}
+        title="Share listing"
+        onClick={() => {
+          void handleShare();
+        }}
+      >
+        <span aria-hidden="true">↗</span>
+      </button>
+
+      {message ? (
+        <span
+          className={styles.message}
+          role="status"
+        >
+          {message}
+        </span>
+      ) : null}
+    </span>
+  );
+}

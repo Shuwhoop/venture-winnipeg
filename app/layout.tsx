@@ -19,14 +19,35 @@ import {
 } from "@/components/service-worker-registration";
 
 export const metadata: Metadata = {
-  title:
-    "Venture by Boogie Bangers | Discover Your City",
+  title: "Venture",
 
   description:
     "Find trustworthy events, restaurants, and complete outings across Winnipeg.",
 
   applicationName:
-    "Venture"
+    "Venture",
+
+  manifest: "/manifest.webmanifest",
+
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Venture"
+  },
+
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" }
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }
+    ]
+  },
+
+  formatDetection: {
+    telephone: false
+  }
 };
 
 export const viewport: Viewport = {
@@ -51,7 +72,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="venture-body"
+        className="venture-body venture-app-first"
         suppressHydrationWarning
       >
         <div className="app-shell">

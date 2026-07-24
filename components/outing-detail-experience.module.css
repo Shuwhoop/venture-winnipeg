@@ -633,3 +633,112 @@
     transition: none !important;
   }
 }
+
+
+/* =========================================================
+   Venture outing detail calm pass v0.2
+   Keeps saved and shared outings aligned with the app-first
+   results screen and removes recommendation-reason clutter.
+   ========================================================= */
+
+.reason {
+  display: none !important;
+}
+
+.page {
+  gap: 15px;
+  background:
+    radial-gradient(circle at 90% 2%, rgba(255, 207, 0, 0.16), transparent 20%),
+    #fffaf2;
+}
+
+.hero,
+.snapshotGrid article,
+.stopCard,
+.actions {
+  box-shadow: none;
+}
+
+.snapshotGrid article {
+  min-height: 104px;
+  border: 1.5px solid #d8cec7;
+  background: #ffffff;
+}
+
+.snapshotGrid article::after {
+  display: none;
+}
+
+.startCard,
+.lengthCard,
+.peopleCard,
+.travelCard,
+.stopsCard,
+.priceCard,
+.groupCard {
+  background: #ffffff;
+}
+
+.startCard { border-top: 5px solid #d01013 !important; }
+.lengthCard { border-top: 5px solid #5d9d32 !important; }
+.peopleCard { border-top: 5px solid #1682b5 !important; }
+.travelCard { border-top: 5px solid #7654d8 !important; }
+.stopsCard { border-top: 5px solid #edb200 !important; }
+.priceCard { border-top: 5px solid #dc7416 !important; }
+.groupCard { border-top: 5px solid #241f20 !important; }
+
+.stopWrapper {
+  opacity: 0;
+  animation: detailStopIn 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stopCard {
+  border: 1.5px solid #d8cec7;
+  border-left: 5px solid #ffcf00;
+  background: #ffffff;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.foodStop { border-left-color: #edb200; }
+.eventStop { border-left-color: #7654d8; }
+.drinksStop { border-left-color: #0f8a4b; }
+
+.stopCard:focus-within {
+  border-color: #241f20;
+  transform: translateY(-2px);
+}
+
+@keyframes detailStopIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stopWrapper {
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .stopCard:focus-within {
+    transform: none;
+  }
+}
+
+/* Dynamic saved/shared route count v0.3 */
+.heroRoute > span {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+
+.heroRoute > span b,
+.heroRoute > span i {
+  position: relative;
+  z-index: 1;
+}

@@ -1,0 +1,264 @@
+.page {
+  display: grid;
+  gap: 18px;
+  padding-bottom: 24px;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 22px 24px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 90% 12%, rgba(255, 207, 0, 0.85), transparent 28%),
+    linear-gradient(145deg, #8250b3, #5d347f 60%, #382047);
+  color: white;
+  box-shadow: 0 20px 54px rgba(60, 33, 76, 0.22);
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 30px;
+  border-radius: 19px;
+  background: #ffcf00;
+  color: #321d42;
+  font-size: 28px;
+  font-weight: 950;
+  transform: rotate(-4deg);
+}
+
+.logo i {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #ffcf00;
+  border-radius: 999px;
+  background: #7b46ad;
+}
+
+.hero > span,
+.formCard header > span {
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+}
+
+.hero > span {
+  color: #ffe873;
+}
+
+.hero h1 {
+  max-width: 12ch;
+  margin: 8px 0 10px;
+  font-size: clamp(2rem, 9vw, 3rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+}
+
+.hero p {
+  max-width: 38rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.55;
+}
+
+.formCard {
+  padding: 22px;
+  border: 1px solid rgba(38, 24, 50, 0.1);
+  border-radius: 26px;
+  background: #fffdf8;
+  box-shadow: 0 16px 42px rgba(39, 24, 52, 0.08);
+}
+
+.formCard form {
+  display: grid;
+  gap: 18px;
+}
+
+.formCard header > span {
+  color: #7b4ca4;
+}
+
+.formCard h2 {
+  margin: 5px 0 7px;
+  color: #271833;
+  font-size: 1.55rem;
+}
+
+.formCard header p {
+  margin: 0;
+  color: #716876;
+  line-height: 1.48;
+}
+
+.formCard label {
+  display: grid;
+  gap: 8px;
+  color: #3b2b44;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.formCard input {
+  width: 100%;
+  min-height: 52px;
+  box-sizing: border-box;
+  border: 1px solid rgba(44, 28, 58, 0.16);
+  border-radius: 16px;
+  padding: 0 15px;
+  background: white;
+  color: #271833;
+  font: inherit;
+  font-weight: 650;
+  outline: none;
+}
+
+.formCard input:focus {
+  border-color: #8652b2;
+  box-shadow: 0 0 0 4px rgba(134, 82, 178, 0.14);
+}
+
+.formCard form > button,
+.sentState button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 16px;
+  padding: 0 18px;
+  background: #ffcf00;
+  color: #2b1939;
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.formCard button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.error {
+  margin: -6px 0 0;
+  color: #a43d2b;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.sentState {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.sentState > span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 5px;
+  border-radius: 16px;
+  background: #e9dff1;
+  color: #70419a;
+  font-size: 1.3rem;
+}
+
+.sentState h2,
+.sentState p,
+.sentState small {
+  margin: 0;
+}
+
+.sentState p {
+  color: #4e3b58;
+  line-height: 1.48;
+}
+
+.sentState small {
+  color: #7b707f;
+  line-height: 1.45;
+}
+
+.sentState button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.benefits article {
+  min-width: 0;
+  padding: 15px 12px;
+  border-radius: 18px;
+  background: #f3ecf7;
+}
+
+.benefits span,
+.benefits strong,
+.benefits small {
+  display: block;
+}
+
+.benefits span {
+  margin-bottom: 12px;
+  color: #71419a;
+  font-size: 1.1rem;
+}
+
+.benefits strong {
+  color: #352240;
+  font-size: 0.82rem;
+}
+
+.benefits small {
+  margin-top: 4px;
+  color: #756b7b;
+  font-size: 0.69rem;
+  line-height: 1.35;
+}
+
+.backLink {
+  justify-self: center;
+  color: #69418c;
+  font-size: 0.84rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+@media (max-width: 390px) {
+  .hero,
+  .formCard {
+    border-radius: 23px;
+  }
+
+  .hero {
+    padding: 23px 18px 21px;
+  }
+
+  .formCard {
+    padding: 18px;
+  }
+
+  .benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .benefits article {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 11px;
+  }
+
+  .benefits span {
+    grid-row: 1 / span 2;
+    margin: 0;
+  }
+}

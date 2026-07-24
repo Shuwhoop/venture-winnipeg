@@ -1,0 +1,125 @@
+.page {
+  display: grid;
+  gap: 18px;
+  padding: 18px 14px 80px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+  padding: 22px;
+  border: 2px solid #241f20;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #fffaf2, #ffefaa);
+  box-shadow: 6px 6px 0 #d01013;
+}
+
+.hero span,
+.devicePlan > span {
+  color: #d01013;
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.hero h1,
+.devicePlan h2 {
+  margin: 5px 0 8px;
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  line-height: 0.96;
+  letter-spacing: -0.055em;
+}
+
+.hero p,
+.devicePlan p {
+  max-width: 52ch;
+  margin: 0;
+  color: #665c5d;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.score {
+  display: grid;
+  justify-items: center;
+  min-width: 130px;
+  padding: 16px;
+  border: 2px solid #241f20;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 4px 4px 0 #6d28d9;
+}
+
+.score strong { font-size: 2rem; }
+.score small { text-align: center; font-size: 0.67rem; }
+
+.checks {
+  display: grid;
+  gap: 10px;
+}
+
+.checks article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  padding: 14px;
+  border: 2px solid #241f20;
+  border-radius: 17px;
+  background: #fff;
+}
+
+.checks article > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #241f20;
+  border-radius: 13px;
+  font-weight: 950;
+}
+
+.ready > span { background: #bff0d4; }
+.blocked > span { background: #ffd0d0; }
+.checks div { display: grid; gap: 3px; }
+.checks strong { font-size: 0.86rem; }
+.checks small { color: #6c6263; font-size: 0.7rem; line-height: 1.4; }
+.checks b { font-size: 0.61rem; letter-spacing: 0.08em; }
+.ready b { color: #137447; }
+.blocked b { color: #d01013; }
+
+.devicePlan {
+  padding: 20px;
+  border: 2px solid #241f20;
+  border-radius: 22px;
+  background: #eee5ff;
+  box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.15);
+}
+
+.devicePlan > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin: 14px 0;
+}
+
+.devicePlan article {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1.5px solid #241f20;
+  border-radius: 14px;
+  background: #fff;
+}
+.devicePlan article strong { font-size: 1rem; }
+.devicePlan article small { color: #685f60; font-size: 0.67rem; line-height: 1.35; }
+
+@media (max-width: 520px) {
+  .hero { grid-template-columns: 1fr; }
+  .score { width: auto; }
+  .devicePlan > div { grid-template-columns: 1fr; }
+  .checks article { grid-template-columns: auto minmax(0, 1fr); }
+  .checks b { grid-column: 2; }
+}

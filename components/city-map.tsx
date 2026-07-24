@@ -8,6 +8,12 @@ import {
 } from "react";
 
 import {
+  getListingPoint,
+  type GeoPoint,
+  type MapBounds
+} from "@/lib/explore-map-utils";
+
+import {
   getVentureMapConfiguration
 } from "@/lib/venture-map-style";
 
@@ -25,9 +31,17 @@ type CityMapProps = {
   listings?: Listing[];
   selectedListingKey?: string | null;
   selectionVersion?: number;
+  fitVersion?: number;
   isVisible?: boolean;
+  userLocation?: GeoPoint | null;
   onSelectListing?: (
     listing: Listing
+  ) => void;
+  onViewportChanged?: (
+    bounds: MapBounds
+  ) => void;
+  onUserLocationChange?: (
+    location: GeoPoint
   ) => void;
 };
 
@@ -39,6 +53,12 @@ type MarkerRecord = {
 
 type MapStatus =
   | "loading"
+  | "ready"
+  | "error";
+
+type LocationStatus =
+  | "idle"
+  | "locating"
   | "ready"
   | "error";
 
@@ -56,60 +76,9 @@ function getListingKey(
   return `${listing.type}-${listing.id}`;
 }
 
-function getCoordinates(
-  listing: Listing
-): [number, number] | null {
-  const latitude =
-    Number(listing.latitude);
-
-  const longitude =
-    Number(listing.longitude);
-
-  if (
-    !Number.isFinite(latitude) ||
-    !Number.isFinite(longitude)
-  ) {
-    return null;
-  }
-
-  return [
-    longitude,
-    latitude
-  ];
-}
-
-function getMarkerIcon(
-  listing: Listing
-): string {
-  if (listing.type === "event") {
-    return "🎟";
-  }
-
-  const text = `${listing.name} ${listing.category}`
-    .toLowerCase();
-
-  if (
-    text.includes("bar") ||
-    text.includes("pub") ||
-    text.includes("cocktail") ||
-    text.includes("brew")
-  ) {
-    return "🍸";
-  }
-
-  if (
-    text.includes("cafe") ||
-    text.includes("coffee") ||
-    text.includes("bakery")
-  ) {
-    return "☕";
-  }
-
-  return "🍴";
-}
-
 function createPopupContent(
-  listing: Listing
+  listing: Listing,
+  index: number
 ): HTMLDivElement {
   const popupContent =
     document.createElement("div");
@@ -121,9 +90,11 @@ function createPopupContent(
     document.createElement("span");
 
   eyebrow.textContent =
-    listing.type === "event"
-      ? "EVENT"
-      : listing.category.toUpperCase();
+    `${index + 1} · ${
+      listing.type === "event"
+        ? "EVENT"
+        : listing.category.toUpperCase()
+    }`;
 
   const heading =
     document.createElement("strong");
@@ -134,10 +105,15 @@ function createPopupContent(
   const description =
     document.createElement("small");
 
-  description.textContent =
+  description.textContent = [
     listing.neighbourhood ||
-    listing.address ||
-    "Winnipeg";
+      listing.address ||
+      "Winnipeg",
+    listing.timeOrHours,
+    listing.price
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   popupContent.append(
     eyebrow,
@@ -148,12 +124,29 @@ function createPopupContent(
   return popupContent;
 }
 
+function getCurrentBounds(
+  map: maplibregl.Map
+): MapBounds {
+  const bounds = map.getBounds();
+
+  return {
+    north: bounds.getNorth(),
+    south: bounds.getSouth(),
+    east: bounds.getEast(),
+    west: bounds.getWest()
+  };
+}
+
 export function CityMap({
   listings = [],
   selectedListingKey = null,
   selectionVersion = 0,
+  fitVersion = 0,
   isVisible = true,
-  onSelectListing
+  userLocation = null,
+  onSelectListing,
+  onViewportChanged,
+  onUserLocationChange
 }: CityMapProps) {
   const mapContainerRef =
     useRef<HTMLDivElement>(null);
@@ -168,27 +161,36 @@ export function CityMap({
       Map<string, MarkerRecord>
     >(new Map());
 
+  const userMarkerRef =
+    useRef<maplibregl.Marker | null>(
+      null
+    );
+
   const boundsRef =
     useRef<maplibregl.LngLatBounds | null>(
       null
     );
 
-  const [
-    mappedCount,
-    setMappedCount
-  ] = useState(0);
+  const lastFitVersionRef =
+    useRef(-1);
 
-  const [
-    mapStatus,
-    setMapStatus
-  ] = useState<MapStatus>(
-    "loading"
-  );
+  const userMovedMapRef =
+    useRef(false);
 
-  const [
-    retryVersion,
-    setRetryVersion
-  ] = useState(0);
+  const [mappedCount, setMappedCount] =
+    useState(0);
+
+  const [mapStatus, setMapStatus] =
+    useState<MapStatus>("loading");
+
+  const [locationStatus, setLocationStatus] =
+    useState<LocationStatus>("idle");
+
+  const [locationMessage, setLocationMessage] =
+    useState("");
+
+  const [retryVersion, setRetryVersion] =
+    useState(0);
 
   const fitAll =
     useCallback(() => {
@@ -212,15 +214,89 @@ export function CityMap({
 
       map.fitBounds(bounds, {
         padding: {
-          top: 72,
-          right: 46,
-          bottom: 84,
-          left: 46
+          top: 78,
+          right: 48,
+          bottom: 100,
+          left: 48
         },
         maxZoom: 13.5,
         duration: 550
       });
     }, []);
+
+  const locateUser =
+    useCallback(() => {
+      if (
+        typeof navigator === "undefined" ||
+        !navigator.geolocation
+      ) {
+        setLocationStatus("error");
+        setLocationMessage(
+          "Location is not available on this device."
+        );
+        return;
+      }
+
+      setLocationStatus("locating");
+      setLocationMessage(
+        "Finding your location..."
+      );
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const nextLocation = {
+            latitude:
+              position.coords.latitude,
+            longitude:
+              position.coords.longitude
+          };
+
+          setLocationStatus("ready");
+          setLocationMessage(
+            "Showing distance from you."
+          );
+
+          onUserLocationChange?.(
+            nextLocation
+          );
+
+          mapRef.current?.flyTo({
+            center: [
+              nextLocation.longitude,
+              nextLocation.latitude
+            ],
+            zoom: Math.max(
+              mapRef.current?.getZoom() ??
+                12,
+              13
+            ),
+            duration: 650,
+            essential: true
+          });
+        },
+        (error) => {
+          setLocationStatus("error");
+
+          if (
+            error.code ===
+            error.PERMISSION_DENIED
+          ) {
+            setLocationMessage(
+              "Location permission was not granted."
+            );
+          } else {
+            setLocationMessage(
+              "Venture could not find your location."
+            );
+          }
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 10000,
+          maximumAge: 300000
+        }
+      );
+    }, [onUserLocationChange]);
 
   useEffect(() => {
     const container =
@@ -298,8 +374,39 @@ export function CityMap({
       }
     };
 
+    const handleMoveStart = (
+      event: unknown
+    ) => {
+      const originalEvent =
+        (
+          event as {
+            originalEvent?: Event;
+          }
+        ).originalEvent;
+
+      if (originalEvent) {
+        userMovedMapRef.current =
+          true;
+      }
+    };
+
+    const handleMoveEnd = () => {
+      if (
+        !userMovedMapRef.current
+      ) {
+        return;
+      }
+
+      userMovedMapRef.current = false;
+      onViewportChanged?.(
+        getCurrentBounds(map)
+      );
+    };
+
     map.on("load", handleLoad);
     map.on("error", handleError);
+    map.on("movestart", handleMoveStart);
+    map.on("moveend", handleMoveEnd);
 
     const resizeObserver =
       new ResizeObserver(() => {
@@ -330,13 +437,23 @@ export function CityMap({
       );
 
       markersRef.current.clear();
+      userMarkerRef.current?.remove();
+      userMarkerRef.current = null;
 
       map.off("load", handleLoad);
       map.off("error", handleError);
+      map.off(
+        "movestart",
+        handleMoveStart
+      );
+      map.off("moveend", handleMoveEnd);
       map.remove();
       mapRef.current = null;
     };
-  }, [retryVersion]);
+  }, [
+    onViewportChanged,
+    retryVersion
+  ]);
 
   useEffect(() => {
     if (!isVisible) {
@@ -349,7 +466,12 @@ export function CityMap({
 
         window.setTimeout(() => {
           mapRef.current?.resize();
-          fitAll();
+
+          if (
+            lastFitVersionRef.current < 0
+          ) {
+            fitAll();
+          }
         }, 120);
       });
 
@@ -386,91 +508,110 @@ export function CityMap({
 
       let markerCount = 0;
 
-      for (const listing of listings) {
-        const coordinates =
-          getCoordinates(listing);
+      listings.forEach(
+        (listing, index) => {
+          const point =
+            getListingPoint(listing);
 
-        if (!coordinates) {
-          continue;
-        }
-
-        const listingKey =
-          getListingKey(listing);
-
-        const markerButton =
-          document.createElement("button");
-
-        markerButton.type = "button";
-        markerButton.draggable = false;
-        markerButton.className =
-          `${styles.mapMarker} ${
-            listing.type === "event"
-              ? styles.eventMarker
-              : styles.placeMarker
-          }`;
-
-        const markerIcon =
-          document.createElement("span");
-
-        markerIcon.textContent =
-          getMarkerIcon(listing);
-
-        markerIcon.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        markerButton.append(
-          markerIcon
-        );
-
-        markerButton.setAttribute(
-          "aria-label",
-          `Show ${listing.name}`
-        );
-
-        markerButton.addEventListener(
-          "click",
-          (event) => {
-            event.stopPropagation();
-            onSelectListing?.(listing);
+          if (!point) {
+            return;
           }
-        );
 
-        const popup =
-          new maplibregl.Popup({
-            offset: 24,
-            closeButton: false,
-            closeOnClick: false,
-            className:
-              styles.mapPopupShell
-          })
-            .setLngLat(coordinates)
-            .setDOMContent(
-              createPopupContent(listing)
+          const coordinates: [
+            number,
+            number
+          ] = [
+            point.longitude,
+            point.latitude
+          ];
+
+          const listingKey =
+            getListingKey(listing);
+
+          const markerButton =
+            document.createElement(
+              "button"
             );
 
-        const marker =
-          new maplibregl.Marker({
-            element: markerButton,
-            anchor: "bottom",
-            draggable: false
-          })
-            .setLngLat(coordinates)
-            .addTo(activeMap);
+          markerButton.type = "button";
+          markerButton.draggable = false;
+          markerButton.className =
+            `${styles.mapMarker} ${
+              listing.type === "event"
+                ? styles.eventMarker
+                : styles.placeMarker
+            }`;
 
-        markersRef.current.set(
-          listingKey,
-          {
-            marker,
-            popup,
-            listing
-          }
-        );
+          const markerNumber =
+            document.createElement(
+              "span"
+            );
 
-        bounds.extend(coordinates);
-        markerCount += 1;
-      }
+          markerNumber.textContent =
+            String(index + 1);
+
+          markerNumber.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+
+          markerButton.append(
+            markerNumber
+          );
+
+          markerButton.setAttribute(
+            "aria-label",
+            `${index + 1}. Show ${listing.name}`
+          );
+
+          markerButton.addEventListener(
+            "click",
+            (event) => {
+              event.stopPropagation();
+              onSelectListing?.(
+                listing
+              );
+            }
+          );
+
+          const popup =
+            new maplibregl.Popup({
+              offset: 24,
+              closeButton: false,
+              closeOnClick: false,
+              className:
+                styles.mapPopupShell
+            })
+              .setLngLat(coordinates)
+              .setDOMContent(
+                createPopupContent(
+                  listing,
+                  index
+                )
+              );
+
+          const marker =
+            new maplibregl.Marker({
+              element: markerButton,
+              anchor: "bottom",
+              draggable: false
+            })
+              .setLngLat(coordinates)
+              .addTo(activeMap);
+
+          markersRef.current.set(
+            listingKey,
+            {
+              marker,
+              popup,
+              listing
+            }
+          );
+
+          bounds.extend(coordinates);
+          markerCount += 1;
+        }
+      );
 
       boundsRef.current =
         markerCount > 0
@@ -478,10 +619,19 @@ export function CityMap({
           : null;
 
       setMappedCount(markerCount);
-      window.setTimeout(
-        fitAll,
-        80
-      );
+
+      if (
+        lastFitVersionRef.current !==
+        fitVersion
+      ) {
+        lastFitVersionRef.current =
+          fitVersion;
+
+        window.setTimeout(
+          fitAll,
+          80
+        );
+      }
     }
 
     if (activeMap.loaded()) {
@@ -501,9 +651,61 @@ export function CityMap({
     };
   }, [
     fitAll,
+    fitVersion,
     listings,
     onSelectListing,
     retryVersion
+  ]);
+
+  useEffect(() => {
+    const currentMap =
+      mapRef.current;
+
+    if (!currentMap) {
+      return;
+    }
+
+    userMarkerRef.current?.remove();
+    userMarkerRef.current = null;
+
+    if (!userLocation) {
+      return;
+    }
+
+    const element =
+      document.createElement("div");
+
+    element.className =
+      styles.userLocationMarker;
+
+    element.setAttribute(
+      "aria-label",
+      "Your location"
+    );
+
+    const dot =
+      document.createElement("span");
+
+    element.append(dot);
+
+    userMarkerRef.current =
+      new maplibregl.Marker({
+        element,
+        anchor: "center"
+      })
+        .setLngLat([
+          userLocation.longitude,
+          userLocation.latitude
+        ])
+        .addTo(currentMap);
+
+    return () => {
+      userMarkerRef.current?.remove();
+      userMarkerRef.current = null;
+    };
+  }, [
+    retryVersion,
+    userLocation
   ]);
 
   useEffect(() => {
@@ -585,10 +787,10 @@ export function CityMap({
       );
     };
   }, [
-    selectedListingKey,
-    selectionVersion,
     listings,
-    retryVersion
+    retryVersion,
+    selectedListingKey,
+    selectionVersion
   ]);
 
   return (
@@ -659,15 +861,51 @@ export function CityMap({
         </span>
       </div>
 
-      <button
-        type="button"
-        className={styles.fitMapButton}
-        onClick={fitAll}
-        disabled={mapStatus !== "ready"}
-      >
-        <span aria-hidden="true">⌗</span>
-        Fit all
-      </button>
+      <div className={styles.mapControlStack}>
+        <button
+          type="button"
+          className={styles.fitMapButton}
+          onClick={fitAll}
+          disabled={mapStatus !== "ready"}
+        >
+          <span aria-hidden="true">⌗</span>
+          Fit all
+        </button>
+
+        <button
+          type="button"
+          className={`${styles.locateMapButton} ${
+            locationStatus === "ready"
+              ? styles.locateMapButtonActive
+              : ""
+          }`}
+          onClick={locateUser}
+          disabled={
+            mapStatus !== "ready" ||
+            locationStatus === "locating"
+          }
+        >
+          <span aria-hidden="true">◎</span>
+          {locationStatus === "locating"
+            ? "Locating"
+            : locationStatus === "ready"
+              ? "Near me"
+              : "Use my location"}
+        </button>
+      </div>
+
+      {locationMessage ? (
+        <div
+          className={`${styles.locationMessage} ${
+            locationStatus === "error"
+              ? styles.locationMessageError
+              : ""
+          }`}
+          role="status"
+        >
+          {locationMessage}
+        </div>
+      ) : null}
 
       <div className={styles.mapCount}>
         {mappedCount} mapped

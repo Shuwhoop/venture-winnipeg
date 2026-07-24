@@ -2,6 +2,9 @@
 
 
 import NewsletterSignup from "@/components/newsletter-signup/newsletter-signup";
+import { AppStatusCard } from "@/components/app-foundation/app-foundation";
+import { AccountSyncCard } from "@/components/account-sync/account-sync";
+import { VisitHistoryDashboard } from "@/components/visit-history-dashboard";
 import NeighbourhoodPicker from "@/components/neighbourhood-picker";
 
 import {
@@ -10,17 +13,12 @@ import {
 } from "react";
 
 import {
-  clearPreferences,
   defaultPreferences,
   loadPreferences,
   savePreferences,
   type VenturePreferences
 } from "@/lib/profile-preferences";
 
-import {
-  SAVED_LISTINGS_EVENT,
-  SAVED_LISTINGS_STORAGE_KEY
-} from "@/lib/saved-listings";
 
 const interestOptions = [
   "Food",
@@ -117,31 +115,22 @@ export default function ProfilePage() {
 
   function handleClear() {
     const confirmed = window.confirm(
-      "Clear your Venture preferences and saved listings from this browser?"
+      "Reset your Venture preferences on this device? Saved listings and outings will stay."
     );
 
     if (!confirmed) {
       return;
     }
 
-    clearPreferences();
+    const resetPreferences = {
+      ...defaultPreferences,
+      updatedAt: new Date().toISOString()
+    };
 
-    window.localStorage.removeItem(
-      SAVED_LISTINGS_STORAGE_KEY
-    );
-
-    window.dispatchEvent(
-      new CustomEvent(
-        SAVED_LISTINGS_EVENT
-      )
-    );
-
-    setPreferences(
-      defaultPreferences
-    );
-
+    savePreferences(resetPreferences);
+    setPreferences(resetPreferences);
     setStatusMessage(
-      "Local Venture data was cleared."
+      "Preferences were reset and are ready to sync."
     );
   }
 
@@ -177,10 +166,14 @@ export default function ProfilePage() {
         </h1>
 
         <p>
-          Winnipeg · Preferences stored
-          only in this browser
+          Winnipeg · Guest-friendly discovery
+          with optional account sync
         </p>
       </section>
+
+      <AccountSyncCard />
+
+      <VisitHistoryDashboard />
 
       <section className="preferences-panel">
         <div className="preference-heading">
@@ -348,14 +341,13 @@ export default function ProfilePage() {
 
           <span>
             <strong>
-              Interested in Venture This
-              Weekend
+              Interested in The Thursday
+              Venture
             </strong>
 
             <small>
-              This records your preference
-              only. Email signup is coming
-              later.
+              Keep this preference alongside
+              the newsletter signup below.
             </small>
           </span>
         </label>
@@ -374,7 +366,7 @@ export default function ProfilePage() {
             type="button"
             onClick={handleClear}
           >
-            Clear local data
+            Reset preferences
           </button>
         </div>
 
@@ -388,6 +380,7 @@ export default function ProfilePage() {
         ) : null}
       </section>
     
+      <AppStatusCard />
       <NewsletterSignup placement="profile" />
     </>
   );

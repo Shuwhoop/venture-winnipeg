@@ -463,7 +463,8 @@ export function PersonalizedExploreResults({
     useMemo(() => {
       if (
         !personalizationActive ||
-        !preferences
+        !preferences ||
+        onSelectListing
       ) {
         return listings;
       }
@@ -495,7 +496,8 @@ export function PersonalizedExploreResults({
     }, [
       listings,
       preferences,
-      personalizationActive
+      personalizationActive,
+      onSelectListing
     ]);
 
   return (
@@ -516,7 +518,8 @@ export function PersonalizedExploreResults({
       ) : null}
 
       {personalizationActive &&
-      preferences ? (
+      preferences &&
+      !onSelectListing ? (
         <div className="personalization-note">
           <span aria-hidden="true">
             ✦
@@ -540,7 +543,7 @@ export function PersonalizedExploreResults({
       {rankedListings.length > 0 ? (
         <div className="vertical-list">
           {rankedListings.map(
-            (listing) => (
+            (listing, index) => (
           <ListingCard
             key={`${listing.type}-${listing.id}`}
             listing={listing}
@@ -549,6 +552,11 @@ export function PersonalizedExploreResults({
               `${listing.type}-${listing.id}`
             }
             onSelect={onSelectListing}
+            mapIndex={
+              onSelectListing
+                ? index
+                : undefined
+            }
           />
             )
           )}

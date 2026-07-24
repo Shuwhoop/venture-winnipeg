@@ -40,6 +40,7 @@ const SECTIONS = [
     title: "Understand how Venture performs",
     cards: [
       ["/admin/beta-readiness", "🚦", "Beta readiness", "See launch blockers, live system checks, and the human testing checklist in one place."],
+      ["/admin/pwa-readiness", "▣", "PWA readiness", "Check installation, offline support, icons, and app update handling."],
       ["/admin/analytics", "▥", "Analytics Lab", "Product KPIs, sessions, funnels, retention, and inventory behaviour."],
       ["/admin/beta", "◌", "Beta inbox", "Read tester feedback and usefulness ratings."],
       ["/admin/experiments", "A/B", "Experiments", "Compare controlled product variants with sample warnings."],

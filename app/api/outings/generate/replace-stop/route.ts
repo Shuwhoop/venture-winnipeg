@@ -21,6 +21,11 @@ import type {
   GeneratedOutingStop
 } from "@/lib/saved-outings";
 
+import {
+  resolveRequestedStopCount,
+  withOutingPlanMetrics
+} from "@/lib/outing-plan-metrics";
+
 import type {
   Listing,
   VerificationStatus
@@ -61,6 +66,12 @@ type OutingDraft = {
   maxTravelMinutes: number;
   mustIncludeTerms: string[];
   avoidTerms: string[];
+  discoveryPreference:
+    | "best"
+    | "new-only"
+    | "mix";
+  visitedListingKeys: string[];
+  visitedEventOccurrenceKeys: string[];
   createdAt?: string;
 };
 
@@ -69,6 +80,7 @@ type ReplaceStopRequest = {
   plan: GeneratedOutingPlan;
   stopOrder: number;
   excludedListingKeys: string[];
+  previewOnly: boolean;
 };
 
 type TimeInterval = {
@@ -306,6 +318,34 @@ function parseRequest(
             .slice(0, 8)
         : null;
 
+  const discoveryPreference =
+    draft?.discoveryPreference === "new-only" ||
+    draft?.discoveryPreference === "mix"
+      ? draft.discoveryPreference
+      : "best";
+
+  const visitedListingKeys =
+    draft?.visitedListingKeys === undefined
+      ? []
+      : isStringArray(draft.visitedListingKeys)
+        ? draft.visitedListingKeys
+            .map((key) => key.trim())
+            .filter(Boolean)
+            .slice(0, 1000)
+        : null;
+
+  const visitedEventOccurrenceKeys =
+    draft?.visitedEventOccurrenceKeys === undefined
+      ? []
+      : isStringArray(
+          draft.visitedEventOccurrenceKeys
+        )
+        ? draft.visitedEventOccurrenceKeys
+            .map((key) => key.trim())
+            .filter(Boolean)
+            .slice(0, 1000)
+        : null;
+
   if (
     !draft ||
     typeof draft !== "object" ||
@@ -344,7 +384,9 @@ function parseRequest(
     mustIncludeTerms ===
       null ||
     avoidTerms ===
-      null
+      null ||
+    visitedListingKeys === null ||
+    visitedEventOccurrenceKeys === null
   ) {
     return null;
   }
@@ -399,6 +441,9 @@ function parseRequest(
       maxTravelMinutes,
       mustIncludeTerms,
       avoidTerms,
+      discoveryPreference,
+      visitedListingKeys,
+      visitedEventOccurrenceKeys,
 
       createdAt:
         typeof draft.createdAt ===
@@ -411,7 +456,8 @@ function parseRequest(
     stopOrder:
       body.stopOrder,
 
-    excludedListingKeys
+    excludedListingKeys,
+    previewOnly: body.previewOnly === true
   };
 }
 
@@ -1202,6 +1248,83 @@ function matchesAnyTerm(
   );
 }
 
+function getEventOccurrenceKey(
+  listing: Listing,
+  fallbackDate: string
+): string | null {
+  if (listing.type !== "event") {
+    return null;
+  }
+
+  if (!listing.startAt) {
+    return `${listing.id}:${fallbackDate}`;
+  }
+
+  const parsed = new Date(listing.startAt);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return `${listing.id}:${fallbackDate}`;
+  }
+
+  const parts = new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone:
+        listing.timezone || WINNIPEG_TIMEZONE,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }
+  ).formatToParts(parsed);
+
+  const year = parts.find(
+    (part) => part.type === "year"
+  )?.value;
+  const month = parts.find(
+    (part) => part.type === "month"
+  )?.value;
+  const day = parts.find(
+    (part) => part.type === "day"
+  )?.value;
+
+  return year && month && day
+    ? `${listing.id}:${year}-${month}-${day}`
+    : `${listing.id}:${fallbackDate}`;
+}
+
+function isPreviouslyVisited(
+  listing: Listing,
+  draft: OutingDraft
+) {
+  const listingKey = getListingKey(listing);
+
+  if (listing.type === "restaurant") {
+    return draft.visitedListingKeys.includes(
+      listingKey
+    );
+  }
+
+  const occurrenceKey =
+    getEventOccurrenceKey(
+      listing,
+      draft.date
+    );
+
+  if (
+    occurrenceKey &&
+    draft.visitedEventOccurrenceKeys.includes(
+      occurrenceKey
+    )
+  ) {
+    return true;
+  }
+
+  return (
+    draft.visitedEventOccurrenceKeys.length === 0 &&
+    draft.visitedListingKeys.includes(listingKey)
+  );
+}
+
 function scoreListing(
   listing: Listing,
   targetListing: Listing,
@@ -1286,6 +1409,15 @@ function scoreListing(
     listing.rating >= 4.5
   ) {
     score += 2;
+  }
+
+  if (draft.discoveryPreference === "mix") {
+    score += isPreviouslyVisited(
+      listing,
+      draft
+    )
+      ? -5
+      : 9;
   }
 
   if (
@@ -1473,24 +1605,13 @@ function createReason(
   targetListing: Listing
 ): string {
   if (
-    candidate.matchedInterests.length >
-    0
-  ) {
-    return `Replacement matches ${candidate.matchedInterests
-      .slice(0, 2)
-      .join(
-        " and "
-      )} while keeping the same time slot.`;
-  }
-
-  if (
     candidate.listing.type ===
     targetListing.type
   ) {
-    return `A verified alternative that fits the same time slot and outing route.`;
+    return "Keeps the same kind of stop and fits the route.";
   }
 
-  return `A verified nearby alternative that fits the available time and travel window.`;
+  return "Fits the open time and travel window.";
 }
 
 export async function POST(
@@ -1532,7 +1653,8 @@ export async function POST(
     draft,
     plan,
     stopOrder,
-    excludedListingKeys
+    excludedListingKeys,
+    previewOnly
   } = parsed;
 
   const targetStop =
@@ -1667,6 +1789,13 @@ export async function POST(
     ]
       .filter(
         (listing) => {
+          if (
+            draft.discoveryPreference === "new-only" &&
+            isPreviouslyVisited(listing, draft)
+          ) {
+            return false;
+          }
+
           if (
             usedListingKeys.has(
               getListingKey(
@@ -1917,107 +2046,45 @@ export async function POST(
           second.order
       );
 
-  const knownCosts =
-    updatedStops
-      .map(
-        (stop) =>
-          stop.estimatedCostCad
-      )
-      .filter(
-        (
-          value
-        ): value is number =>
-          value !== null
-      );
-
-  const updatedWarnings =
-    plan.warnings.filter(
-      (warning) =>
-        !warning.startsWith(
-          "At least one listing does not have a confirmed numeric price"
-        )
+  const updatedPlan =
+    withOutingPlanMetrics(
+      {
+        ...plan,
+        generatedAt:
+          new Date().toISOString(),
+        stops:
+          updatedStops,
+        candidateCount:
+          candidates.length
+      },
+      {
+        requestedStopCount:
+          resolveRequestedStopCount(plan),
+        requestedMix:
+          plan.requestedMix,
+        partySize:
+          draft.partySize
+      }
     );
 
-  if (
-    updatedStops.some(
-      (stop) =>
-        stop.estimatedCostCad ===
-        null
-    )
-  ) {
-    updatedWarnings.push(
-      "At least one listing does not have a confirmed numeric price, so the total is incomplete."
-    );
+  if (!previewOnly) {
+    await recordServerBetaEvent({
+      request,
+      eventName: "outing_stop_replaced",
+      pagePath: "/build-outing/results",
+      properties: {
+        stopOrder,
+        previousListingKey:
+          getListingKey(targetStop.listing),
+        replacementListingKey:
+          getListingKey(replacement.listing),
+        candidateCount: candidates.length,
+        recommendationVersion:
+          plan.recommendationVersion ||
+          "route-score-v1"
+      }
+    });
   }
-
-  const updatedPlan:
-    GeneratedOutingPlan = {
-      ...plan,
-
-      planId:
-        crypto.randomUUID(),
-
-      generatedAt:
-        new Date().toISOString(),
-
-      estimatedTotalCad:
-        knownCosts.length > 0
-          ? knownCosts.reduce(
-              (
-                total,
-                cost
-              ) =>
-                total + cost,
-              0
-            )
-          : null,
-
-      estimatedGroupTotalCad:
-        knownCosts.length > 0
-          ? knownCosts.reduce(
-              (
-                total,
-                cost
-              ) =>
-                total + cost,
-              0
-            ) *
-            Math.max(
-              1,
-              draft.partySize
-            )
-          : null,
-
-      stops:
-        updatedStops,
-
-      warnings:
-        Array.from(
-          new Set(
-            updatedWarnings
-          )
-        ),
-
-      candidateCount:
-        candidates.length
-  };
-
-  await recordServerBetaEvent({
-    request,
-    eventName: "outing_stop_replaced",
-    pagePath: "/build-outing/results",
-    properties: {
-      stopOrder,
-      previousListingKey:
-        getListingKey(targetStop.listing),
-      replacementListingKey:
-        getListingKey(replacement.listing),
-      candidateCount: candidates.length,
-      recommendationVersion:
-        plan.recommendationVersion ||
-        "route-score-v1"
-    }
-  });
 
   return NextResponse.json({
     plan: updatedPlan,

@@ -6,7 +6,6 @@ import {
   updateSupabaseSession
 } from "@/lib/supabase/proxy";
 
-
 export async function proxy(
   request: NextRequest
 ) {
@@ -15,9 +14,12 @@ export async function proxy(
   );
 }
 
-
 export const config = {
   matcher: [
-    "/admin/:path*"
+    "/admin/:path*",
+    "/profile",
+    "/saved/:path*",
+    "/sign-in",
+    "/auth/:path*"
   ]
 };

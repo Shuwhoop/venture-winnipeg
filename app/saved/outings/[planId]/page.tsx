@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useState
 } from "react";
@@ -17,8 +18,13 @@ import {
 } from "@/components/outing-detail-experience";
 
 import {
+  ACCOUNT_SYNC_STATUS_EVENT
+} from "@/lib/account-sync-storage";
+
+import {
   getSavedOutings,
   removeSavedOuting,
+  SAVED_OUTINGS_EVENT,
   type GeneratedOutingPlan
 } from "@/lib/saved-outings";
 
@@ -32,31 +38,22 @@ export default function SavedOutingPage() {
   const router = useRouter();
 
   const planId =
-    typeof params.planId ===
-    "string"
+    typeof params.planId === "string"
       ? params.planId
       : "";
 
-  const [
-    status,
-    setStatus
-  ] =
-    useState<PageStatus>(
-      "loading"
-    );
-
-  const [
-    plan,
-    setPlan
-  ] =
+  const [status, setStatus] =
+    useState<PageStatus>("loading");
+  const [plan, setPlan] =
     useState<GeneratedOutingPlan | null>(
       null
     );
 
-  useEffect(() => {
+  const loadPlan = useCallback(() => {
     if (!planId) {
+      setPlan(null);
       setStatus("missing");
-      return;
+      return false;
     }
 
     const savedPlan =
@@ -66,24 +63,60 @@ export default function SavedOutingPage() {
       );
 
     if (!savedPlan) {
-      setPlan(null);
-      setStatus("missing");
-      return;
+      return false;
     }
 
     setPlan(savedPlan);
     setStatus("ready");
+    return true;
   }, [planId]);
+
+  useEffect(() => {
+    if (loadPlan()) {
+      return;
+    }
+
+    const onPossibleSync = () => {
+      void loadPlan();
+    };
+
+    window.addEventListener(
+      SAVED_OUTINGS_EVENT,
+      onPossibleSync
+    );
+    window.addEventListener(
+      ACCOUNT_SYNC_STATUS_EVENT,
+      onPossibleSync
+    );
+
+    const fallback = window.setTimeout(
+      () => {
+        if (!loadPlan()) {
+          setStatus("missing");
+        }
+      },
+      4500
+    );
+
+    return () => {
+      window.clearTimeout(fallback);
+      window.removeEventListener(
+        SAVED_OUTINGS_EVENT,
+        onPossibleSync
+      );
+      window.removeEventListener(
+        ACCOUNT_SYNC_STATUS_EVENT,
+        onPossibleSync
+      );
+    };
+  }, [loadPlan]);
 
   function handleRemove() {
     if (!plan) {
       return;
     }
 
-    removeSavedOuting(
-      plan.planId
-    );
-
+    removeSavedOuting(plan.planId);
     router.push("/saved");
   }
 
@@ -91,13 +124,9 @@ export default function SavedOutingPage() {
     return (
       <section className="empty-state">
         <div>✨</div>
-
-        <h1>
-          Opening your outing
-        </h1>
-
+        <h1>Opening your outing</h1>
         <p>
-          Pulling your saved route back onto the map.
+          Checking this device and your Venture account for the route.
         </p>
       </section>
     );
@@ -110,15 +139,11 @@ export default function SavedOutingPage() {
     return (
       <section className="empty-state">
         <div>?</div>
-
-        <h1>
-          Saved outing not found
-        </h1>
-
+        <h1>Saved outing not found</h1>
         <p>
-          It may have been removed or saved in a different browser.
+          It may have been removed, or this device may still need to reconnect
+          and sync.
         </p>
-
         <Link href="/saved">
           Return to Saved
         </Link>
@@ -138,7 +163,6 @@ export default function SavedOutingPage() {
           <Link href="/build-outing">
             Build another outing
           </Link>
-
           <button
             type="button"
             onClick={handleRemove}

@@ -20,7 +20,8 @@ export const ANALYTICS_EVENT_TAXONOMY = [
       ["listing_detail_opened", "A listing detail page was selected."],
       ["listing_map_selected", "A listing was selected on the discovery map."],
       ["listing_saved", "A listing was added to saved items."],
-      ["listing_unsaved", "A listing was removed from saved items."]
+      ["listing_unsaved", "A listing was removed from saved items."],
+      ["listing_shared", "A listing was shared from Venture."]
     ]
   },
   {

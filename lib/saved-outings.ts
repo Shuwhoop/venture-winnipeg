@@ -1,3 +1,10 @@
+"use client";
+
+import {
+  clearSyncDeletion,
+  queueSyncDeletion
+} from "@/lib/account-sync-storage";
+
 import type {
   Listing
 } from "@/lib/types";
@@ -50,53 +57,35 @@ export type GeneratedOutingPlan = {
   requestedDuration: string;
   transportation: string;
   alcoholFree: boolean;
-
-  planningMode?:
-    | "solo"
-    | "group";
-
-  buildMethod?:
-    | "surprise"
-    | "mix"
-    | "anchor";
-
+  planningMode?: "solo" | "group";
+  buildMethod?: "surprise" | "mix" | "anchor";
+  discoveryPreference?:
+    | "best"
+    | "new-only"
+    | "mix";
   partySize?: number;
   maxTravelMinutes?: number;
   mustIncludeTerms?: string[];
   avoidTerms?: string[];
-
-  requestedMix?:
-    OutingStopMix;
-
-  actualMix?:
-    OutingStopMix;
-
+  requestedMix?: OutingStopMix;
+  actualMix?: OutingStopMix;
   requestedStopCount?: number;
   actualStopCount?: number;
   missingStopCount?: number;
   planStatus?: OutingPlanStatus;
-
-  anchorListingKey?:
-    | string
-    | null;
-
-  anchorListingName?:
-    | string
-    | null;
-
+  anchorListingKey?: string | null;
+  anchorListingName?: string | null;
   soloVibe?:
     | "slow-reset"
     | "curious-explorer"
     | "treat-myself"
     | "social-solo"
     | null;
-
   soloPace?:
     | "relaxed"
     | "balanced"
     | "packed"
     | null;
-
   groupVibe?:
     | "friends-night"
     | "date-night"
@@ -104,31 +93,49 @@ export type GeneratedOutingPlan = {
     | "family-plan"
     | "nightlife"
     | null;
-
   groupPriority?:
     | "everyone-happy"
     | "budget-friendly"
     | "minimal-travel"
     | null;
-
-  estimatedTotalCad:
-    | number
-    | null;
-
-  estimatedGroupTotalCad?:
-    | number
-    | null;
-
+  estimatedTotalCad: number | null;
+  estimatedGroupTotalCad?: number | null;
   stops: GeneratedOutingStop[];
   warnings: string[];
   candidateCount: number;
 };
 
-function notifySavedOutingsChanged() {
+export function isGeneratedOutingPlan(
+  value: unknown
+): value is GeneratedOutingPlan {
   if (
-    typeof window ===
-    "undefined"
+    !value ||
+    typeof value !== "object"
   ) {
+    return false;
+  }
+
+  const item = value as Record<
+    string,
+    unknown
+  >;
+
+  return (
+    typeof item.planId === "string" &&
+    typeof item.generatedAt === "string" &&
+    typeof item.title === "string" &&
+    typeof item.date === "string" &&
+    typeof item.requestedStartTime === "string" &&
+    typeof item.requestedDuration === "string" &&
+    typeof item.transportation === "string" &&
+    typeof item.alcoholFree === "boolean" &&
+    Array.isArray(item.stops) &&
+    Array.isArray(item.warnings)
+  );
+}
+
+function notifySavedOutingsChanged() {
+  if (typeof window === "undefined") {
     return;
   }
 
@@ -141,10 +148,7 @@ function notifySavedOutingsChanged() {
 
 export function getSavedOutings():
   GeneratedOutingPlan[] {
-  if (
-    typeof window ===
-    "undefined"
-  ) {
+  if (typeof window === "undefined") {
     return [];
   }
 
@@ -158,7 +162,7 @@ export function getSavedOutings():
       return [];
     }
 
-    const parsed =
+    const parsed: unknown =
       JSON.parse(stored);
 
     if (!Array.isArray(parsed)) {
@@ -166,20 +170,56 @@ export function getSavedOutings():
     }
 
     return parsed.filter(
-      (
-        item
-      ): item is GeneratedOutingPlan =>
-        Boolean(
-          item &&
-          typeof item === "object" &&
-          typeof item.planId === "string" &&
-          typeof item.title === "string" &&
-          Array.isArray(item.stops)
-        )
+      isGeneratedOutingPlan
     );
   } catch {
     return [];
   }
+}
+
+export function writeSavedOutings(
+  outings: GeneratedOutingPlan[]
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const seen = new Set<string>();
+
+  const normalized = outings
+    .filter(isGeneratedOutingPlan)
+    .filter((outing) => {
+      if (seen.has(outing.planId)) {
+        return false;
+      }
+
+      seen.add(outing.planId);
+      return true;
+    })
+    .sort((first, second) =>
+      second.generatedAt.localeCompare(
+        first.generatedAt
+      )
+    )
+    .slice(0, 100);
+
+  const nextValue =
+    JSON.stringify(normalized);
+
+  if (
+    window.localStorage.getItem(
+      SAVED_OUTINGS_KEY
+    ) === nextValue
+  ) {
+    return;
+  }
+
+  window.localStorage.setItem(
+    SAVED_OUTINGS_KEY,
+    nextValue
+  );
+
+  notifySavedOutingsChanged();
 }
 
 export function isOutingSaved(
@@ -194,57 +234,40 @@ export function isOutingSaved(
 export function saveOuting(
   plan: GeneratedOutingPlan
 ) {
-  if (
-    typeof window ===
-    "undefined"
-  ) {
+  if (typeof window === "undefined") {
     return;
   }
 
-  const currentOutings =
-    getSavedOutings();
-
-  const withoutExisting =
-    currentOutings.filter(
-      (outing) =>
-        outing.planId !==
-        plan.planId
-    );
-
-  window.localStorage.setItem(
-    SAVED_OUTINGS_KEY,
-    JSON.stringify([
-      plan,
-      ...withoutExisting
-    ])
+  clearSyncDeletion(
+    "outing",
+    plan.planId
   );
 
-  notifySavedOutingsChanged();
+  writeSavedOutings([
+    plan,
+    ...getSavedOutings().filter(
+      (outing) =>
+        outing.planId !== plan.planId
+    )
+  ]);
 }
 
 export function removeSavedOuting(
   planId: string
 ) {
-  if (
-    typeof window ===
-    "undefined"
-  ) {
+  if (typeof window === "undefined") {
     return;
   }
 
-  const updatedOutings =
+  writeSavedOutings(
     getSavedOutings().filter(
       (outing) =>
-        outing.planId !==
-        planId
-    );
-
-  window.localStorage.setItem(
-    SAVED_OUTINGS_KEY,
-    JSON.stringify(
-      updatedOutings
+        outing.planId !== planId
     )
   );
 
-  notifySavedOutingsChanged();
+  queueSyncDeletion(
+    "outing",
+    planId
+  );
 }

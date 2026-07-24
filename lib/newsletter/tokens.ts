@@ -7,6 +7,7 @@ import {
 
 
 type NewsletterTokenPurpose =
+  | "confirm"
   | "unsubscribe";
 
 
@@ -52,7 +53,10 @@ function signPayload(
 export function createNewsletterToken({
   email,
   purpose,
-  lifetimeDays = 3650
+  lifetimeDays =
+    purpose === "confirm"
+      ? 2
+      : 3650
 }: {
   email: string;
   purpose: NewsletterTokenPurpose;
@@ -135,17 +139,20 @@ export function verifyNewsletterToken({
       ) as NewsletterTokenPayload;
 
     if (
-      payload.purpose !==
-        purpose ||
-      payload.expiresAt <
-        Date.now() ||
-      typeof payload.email !==
-        "string"
+      payload.purpose !== purpose ||
+      payload.expiresAt < Date.now() ||
+      typeof payload.email !== "string"
     ) {
       return null;
     }
 
-    return payload;
+    return {
+      ...payload,
+      email:
+        payload.email
+          .trim()
+          .toLowerCase()
+    };
   } catch {
     return null;
   }

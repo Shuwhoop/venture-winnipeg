@@ -24,6 +24,11 @@ import {
   type VenturePreferences
 } from "@/lib/profile-preferences";
 
+import {
+  getVisitedEventOccurrenceKeys,
+  getVisitedListingKeys
+} from "@/lib/visit-history";
+
 const OUTING_DRAFT_KEY =
   "venture:outing-draft:v1";
 
@@ -100,6 +105,11 @@ type StopKind =
   | "event"
   | "drinks";
 
+type DiscoveryPreference =
+  | "best"
+  | "new-only"
+  | "mix";
+
 type StopMix = {
   food: number;
   events: number;
@@ -163,6 +173,9 @@ type OutingDraft = {
   maxTravelMinutes: number;
   mustIncludeTerms: string[];
   avoidTerms: string[];
+  discoveryPreference: DiscoveryPreference;
+  visitedListingKeys: string[];
+  visitedEventOccurrenceKeys: string[];
   stopMix: StopMix;
   totalStops: number;
   allowedKinds: StopKind[];
@@ -377,6 +390,35 @@ const standardInterestOptions = [
   "Gaming",
   "Nightlife",
   "Outdoor activities"
+];
+
+const discoveryPreferenceOptions: {
+  id: DiscoveryPreference;
+  icon: string;
+  title: string;
+  description: string;
+}[] = [
+  {
+    id: "best",
+    icon: "★",
+    title: "Best matches",
+    description:
+      "Use every strong option, including places you already know."
+  },
+  {
+    id: "new-only",
+    icon: "✨",
+    title: "Only somewhere new",
+    description:
+      "Exclude restaurants and event occurrences already in My Venture."
+  },
+  {
+    id: "mix",
+    icon: "↔",
+    title: "Familiar + new",
+    description:
+      "Prefer a new discovery while keeping room for one reliable favourite."
+  }
 ];
 
 const durationOptions = [
@@ -668,6 +710,26 @@ function formatAnchorTime(
         "America/Winnipeg"
     }
   ).format(date);
+}
+
+function textRequestsSomewhereNew(
+  ...values: string[]
+) {
+  const text = values
+    .join(" ")
+    .toLowerCase()
+    .replaceAll("’", "'");
+
+  return [
+    "new to me",
+    "somewhere new",
+    "somewhere i haven't gone",
+    "somewhere i havent gone",
+    "place i haven't been",
+    "place i havent been",
+    "never been",
+    "not been before"
+  ].some((phrase) => text.includes(phrase));
 }
 
 function getStepContent(
@@ -962,6 +1024,11 @@ export default function BuildOutingPage() {
   ] = useState("");
 
   const [
+    discoveryPreference,
+    setDiscoveryPreference
+  ] = useState<DiscoveryPreference>("best");
+
+  const [
     stopMix,
     setStopMix
   ] = useState<StopMix>({
@@ -1079,6 +1146,18 @@ export default function BuildOutingPage() {
     setOutingDate(
       getTodayInputValue()
     );
+
+    const requestedAnchor =
+      new URLSearchParams(
+        window.location.search
+      ).get("anchor");
+
+    if (requestedAnchor) {
+      setBuildMethod("anchor");
+      setAnchorListingKey(
+        requestedAnchor
+      );
+    }
   }, []);
 
   useEffect(() => {
@@ -1261,6 +1340,22 @@ export default function BuildOutingPage() {
           avoidText
         ),
       [avoidText]
+    );
+
+  const effectiveDiscoveryPreference =
+    useMemo(
+      () =>
+        textRequestsSomewhereNew(
+          mustIncludeText,
+          avoidText
+        )
+          ? "new-only" as const
+          : discoveryPreference,
+      [
+        avoidText,
+        discoveryPreference,
+        mustIncludeText
+      ]
     );
 
   const selectedAnchor =
@@ -1568,6 +1663,12 @@ export default function BuildOutingPage() {
       maxTravelMinutes,
       mustIncludeTerms,
       avoidTerms,
+      discoveryPreference:
+        effectiveDiscoveryPreference,
+      visitedListingKeys:
+        getVisitedListingKeys(),
+      visitedEventOccurrenceKeys:
+        getVisitedEventOccurrenceKeys(),
       stopMix,
       totalStops,
       allowedKinds,
@@ -2707,6 +2808,55 @@ export default function BuildOutingPage() {
                 )}
               </div>
 
+              <div className={styles.discoveryPreferencePanel}>
+                <div className={styles.discoveryPreferenceHeading}>
+                  <span>NEW TO ME</span>
+                  <strong>Should Venture avoid places you have already tried?</strong>
+                  <small>
+                    Only confirmed visits count. Saved or viewed listings are never treated as visited.
+                  </small>
+                </div>
+
+                <div className={styles.discoveryPreferenceGrid}>
+                  {discoveryPreferenceOptions.map((option) => {
+                    const selected =
+                      effectiveDiscoveryPreference === option.id;
+
+                    return (
+                      <button
+                        type="button"
+                        key={option.id}
+                        className={
+                          selected
+                            ? styles.discoveryPreferenceSelected
+                            : ""
+                        }
+                        aria-pressed={selected}
+                        onClick={() =>
+                          setDiscoveryPreference(option.id)
+                        }
+                      >
+                        <span aria-hidden="true">{option.icon}</span>
+                        <div>
+                          <strong>{option.title}</strong>
+                          <small>{option.description}</small>
+                        </div>
+                        <i aria-hidden="true">
+                          {selected ? "✓" : ""}
+                        </i>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {effectiveDiscoveryPreference === "new-only" &&
+                discoveryPreference !== "new-only" ? (
+                  <p className={styles.discoveryPhraseNotice}>
+                    Venture recognized your request for somewhere you have not gone and switched on New to Me.
+                  </p>
+                ) : null}
+              </div>
+
               <div className="outing-custom-preferences">
                 <label>
                   <span>
@@ -3120,6 +3270,17 @@ export default function BuildOutingPage() {
                           ", "
                         )
                       : "Surprise me"}
+                  </strong>
+                </div>
+
+                <div className="review-wide">
+                  <span>DISCOVERY</span>
+                  <strong>
+                    {effectiveDiscoveryPreference === "new-only"
+                      ? "Only places and event dates new to me"
+                      : effectiveDiscoveryPreference === "mix"
+                        ? "A mix of familiar and new"
+                        : "Best available matches"}
                   </strong>
                 </div>
 

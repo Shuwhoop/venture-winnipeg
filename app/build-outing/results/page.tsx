@@ -1,15 +1,23 @@
 "use client";
 
+import type {
+  PointerEvent as ReactPointerEvent
+} from "react";
 import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from "react";
 import {
   OutingRouteMap
 } from "@/components/outing-route-map";
+import {
+  VisitButton
+} from "@/components/visit-button";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 
 import styles from "./results-refresh.module.css";
 
@@ -25,11 +33,29 @@ import type {
 } from "@/lib/profile-preferences";
 
 import {
+  getOutingStopKey,
+  reorderOutingPlan
+} from "@/lib/outing-reorder";
+
+import {
+  repairOutingSchedule,
+  validateOutingSchedule
+} from "@/lib/outing-schedule-validation";
+
+import {
   isOutingSaved,
   removeSavedOuting,
   saveOuting,
   type GeneratedOutingPlan
 } from "@/lib/saved-outings";
+
+import {
+  addVisits,
+  getVisitHistory,
+  getVisitedEventOccurrenceKeys,
+  getVisitedListingKeys,
+  VISIT_HISTORY_EVENT
+} from "@/lib/visit-history";
 
 const OUTING_DRAFT_KEY =
   "venture:outing-draft:v1";
@@ -70,6 +96,12 @@ type OutingDraft = {
   maxTravelMinutes?: number;
   mustIncludeTerms?: string[];
   avoidTerms?: string[];
+  discoveryPreference?:
+    | "best"
+    | "new-only"
+    | "mix";
+  visitedListingKeys?: string[];
+  visitedEventOccurrenceKeys?: string[];
   stopMix?: StopMix;
   totalStops?: number;
   allowedKinds?: StopKind[];
@@ -84,6 +116,38 @@ type OutingDraft = {
   groupVibe?: string | null;
   groupPriority?: string | null;
   createdAt: string;
+};
+
+type AddStopOption = {
+  key: string;
+  kind: StopKind;
+  name: string;
+  category: string;
+  subtitle: string;
+  neighbourhood: string;
+  startTime: string;
+  endTime: string;
+  insertionIndex: number;
+  positionLabel: string;
+  estimatedCostCad: number | null;
+  travelMinutes: number;
+  fitReason: string;
+};
+
+type ReplacementOption = {
+  key: string;
+  previousListingKey: string;
+  kind: StopKind;
+  name: string;
+  category: string;
+  subtitle: string;
+  neighbourhood: string;
+  startTime: string;
+  endTime: string;
+  estimatedCostCad: number | null;
+  travelMinutes: number | null;
+  fitReason: string;
+  plan: GeneratedOutingPlan;
 };
 
 type PageStatus =
@@ -171,6 +235,23 @@ function buildShareText(
     "",
     "Built with Venture Winnipeg"
   ].join("\n");
+}
+
+function getDirectionsUrl(
+  listing: GeneratedOutingPlan["stops"][number]["listing"]
+): string {
+  const destination = [
+    listing.name,
+    listing.address,
+    listing.neighbourhood,
+    "Winnipeg"
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+    destination
+  )}`;
 }
 
 function getListingSearchText(
@@ -366,20 +447,22 @@ function SaveRouteIcon({
       focusable="false"
     >
       <path
-        d="M6.75 4.5h10.5a1.5 1.5 0 0 1 1.5 1.5v14.25l-6.75-3.9-6.75 3.9V6a1.5 1.5 0 0 1 1.5-1.5Z"
+        d="M7.25 4.25h9.5c.83 0 1.5.67 1.5 1.5v14.1L12 16.35l-6.25 3.5V5.75c0-.83.67-1.5 1.5-1.5Z"
         fill={filled ? "currentColor" : "none"}
         stroke="currentColor"
-        strokeWidth="1.8"
+        strokeWidth="1.9"
         strokeLinejoin="round"
       />
-      <path
-        d="m9.2 10.9 1.65 1.65 3.95-4.1"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {filled ? (
+        <path
+          d="m9.2 10.7 1.75 1.75 3.9-4.15"
+          fill="none"
+          stroke="#fff"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : null}
     </svg>
   );
 }
@@ -392,15 +475,21 @@ function ShareRouteIcon() {
       aria-hidden="true"
       focusable="false"
     >
-      <circle cx="18" cy="5" r="2.25" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="6" cy="12" r="2.25" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="18" cy="19" r="2.25" fill="none" stroke="currentColor" strokeWidth="1.8" />
       <path
-        d="m8 10.95 7.8-4.7M8 13.05l7.8 4.7"
+        d="M12 15V3.75M7.75 8 12 3.75 16.25 8"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.8"
+        strokeWidth="1.9"
         strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6 11.5H4.75A1.75 1.75 0 0 0 3 13.25v5A1.75 1.75 0 0 0 4.75 20h14.5A1.75 1.75 0 0 0 21 18.25v-5a1.75 1.75 0 0 0-1.75-1.75H18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -641,6 +730,21 @@ export default function OutingResultsPage() {
   ] = useState("");
 
   const [
+    completionSheetOpen,
+    setCompletionSheetOpen
+  ] = useState(false);
+
+  const [
+    completionSelections,
+    setCompletionSelections
+  ] = useState<string[]>([]);
+
+  const [
+    loggingCompletion,
+    setLoggingCompletion
+  ] = useState(false);
+
+  const [
     draft,
     setDraft
   ] =
@@ -680,9 +784,75 @@ export default function OutingResultsPage() {
     );
 
   const [
+    addStopSheetKind,
+    setAddStopSheetKind
+  ] = useState<StopKind | null>(null);
+
+  const [
+    addStopOptions,
+    setAddStopOptions
+  ] = useState<AddStopOption[]>([]);
+
+  const [
+    loadingAddStopOptions,
+    setLoadingAddStopOptions
+  ] = useState(false);
+
+  const [
+    removingOrder,
+    setRemovingOrder
+  ] = useState<number | null>(null);
+
+  const [
+    replacementSheetOrder,
+    setReplacementSheetOrder
+  ] = useState<number | null>(null);
+
+  const [
+    replacementOptions,
+    setReplacementOptions
+  ] = useState<ReplacementOption[]>([]);
+
+  const [
+    loadingReplacementOptions,
+    setLoadingReplacementOptions
+  ] = useState(false);
+
+  const [
+    applyingReplacementKey,
+    setApplyingReplacementKey
+  ] = useState<string | null>(null);
+
+  const [
+    openStopMenuOrder,
+    setOpenStopMenuOrder
+  ] = useState<number | null>(null);
+
+  const [
+    dismissedScheduleSignature,
+    setDismissedScheduleSignature
+  ] = useState("");
+
+  const [
     expandedOrders,
     setExpandedOrders
   ] = useState<number[]>([]);
+
+  const [
+    routeEditMode,
+    setRouteEditMode
+  ] = useState(false);
+
+  const [
+    draggingStopKey,
+    setDraggingStopKey
+  ] = useState<string | null>(null);
+
+  const draggingStopKeyRef =
+    useRef<string | null>(null);
+
+  const planRef =
+    useRef<GeneratedOutingPlan | null>(null);
 
   const resultsExperiment =
     useExperimentAssignment(
@@ -726,13 +896,29 @@ export default function OutingResultsPage() {
         return;
       }
 
+      const personalizedDraft: OutingDraft = {
+        ...parsedDraft,
+        visitedListingKeys:
+          getVisitedListingKeys(),
+        visitedEventOccurrenceKeys:
+          getVisitedEventOccurrenceKeys()
+      };
+
       setDraft(
-        parsedDraft
+        personalizedDraft
+      );
+
+      window.localStorage.setItem(
+        OUTING_DRAFT_KEY,
+        JSON.stringify(personalizedDraft)
       );
 
       setStatus("loading");
       setErrorMessage("");
       setActionMessage("");
+      setCompletionSheetOpen(false);
+      setCompletionSelections([]);
+      setLoggingCompletion(false);
 
       try {
         const response =
@@ -748,7 +934,7 @@ export default function OutingResultsPage() {
 
               body:
                 JSON.stringify(
-                  parsedDraft
+                  personalizedDraft
                 )
             }
           );
@@ -784,7 +970,20 @@ export default function OutingResultsPage() {
         setReplacingOrder(null);
         setRefreshingUnlocked(false);
         setAddingKind(null);
+        setAddStopSheetKind(null);
+        setAddStopOptions([]);
+        setLoadingAddStopOptions(false);
+        setRemovingOrder(null);
+        setReplacementSheetOrder(null);
+        setReplacementOptions([]);
+        setLoadingReplacementOptions(false);
+        setApplyingReplacementKey(null);
+        setOpenStopMenuOrder(null);
+        setDismissedScheduleSignature("");
         setExpandedOrders([]);
+        setRouteEditMode(false);
+        setDraggingStopKey(null);
+        draggingStopKeyRef.current = null;
 
         setStatus("ready");
 
@@ -809,6 +1008,87 @@ export default function OutingResultsPage() {
     void generateOuting();
   }, [generateOuting]);
 
+  useEffect(() => {
+    planRef.current = plan;
+  }, [plan]);
+
+  useEffect(() => {
+    function refreshVisitKeys() {
+      setDraft((current) => {
+        if (!current) {
+          return current;
+        }
+
+        const nextDraft: OutingDraft = {
+          ...current,
+          visitedListingKeys:
+            getVisitedListingKeys(),
+          visitedEventOccurrenceKeys:
+            getVisitedEventOccurrenceKeys()
+        };
+
+        window.localStorage.setItem(
+          OUTING_DRAFT_KEY,
+          JSON.stringify(nextDraft)
+        );
+
+        return nextDraft;
+      });
+    }
+
+    window.addEventListener(
+      VISIT_HISTORY_EVENT,
+      refreshVisitKeys
+    );
+
+    return () => {
+      window.removeEventListener(
+        VISIT_HISTORY_EVENT,
+        refreshVisitKeys
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      !addStopSheetKind &&
+      replacementSheetOrder === null &&
+      !completionSheetOpen
+    ) {
+      return;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (
+        event.key === "Escape" &&
+        addingKind === null &&
+        applyingReplacementKey === null
+      ) {
+        setAddStopSheetKind(null);
+        setAddStopOptions([]);
+        setReplacementSheetOrder(null);
+        setReplacementOptions([]);
+      }
+    }
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    addStopSheetKind,
+    addingKind,
+    applyingReplacementKey,
+    completionSheetOpen,
+    replacementSheetOrder
+  ]);
+
   const partySize =
     Math.max(
       1,
@@ -829,21 +1109,21 @@ export default function OutingResultsPage() {
       )
     );
 
-  const requestedStopCount =
-    plan?.requestedStopCount ??
-    (
-      countRequestedStops(
-        plan?.requestedMix
-      ) ||
-      draft?.totalStops ||
-      plan?.stops.length ||
-      0
-    );
-
   const actualStopCount =
-    plan?.actualStopCount ??
-    plan?.stops.length ??
-    0;
+    plan?.stops.length ?? 0;
+
+  const requestedStopCount =
+    Math.max(
+      actualStopCount,
+      plan?.requestedStopCount ??
+      (
+        countRequestedStops(
+          plan?.requestedMix
+        ) ||
+        draft?.totalStops ||
+        actualStopCount
+      )
+    );
 
   const recipeItems =
     getRecipeItems(
@@ -851,7 +1131,6 @@ export default function OutingResultsPage() {
     );
 
   const missingStopCount =
-    plan?.missingStopCount ??
     Math.max(
       0,
       requestedStopCount -
@@ -859,12 +1138,11 @@ export default function OutingResultsPage() {
     );
 
   const planStatus =
-    plan?.planStatus ??
-    (actualStopCount === 0
+    actualStopCount === 0
       ? "empty"
       : missingStopCount > 0
         ? "partial"
-        : "complete");
+        : "complete";
 
   const preferenceWarnings =
     useMemo(
@@ -961,6 +1239,22 @@ export default function OutingResultsPage() {
       ]
     );
 
+  const scheduleIssues = useMemo(
+    () => (plan ? validateOutingSchedule(plan) : []),
+    [plan]
+  );
+
+  const scheduleIssueSignature = useMemo(
+    () => scheduleIssues.map((issue) => issue.id).join("|"),
+    [scheduleIssues]
+  );
+
+  const visibleScheduleIssues =
+    scheduleIssueSignature &&
+    scheduleIssueSignature !== dismissedScheduleSignature
+      ? scheduleIssues
+      : [];
+
   const estimatedGroupTotal =
     plan?.estimatedTotalCad ===
       null ||
@@ -969,6 +1263,35 @@ export default function OutingResultsPage() {
       ? null
       : plan.estimatedTotalCad *
         partySize;
+
+  function applyPlanUpdate(
+    nextPlan: GeneratedOutingPlan,
+    message: string,
+    resetLocks = true
+  ) {
+    planRef.current = nextPlan;
+    setPlan(nextPlan);
+
+    if (resetLocks) {
+      setLockedOrders([]);
+    }
+
+    if (saved) {
+      saveOuting(nextPlan);
+      setSaved(true);
+    } else {
+      setSaved(false);
+    }
+
+    window.localStorage.setItem(
+      GENERATED_OUTING_KEY,
+      JSON.stringify(nextPlan)
+    );
+
+    setOpenStopMenuOrder(null);
+    setDismissedScheduleSignature("");
+    setActionMessage(message);
+  }
 
   function handleSaveOuting() {
     if (!plan) {
@@ -1069,11 +1392,14 @@ export default function OutingResultsPage() {
     currentPlan:
       GeneratedOutingPlan,
     stopOrder: number,
-    exclusions: string[]
+    exclusions: string[],
+    previewOnly = false
   ): Promise<{
     plan:
       GeneratedOutingPlan;
     previousListingKey:
+      string;
+    replacementListingKey:
       string;
   }> {
     if (!draft) {
@@ -1101,7 +1427,8 @@ export default function OutingResultsPage() {
               stopOrder,
 
               excludedListingKeys:
-                exclusions
+                exclusions,
+              previewOnly
             })
         }
       );
@@ -1112,13 +1439,16 @@ export default function OutingResultsPage() {
           GeneratedOutingPlan;
         previousListingKey?:
           string;
+        replacementListingKey?:
+          string;
         error?: string;
       };
 
     if (
       !response.ok ||
       !result.plan ||
-      !result.previousListingKey
+      !result.previousListingKey ||
+      !result.replacementListingKey
     ) {
       throw new Error(
         result.error ||
@@ -1131,78 +1461,169 @@ export default function OutingResultsPage() {
         result.plan,
 
       previousListingKey:
-        result.previousListingKey
+        result.previousListingKey,
+      replacementListingKey:
+        result.replacementListingKey
     };
   }
 
-  async function handleReplaceStop(
+  async function openReplacementOptions(
     stopOrder: number
   ) {
     if (
       !plan ||
-      replacingOrder !==
-        null ||
-      refreshingUnlocked
+      replacingOrder !== null ||
+      refreshingUnlocked ||
+      loadingReplacementOptions ||
+      removingOrder !== null ||
+      addingKind !== null
     ) {
       return;
     }
 
-    setReplacingOrder(
-      stopOrder
+    const currentStop = plan.stops.find(
+      (stop) => stop.order === stopOrder
     );
 
+    if (!currentStop) {
+      return;
+    }
+
+    setOpenStopMenuOrder(null);
+    setReplacementSheetOrder(stopOrder);
+    setReplacementOptions([]);
+    setLoadingReplacementOptions(true);
     setActionMessage(
-      `Finding a new option for stop ${stopOrder}...`
+      `Finding alternatives for ${currentStop.listing.name}...`
     );
+
+    const options: ReplacementOption[] = [];
+    let workingExclusions = [...excludedListingKeys];
 
     try {
-      const result =
-        await requestReplacement(
-          plan,
-          stopOrder,
-          excludedListingKeys
+      for (let index = 0; index < 4; index += 1) {
+        try {
+          const result = await requestReplacement(
+            plan,
+            stopOrder,
+            workingExclusions,
+            true
+          );
+          const replacementStop = result.plan.stops.find(
+            (stop) => stop.order === stopOrder
+          );
+
+          if (!replacementStop) {
+            break;
+          }
+
+          options.push({
+            key: result.replacementListingKey,
+            previousListingKey: result.previousListingKey,
+            kind: getStopKind(replacementStop),
+            name: replacementStop.listing.name,
+            category: replacementStop.listing.category,
+            subtitle: replacementStop.listing.subtitle,
+            neighbourhood:
+              replacementStop.listing.neighbourhood || "Winnipeg",
+            startTime: replacementStop.startTime,
+            endTime: replacementStop.endTime,
+            estimatedCostCad: replacementStop.estimatedCostCad,
+            travelMinutes: replacementStop.travelFromPreviousMinutes,
+            fitReason: replacementStop.reason,
+            plan: result.plan
+          });
+
+          workingExclusions = Array.from(
+            new Set([
+              ...workingExclusions,
+              result.replacementListingKey
+            ])
+          );
+        } catch {
+          break;
+        }
+      }
+
+      if (options.length === 0) {
+        throw new Error(
+          "No other verified listing fits this exact time, budget, and travel window."
         );
+      }
 
-      const updatedExclusions =
-        Array.from(
-          new Set([
-            ...excludedListingKeys,
-            result
-              .previousListingKey
-          ])
-        );
-
-      setPlan(
-        result.plan
-      );
-
-      setExcludedListingKeys(
-        updatedExclusions
-      );
-
-      setSaved(false);
-
-      window.localStorage.setItem(
-        GENERATED_OUTING_KEY,
-        JSON.stringify(
-          result.plan
-        )
-      );
-
+      setReplacementOptions(options);
       setActionMessage(
-        `Stop ${stopOrder} was replaced.`
+        `${options.length} replacement ${
+          options.length === 1 ? "option fits" : "options fit"
+        } this time slot.`
       );
     } catch (error) {
+      setReplacementSheetOrder(null);
+      setReplacementOptions([]);
       setActionMessage(
         error instanceof Error
           ? error.message
-          : "The stop could not be replaced."
+          : "No suitable replacement was found."
       );
     } finally {
-      setReplacingOrder(
-        null
-      );
+      setLoadingReplacementOptions(false);
     }
+  }
+
+  function applyReplacementOption(option: ReplacementOption) {
+    if (replacementSheetOrder === null || applyingReplacementKey !== null) {
+      return;
+    }
+
+    const stopOrder = replacementSheetOrder;
+    setApplyingReplacementKey(option.key);
+    setReplacingOrder(stopOrder);
+
+    setExcludedListingKeys((current) =>
+      Array.from(
+        new Set([
+          ...current,
+          option.previousListingKey,
+          option.key
+        ])
+      )
+    );
+
+    trackBetaEvent({
+      eventName: "outing_stop_replaced",
+      pagePath: "/build-outing/results",
+      properties: {
+        stopOrder,
+        previousListingKey: option.previousListingKey,
+        replacementListingKey: option.key,
+        recommendationVersion:
+          option.plan.recommendationVersion || "route-score-v1"
+      }
+    });
+
+    applyPlanUpdate(
+      option.plan,
+      `Stop ${stopOrder} is now ${option.name}.`,
+      false
+    );
+    setExpandedOrders([stopOrder]);
+    setReplacementSheetOrder(null);
+    setReplacementOptions([]);
+    setApplyingReplacementKey(null);
+    setReplacingOrder(null);
+  }
+
+  function handleFixSchedule() {
+    if (!plan) {
+      return;
+    }
+
+    const repairedPlan = repairOutingSchedule(plan);
+    applyPlanUpdate(
+      repairedPlan,
+      "Timing adjusted around fixed events and route travel.",
+      false
+    );
   }
 
   async function handleRefreshUnlocked() {
@@ -1309,29 +1730,18 @@ export default function OutingResultsPage() {
         return;
       }
 
-      setPlan(
-        workingPlan
-      );
-
       setExcludedListingKeys(
         workingExclusions
       );
 
-      setSaved(false);
-
-      window.localStorage.setItem(
-        GENERATED_OUTING_KEY,
-        JSON.stringify(
-          workingPlan
-        )
-      );
-
-      setActionMessage(
+      applyPlanUpdate(
+        workingPlan,
         `Refreshed ${replacedCount} ${
           replacedCount === 1
             ? "stop"
             : "stops"
-        }.`
+        }.`,
+        false
       );
     } finally {
       setRefreshingUnlocked(
@@ -1340,7 +1750,7 @@ export default function OutingResultsPage() {
     }
   }
 
-  async function handleAddStop(
+  async function openAddStopOptions(
     requestedKind: StopKind
   ) {
     if (
@@ -1348,60 +1758,54 @@ export default function OutingResultsPage() {
       !draft ||
       addingKind !== null ||
       replacingOrder !== null ||
-      refreshingUnlocked
+      refreshingUnlocked ||
+      removingOrder !== null ||
+      replacementSheetOrder !== null
     ) {
       return;
     }
 
-    if (
-      plan.stops.length >= 5
-    ) {
+    if (plan.stops.length >= 5) {
       setActionMessage(
         "This outing already has the current maximum of five stops."
       );
       return;
     }
 
-    setAddingKind(
-      requestedKind
-    );
-
+    setAddStopSheetKind(requestedKind);
+    setAddStopOptions([]);
+    setLoadingAddStopOptions(true);
     setActionMessage(
-      `Finding another ${requestedKind} stop...`
+      `Finding verified ${requestedKind} options...`
     );
 
     try {
-      const response =
-        await fetch(
-          "/api/outings/generate/add-stop",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-            body:
-              JSON.stringify({
-                draft,
-                plan,
-                requestedKind,
-                excludedListingKeys
-              })
-          }
-        );
+      const response = await fetch(
+        "/api/outings/generate/add-stop",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            draft,
+            plan,
+            requestedKind,
+            excludedListingKeys,
+            previewOnly: true
+          })
+        }
+      );
 
-      const result =
-        (await response.json()) as {
-          plan?:
-            GeneratedOutingPlan;
-          addedListingKey?:
-            string;
-          error?: string;
-        };
+      const result = (await response.json()) as {
+        options?: AddStopOption[];
+        error?: string;
+      };
 
       if (
         !response.ok ||
-        !result.plan
+        !result.options ||
+        result.options.length === 0
       ) {
         throw new Error(
           result.error ||
@@ -1409,15 +1813,79 @@ export default function OutingResultsPage() {
         );
       }
 
-      setPlan(
-        result.plan
+      setAddStopOptions(result.options);
+      setActionMessage(
+        `${result.options.length} ${requestedKind} ${
+          result.options.length === 1
+            ? "option fits"
+            : "options fit"
+        } this route.`
       );
-      setSaved(false);
-      setLockedOrders([]);
+    } catch (error) {
+      setAddStopSheetKind(null);
+      setAddStopOptions([]);
+      setActionMessage(
+        error instanceof Error
+          ? error.message
+          : "No suitable additional stop was found."
+      );
+    } finally {
+      setLoadingAddStopOptions(false);
+    }
+  }
 
-      if (
-        result.addedListingKey
-      ) {
+  async function handleAddStop(
+    requestedKind: StopKind,
+    selectedListingKey: string
+  ) {
+    if (
+      !plan ||
+      !draft ||
+      addingKind !== null ||
+      replacingOrder !== null ||
+      refreshingUnlocked ||
+      removingOrder !== null
+    ) {
+      return;
+    }
+
+    setAddingKind(requestedKind);
+    setActionMessage(
+      `Adding your selected ${requestedKind} stop...`
+    );
+
+    try {
+      const response = await fetch(
+        "/api/outings/generate/add-stop",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            draft,
+            plan,
+            requestedKind,
+            selectedListingKey,
+            excludedListingKeys
+          })
+        }
+      );
+
+      const result = (await response.json()) as {
+        plan?: GeneratedOutingPlan;
+        addedListingKey?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !result.plan) {
+        throw new Error(
+          result.error ||
+          `No additional ${requestedKind} stop fits this outing.`
+        );
+      }
+
+      if (result.addedListingKey) {
         setExcludedListingKeys(
           (current) =>
             Array.from(
@@ -1429,16 +1897,30 @@ export default function OutingResultsPage() {
         );
       }
 
-      window.localStorage.setItem(
-        GENERATED_OUTING_KEY,
-        JSON.stringify(
-          result.plan
-        )
+      const addedOrder =
+        result.addedListingKey
+          ? result.plan.stops.find(
+              (stop) =>
+                `${stop.listing.type}-${stop.listing.id}` ===
+                result.addedListingKey
+            )?.order
+          : undefined;
+
+      if (addedOrder) {
+        setExpandedOrders([addedOrder]);
+      }
+
+      applyPlanUpdate(
+        result.plan,
+        `Added ${
+          result.plan.stops.find(
+            (stop) => stop.order === addedOrder
+          )?.listing.name || `another ${requestedKind} stop`
+        }. Your outing now has ${result.plan.stops.length} stops.`
       );
 
-      setActionMessage(
-        `Added another ${requestedKind} stop. Stop numbers were refreshed.`
-      );
+      setAddStopSheetKind(null);
+      setAddStopOptions([]);
     } catch (error) {
       setActionMessage(
         error instanceof Error
@@ -1447,6 +1929,97 @@ export default function OutingResultsPage() {
       );
     } finally {
       setAddingKind(null);
+    }
+  }
+
+  async function handleRemoveStop(
+    stopOrder: number
+  ) {
+    if (
+      !plan ||
+      !draft ||
+      removingOrder !== null ||
+      replacingOrder !== null ||
+      refreshingUnlocked ||
+      addingKind !== null
+    ) {
+      return;
+    }
+
+    const stop = plan.stops.find(
+      (item) => item.order === stopOrder
+    );
+
+    if (!stop) {
+      return;
+    }
+
+    if (plan.stops.length <= 1) {
+      setActionMessage(
+        "An outing needs at least one stop."
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Remove ${stop.listing.name} from this outing?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setRemovingOrder(stopOrder);
+    setActionMessage(
+      `Removing ${stop.listing.name}...`
+    );
+
+    try {
+      const response = await fetch(
+        "/api/outings/generate/remove-stop",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            draft,
+            plan,
+            stopOrder
+          })
+        }
+      );
+
+      const result = (await response.json()) as {
+        plan?: GeneratedOutingPlan;
+        removedListingName?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !result.plan) {
+        throw new Error(
+          result.error ||
+          "The stop could not be removed."
+        );
+      }
+
+      setExpandedOrders([]);
+      applyPlanUpdate(
+        result.plan,
+        `${result.removedListingName || "The stop"} was removed. Your outing now has ${result.plan.stops.length} ${
+          result.plan.stops.length === 1
+            ? "stop"
+            : "stops"
+        }.`
+      );
+    } catch (error) {
+      setActionMessage(
+        error instanceof Error
+          ? error.message
+          : "The stop could not be removed."
+      );
+    } finally {
+      setRemovingOrder(null);
     }
   }
 
@@ -1468,6 +2041,291 @@ export default function OutingResultsPage() {
               stopOrder
             ]
     );
+  }
+
+  function moveStopToTarget(
+    sourceKey: string,
+    targetKey: string,
+    announce = false
+  ) {
+    const currentPlan = planRef.current;
+
+    if (!currentPlan || sourceKey === targetKey) {
+      return;
+    }
+
+    const lockedKeys = new Set(
+      currentPlan.stops
+        .filter((stop) =>
+          lockedOrders.includes(stop.order)
+        )
+        .map(getOutingStopKey)
+    );
+    const expandedKeys = new Set(
+      currentPlan.stops
+        .filter((stop) =>
+          expandedOrders.includes(stop.order)
+        )
+        .map(getOutingStopKey)
+    );
+
+    const nextPlan = reorderOutingPlan(
+      currentPlan,
+      sourceKey,
+      targetKey
+    );
+
+    if (nextPlan === currentPlan) {
+      return;
+    }
+
+    applyPlanUpdate(
+      nextPlan,
+      announce
+        ? "Route order updated. Travel and timing were recalculated."
+        : "",
+      false
+    );
+
+    setLockedOrders(
+      nextPlan.stops
+        .filter((stop) =>
+          lockedKeys.has(getOutingStopKey(stop))
+        )
+        .map((stop) => stop.order)
+    );
+    setExpandedOrders(
+      nextPlan.stops
+        .filter((stop) =>
+          expandedKeys.has(getOutingStopKey(stop))
+        )
+        .map((stop) => stop.order)
+    );
+  }
+
+  function moveStopByDirection(
+    stopKey: string,
+    direction: -1 | 1
+  ) {
+    if (!plan) {
+      return;
+    }
+
+    const currentIndex = plan.stops.findIndex(
+      (stop) => getOutingStopKey(stop) === stopKey
+    );
+    const targetIndex = currentIndex + direction;
+
+    if (
+      currentIndex < 0 ||
+      targetIndex < 0 ||
+      targetIndex >= plan.stops.length
+    ) {
+      return;
+    }
+
+    moveStopToTarget(
+      stopKey,
+      getOutingStopKey(plan.stops[targetIndex]),
+      true
+    );
+  }
+
+  function handleStopDragStart(
+    event: ReactPointerEvent<HTMLButtonElement>,
+    stopKey: string
+  ) {
+    if (!routeEditMode) {
+      return;
+    }
+
+    event.currentTarget.setPointerCapture(
+      event.pointerId
+    );
+    draggingStopKeyRef.current = stopKey;
+    setDraggingStopKey(stopKey);
+    document.body.classList.add(
+      "venture-route-reordering"
+    );
+    setActionMessage(
+      "Drag the stop to its new position."
+    );
+  }
+
+  function handleStopDragMove(
+    event: ReactPointerEvent<HTMLButtonElement>
+  ) {
+    const sourceKey = draggingStopKeyRef.current;
+
+    if (!sourceKey) {
+      return;
+    }
+
+    if (event.clientY < 110) {
+      window.scrollBy({ top: -12, behavior: "auto" });
+    } else if (
+      event.clientY > window.innerHeight - 130
+    ) {
+      window.scrollBy({ top: 12, behavior: "auto" });
+    }
+
+    const target = document
+      .elementFromPoint(
+        event.clientX,
+        event.clientY
+      )
+      ?.closest<HTMLElement>(
+        "[data-venture-stop-key]"
+      );
+    const targetKey =
+      target?.dataset.ventureStopKey;
+
+    if (!targetKey || targetKey === sourceKey) {
+      return;
+    }
+
+    moveStopToTarget(
+      sourceKey,
+      targetKey
+    );
+  }
+
+  function handleStopDragEnd(
+    event: ReactPointerEvent<HTMLButtonElement>
+  ) {
+    if (
+      event.currentTarget.hasPointerCapture(
+        event.pointerId
+      )
+    ) {
+      event.currentTarget.releasePointerCapture(
+        event.pointerId
+      );
+    }
+
+    const hadActiveDrag =
+      draggingStopKeyRef.current !== null;
+
+    draggingStopKeyRef.current = null;
+    setDraggingStopKey(null);
+    document.body.classList.remove(
+      "venture-route-reordering"
+    );
+
+    if (hadActiveDrag) {
+      setActionMessage(
+        "Route order updated. Venture recalculated travel and timing."
+      );
+    }
+  }
+
+  function openCompletionSheet() {
+    if (!plan) {
+      return;
+    }
+
+    setCompletionSelections(
+      plan.stops.map(
+        (stop) =>
+          `${stop.listing.type}-${stop.listing.id}`
+      )
+    );
+    setCompletionSheetOpen(true);
+  }
+
+  function toggleCompletionStop(
+    listingKey: string
+  ) {
+    setCompletionSelections(
+      (current) =>
+        current.includes(listingKey)
+          ? current.filter(
+              (key) => key !== listingKey
+            )
+          : [...current, listingKey]
+    );
+  }
+
+  function getCompletionVisitedAt(
+    dateKey: string
+  ) {
+    const parsed = new Date(
+      `${dateKey}T12:00:00`
+    );
+
+    return Number.isNaN(parsed.getTime())
+      ? new Date().toISOString()
+      : parsed.toISOString();
+  }
+
+  function handleConfirmCompletion() {
+    if (
+      !plan ||
+      completionSelections.length === 0
+    ) {
+      setActionMessage(
+        "Choose at least one stop you made it to."
+      );
+      return;
+    }
+
+    setLoggingCompletion(true);
+
+    const existing = getVisitHistory();
+    const selectedStops = plan.stops.filter(
+      (stop) =>
+        completionSelections.includes(
+          `${stop.listing.type}-${stop.listing.id}`
+        )
+    );
+
+    const newEntries = selectedStops
+      .filter((stop) =>
+        !existing.some(
+          (visit) =>
+            visit.outingId === plan.planId &&
+            visit.listingKey ===
+              `${stop.listing.type}-${stop.listing.id}`
+        )
+      )
+      .map((stop) => ({
+        listing: stop.listing,
+        options: {
+          source: "outing_complete" as const,
+          outingId: plan.planId,
+          fallbackEventDate: plan.date,
+          visitedAt:
+            getCompletionVisitedAt(plan.date)
+        }
+      }));
+
+    if (newEntries.length > 0) {
+      addVisits(newEntries);
+    }
+
+    setLoggingCompletion(false);
+    setCompletionSheetOpen(false);
+    setActionMessage(
+      newEntries.length > 0
+        ? `${newEntries.length} ${
+            newEntries.length === 1
+              ? "visit"
+              : "visits"
+          } added to My Venture.`
+        : "Those stops are already in your Venture history."
+    );
+
+    trackBetaEvent({
+      eventName: "outing_completed",
+      pagePath: "/build-outing/results",
+      properties: {
+        planId: plan.planId,
+        confirmedStopCount:
+          selectedStops.length,
+        newVisitCount:
+          newEntries.length
+      }
+    });
   }
 
   async function handleShareOuting() {
@@ -1888,7 +2746,7 @@ export default function OutingResultsPage() {
                     ? "Saved"
                     : "Save outing"}
                 </strong>
-                <small>Keep this route for later</small>
+                <small>Keep it ready for later</small>
               </span>
             </button>
 
@@ -1908,7 +2766,25 @@ export default function OutingResultsPage() {
 
               <span className={styles.actionCopy}>
                 <strong>Share</strong>
-                <small>Send the plan to your people</small>
+                <small>Send the full route</small>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className={styles.completeAction}
+              onClick={openCompletionSheet}
+            >
+              <span
+                className={`${styles.actionIcon} ${styles.completeIcon}`}
+                aria-hidden="true"
+              >
+                ✓
+              </span>
+
+              <span className={styles.actionCopy}>
+                <strong>Mark complete</strong>
+                <small>Confirm where you went</small>
               </span>
             </button>
 
@@ -1937,7 +2813,7 @@ export default function OutingResultsPage() {
                     ? "Refreshing"
                     : "Refresh unlocked"}
                 </strong>
-                <small>Keep locked stops, remix the rest</small>
+                <small>Keep favourites, switch the rest</small>
               </span>
             </button>
           </section>
@@ -1957,8 +2833,8 @@ export default function OutingResultsPage() {
                 <span className={styles.snapshotSpark} aria-hidden="true">✦</span>
                 <span>ADVENTURE SNAPSHOT</span>
               </div>
-              <h2>Your night&apos;s little blueprint</h2>
-              <p>The useful details, dressed for the occasion.</p>
+              <h2>The plan, without the clutter</h2>
+              <p>Everything you need before you head out.</p>
             </div>
 
             <div className={styles.snapshotRouteLine} aria-hidden="true">
@@ -1969,16 +2845,18 @@ export default function OutingResultsPage() {
             </div>
 
             <div className="outing-plan-summary outing-plan-summary-v3">
-              <div className={`${styles.statCard} ${styles.dateCard}`}>
-                <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="date" /></i> DATE</span>
-                <strong>{formatPlanDate(plan.date)}</strong>
-                <small>Your Venture day</small>
-              </div>
+              <div className={`${styles.statCard} ${styles.whenCard}`}>
+                <div className={styles.whenMain}>
+                  <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="date" /></i> DATE</span>
+                  <strong>{formatPlanDate(plan.date)}</strong>
+                  <small>Your Venture day</small>
+                </div>
 
-              <div className={`${styles.statCard} ${styles.startCard}`}>
-                <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="start" /></i> START</span>
-                <strong>{plan.requestedStartTime}</strong>
-                <small>Meet-up time</small>
+                <div className={styles.whenTime}>
+                  <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="start" /></i> START</span>
+                  <strong>{plan.requestedStartTime}</strong>
+                  <small>Meet-up time</small>
+                </div>
               </div>
 
               <div className={`${styles.statCard} ${styles.peopleCard}`}>
@@ -2019,20 +2897,20 @@ export default function OutingResultsPage() {
             <div className={styles.addStopIntro}>
               <span className={styles.addStopSpark} aria-hidden="true">+</span>
               <div>
-                <span>KEEP THE NIGHT GOING</span>
+                <span>EXTEND THE ROUTE</span>
 
                 <h2>
                   {planStatus ===
                   "partial"
-                    ? "Complete the story"
-                    : "One more memory?"}
+                    ? "Fill the missing stop"
+                    : "Add another stop"}
                 </h2>
 
                 <p>
                   {planStatus ===
                   "partial"
-                    ? "Pick a category and Venture will fill the safest available gap."
-                    : "Drop in one more stop without unravelling the route you already love."}
+                    ? "Choose what is missing and Venture will place it where the route still works."
+                    : "Add one more place without rebuilding the outing from scratch."}
                 </p>
               </div>
             </div>
@@ -2075,6 +2953,7 @@ export default function OutingResultsPage() {
                       addingKind !== null ||
                       replacingOrder !== null ||
                       refreshingUnlocked ||
+                      removingOrder !== null ||
                       plan.stops.length >= 5 ||
                       (
                         option.kind ===
@@ -2083,7 +2962,7 @@ export default function OutingResultsPage() {
                       )
                     }
                     onClick={() => {
-                      void handleAddStop(
+                      void openAddStopOptions(
                         option.kind
                       );
                     }}
@@ -2094,17 +2973,17 @@ export default function OutingResultsPage() {
 
                     <span className={styles.addStopCopy}>
                       <strong>
-                        {addingKind ===
-                        option.kind
-                          ? "Adding..."
-                          : `Add ${option.label}`}
+                        {loadingAddStopOptions &&
+                        addStopSheetKind === option.kind
+                          ? "Finding options..."
+                          : `Choose ${option.label}`}
                       </strong>
                       <small>
                         {option.kind === "food"
-                          ? "Find a bite near the route"
+                          ? "A nearby place to eat"
                           : option.kind === "event"
-                            ? "Add something happening"
-                            : "Finish with a relaxed drink"}
+                            ? "An event that fits the timing"
+                            : "A drinks stop near the route"}
                       </small>
                     </span>
 
@@ -2132,29 +3011,145 @@ export default function OutingResultsPage() {
             </section>
           ) : null}
 
-          {plan.stops.length > 0 ? (
-            <section className="outing-timeline outing-timeline-v3">
-              <div className="section-heading">
+          {visibleScheduleIssues.length > 0 ? (
+            <section className={styles.scheduleCheckCard} aria-live="polite">
+              <div className={styles.scheduleCheckHeader}>
+                <span className={styles.scheduleCheckIcon} aria-hidden="true">!</span>
                 <div>
-                  <span>
-                    YOUR NIGHT, SCENE BY SCENE
-                  </span>
-
+                  <small>SMART ROUTE CHECK</small>
                   <h2>
-                    {planStatus ===
-                    "partial"
-                      ? `${actualStopCount} of ${requestedStopCount} stops found`
-                      : `Your ${actualStopCount}-stop outing`}
+                    {visibleScheduleIssues.some(
+                      (issue) => issue.severity === "critical"
+                    )
+                      ? "This order needs attention"
+                      : "A few timing details to check"}
                   </h2>
-
                   <p>
-                    Follow the route, open each stop, and tune the night without rebuilding everything.
+                    Venture checked fixed event times, travel gaps, and your selected outing window.
                   </p>
                 </div>
               </div>
 
+              <div className={styles.scheduleIssueList}>
+                {visibleScheduleIssues.slice(0, 4).map((issue) => (
+                  <article
+                    key={issue.id}
+                    className={
+                      issue.severity === "critical"
+                        ? styles.scheduleIssueCritical
+                        : styles.scheduleIssueWarning
+                    }
+                  >
+                    <span aria-hidden="true">
+                      {issue.severity === "critical" ? "×" : "!"}
+                    </span>
+                    <div>
+                      <strong>{issue.title}</strong>
+                      <p>{issue.message}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div className={styles.scheduleCheckActions}>
+                <button type="button" onClick={handleFixSchedule}>
+                  <span aria-hidden="true">↻</span>
+                  Fix the timing
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDismissedScheduleSignature(scheduleIssueSignature)
+                  }
+                >
+                  Keep this order
+                </button>
+              </div>
+            </section>
+          ) : null}
+
+          {plan.stops.length > 0 ? (
+            <section className="outing-timeline outing-timeline-v3">
+              <div className={`section-heading ${styles.routeHeading}`}>
+                <div>
+                  <span>
+                    YOUR ROUTE
+                  </span>
+
+                  <h2 aria-live="polite">
+                    {planStatus === "partial" ? (
+                      <>
+                        <b
+                          className={styles.liveStopCount}
+                          key={`partial-${actualStopCount}`}
+                        >
+                          {actualStopCount}
+                        </b>{" "}
+                        of {requestedStopCount} stops found
+                      </>
+                    ) : (
+                      <>
+                        Your{" "}
+                        <b
+                          className={styles.liveStopCount}
+                          key={`complete-${actualStopCount}`}
+                        >
+                          {actualStopCount}
+                        </b>
+                        -stop outing
+                      </>
+                    )}
+                  </h2>
+
+                  <p>
+                    {routeEditMode
+                      ? "Press and hold the grip, then drag each stop into your preferred order."
+                      : "One smooth plan, with every stop in the order it makes sense."}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className={styles.routeEditButton}
+                  aria-pressed={routeEditMode}
+                  onClick={() => {
+                    const nextMode = !routeEditMode;
+                    setRouteEditMode(nextMode);
+                    draggingStopKeyRef.current = null;
+                    setDraggingStopKey(null);
+                    document.body.classList.remove(
+                      "venture-route-reordering"
+                    );
+                    setActionMessage(
+                      nextMode
+                        ? "Route editing is on. Drag the grip or use the arrow buttons."
+                        : "Route order saved."
+                    );
+                  }}
+                >
+                  <span aria-hidden="true">
+                    {routeEditMode ? "✓" : "↕"}
+                  </span>
+                  {routeEditMode
+                    ? "Done"
+                    : "Edit order"}
+                </button>
+              </div>
+
+              {routeEditMode ? (
+                <div
+                  className={styles.routeEditNotice}
+                  role="status"
+                >
+                  <span aria-hidden="true">☝</span>
+                  <p>
+                    Hold the dotted grip and drag. Venture updates the numbering, map, travel legs, timing, saved outing, and share data.
+                  </p>
+                </div>
+              ) : null}
+
               {plan.stops.map(
-                (stop) => {
+                (stop, stopIndex) => {
                   const kind =
                     getStopKind(stop);
 
@@ -2168,8 +3163,20 @@ export default function OutingResultsPage() {
 
                   return (
                     <div
-                      className={`outing-stop-wrapper outing-kind-${kind}`}
-                      key={`${stop.listing.type}-${stop.listing.id}-${stop.order}`}
+                      className={`outing-stop-wrapper outing-kind-${kind} ${
+                        routeEditMode
+                          ? styles.reorderableStop
+                          : ""
+                      } ${
+                        draggingStopKey === getOutingStopKey(stop)
+                          ? styles.draggingStop
+                          : ""
+                      }`}
+                      key={getOutingStopKey(stop)}
+                      data-venture-stop-key={getOutingStopKey(stop)}
+                      style={{
+                        animationDelay: `${Math.min(stopIndex, 6) * 90}ms`
+                      }}
                     >
                       {stop.travelFromPreviousMinutes !==
                       null ? (
@@ -2196,6 +3203,63 @@ export default function OutingResultsPage() {
                       ) : null}
 
                       <article className="outing-stop-card outing-stop-card-v3">
+                        {routeEditMode ? (
+                          <div className={styles.routeDragTools}>
+                            <button
+                              type="button"
+                              className={styles.routeDragHandle}
+                              aria-label={`Drag ${stop.listing.name} to reorder the outing`}
+                              onPointerDown={(event) =>
+                                handleStopDragStart(
+                                  event,
+                                  getOutingStopKey(stop)
+                                )
+                              }
+                              onPointerMove={handleStopDragMove}
+                              onPointerUp={handleStopDragEnd}
+                              onPointerCancel={handleStopDragEnd}
+                            >
+                              <span aria-hidden="true">
+                                <i />
+                                <i />
+                                <i />
+                                <i />
+                                <i />
+                                <i />
+                              </span>
+                            </button>
+
+                            <div className={styles.routeMoveButtons}>
+                              <button
+                                type="button"
+                                aria-label={`Move ${stop.listing.name} earlier`}
+                                disabled={stopIndex === 0}
+                                onClick={() =>
+                                  moveStopByDirection(
+                                    getOutingStopKey(stop),
+                                    -1
+                                  )
+                                }
+                              >
+                                ↑
+                              </button>
+                              <button
+                                type="button"
+                                aria-label={`Move ${stop.listing.name} later`}
+                                disabled={stopIndex === plan.stops.length - 1}
+                                onClick={() =>
+                                  moveStopByDirection(
+                                    getOutingStopKey(stop),
+                                    1
+                                  )
+                                }
+                              >
+                                ↓
+                              </button>
+                            </div>
+                          </div>
+                        ) : null}
+
                         <div className="outing-stop-order">
                           {stop.order}
                         </div>
@@ -2207,15 +3271,101 @@ export default function OutingResultsPage() {
                               {stop.endTime}
                             </span>
 
-                            <small className={`outing-kind-badge kind-${kind}`}>
-                              <i
-                                aria-hidden="true"
+                            <span className={styles.stopTopActions}>
+                              <small className={`outing-kind-badge kind-${kind}`}>
+                                <i aria-hidden="true">
+                                  {kindDetails.icon}
+                                </i>
+                                {kindDetails.label}
+                              </small>
+
+                              <button
+                                type="button"
+                                className={styles.stopMenuButton}
+                                aria-label={`Edit ${stop.listing.name}`}
+                                aria-expanded={openStopMenuOrder === stop.order}
+                                onClick={() =>
+                                  setOpenStopMenuOrder((current) =>
+                                    current === stop.order ? null : stop.order
+                                  )
+                                }
                               >
-                                {kindDetails.icon}
-                              </i>
-                              {kindDetails.label}
-                            </small>
+                                <span aria-hidden="true">•••</span>
+                              </button>
+                            </span>
                           </div>
+
+                          {openStopMenuOrder === stop.order ? (
+                            <div className={styles.stopMenuPanel}>
+                              <button
+                                type="button"
+                                disabled={
+                                  lockedOrders.includes(stop.order) ||
+                                  loadingReplacementOptions ||
+                                  replacingOrder !== null ||
+                                  refreshingUnlocked ||
+                                  removingOrder !== null
+                                }
+                                onClick={() => {
+                                  void openReplacementOptions(stop.order);
+                                }}
+                              >
+                                <span aria-hidden="true">↻</span>
+                                Replace stop
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  toggleStopDetails(stop.order);
+                                  setOpenStopMenuOrder(null);
+                                }}
+                              >
+                                <span aria-hidden="true">⌄</span>
+                                {expanded ? "Hide details" : "View details"}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setRouteEditMode(true);
+                                  setOpenStopMenuOrder(null);
+                                  setActionMessage(
+                                    "Route editing is on. Drag the grip or use the arrow buttons."
+                                  );
+                                }}
+                              >
+                                <span aria-hidden="true">↕</span>
+                                Move in route
+                              </button>
+
+                              <a
+                                href={getDirectionsUrl(stop.listing)}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={() => setOpenStopMenuOrder(null)}
+                              >
+                                <span aria-hidden="true">↗</span>
+                                Open directions
+                              </a>
+
+                              <button
+                                type="button"
+                                className={styles.stopMenuRemove}
+                                disabled={
+                                  plan.stops.length <= 1 ||
+                                  removingOrder !== null
+                                }
+                                onClick={() => {
+                                  setOpenStopMenuOrder(null);
+                                  void handleRemoveStop(stop.order);
+                                }}
+                              >
+                                <span aria-hidden="true">−</span>
+                                Remove stop
+                              </button>
+                            </div>
+                          ) : null}
 
                           <h2>
                             {stop.listing.name}
@@ -2316,10 +3466,11 @@ export default function OutingResultsPage() {
                                     ) ||
                                     replacingOrder !== null ||
                                     refreshingUnlocked ||
-                                    addingKind !== null
+                                    addingKind !== null ||
+                                    removingOrder !== null
                                   }
                                   onClick={() => {
-                                    void handleReplaceStop(
+                                    void openReplacementOptions(
                                       stop.order
                                     );
                                   }}
@@ -2328,12 +3479,44 @@ export default function OutingResultsPage() {
                                     ↻
                                   </span>
 
-                                  {replacingOrder ===
-                                  stop.order
-                                    ? "Replacing..."
+                                  {loadingReplacementOptions &&
+                                  replacementSheetOrder === stop.order
+                                    ? "Finding options..."
                                     : `Replace ${kind}`}
                                 </button>
+
+
+                                <button
+                                  type="button"
+                                  className={styles.removeStopButton}
+                                  disabled={
+                                    plan.stops.length <= 1 ||
+                                    replacingOrder !== null ||
+                                    refreshingUnlocked ||
+                                    addingKind !== null ||
+                                    removingOrder !== null
+                                  }
+                                  onClick={() => {
+                                    void handleRemoveStop(
+                                      stop.order
+                                    );
+                                  }}
+                                >
+                                  <span aria-hidden="true">
+                                    −
+                                  </span>
+
+                                  {removingOrder === stop.order
+                                    ? "Removing..."
+                                    : "Remove stop"}
+                                </button>
                               </div>
+
+                              <VisitButton
+                                listing={stop.listing}
+                                fallbackEventDate={plan.date}
+                                compact
+                              />
 
                               <Link
                                 className="outing-stop-link"
@@ -2382,16 +3565,379 @@ export default function OutingResultsPage() {
               }}
             >
               <span aria-hidden="true">↻</span>
-              Generate another version
+              Build a fresh version
             </button>
 
             <Link href="/build-outing">
               <span aria-hidden="true">✎</span>
-              Change preferences
+              Edit preferences
             </Link>
           </div>
         </>
       ) : null}
+      {completionSheetOpen &&
+      plan &&
+      typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className={styles.completionBackdrop}
+              onMouseDown={(event) => {
+                if (
+                  event.target === event.currentTarget &&
+                  !loggingCompletion
+                ) {
+                  setCompletionSheetOpen(false);
+                }
+              }}
+            >
+              <section
+                className={styles.completionSheet}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="completion-sheet-title"
+              >
+                <span
+                  className={styles.completionHandle}
+                  aria-hidden="true"
+                />
+
+                <button
+                  type="button"
+                  className={styles.completionClose}
+                  aria-label="Close outing completion"
+                  disabled={loggingCompletion}
+                  onClick={() =>
+                    setCompletionSheetOpen(false)
+                  }
+                >
+                  ×
+                </button>
+
+                <header className={styles.completionHeader}>
+                  <span>MY VENTURE</span>
+                  <h2 id="completion-sheet-title">
+                    Which stops did you make it to?
+                  </h2>
+                  <p>
+                    Uncheck anything you skipped. Only confirmed stops shape New to Me recommendations.
+                  </p>
+                </header>
+
+                <div className={styles.completionList}>
+                  {plan.stops.map((stop) => {
+                    const key =
+                      `${stop.listing.type}-${stop.listing.id}`;
+                    const selected =
+                      completionSelections.includes(key);
+
+                    return (
+                      <label
+                        className={`${styles.completionStop} ${
+                          selected
+                            ? styles.completionStopSelected
+                            : ""
+                        }`}
+                        key={key}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() =>
+                            toggleCompletionStop(key)
+                          }
+                        />
+                        <span className={styles.completionCheck}>
+                          {selected ? "✓" : ""}
+                        </span>
+                        <span className={styles.completionOrder}>
+                          {stop.order}
+                        </span>
+                        <span className={styles.completionCopy}>
+                          <strong>{stop.listing.name}</strong>
+                          <small>
+                            {stop.startTime}–{stop.endTime} · {stop.listing.neighbourhood || "Winnipeg"}
+                          </small>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <footer className={styles.completionFooter}>
+                  <span>
+                    {completionSelections.length} of {plan.stops.length} selected
+                  </span>
+                  <button
+                    type="button"
+                    disabled={
+                      loggingCompletion ||
+                      completionSelections.length === 0
+                    }
+                    onClick={handleConfirmCompletion}
+                  >
+                    {loggingCompletion
+                      ? "Saving visits…"
+                      : "Add to My Venture"}
+                  </button>
+                </footer>
+              </section>
+            </div>,
+            document.body
+          )
+        : null}
+
+      {addStopSheetKind && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className={styles.addStopSheetBackdrop}
+          onMouseDown={(event) => {
+            if (
+              event.target === event.currentTarget &&
+              addingKind === null
+            ) {
+              setAddStopSheetKind(null);
+              setAddStopOptions([]);
+            }
+          }}
+        >
+          <section
+            className={styles.addStopSheet}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-stop-sheet-title"
+          >
+            <span
+              className={styles.addStopSheetHandle}
+              aria-hidden="true"
+            />
+
+            <button
+              type="button"
+              className={styles.addStopSheetClose}
+              aria-label="Close stop options"
+              disabled={addingKind !== null}
+              onClick={() => {
+                setAddStopSheetKind(null);
+                setAddStopOptions([]);
+              }}
+            >
+              ×
+            </button>
+
+            <header className={styles.addStopSheetHeader}>
+              <span>BEST VERIFIED FITS</span>
+              <h2 id="add-stop-sheet-title">
+                Choose a {addStopSheetKind} stop
+              </h2>
+              <p>
+                Venture checked the timing, route, travel limit, and your preferences.
+              </p>
+            </header>
+
+            {loadingAddStopOptions ? (
+              <div
+                className={styles.addStopSheetLoading}
+                aria-live="polite"
+              >
+                {[0, 1, 2].map((item) => (
+                  <span key={item} />
+                ))}
+                <p>Finding stops that genuinely fit...</p>
+              </div>
+            ) : (
+              <div className={styles.addStopOptionList}>
+                {addStopOptions.map((option, optionIndex) => (
+                  <button
+                    type="button"
+                    className={styles.addStopOptionCard}
+                    key={option.key}
+                    disabled={addingKind !== null}
+                    style={{
+                      animationDelay: `${optionIndex * 70}ms`
+                    }}
+                    onClick={() => {
+                      void handleAddStop(
+                        addStopSheetKind,
+                        option.key
+                      );
+                    }}
+                  >
+                    <span className={styles.addStopOptionNumber}>
+                      {optionIndex + 1}
+                    </span>
+
+                    <span className={styles.addStopOptionMain}>
+                      <small>
+                        {option.category} · {option.neighbourhood}
+                      </small>
+                      <strong>{option.name}</strong>
+                      <em>{option.subtitle}</em>
+
+                      <span className={styles.addStopOptionFacts}>
+                        <i>
+                          {option.startTime}–{option.endTime}
+                        </i>
+                        <i>{option.positionLabel}</i>
+                        <i>
+                          {option.travelMinutes} min route travel
+                        </i>
+                      </span>
+
+                      <span className={styles.addStopOptionFit}>
+                        {option.fitReason}
+                      </span>
+                    </span>
+
+                    <span className={styles.addStopOptionPrice}>
+                      <small>EST.</small>
+                      <strong>
+                        {formatCost(option.estimatedCostCad)}
+                      </strong>
+                      <i aria-hidden="true">
+                        {addingKind === addStopSheetKind
+                          ? "…"
+                          : "→"}
+                      </i>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!loadingAddStopOptions && addStopOptions.length > 0 ? (
+              <p className={styles.addStopSheetNote}>
+                Choose one option. Venture will insert it in the correct place and refresh the whole route.
+              </p>
+            ) : null}
+          </section>
+            </div>,
+            document.body
+          )
+        : null}
+
+      {replacementSheetOrder !== null && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className={styles.addStopSheetBackdrop}
+              onMouseDown={(event) => {
+                if (
+                  event.target === event.currentTarget &&
+                  applyingReplacementKey === null
+                ) {
+                  setReplacementSheetOrder(null);
+                  setReplacementOptions([]);
+                }
+              }}
+            >
+              <section
+                className={`${styles.addStopSheet} ${styles.replacementSheet}`}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="replacement-sheet-title"
+              >
+                <span
+                  className={styles.addStopSheetHandle}
+                  aria-hidden="true"
+                />
+
+                <button
+                  type="button"
+                  className={styles.addStopSheetClose}
+                  aria-label="Close replacement options"
+                  disabled={applyingReplacementKey !== null}
+                  onClick={() => {
+                    setReplacementSheetOrder(null);
+                    setReplacementOptions([]);
+                  }}
+                >
+                  ×
+                </button>
+
+                <header className={styles.addStopSheetHeader}>
+                  <span>SWAP THIS STOP</span>
+                  <h2 id="replacement-sheet-title">
+                    Choose a better fit
+                  </h2>
+                  <p>
+                    Each option keeps the same route position and has been checked against timing, budget, and travel.
+                  </p>
+                </header>
+
+                {loadingReplacementOptions ? (
+                  <div
+                    className={styles.addStopSheetLoading}
+                    aria-live="polite"
+                  >
+                    {[0, 1, 2].map((item) => (
+                      <span key={item} />
+                    ))}
+                    <p>Finding verified alternatives...</p>
+                  </div>
+                ) : (
+                  <div className={styles.addStopOptionList}>
+                    {replacementOptions.map((option, optionIndex) => (
+                      <button
+                        type="button"
+                        className={`${styles.addStopOptionCard} ${styles.replacementOptionCard}`}
+                        key={option.key}
+                        disabled={applyingReplacementKey !== null}
+                        style={{
+                          animationDelay: `${optionIndex * 70}ms`
+                        }}
+                        onClick={() => applyReplacementOption(option)}
+                      >
+                        <span className={styles.addStopOptionNumber}>
+                          {optionIndex + 1}
+                        </span>
+
+                        <span className={styles.addStopOptionMain}>
+                          <small>
+                            {option.category} · {option.neighbourhood}
+                          </small>
+                          <strong>{option.name}</strong>
+                          <em>{option.subtitle}</em>
+
+                          <span className={styles.addStopOptionFacts}>
+                            <i>
+                              {option.startTime}–{option.endTime}
+                            </i>
+                            <i>
+                              {option.travelMinutes === null
+                                ? "First stop"
+                                : `${option.travelMinutes} min from previous`}
+                            </i>
+                          </span>
+
+                          <span className={styles.addStopOptionFit}>
+                            {option.fitReason}
+                          </span>
+                        </span>
+
+                        <span className={styles.addStopOptionPrice}>
+                          <small>EST.</small>
+                          <strong>
+                            {formatCost(option.estimatedCostCad)}
+                          </strong>
+                          <i aria-hidden="true">
+                            {applyingReplacementKey === option.key ? "…" : "→"}
+                          </i>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {!loadingReplacementOptions && replacementOptions.length > 0 ? (
+                  <p className={styles.addStopSheetNote}>
+                    Pick one option. Venture will update the map, timing, saved outing, and share data.
+                  </p>
+                ) : null}
+              </section>
+            </div>,
+            document.body
+          )
+        : null}
+
     </main>
   );
 }

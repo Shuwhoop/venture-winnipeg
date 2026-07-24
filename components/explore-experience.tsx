@@ -24,6 +24,19 @@ import {
   PersonalizedExploreResults
 } from "@/components/personalized-explore-results";
 
+import {
+  listingIsInsideBounds,
+  type GeoPoint,
+  type MapBounds
+} from "@/lib/explore-map-utils";
+
+import {
+  getEventOccurrenceKey,
+  getVisitHistory,
+  VISIT_HISTORY_EVENT,
+  visitListingKey
+} from "@/lib/visit-history";
+
 import type {
   Listing
 } from "@/lib/types";
@@ -34,6 +47,7 @@ type ExploreExperienceProps = {
   listings: Listing[];
   eyebrow: string;
   searchQuery: string;
+  newToMeOnly?: boolean;
   requestType?:
     | "restaurant"
     | "event"
@@ -52,10 +66,44 @@ function getListingKey(
   return `${listing.type}-${listing.id}`;
 }
 
+function hasVisitedListing(
+  listing: Listing,
+  visits: ReturnType<
+    typeof getVisitHistory
+  >
+) {
+  const listingKey =
+    visitListingKey(listing);
+
+  if (listing.type === "restaurant") {
+    return visits.some(
+      (visit) =>
+        visit.listingKey ===
+        listingKey
+    );
+  }
+
+  const occurrenceKey =
+    getEventOccurrenceKey(listing);
+
+  return visits.some(
+    (visit) =>
+      visit.listingKey ===
+        listingKey &&
+      (
+        !occurrenceKey ||
+        !visit.eventOccurrenceKey ||
+        visit.eventOccurrenceKey ===
+          occurrenceKey
+      )
+  );
+}
+
 export function ExploreExperience({
   listings,
   eyebrow,
   searchQuery,
+  newToMeOnly = false,
   requestType = "other"
 }: ExploreExperienceProps) {
   const workbenchRef =
@@ -64,20 +112,133 @@ export function ExploreExperience({
   const resultRailRef =
     useRef<HTMLDivElement>(null);
 
-  const [
-    view,
-    setView
-  ] = useState<ExploreView>("list");
+  const railScrollTimeoutRef =
+    useRef<number | null>(null);
 
-  const [
-    selectedListingKey,
-    setSelectedListingKey
-  ] = useState<string | null>(null);
+  const [view, setView] =
+    useState<ExploreView>("list");
 
-  const [
-    selectionVersion,
-    setSelectionVersion
-  ] = useState(0);
+  const [selectedListingKey, setSelectedListingKey] =
+    useState<string | null>(null);
+
+  const [selectionVersion, setSelectionVersion] =
+    useState(0);
+
+  const [fitVersion, setFitVersion] =
+    useState(0);
+
+  const [visitVersion, setVisitVersion] =
+    useState(0);
+
+  const [visitHistoryReady, setVisitHistoryReady] =
+    useState(false);
+
+  const [pendingBounds, setPendingBounds] =
+    useState<MapBounds | null>(null);
+
+  const [activeBounds, setActiveBounds] =
+    useState<MapBounds | null>(null);
+
+  const [mapHasMoved, setMapHasMoved] =
+    useState(false);
+
+  const [userLocation, setUserLocation] =
+    useState<GeoPoint | null>(null);
+
+  useEffect(() => {
+    function refreshVisitHistory() {
+      setVisitVersion(
+        (current) => current + 1
+      );
+    }
+
+    setVisitHistoryReady(true);
+    refreshVisitHistory();
+
+    window.addEventListener(
+      VISIT_HISTORY_EVENT,
+      refreshVisitHistory
+    );
+
+    window.addEventListener(
+      "storage",
+      refreshVisitHistory
+    );
+
+    return () => {
+      window.removeEventListener(
+        VISIT_HISTORY_EVENT,
+        refreshVisitHistory
+      );
+
+      window.removeEventListener(
+        "storage",
+        refreshVisitHistory
+      );
+    };
+  }, []);
+
+  const historyFilteredListings =
+    useMemo(() => {
+      if (
+        !newToMeOnly ||
+        !visitHistoryReady
+      ) {
+        return listings;
+      }
+
+      const visits =
+        getVisitHistory();
+
+      return listings.filter(
+        (listing) =>
+          !hasVisitedListing(
+            listing,
+            visits
+          )
+      );
+    }, [
+      listings,
+      newToMeOnly,
+      visitHistoryReady,
+      visitVersion
+    ]);
+
+  const visibleListings =
+    useMemo(() => {
+      if (!activeBounds) {
+        return historyFilteredListings;
+      }
+
+      return historyFilteredListings.filter(
+        (listing) =>
+          listingIsInsideBounds(
+            listing,
+            activeBounds
+          )
+      );
+    }, [
+      activeBounds,
+      historyFilteredListings
+    ]);
+
+  const pendingAreaCount =
+    useMemo(() => {
+      if (!pendingBounds) {
+        return historyFilteredListings.length;
+      }
+
+      return historyFilteredListings.filter(
+        (listing) =>
+          listingIsInsideBounds(
+            listing,
+            pendingBounds
+          )
+      ).length;
+    }, [
+      historyFilteredListings,
+      pendingBounds
+    ]);
 
   useEffect(() => {
     if (!selectedListingKey) {
@@ -85,37 +246,45 @@ export function ExploreExperience({
     }
 
     const selectedStillExists =
-      listings.some(
+      visibleListings.some(
         (listing) =>
           getListingKey(listing) ===
           selectedListingKey
       );
 
     if (!selectedStillExists) {
-      setSelectedListingKey(null);
+      setSelectedListingKey(
+        visibleListings[0]
+          ? getListingKey(
+              visibleListings[0]
+            )
+          : null
+      );
     }
   }, [
-    listings,
-    selectedListingKey
+    selectedListingKey,
+    visibleListings
   ]);
 
-  const selectedListing =
-    useMemo(
-      () =>
-        listings.find(
-          (listing) =>
-            getListingKey(listing) ===
-            selectedListingKey
-        ) ?? null,
-      [
-        listings,
-        selectedListingKey
-      ]
-    );
+  const selectedListing = useMemo(
+    () =>
+      visibleListings.find(
+        (listing) =>
+          getListingKey(listing) ===
+          selectedListingKey
+      ) ?? null,
+    [
+      visibleListings,
+      selectedListingKey
+    ]
+  );
 
-  const selectListing =
+  const updateSelection =
     useCallback(
-      (listing: Listing) => {
+      (
+        listing: Listing,
+        scrollCard: boolean
+      ) => {
         const listingKey =
           getListingKey(listing);
 
@@ -126,6 +295,10 @@ export function ExploreExperience({
         setSelectionVersion(
           (current) => current + 1
         );
+
+        if (!scrollCard) {
+          return;
+        }
 
         window.requestAnimationFrame(
           () => {
@@ -148,6 +321,17 @@ export function ExploreExperience({
       []
     );
 
+  const selectListing =
+    useCallback(
+      (listing: Listing) => {
+        updateSelection(
+          listing,
+          true
+        );
+      },
+      [updateSelection]
+    );
+
   const showListingOnMap =
     useCallback(
       (listing: Listing) => {
@@ -166,6 +350,110 @@ export function ExploreExperience({
       [selectListing]
     );
 
+  const synchronizeRailSelection =
+    useCallback(() => {
+      const rail =
+        resultRailRef.current;
+
+      if (!rail) {
+        return;
+      }
+
+      const railBounds =
+        rail.getBoundingClientRect();
+
+      const railCenter =
+        railBounds.left +
+        railBounds.width / 2;
+
+      let nearestKey: string | null =
+        null;
+
+      let nearestDistance =
+        Number.POSITIVE_INFINITY;
+
+      rail
+        .querySelectorAll<HTMLElement>(
+          "[data-listing-key]"
+        )
+        .forEach((card) => {
+          const cardBounds =
+            card.getBoundingClientRect();
+
+          const cardCenter =
+            cardBounds.left +
+            cardBounds.width / 2;
+
+          const distance =
+            Math.abs(
+              cardCenter - railCenter
+            );
+
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestKey =
+              card.dataset.listingKey ??
+              null;
+          }
+        });
+
+      if (
+        !nearestKey ||
+        nearestKey === selectedListingKey
+      ) {
+        return;
+      }
+
+      const listing =
+        visibleListings.find(
+          (candidate) =>
+            getListingKey(candidate) ===
+            nearestKey
+        );
+
+      if (listing) {
+        updateSelection(
+          listing,
+          false
+        );
+      }
+    }, [
+      selectedListingKey,
+      updateSelection,
+      visibleListings
+    ]);
+
+  function handleRailScroll() {
+    if (
+      railScrollTimeoutRef.current !==
+      null
+    ) {
+      window.clearTimeout(
+        railScrollTimeoutRef.current
+      );
+    }
+
+    railScrollTimeoutRef.current =
+      window.setTimeout(() => {
+        synchronizeRailSelection();
+        railScrollTimeoutRef.current =
+          null;
+      }, 120);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (
+        railScrollTimeoutRef.current !==
+        null
+      ) {
+        window.clearTimeout(
+          railScrollTimeoutRef.current
+        );
+      }
+    };
+  }, []);
+
   function changeView(
     nextView: ExploreView
   ) {
@@ -174,11 +462,71 @@ export function ExploreExperience({
     if (
       nextView === "map" &&
       !selectedListingKey &&
-      listings[0]
+      visibleListings[0]
     ) {
-      selectListing(listings[0]);
+      selectListing(
+        visibleListings[0]
+      );
     }
   }
+
+  const handleViewportChanged =
+    useCallback(
+      (bounds: MapBounds) => {
+        setPendingBounds(bounds);
+        setMapHasMoved(true);
+      },
+      []
+    );
+
+  function searchThisArea() {
+    if (!pendingBounds) {
+      return;
+    }
+
+    const matches =
+      historyFilteredListings.filter(
+        (listing) =>
+          listingIsInsideBounds(
+            listing,
+            pendingBounds
+          )
+      );
+
+    setActiveBounds(pendingBounds);
+    setMapHasMoved(false);
+
+    setSelectedListingKey(
+      matches[0]
+        ? getListingKey(matches[0])
+        : null
+    );
+
+    setSelectionVersion(
+      (current) => current + 1
+    );
+  }
+
+  function showAllWinnipeg() {
+    setActiveBounds(null);
+    setPendingBounds(null);
+    setMapHasMoved(false);
+    setFitVersion(
+      (current) => current + 1
+    );
+
+    const firstListing =
+      historyFilteredListings[0];
+
+    setSelectedListingKey(
+      firstListing
+        ? getListingKey(firstListing)
+        : null
+    );
+  }
+
+  const hasBaseMatches =
+    historyFilteredListings.length > 0;
 
   return (
     <section
@@ -191,11 +539,21 @@ export function ExploreExperience({
           <span>{eyebrow}</span>
 
           <strong>
-            {listings.length}{" "}
-            {listings.length === 1
+            {visibleListings.length}{" "}
+            {visibleListings.length === 1
               ? "place to explore"
               : "places to explore"}
           </strong>
+
+          {activeBounds ? (
+            <small>
+              Showing the selected map area.
+            </small>
+          ) : newToMeOnly ? (
+            <small>
+              Visited matches are hidden.
+            </small>
+          ) : null}
         </div>
 
         <div
@@ -247,18 +605,28 @@ export function ExploreExperience({
           ? selectedListing
             ? `${selectedListing.name} selected on the map.`
             : "Map view opened."
-          : "List view opened."}
+          : newToMeOnly
+            ? `${visibleListings.length} unvisited matches shown.`
+            : "List view opened."}
       </div>
 
-      {listings.length === 0 ? (
+      {!hasBaseMatches ? (
         <div className={styles.emptyRequestStack}>
           <section className={styles.emptyState}>
-            <div aria-hidden="true">⌕</div>
-            <h2>No matches yet</h2>
+            <div aria-hidden="true">
+              {newToMeOnly ? "✦" : "⌕"}
+            </div>
+
+            <h2>
+              {newToMeOnly
+                ? "No new matches here"
+                : "No matches yet"}
+            </h2>
+
             <p>
-              Try a broader neighbourhood,
-              category, venue, or search term, or
-              send Venture the missing listing below.
+              {newToMeOnly
+                ? "Broaden the neighbourhood, timing or budget, or turn off New to me to include familiar favourites."
+                : "Try a broader neighbourhood, category, venue, or search term, or send Venture the missing listing below."}
             </p>
           </section>
 
@@ -271,48 +639,108 @@ export function ExploreExperience({
         <div className={styles.mapMode}>
           <div className={styles.mapFrame}>
             <CityMap
-              listings={listings}
+              listings={visibleListings}
               selectedListingKey={
                 selectedListingKey
               }
               selectionVersion={
                 selectionVersion
               }
+              fitVersion={fitVersion}
               isVisible
+              userLocation={userLocation}
               onSelectListing={
                 selectListing
               }
+              onViewportChanged={
+                handleViewportChanged
+              }
+              onUserLocationChange={
+                setUserLocation
+              }
             />
 
+            {mapHasMoved && pendingBounds ? (
+              <button
+                type="button"
+                className={styles.searchAreaButton}
+                onClick={searchThisArea}
+              >
+                <span aria-hidden="true">⌖</span>
+                Search this area
+                <strong>
+                  {pendingAreaCount}
+                </strong>
+              </button>
+            ) : null}
+
+            {activeBounds ? (
+              <button
+                type="button"
+                className={styles.showAllAreaButton}
+                onClick={showAllWinnipeg}
+              >
+                Show all Winnipeg
+              </button>
+            ) : null}
+
             <div className={styles.mapTip}>
-              <span aria-hidden="true">☝</span>
-              Tap a marker, then swipe the cards
+              <span aria-hidden="true">↔</span>
+              Swipe cards to move between pins
             </div>
           </div>
 
-          <div
-            className={styles.mapResultRail}
-            ref={resultRailRef}
-            aria-label="Listings shown on map"
-          >
-            {listings.map(
-              (listing) => (
-                <ExploreMapCard
-                  key={getListingKey(listing)}
-                  listing={listing}
-                  selected={
-                    selectedListingKey ===
-                    getListingKey(listing)
-                  }
-                  onFocus={selectListing}
-                />
-              )
-            )}
-          </div>
+          {visibleListings.length > 0 ? (
+            <div
+              className={styles.mapResultRail}
+              ref={resultRailRef}
+              aria-label="Listings shown on map"
+              onScroll={handleRailScroll}
+            >
+              {visibleListings.map(
+                (listing, index) => (
+                  <ExploreMapCard
+                    key={getListingKey(listing)}
+                    listing={listing}
+                    index={index}
+                    selected={
+                      selectedListingKey ===
+                      getListingKey(listing)
+                    }
+                    userLocation={
+                      userLocation
+                    }
+                    onFocus={selectListing}
+                  />
+                )
+              )}
+            </div>
+          ) : (
+            <section className={styles.mapAreaEmpty}>
+              <span aria-hidden="true">⌖</span>
+
+              <div>
+                <strong>
+                  Nothing fits this map area
+                </strong>
+
+                <small>
+                  Move the map and search again, or show all Winnipeg listings.
+                </small>
+              </div>
+
+              <button
+                type="button"
+                onClick={showAllWinnipeg}
+              >
+                Show all
+              </button>
+            </section>
+          )}
         </div>
-      ) : (
+      ) : visibleListings.length > 0 ? (
         <PersonalizedExploreResults
-          listings={listings}
+          listings={visibleListings}
           eyebrow={eyebrow}
           selectedListingKey={
             selectedListingKey
@@ -323,9 +751,29 @@ export function ExploreExperience({
           showHeading={false}
           className={styles.listResults}
         />
+      ) : (
+        <section className={styles.emptyState}>
+          <div aria-hidden="true">⌖</div>
+
+          <h2>
+            Nothing fits this map area
+          </h2>
+
+          <p>
+            Return to the map, search another area, or show all Winnipeg listings.
+          </p>
+
+          <button
+            type="button"
+            className={styles.emptyShowAllButton}
+            onClick={showAllWinnipeg}
+          >
+            Show all Winnipeg
+          </button>
+        </section>
       )}
 
-      {listings.length > 0 ? (
+      {hasBaseMatches ? (
         <ExploreMissingListingRequest
           compact
           initialQuery={searchQuery}

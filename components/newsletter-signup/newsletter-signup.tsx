@@ -70,7 +70,7 @@ export default function NewsletterSignup({
     );
 
     setMessage(
-      "Saving your spot..."
+      "Sending your confirmation link..."
     );
 
     try {
@@ -114,6 +114,7 @@ export default function NewsletterSignup({
           message?: string;
           error?: string;
           alreadySubscribed?: boolean;
+          pendingConfirmation?: boolean;
         };
 
       if (!response.ok) {
@@ -129,18 +130,26 @@ export default function NewsletterSignup({
 
       setMessage(
         result.message ||
-        "Welcome to Venture."
+        "Check your inbox to confirm your subscription."
       );
 
       form.reset();
 
       trackBetaEvent({
-        eventName: "newsletter_signup",
-        pagePath: window.location.pathname,
+        eventName:
+          "newsletter_signup",
+        pagePath:
+          window.location.pathname,
         properties: {
           placement,
           alreadySubscribed:
-            Boolean(result.alreadySubscribed)
+            Boolean(
+              result.alreadySubscribed
+            ),
+          pendingConfirmation:
+            Boolean(
+              result.pendingConfirmation
+            )
         }
       });
     } catch (error) {
@@ -162,9 +171,7 @@ export default function NewsletterSignup({
       className={`${styles.card} ${styles[placement]}`}
     >
       <div
-        className={
-          styles.graphics
-        }
+        className={styles.graphics}
         aria-hidden="true"
       >
         <span>
@@ -176,22 +183,14 @@ export default function NewsletterSignup({
         </span>
 
         <span>
-          ✨
+          🗺️
         </span>
 
         <i />
       </div>
 
-      <div
-        className={
-          styles.copy
-        }
-      >
-        <span
-          className={
-            styles.eyebrow
-          }
-        >
+      <div className={styles.copy}>
+        <span className={styles.eyebrow}>
           EVERY THURSDAY
         </span>
 
@@ -201,20 +200,27 @@ export default function NewsletterSignup({
         </h2>
 
         <p>
-          Standout events, local food
-          and drink spots, complete
-          outing ideas, and meaningful
-          Venture updates.
+          Standout events, local food and drink spots, complete outing ideas, and meaningful Venture updates.
         </p>
+
+        <div className={styles.promiseRow}>
+          <span>
+            One useful email
+          </span>
+
+          <span>
+            No disguised ads
+          </span>
+
+          <span>
+            Leave anytime
+          </span>
+        </div>
       </div>
 
       <form
-        className={
-          styles.form
-        }
-        onSubmit={
-          handleSubmit
-        }
+        className={styles.form}
+        onSubmit={handleSubmit}
       >
         <label>
           <span>
@@ -255,11 +261,7 @@ export default function NewsletterSignup({
           />
         </label>
 
-        <label
-          className={
-            styles.consent
-          }
-        >
+        <label className={styles.consent}>
           <input
             disabled={
               formState ===
@@ -271,18 +273,12 @@ export default function NewsletterSignup({
           />
 
           <span>
-            I agree to receive the
-            Venture by Boogie Bangers
-            Thursday newsletter and
-            understand that I can
-            unsubscribe at any time.
+            I agree to receive The Thursday Venture from Venture by Boogie Bangers. I understand that I can unsubscribe at any time. Read the <Link href="/privacy">privacy notice</Link>.
           </span>
         </label>
 
         <label
-          className={
-            styles.honeypot
-          }
+          className={styles.honeypot}
           aria-hidden="true"
         >
           Website
@@ -304,19 +300,17 @@ export default function NewsletterSignup({
         >
           {formState ===
           "submitting"
-            ? "Joining..."
+            ? "Sending confirmation..."
             : "Join The Thursday Venture"}
 
-          <span
-            aria-hidden="true"
-          >
+          <span aria-hidden="true">
             →
           </span>
         </button>
       </form>
 
       {message ? (
-        <p
+        <div
           className={`${styles.message} ${
             formState ===
             "error"
@@ -328,30 +322,31 @@ export default function NewsletterSignup({
           }`}
           role="status"
         >
-          {message}
-        </p>
+          <strong>
+            {formState === "success"
+              ? "Check your inbox"
+              : formState === "error"
+                ? "Something needs attention"
+                : "Working on it"}
+          </strong>
+
+          <span>
+            {message}
+          </span>
+        </div>
       ) : null}
 
-      <footer
-        className={
-          styles.footer
-        }
-      >
+      <footer className={styles.footer}>
         <span>
-          Venture by Boogie Bangers
+          The Thursday Venture
         </span>
 
-        <a
-          href="mailto:venturebangers@gmail.com"
-        >
+        <a href="mailto:venturebangers@gmail.com">
           venturebangers@gmail.com
         </a>
 
-        {placement !==
-        "page" ? (
-          <Link
-            href="/newsletter"
-          >
+        {placement !== "page" ? (
+          <Link href="/newsletter">
             Newsletter details
           </Link>
         ) : null}

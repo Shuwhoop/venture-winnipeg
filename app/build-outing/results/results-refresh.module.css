@@ -2325,3 +2325,2412 @@
     font-size: 0.67rem !important;
   }
 }
+
+/* =========================================================
+   Venture results blueprint balance v0.1
+   Reorganizes the snapshot into one calm visual system.
+   ========================================================= */
+
+.snapshotSection {
+  padding: 18px;
+  background:
+    radial-gradient(circle at 91% 7%, rgba(255, 207, 0, 0.2), transparent 23%),
+    linear-gradient(155deg, #fffdf8 0%, #fff7e8 52%, #f8f3ff 100%);
+}
+
+.snapshotHeading {
+  display: grid;
+  gap: 6px;
+  padding-right: 66px;
+}
+
+.snapshotHeading h2 {
+  max-width: 15ch;
+  font-size: clamp(1.8rem, 7vw, 2.35rem);
+  line-height: 0.98;
+}
+
+.snapshotHeading p {
+  color: #6c6263;
+  font-size: 0.75rem;
+}
+
+.snapshotRouteLine {
+  gap: 7px;
+  margin-block: 2px 1px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 11px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+  position: relative;
+  display: grid;
+  align-content: space-between;
+  gap: 8px;
+  min-height: 128px;
+  padding: 14px;
+  overflow: hidden;
+  border: 2px solid var(--result-ink);
+  border-radius: 21px;
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.14);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard::before {
+  height: 5px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard::after {
+  position: absolute;
+  right: -22px;
+  bottom: -25px;
+  width: 86px;
+  height: 86px;
+  border: 13px solid rgba(255, 255, 255, 0.34);
+  border-radius: 999px;
+  content: "";
+}
+
+.whenCard {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1.45fr) minmax(110px, 0.7fr);
+  align-items: stretch;
+  gap: 12px !important;
+  min-height: 136px !important;
+  background: linear-gradient(135deg, #fff4b7 0%, #ffdc69 100%) !important;
+  --stat-accent: #d01013;
+}
+
+.whenMain,
+.whenTime {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.whenTime {
+  padding: 12px;
+  border: 1.5px solid rgba(36, 31, 32, 0.28);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: inset 0 -2px 0 rgba(208, 16, 19, 0.08);
+}
+
+.whenMain > span,
+.whenTime > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--result-red);
+  font-size: 0.61rem;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+}
+
+.whenMain strong {
+  max-width: 18ch;
+  font-size: clamp(1.08rem, 4.4vw, 1.35rem) !important;
+  line-height: 1.12 !important;
+}
+
+.whenTime strong {
+  font-size: 1.25rem !important;
+}
+
+.whenMain small,
+.whenTime small {
+  color: #665c5e;
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).peopleCard,
+.refreshRoot :global(.outing-plan-summary-v3 > div).lengthCard,
+.refreshRoot :global(.outing-plan-summary-v3 > div).travelCard,
+.refreshRoot :global(.outing-plan-summary-v3 > div).priceCard {
+  grid-column: auto;
+  min-height: 128px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).peopleCard {
+  background: linear-gradient(145deg, #e4f7ff 0%, #b8e1f2 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).lengthCard {
+  background: linear-gradient(145deg, #effce6 0%, #ccecad 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).travelCard {
+  background: linear-gradient(145deg, #f0eaff 0%, #d6c5ff 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).priceCard {
+  background: linear-gradient(145deg, #fff0dd 0%, #ffc98f 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).groupCard {
+  grid-column: 1 / -1;
+  min-height: 104px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard > span,
+.whenMain > span,
+.whenTime > span {
+  position: relative;
+  z-index: 1;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard strong,
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard small {
+  position: relative;
+  z-index: 1;
+}
+
+.statIcon {
+  width: 39px;
+  height: 39px;
+  flex-basis: 39px;
+  border: 1.5px solid rgba(36, 31, 32, 0.75);
+  border-radius: 13px;
+  box-shadow: 2px 2px 0 rgba(36, 31, 32, 0.09);
+}
+
+.statIcon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard strong {
+  font-size: 1.04rem;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard small {
+  line-height: 1.35;
+}
+
+@media (max-width: 390px) {
+  .snapshotSection {
+    padding: 14px;
+  }
+
+  .snapshotHeading {
+    padding-right: 42px;
+  }
+
+  .snapshotHeading h2 {
+    font-size: 1.72rem;
+  }
+
+  .whenCard {
+    grid-template-columns: 1fr;
+    min-height: 0 !important;
+  }
+
+  .whenTime {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .whenTime > span {
+    grid-row: 1 / span 2;
+  }
+
+  .whenTime strong,
+  .whenTime small {
+    grid-column: 2;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3 > div).peopleCard,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).lengthCard,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).travelCard,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).priceCard {
+    min-height: 116px;
+  }
+}
+
+@media (max-width: 330px) {
+  .refreshRoot :global(.outing-plan-summary-v3) {
+    grid-template-columns: 1fr;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3 > div).peopleCard,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).lengthCard,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).travelCard,
+  .refreshRoot :global(.outing-plan-summary-v3 > div).priceCard {
+    min-height: 100px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refreshRoot :global(.outing-plan-summary-v3 > div).statCard:hover {
+    transform: none !important;
+  }
+}
+
+
+/* =========================================================
+   Venture outing results polish v0.2
+   App-first hierarchy, calmer cards, better action icons,
+   reliable add-stop text, and route-led motion.
+   ========================================================= */
+
+.refreshRoot :global(.outing-map-first-stage),
+.refreshRoot :global(.outing-completeness-card),
+.refreshRoot :global(.outing-action-dock),
+.snapshotSection,
+.addStopPanel,
+.refreshRoot :global(.outing-timeline-v3) {
+  opacity: 0;
+  animation: ventureResultsSectionIn 560ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.refreshRoot :global(.outing-map-first-stage) { animation-delay: 40ms; }
+.refreshRoot :global(.outing-completeness-card) { animation-delay: 100ms; }
+.refreshRoot :global(.outing-action-dock) { animation-delay: 150ms; }
+.snapshotSection { animation-delay: 210ms; }
+.addStopPanel { animation-delay: 270ms; }
+.refreshRoot :global(.outing-timeline-v3) { animation-delay: 330ms; }
+
+@keyframes ventureResultsSectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Quick actions: one compact control shelf instead of three competing posters. */
+.refreshRoot :global(.outing-action-dock) {
+  padding: 9px;
+  border: 1.5px solid #d8cec7;
+  border-radius: 22px;
+  background: #f3eee6;
+  box-shadow: none;
+}
+
+.refreshRoot :global(.outing-action-dock button) {
+  min-height: 66px;
+  padding: 10px;
+  border: 1.5px solid #241f20;
+  border-radius: 16px;
+  box-shadow: none !important;
+  transition:
+    transform 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.refreshRoot :global(.outing-action-dock button:hover:not(:disabled)),
+.refreshRoot :global(.outing-action-dock button:focus-visible) {
+  transform: translateY(-2px);
+  box-shadow: none !important;
+}
+
+.refreshRoot :global(.outing-action-dock button:active:not(:disabled)) {
+  transform: translateY(0) scale(0.985);
+}
+
+.primaryAction {
+  background: #ffcf00 !important;
+}
+
+.shareAction {
+  background: #ffffff !important;
+}
+
+.refreshAction {
+  color: #ffffff !important;
+  background: #241f20 !important;
+}
+
+.refreshAction .actionCopy small {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.actionIcon {
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.actionIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.saveIcon {
+  color: #241f20;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.shareIcon {
+  color: #241f20;
+  background: #f3eee6;
+}
+
+.refreshIcon {
+  color: #241f20;
+  background: #ffcf00;
+}
+
+.refreshRoot :global(.outing-action-dock button) .actionIcon,
+.refreshRoot :global(.outing-action-dock button:hover:not(:disabled)) .actionIcon,
+.refreshRoot :global(.outing-action-dock button:focus-visible) .actionIcon {
+  transform: none;
+  box-shadow: none;
+}
+
+.refreshRoot :global(.outing-action-dock button.saved) .saveIcon {
+  animation: savedBookmarkPop 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes savedBookmarkPop {
+  0% { transform: scale(0.72) rotate(-7deg); }
+  70% { transform: scale(1.12) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+/* Snapshot: a quiet dashboard with accent lines, not a pile of unrelated tiles. */
+.snapshotSection {
+  gap: 14px;
+  padding: 17px;
+  border: 1.5px solid #d8cec7;
+  border-radius: 24px;
+  background: #fffaf2;
+  box-shadow: none;
+}
+
+.snapshotSection::before,
+.snapshotSection::after {
+  display: none;
+}
+
+.snapshotHeading {
+  gap: 5px;
+  padding-right: 0;
+}
+
+.snapshotHeading h2 {
+  max-width: 18ch;
+  font-size: clamp(1.65rem, 6.6vw, 2.1rem);
+  line-height: 1;
+}
+
+.snapshotHeading p {
+  max-width: 42ch;
+  color: #6a6061;
+  font-size: 0.74rem;
+}
+
+.snapshotBadge {
+  min-height: 28px;
+  padding: 5px 9px;
+  border: 0;
+  background: #241f20;
+  box-shadow: none;
+}
+
+.snapshotBadge > span:last-child {
+  color: #ffffff;
+}
+
+.snapshotSpark {
+  background: #ffcf00;
+  animation: snapshotSparkCalm 2.6s ease-in-out infinite;
+}
+
+@keyframes snapshotSparkCalm {
+  0%, 100% { transform: scale(1) rotate(0); }
+  50% { transform: scale(1.08) rotate(10deg); }
+}
+
+.snapshotRouteLine span {
+  height: 4px;
+  background: #e4ddd7;
+}
+
+.snapshotRouteLine span::after {
+  background: #ffcf00;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3) {
+  gap: 9px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+  min-height: 105px;
+  padding: 12px;
+  border: 1.5px solid #d8cec7;
+  border-radius: 17px;
+  background: #ffffff !important;
+  box-shadow: none;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard::after {
+  display: none;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard::before {
+  height: 4px;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard:hover {
+  transform: none !important;
+}
+
+.whenCard {
+  min-height: 118px !important;
+  background: #ffffff !important;
+}
+
+.whenTime {
+  border: 1px solid #ded6d0;
+  background: #f7f3ed;
+  box-shadow: none;
+}
+
+.statIcon {
+  width: 36px;
+  height: 36px;
+  flex-basis: 36px;
+  border: 0;
+  border-radius: 11px;
+  background: #f3eee6;
+  box-shadow: none;
+}
+
+.statIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Add another stop: sturdy app rows with copy that cannot collapse into icon boxes. */
+.addStopPanel {
+  gap: 14px;
+  padding: 16px !important;
+  border: 0 !important;
+  border-radius: 24px !important;
+  background: #241f20 !important;
+  box-shadow: none !important;
+}
+
+.addStopPanel::after {
+  right: -40px;
+  bottom: -42px;
+  border-color: rgba(255, 207, 0, 0.12);
+}
+
+.addStopIntro {
+  align-items: center;
+}
+
+.addStopSpark {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 13px;
+  background: #ffcf00;
+  box-shadow: none;
+  animation: addStopPulse 2.6s ease-in-out infinite;
+}
+
+@keyframes addStopPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.addStopIntro > div > span {
+  color: #ffcf00;
+}
+
+.addStopIntro h2 {
+  color: #ffffff;
+  font-size: clamp(1.4rem, 5.6vw, 1.75rem);
+}
+
+.addStopIntro p {
+  max-width: 44ch;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.72rem;
+}
+
+.addStopGrid {
+  gap: 8px !important;
+}
+
+.addStopChoice {
+  grid-template-columns: 46px minmax(0, 1fr) 30px !important;
+  gap: 11px !important;
+  width: 100%;
+  min-width: 0;
+  min-height: 72px !important;
+  padding: 10px 11px !important;
+  border: 0 !important;
+  border-left: 5px solid #ffcf00 !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: none;
+}
+
+.addStopChoice::after {
+  display: none;
+}
+
+.foodChoice { border-left-color: #edb200 !important; }
+.eventChoice { border-left-color: #7654d8 !important; }
+.drinksChoice { border-left-color: #0f8a4b !important; }
+
+.addStopChoice:hover:not(:disabled),
+.addStopChoice:focus-visible {
+  transform: translateX(3px);
+  box-shadow: none;
+}
+
+.addStopChoice:active:not(:disabled) {
+  transform: translateX(1px) scale(0.99);
+}
+
+.addStopChoice:disabled {
+  opacity: 0.48;
+}
+
+.refreshRoot :global(.outing-add-stop-grid button) > .addStopCopy {
+  display: grid !important;
+  align-content: center !important;
+  justify-items: start !important;
+  gap: 3px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.addStopCopy strong,
+.addStopCopy small {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-align: left !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+
+.addStopCopy strong {
+  color: #241f20 !important;
+  font-size: 0.92rem !important;
+  line-height: 1.1 !important;
+}
+
+.addStopCopy small {
+  color: #6a6061 !important;
+  font-size: 0.67rem !important;
+  line-height: 1.3 !important;
+}
+
+.refreshRoot :global(.outing-add-stop-grid button) > .addStopIcon {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border: 0;
+  border-radius: 12px !important;
+  background: #f3eee6 !important;
+  box-shadow: none;
+}
+
+.addStopIcon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.refreshRoot :global(.outing-add-stop-grid button) > .addStopArrow {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border: 0;
+  background: #241f20 !important;
+  color: #ffffff;
+}
+
+/* Route breakdown: the motion lives in the route, while the cards stay readable. */
+.refreshRoot :global(.outing-timeline-v3) {
+  padding: 14px;
+  border: 1.5px solid #d8cec7;
+  border-radius: 24px;
+  background: #fffaf2;
+  box-shadow: none;
+}
+
+.refreshRoot :global(.outing-timeline-v3)::before {
+  top: 102px;
+  left: 34px;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #d8cec7 0 8px,
+    transparent 8px 14px
+  );
+  opacity: 1;
+  animation: routeRailDrift 3.8s linear infinite;
+}
+
+@keyframes routeRailDrift {
+  to { background-position-y: 14px; }
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading) {
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 0;
+  border-radius: 18px;
+  background: #241f20;
+  box-shadow: none;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading span) {
+  color: #ffcf00;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading h2) {
+  color: #ffffff;
+  font-size: clamp(1.55rem, 6.5vw, 2rem);
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading p) {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.refreshRoot :global(.outing-stop-wrapper) {
+  opacity: 0;
+  animation: routeStopIn 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes routeStopIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.refreshRoot :global(.outing-stop-card-v3) {
+  border: 1.5px solid #d8cec7;
+  border-left: 5px solid #edb200;
+  background: #ffffff !important;
+  box-shadow: none;
+}
+
+.refreshRoot :global(.outing-kind-event .outing-stop-card-v3) {
+  border-left-color: #7654d8;
+}
+
+.refreshRoot :global(.outing-kind-drinks .outing-stop-card-v3) {
+  border-left-color: #0f8a4b;
+}
+
+.refreshRoot :global(.outing-stop-card-v3)::after {
+  display: none;
+}
+
+.refreshRoot :global(.outing-stop-card-v3:hover) {
+  transform: translateY(-2px);
+  box-shadow: none;
+  border-color: #241f20;
+}
+
+.refreshRoot :global(.outing-stop-order) {
+  border: 0;
+  border-radius: 13px;
+  box-shadow: none;
+}
+
+.refreshRoot :global(.outing-stop-topline > span) {
+  background: #f3eee6;
+  color: #241f20;
+}
+
+.refreshRoot :global(.outing-travel-row) {
+  min-height: 64px;
+  border: 0;
+  border-left: 3px solid #7654d8;
+  background: #f1ecfb;
+}
+
+.refreshRoot :global(.outing-travel-row)::after {
+  display: none;
+}
+
+.detailsToggle {
+  min-height: 42px;
+  border: 1px solid #d8cec7;
+  background: #f7f3ed;
+  box-shadow: none;
+}
+
+.detailsToggle:hover,
+.detailsToggle:focus-visible {
+  transform: none;
+  border-color: #241f20;
+  box-shadow: none;
+}
+
+.stopDetailsPanel {
+  animation: detailsOpen 220ms ease-out both;
+}
+
+@keyframes detailsOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 390px) {
+  .refreshRoot :global(.outing-action-dock) {
+    gap: 8px;
+  }
+
+  .refreshRoot :global(.outing-action-dock button) {
+    min-height: 63px;
+    padding: 9px;
+  }
+
+  .actionIcon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .snapshotSection,
+  .addStopPanel,
+  .refreshRoot :global(.outing-timeline-v3) {
+    padding: 13px !important;
+    border-radius: 21px !important;
+  }
+
+  .whenCard {
+    grid-template-columns: 1fr;
+  }
+
+  .addStopIntro {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .refreshRoot :global(.outing-timeline-v3)::before {
+    left: 29px;
+  }
+}
+
+@media (max-width: 330px) {
+  .refreshRoot :global(.outing-action-dock) {
+    grid-template-columns: 1fr;
+  }
+
+  .refreshAction {
+    grid-column: auto;
+  }
+
+  .refreshRoot :global(.outing-plan-summary-v3) {
+    grid-template-columns: 1fr;
+  }
+
+  .addStopChoice {
+    grid-template-columns: 40px minmax(0, 1fr) 26px !important;
+    gap: 8px !important;
+    padding: 9px !important;
+  }
+
+  .refreshRoot :global(.outing-add-stop-grid button) > .addStopIcon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refreshRoot :global(.outing-map-first-stage),
+  .refreshRoot :global(.outing-completeness-card),
+  .refreshRoot :global(.outing-action-dock),
+  .snapshotSection,
+  .addStopPanel,
+  .refreshRoot :global(.outing-timeline-v3),
+  .refreshRoot :global(.outing-stop-wrapper) {
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .snapshotSpark,
+  .addStopSpark,
+  .refreshRoot :global(.outing-timeline-v3)::before,
+  .refreshRoot :global(.outing-action-dock button.saved) .saveIcon {
+    animation: none !important;
+  }
+
+  .refreshRoot :global(.outing-action-dock button:hover:not(:disabled)),
+  .addStopChoice:hover:not(:disabled),
+  .refreshRoot :global(.outing-stop-card-v3:hover) {
+    transform: none;
+  }
+}
+
+/* Venture dynamic add-stop system v0.3 */
+
+/* Keep the refreshed palette warm, soft, and app-first. */
+.refreshAction {
+  color: #ffffff !important;
+  background: #7654d8 !important;
+  border-color: #7654d8 !important;
+}
+
+.refreshAction:hover:not(:disabled),
+.refreshAction:focus-visible {
+  background: #6443c5 !important;
+}
+
+.refreshAction .actionCopy small {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.snapshotBadge {
+  background: #d01013 !important;
+}
+
+.addStopPanel {
+  border: 1.5px solid #d9c9f8 !important;
+  background:
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(255, 207, 0, 0.22),
+      transparent 34%
+    ),
+    linear-gradient(
+      145deg,
+      #f4edff 0%,
+      #fffaf2 100%
+    ) !important;
+}
+
+.addStopIntro > div > span {
+  color: #7654d8 !important;
+}
+
+.addStopIntro h2,
+.refreshRoot :global(.outing-timeline-v3 .section-heading h2) {
+  color: #493a52 !important;
+}
+
+.addStopIntro p,
+.refreshRoot :global(.outing-timeline-v3 .section-heading p) {
+  color: #6a606d !important;
+}
+
+.refreshRoot :global(.outing-add-stop-grid button) > .addStopArrow {
+  color: #ffffff !important;
+  background: #7654d8 !important;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading) {
+  border: 1.5px solid #ead17a !important;
+  background:
+    linear-gradient(
+      145deg,
+      #fff1bd 0%,
+      #fffaf2 100%
+    ) !important;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading span) {
+  color: #d01013 !important;
+}
+
+.liveStopCount {
+  display: inline-grid;
+  min-width: 0.8em;
+  place-items: center;
+  color: #7654d8;
+  font: inherit;
+  animation: stopCountPop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes stopCountPop {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.72);
+  }
+  65% {
+    transform: translateY(-2px) scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.removeStopButton {
+  border-color: #f1b9bd !important;
+  background: #fff2f3 !important;
+  color: #a40c18 !important;
+}
+
+.removeStopButton:hover:not(:disabled),
+.removeStopButton:focus-visible {
+  border-color: #d01013 !important;
+  background: #ffe4e7 !important;
+}
+
+.addStopSheetBackdrop {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 18px 12px 0;
+  background: rgba(54, 39, 64, 0.42);
+  backdrop-filter: blur(7px);
+  animation: sheetBackdropIn 220ms ease-out both;
+}
+
+@keyframes sheetBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.addStopSheet {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  width: min(100%, 560px);
+  max-height: min(84dvh, 760px);
+  padding: 12px 14px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  border: 1.5px solid #d5c3f7;
+  border-bottom: 0;
+  border-radius: 28px 28px 0 0;
+  background:
+    radial-gradient(
+      circle at 92% 4%,
+      rgba(255, 207, 0, 0.2),
+      transparent 24%
+    ),
+    #fffaf3;
+  box-shadow: 0 -18px 55px rgba(73, 58, 82, 0.2);
+  animation: addStopSheetIn 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes addStopSheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(42px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.addStopSheetHandle {
+  width: 42px;
+  height: 5px;
+  margin: 0 auto 2px;
+  border-radius: 999px;
+  background: #c9bacd;
+}
+
+.addStopSheetClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #dacfdc;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #493a52;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.addStopSheetHeader {
+  display: grid;
+  gap: 5px;
+  padding: 4px 48px 2px 2px;
+}
+
+.addStopSheetHeader > span {
+  color: #7654d8;
+  font-size: 0.63rem;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+}
+
+.addStopSheetHeader h2 {
+  margin: 0;
+  color: #493a52;
+  font-size: clamp(1.55rem, 7vw, 2.1rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-transform: capitalize;
+}
+
+.addStopSheetHeader p,
+.addStopSheetNote {
+  margin: 0;
+  color: #716575;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.addStopOptionList {
+  display: grid;
+  gap: 10px;
+}
+
+.addStopOptionCard {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1.5px solid #ded3e2;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #493a52;
+  text-align: left;
+  box-shadow: 0 7px 20px rgba(73, 58, 82, 0.07);
+  opacity: 0;
+  animation: optionCardIn 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes optionCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.addStopOptionCard:hover:not(:disabled),
+.addStopOptionCard:focus-visible {
+  border-color: #7654d8;
+  background: #fbf8ff;
+  transform: translateY(-2px);
+}
+
+.addStopOptionCard:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.addStopOptionNumber {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 11px;
+  background: #ffcf00;
+  color: #493a52;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.addStopOptionMain {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.addStopOptionMain > small {
+  color: #7654d8;
+  font-size: 0.59rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.addStopOptionMain > strong {
+  color: #493a52;
+  font-size: 0.96rem;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.addStopOptionMain > em {
+  color: #726a74;
+  font-size: 0.68rem;
+  font-style: normal;
+  line-height: 1.35;
+}
+
+.addStopOptionFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.addStopOptionFacts i,
+.addStopOptionFit {
+  width: fit-content;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: #f3edf8;
+  color: #5f5264;
+  font-size: 0.59rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.addStopOptionFit {
+  background: #ecf8ef;
+  color: #16733f;
+}
+
+.addStopOptionPrice {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+  min-width: 70px;
+}
+
+.addStopOptionPrice small {
+  color: #8d808f;
+  font-size: 0.52rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.addStopOptionPrice strong {
+  max-width: 90px;
+  color: #493a52;
+  font-size: 0.68rem;
+  line-height: 1.15;
+  text-align: right;
+}
+
+.addStopOptionPrice i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  margin-top: 5px;
+  place-items: center;
+  border-radius: 999px;
+  background: #7654d8;
+  color: #ffffff;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.addStopSheetLoading {
+  display: grid;
+  gap: 10px;
+}
+
+.addStopSheetLoading > span {
+  display: block;
+  height: 90px;
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      90deg,
+      #f1eaf5 0%,
+      #fff8e4 50%,
+      #f1eaf5 100%
+    );
+  background-size: 200% 100%;
+  animation: optionLoading 1.2s linear infinite;
+}
+
+.addStopSheetLoading p {
+  margin: 0;
+  color: #7654d8;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+@keyframes optionLoading {
+  to { background-position: -200% 0; }
+}
+
+.addStopSheetNote {
+  padding: 10px 12px;
+  border: 1px solid #ead786;
+  border-radius: 14px;
+  background: #fff5c9;
+  color: #655b43;
+  text-align: center;
+}
+
+@media (max-width: 380px) {
+  .addStopSheetBackdrop {
+    padding-inline: 0;
+  }
+
+  .addStopSheet {
+    border-inline: 0;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .addStopOptionCard {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .addStopOptionPrice {
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: auto auto 28px;
+    align-items: center;
+    justify-items: start;
+    min-width: 0;
+  }
+
+  .addStopOptionPrice strong {
+    max-width: none;
+    text-align: left;
+  }
+
+  .addStopOptionPrice i {
+    margin: 0 0 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liveStopCount,
+  .addStopSheetBackdrop,
+  .addStopSheet,
+  .addStopOptionCard,
+  .addStopSheetLoading > span {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.refreshRoot :global(.outing-stop-controls) .removeStopButton {
+  grid-column: 1 / -1;
+}
+
+/* VENTURE MOBILE ADD-STOP SHEET + ROUTE REORDER */
+
+.addStopSheetBackdrop {
+  position: fixed !important;
+  z-index: 2147483000 !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  padding: max(8px, env(safe-area-inset-top)) 0 0 !important;
+  overflow: hidden !important;
+  background: rgba(73, 58, 82, 0.48) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  isolation: isolate !important;
+  overscroll-behavior: contain !important;
+}
+
+.addStopSheet {
+  position: relative !important;
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  width: min(100vw, 500px) !important;
+  max-width: 500px !important;
+  max-height: calc(100dvh - max(18px, env(safe-area-inset-top))) !important;
+  margin: 0 !important;
+  padding: 10px 14px calc(18px + env(safe-area-inset-bottom)) !important;
+  overflow: hidden !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  border-left: 0 !important;
+  border-radius: 26px 26px 0 0 !important;
+  box-shadow: 0 -16px 45px rgba(73, 58, 82, 0.24) !important;
+  overscroll-behavior: contain !important;
+}
+
+.addStopSheetHandle {
+  width: 38px !important;
+  height: 5px !important;
+  margin: 0 auto 1px !important;
+}
+
+.addStopSheetClose {
+  z-index: 5 !important;
+  top: 14px !important;
+  right: 14px !important;
+  width: 36px !important;
+  height: 36px !important;
+  touch-action: manipulation !important;
+}
+
+.addStopSheetHeader {
+  min-width: 0 !important;
+  padding: 2px 46px 4px 2px !important;
+}
+
+.addStopSheetHeader h2 {
+  max-width: 100% !important;
+  font-size: clamp(1.42rem, 6.5vw, 1.9rem) !important;
+  line-height: 1.04 !important;
+  overflow-wrap: anywhere !important;
+}
+
+.addStopSheetHeader p {
+  max-width: 34rem !important;
+  font-size: 0.73rem !important;
+}
+
+.addStopOptionList {
+  min-height: 0 !important;
+  padding: 1px 2px 10px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  scrollbar-width: thin !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.addStopOptionCard {
+  grid-template-columns: 32px minmax(0, 1fr) auto !important;
+  gap: 9px !important;
+  min-height: 92px !important;
+  padding: 11px !important;
+  border-radius: 18px !important;
+  touch-action: manipulation !important;
+}
+
+.addStopOptionNumber {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 10px !important;
+}
+
+.addStopOptionMain {
+  gap: 4px !important;
+}
+
+.addStopOptionMain > strong {
+  font-size: 0.91rem !important;
+  line-height: 1.13 !important;
+}
+
+.addStopOptionMain > em {
+  font-size: 0.65rem !important;
+}
+
+.addStopOptionFacts {
+  gap: 4px !important;
+}
+
+.addStopOptionFacts i,
+.addStopOptionFit {
+  padding: 4px 6px !important;
+  font-size: 0.55rem !important;
+}
+
+.addStopOptionPrice {
+  min-width: 64px !important;
+}
+
+.addStopOptionPrice strong {
+  max-width: 76px !important;
+  font-size: 0.63rem !important;
+}
+
+.addStopOptionPrice i {
+  width: 27px !important;
+  height: 27px !important;
+}
+
+.addStopSheetLoading {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+
+.addStopSheetNote {
+  padding: 8px 10px !important;
+  font-size: 0.66rem !important;
+  line-height: 1.35 !important;
+}
+
+.routeHeading {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: start !important;
+  gap: 12px !important;
+  border: 1.5px solid #ead17a !important;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(255, 255, 255, 0.7), transparent 25%),
+    linear-gradient(145deg, #fff1bd 0%, #fffaf2 100%) !important;
+}
+
+.routeHeading > div > span {
+  color: #d01013 !important;
+}
+
+.routeHeading > div > h2 {
+  color: #3f3244 !important;
+}
+
+.routeHeading > div > p {
+  color: #6a6061 !important;
+}
+
+.routeEditButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1.5px solid #7c3aed;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #5b21b6;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 900;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(124, 58, 237, 0.14);
+  transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.routeEditButton span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  background: #f0e8ff;
+  font-size: 0.86rem;
+}
+
+.routeEditButton[aria-pressed="true"] {
+  border-color: #d01013;
+  background: #d01013;
+  color: #ffffff;
+}
+
+.routeEditButton[aria-pressed="true"] span {
+  background: #ffcf00;
+  color: #3f3244;
+}
+
+.routeEditButton:hover,
+.routeEditButton:focus-visible {
+  transform: translateY(-2px);
+}
+
+.routeEditNotice {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  margin: 0 0 12px;
+  padding: 10px 11px;
+  border: 1.5px solid #d9c9f8;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f4edff 0%, #fffaf2 100%);
+  color: #4b3c50;
+}
+
+.routeEditNotice > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: #ffcf00;
+  color: #3f3244;
+  font-size: 1rem;
+}
+
+.routeEditNotice p {
+  margin: 0;
+  font-size: 0.69rem;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.reorderableStop {
+  cursor: default;
+}
+
+.reorderableStop :global(.outing-stop-card-v3) {
+  padding-top: 58px !important;
+  border-color: #cbb5f6 !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.06) !important;
+}
+
+.draggingStop {
+  z-index: 20 !important;
+  opacity: 0.92 !important;
+  transform: scale(1.015) !important;
+}
+
+.draggingStop :global(.outing-stop-card-v3) {
+  border-color: #7c3aed !important;
+  box-shadow: 0 14px 35px rgba(73, 58, 82, 0.2) !important;
+}
+
+.routeDragTools {
+  position: absolute;
+  z-index: 8;
+  top: 10px;
+  right: 10px;
+  left: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.routeDragHandle,
+.routeMoveButtons button {
+  pointer-events: auto;
+}
+
+.routeDragHandle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 82px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1.5px solid #d9c9f8;
+  border-radius: 13px;
+  background: #f4edff;
+  color: #5b21b6;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.routeDragHandle:active {
+  cursor: grabbing;
+}
+
+.routeDragHandle::after {
+  content: "DRAG";
+  font-size: 0.59rem;
+  font-weight: 950;
+  letter-spacing: 0.07em;
+}
+
+.routeDragHandle > span {
+  display: grid;
+  grid-template-columns: repeat(2, 4px);
+  gap: 3px;
+}
+
+.routeDragHandle i {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.routeMoveButtons {
+  display: flex;
+  gap: 6px;
+}
+
+.routeMoveButtons button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid #d8cec7;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #3f3244;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.routeMoveButtons button:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+.routeMoveButtons button:not(:disabled):hover,
+.routeMoveButtons button:not(:disabled):focus-visible {
+  border-color: #7c3aed;
+  background: #f4edff;
+  color: #5b21b6;
+}
+
+:global(body.venture-route-reordering) .refreshRoot {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  overscroll-behavior-y: contain;
+}
+
+@media (max-width: 430px) {
+  .addStopSheet {
+    width: 100vw !important;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+    border-radius: 24px 24px 0 0 !important;
+  }
+
+  .addStopOptionCard {
+    grid-template-columns: 30px minmax(0, 1fr) !important;
+  }
+
+  .addStopOptionPrice {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+  }
+
+  .addStopOptionPrice strong {
+    max-width: none !important;
+    text-align: left !important;
+  }
+
+  .addStopOptionPrice i {
+    margin: 0 0 0 auto !important;
+  }
+
+  .routeHeading {
+    grid-template-columns: 1fr !important;
+  }
+
+  .routeEditButton {
+    width: 100%;
+  }
+
+  .routeDragTools {
+    left: 52px;
+  }
+}
+
+@media (max-width: 360px) {
+  .addStopSheet {
+    gap: 8px !important;
+    padding: 8px 9px calc(14px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .addStopSheetHeader h2 {
+    font-size: 1.35rem !important;
+  }
+
+  .addStopOptionCard {
+    gap: 7px !important;
+    padding: 9px !important;
+  }
+
+  .addStopOptionFacts i,
+  .addStopOptionFit {
+    font-size: 0.52rem !important;
+  }
+
+  .routeDragTools {
+    right: 8px;
+    left: 48px;
+  }
+
+  .routeDragHandle {
+    min-width: 68px;
+    padding: 8px 9px;
+  }
+
+  .routeMoveButtons button {
+    width: 36px;
+    height: 38px;
+  }
+}
+
+@media (min-width: 820px) {
+  .addStopSheetBackdrop {
+    align-items: center !important;
+    padding: 24px 0 !important;
+  }
+
+  .addStopSheet {
+    max-height: calc(100dvh - 48px) !important;
+    border: 1.5px solid #d9c9f8 !important;
+    border-radius: 26px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .draggingStop,
+  .routeEditButton {
+    transition: none !important;
+  }
+}
+
+/* END VENTURE MOBILE ADD-STOP SHEET + ROUTE REORDER */
+
+/* VENTURE STOP EDITOR + SMART ROUTE CHECK v0.5 */
+
+.scheduleCheckCard {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 207, 0, 0.22), transparent 34%),
+    linear-gradient(145deg, #f4edff 0%, #fffaf2 100%);
+  box-shadow: 0 18px 42px rgba(70, 52, 82, 0.09);
+  animation: routeEditorRise 360ms ease-out both;
+}
+
+.scheduleCheckHeader {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.scheduleCheckIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
+  color: #fff;
+  background: #d01013;
+  font-weight: 900;
+  font-size: 1.15rem;
+  box-shadow: 0 8px 18px rgba(208, 16, 19, 0.18);
+}
+
+.scheduleCheckHeader small {
+  display: block;
+  margin-bottom: 4px;
+  color: #7c3aed;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.scheduleCheckHeader h2 {
+  margin: 0;
+  color: #3f3244;
+  font-size: clamp(1.12rem, 5vw, 1.42rem);
+  line-height: 1.08;
+}
+
+.scheduleCheckHeader p {
+  margin: 6px 0 0;
+  color: #6a6061;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.scheduleIssueList {
+  display: grid;
+  gap: 8px;
+}
+
+.scheduleIssueList article {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  padding: 11px;
+  border-radius: 16px;
+}
+
+.scheduleIssueList article > span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.scheduleIssueList strong {
+  display: block;
+  color: #3f3244;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.scheduleIssueList p {
+  margin: 3px 0 0;
+  color: #6a6061;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.scheduleIssueCritical {
+  border: 1px solid rgba(208, 16, 19, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.scheduleIssueCritical > span {
+  color: #fff;
+  background: #d01013;
+}
+
+.scheduleIssueWarning {
+  border: 1px solid rgba(255, 183, 0, 0.28);
+  background: rgba(255, 250, 235, 0.84);
+}
+
+.scheduleIssueWarning > span {
+  color: #3f3244;
+  background: #ffcf00;
+}
+
+.scheduleCheckActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 8px;
+}
+
+.scheduleCheckActions button {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 850;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.scheduleCheckActions button:first-child {
+  color: #fff;
+  background: #7c3aed;
+  box-shadow: 0 9px 20px rgba(124, 58, 237, 0.18);
+}
+
+.scheduleCheckActions button:first-child span {
+  margin-right: 6px;
+}
+
+.scheduleCheckActions button:last-child {
+  color: #3f3244;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(63, 50, 68, 0.12);
+}
+
+.stopTopActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.stopMenuButton {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(63, 50, 68, 0.12);
+  border-radius: 12px;
+  color: #3f3244;
+  background: rgba(255, 255, 255, 0.78);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.stopMenuButton span {
+  transform: translateY(-2px);
+  font-size: 0.83rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.stopMenuButton[aria-expanded="true"] {
+  color: #fff;
+  border-color: #7c3aed;
+  background: #7c3aed;
+}
+
+.stopMenuPanel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin: 10px 0 12px;
+  padding: 9px;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  border-radius: 17px;
+  background: linear-gradient(145deg, #f4edff, #fffaf2);
+  box-shadow: 0 14px 30px rgba(63, 50, 68, 0.1);
+  animation: routeMenuOpen 180ms ease-out both;
+}
+
+.stopMenuPanel button,
+.stopMenuPanel a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 9px 10px;
+  border: 1px solid rgba(63, 50, 68, 0.1);
+  border-radius: 12px;
+  color: #3f3244;
+  background: rgba(255, 255, 255, 0.84);
+  font: inherit;
+  font-size: 0.67rem;
+  font-weight: 800;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.stopMenuPanel button > span,
+.stopMenuPanel a > span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 23px;
+  height: 23px;
+  border-radius: 8px;
+  color: #fff;
+  background: #7c3aed;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.stopMenuPanel button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.stopMenuPanel .stopMenuRemove {
+  color: #a20d10;
+  border-color: rgba(208, 16, 19, 0.14);
+}
+
+.stopMenuPanel .stopMenuRemove > span {
+  background: #d01013;
+}
+
+.replacementSheet {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 207, 0, 0.2), transparent 31%),
+    linear-gradient(165deg, #fffaf2 0%, #f4edff 100%) !important;
+}
+
+.replacementOptionCard {
+  border-color: rgba(124, 58, 237, 0.16) !important;
+}
+
+.replacementOptionCard:hover,
+.replacementOptionCard:focus-visible {
+  border-color: rgba(124, 58, 237, 0.44) !important;
+  transform: translateY(-1px);
+}
+
+@keyframes routeEditorRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes routeMenuOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 390px) {
+  .scheduleCheckCard {
+    padding: 14px;
+    border-radius: 21px;
+  }
+
+  .scheduleCheckActions {
+    grid-template-columns: 1fr;
+  }
+
+  .stopMenuPanel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scheduleCheckCard,
+  .stopMenuPanel {
+    animation: none !important;
+  }
+}
+
+/* END VENTURE STOP EDITOR + SMART ROUTE CHECK v0.5 */
+
+/* VENTURE VISIT HISTORY + NEW TO ME v0.6 */
+.refreshRoot :global(.outing-action-dock) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.refreshAction {
+  grid-column: auto !important;
+}
+
+.completeAction {
+  color: #ffffff !important;
+  background: #0f8a57 !important;
+  border-color: #0f8a57 !important;
+}
+
+.completeAction:hover:not(:disabled),
+.completeAction:focus-visible {
+  background: #0b754a !important;
+}
+
+.completeAction .actionCopy small {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+.completeIcon {
+  color: #3f3244 !important;
+  background: #ffcf00 !important;
+  font-size: 1rem !important;
+}
+
+.completionBackdrop {
+  position: fixed;
+  z-index: 2147483100;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  padding-top: max(12px, env(safe-area-inset-top));
+  background: rgba(63, 50, 68, 0.48);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  overscroll-behavior: contain;
+  isolation: isolate;
+  animation: completionBackdropIn 180ms ease-out both;
+}
+
+.completionSheet {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 11px;
+  width: min(100%, 500px);
+  max-height: calc(100dvh - max(16px, env(safe-area-inset-top)));
+  overflow: hidden;
+  border: 1.5px solid #d9c9e9;
+  border-bottom: 0;
+  border-radius: 27px 27px 0 0;
+  padding:
+    10px
+    14px
+    calc(16px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 100% 0, rgba(255, 207, 0, 0.24), transparent 32%),
+    linear-gradient(165deg, #fffaf2 0%, #f4edff 100%);
+  box-shadow: 0 -18px 52px rgba(48, 31, 57, 0.24);
+  animation: completionSheetIn 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.completionHandle {
+  width: 40px;
+  height: 5px;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: #c6b9cb;
+}
+
+.completionClose {
+  position: absolute;
+  z-index: 3;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #d8c9e3;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #4a3b50;
+  font: inherit;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.completionHeader {
+  padding: 2px 44px 1px 1px;
+}
+
+.completionHeader > span {
+  color: #7c3aed;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.completionHeader h2 {
+  margin: 5px 0 5px;
+  color: #3f3244;
+  font-size: clamp(1.35rem, 6.7vw, 1.9rem);
+  line-height: 1.03;
+}
+
+.completionHeader p {
+  margin: 0;
+  color: #736878;
+  font-size: 0.69rem;
+  line-height: 1.42;
+}
+
+.completionList {
+  display: grid;
+  min-height: 0;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 1px 2px 8px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.completionStop {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+  border: 1.5px solid #ded2e5;
+  border-radius: 17px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: border-color 150ms ease, transform 150ms ease, background 150ms ease;
+}
+
+.completionStop input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.completionStopSelected {
+  border-color: #0f8a57;
+  background: #effff5;
+}
+
+.completionCheck {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1.5px solid #bcaec2;
+  border-radius: 10px;
+  background: #fff;
+  color: transparent;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.completionStopSelected .completionCheck {
+  border-color: #0f8a57;
+  background: #0f8a57;
+  color: #fff;
+}
+
+.completionOrder {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 10px;
+  background: #ffcf00;
+  color: #3f3244;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.completionCopy {
+  min-width: 0;
+}
+
+.completionCopy strong,
+.completionCopy small {
+  display: block;
+}
+
+.completionCopy strong {
+  overflow: hidden;
+  color: #3f3244;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.completionCopy small {
+  margin-top: 3px;
+  color: #736978;
+  font-size: 0.6rem;
+  line-height: 1.25;
+}
+
+.completionFooter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid #e2d6e7;
+  padding-top: 10px;
+}
+
+.completionFooter > span {
+  color: #6f6474;
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+.completionFooter button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 15px;
+  background: #7c3aed;
+  color: #fff;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.completionFooter button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes completionBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes completionSheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 360px) {
+  .refreshRoot :global(.outing-action-dock) {
+    grid-template-columns: 1fr;
+  }
+
+  .completionSheet {
+    gap: 9px;
+    padding:
+      8px
+      9px
+      calc(13px + env(safe-area-inset-bottom));
+  }
+
+  .completionStop {
+    gap: 7px;
+    padding: 9px;
+  }
+
+  .completionFooter {
+    grid-template-columns: 1fr;
+  }
+
+  .completionFooter button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 820px) {
+  .completionBackdrop {
+    inset-block: 24px;
+    left: 50%;
+    right: auto;
+    width: min(500px, 100vw);
+    height: calc(100dvh - 48px);
+    transform: translateX(-50%);
+    border-radius: 28px;
+  }
+
+  .completionSheet {
+    max-height: calc(100dvh - 72px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completionBackdrop,
+  .completionSheet,
+  .completionStop {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* END VENTURE VISIT HISTORY + NEW TO ME v0.6 */

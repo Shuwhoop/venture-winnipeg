@@ -1,6 +1,10 @@
 import Link from "next/link";
 
 import {
+  DiscoveryFilterSheet
+} from "@/components/discovery-filter-sheet";
+
+import {
   ExploreExperience
 } from "@/components/explore-experience";
 
@@ -12,6 +16,17 @@ import {
   getPublishedPlaceListings
 } from "@/lib/data/places";
 
+import {
+  matchesDiscoveryFilter,
+  matchesDiscoveryPrice,
+  matchesDiscoverySearch,
+  matchesDiscoveryWhen,
+  parseDiscoveryIntent,
+  type DiscoveryFilter,
+  type DiscoveryPrice,
+  type DiscoveryWhen
+} from "@/lib/discovery-intent";
+
 import type {
   Listing
 } from "@/lib/types";
@@ -20,53 +35,102 @@ import styles from "./explore.module.css";
 
 export const dynamic = "force-dynamic";
 
-type ExploreFilter =
-  | "all"
-  | "events"
-  | "food"
-  | "open"
-  | "verified";
-
 type ExplorePageProps = {
   searchParams: Promise<{
     q?: string;
     filter?: string;
+    when?: string;
+    price?: string;
+    area?: string;
+    new?: string;
   }>;
 };
 
 function getValidFilter(
-  filter: string | undefined
-): ExploreFilter {
+  value: string | undefined
+): DiscoveryFilter | null {
   if (
-    filter === "events" ||
-    filter === "food" ||
-    filter === "open" ||
-    filter === "verified"
+    value === "all" ||
+    value === "events" ||
+    value === "food" ||
+    value === "open" ||
+    value === "verified"
   ) {
-    return filter;
+    return value;
   }
 
-  return "all";
+  return null;
 }
 
-function buildExploreHref(
-  filter: ExploreFilter,
-  search: string
-): string {
+function getValidWhen(
+  value: string | undefined
+): DiscoveryWhen | null {
+  if (
+    value === "any" ||
+    value === "tonight" ||
+    value === "weekend" ||
+    value === "open"
+  ) {
+    return value;
+  }
+
+  return null;
+}
+
+function getValidPrice(
+  value: string | undefined
+): DiscoveryPrice | null {
+  if (
+    value === "any" ||
+    value === "free" ||
+    value === "under-20" ||
+    value === "under-40"
+  ) {
+    return value;
+  }
+
+  return null;
+}
+
+function buildExploreHref({
+  filter,
+  search,
+  when,
+  price,
+  area,
+  newToMe
+}: {
+  filter: DiscoveryFilter;
+  search: string;
+  when: DiscoveryWhen;
+  price: DiscoveryPrice;
+  area: string;
+  newToMe: boolean;
+}) {
   const params = new URLSearchParams();
 
   if (search.trim()) {
-    params.set(
-      "q",
-      search.trim()
-    );
+    params.set("q", search.trim());
   }
 
   if (filter !== "all") {
-    params.set(
-      "filter",
-      filter
-    );
+    params.set("filter", filter);
+  }
+
+  if (when !== "any") {
+    params.set("when", when);
+  }
+
+  if (price !== "any") {
+    params.set("price", price);
+  }
+
+  if (area) {
+    params.set("area", area);
+  }
+
+  if (newToMe) {
+    params.set("new", "1");
   }
 
   const query = params.toString();
@@ -76,38 +140,40 @@ function buildExploreHref(
     : "/explore";
 }
 
-function isVerified(
-  listing: Listing
-): boolean {
-  return (
-    listing.verification !== "unverified" &&
-    listing.verification !== "community_reported"
-  );
+function readableWhen(
+  when: DiscoveryWhen
+) {
+  if (when === "tonight") {
+    return "Tonight";
+  }
+
+  if (when === "weekend") {
+    return "This weekend";
+  }
+
+  if (when === "open") {
+    return "Open now";
+  }
+
+  return null;
 }
 
-function matchesFilter(
-  listing: Listing,
-  filter: ExploreFilter
-): boolean {
-  switch (filter) {
-    case "events":
-      return listing.type === "event";
-
-    case "food":
-      return listing.type === "restaurant";
-
-    case "open":
-      return (
-        listing.type === "restaurant" &&
-        listing.isOpenNow === true
-      );
-
-    case "verified":
-      return isVerified(listing);
-
-    default:
-      return true;
+function readablePrice(
+  price: DiscoveryPrice
+) {
+  if (price === "free") {
+    return "Free";
   }
+
+  if (price === "under-20") {
+    return "Under $20";
+  }
+
+  if (price === "under-40") {
+    return "Under $40";
+  }
+
+  return null;
 }
 
 export default async function ExplorePage({
@@ -115,56 +181,90 @@ export default async function ExplorePage({
 }: ExplorePageProps) {
   const {
     q = "",
-    filter: requestedFilter
+    filter: requestedFilter,
+    when: requestedWhen,
+    price: requestedPrice,
+    area: requestedArea = "",
+    new: requestedNew
   } = await searchParams;
 
-  const activeFilter =
-    getValidFilter(requestedFilter);
+  const intent =
+    parseDiscoveryIntent(q);
 
-  const [
-    databaseEvents,
-    databasePlaces
-  ] = await Promise.all([
-    getPublishedEventListings(60),
-    getPublishedPlaceListings(60)
-  ]);
+  const activeFilter =
+    getValidFilter(requestedFilter) ??
+    intent.inferredFilter ??
+    "all";
+
+  const activeWhen =
+    getValidWhen(requestedWhen) ??
+    intent.inferredWhen ??
+    "any";
+
+  const activePrice =
+    getValidPrice(requestedPrice) ??
+    intent.inferredPrice ??
+    "any";
+
+  const activeArea =
+    requestedArea.trim();
+
+  const newToMe =
+    requestedNew === "1" ||
+    intent.newToMe;
+
+  const [databaseEvents, databasePlaces] =
+    await Promise.all([
+      getPublishedEventListings(100),
+      getPublishedPlaceListings(100)
+    ]);
 
   const combinedListings: Listing[] = [
     ...databaseEvents,
     ...databasePlaces
   ];
 
-  const normalizedSearch =
-    q.trim().toLowerCase();
+  const neighbourhoods = Array.from(
+    new Set(
+      combinedListings
+        .map((listing) =>
+          listing.neighbourhood.trim()
+        )
+        .filter(Boolean)
+    )
+  ).sort((first, second) =>
+    first.localeCompare(second)
+  );
 
-  const searchedListings =
-    normalizedSearch.length === 0
-      ? combinedListings
-      : combinedListings.filter(
-          (listing) => {
-            const searchableText = [
-              listing.name,
-              listing.category,
-              listing.subtitle,
-              listing.neighbourhood,
-              listing.description,
-              listing.venueName ?? "",
-              listing.address ?? "",
-              ...(listing.searchTerms ?? [])
-            ]
-              .join(" ")
-              .toLowerCase();
-
-            return searchableText.includes(
-              normalizedSearch
-            );
-          }
-        );
+  const searchAndAdvancedMatches =
+    combinedListings.filter(
+      (listing) =>
+        matchesDiscoverySearch(
+          listing,
+          intent.cleanedQuery
+        ) &&
+        matchesDiscoveryPrice(
+          listing,
+          activePrice
+        ) &&
+        matchesDiscoveryWhen(
+          listing,
+          activeWhen
+        ) &&
+        (
+          !activeArea ||
+          listing.neighbourhood
+            .toLowerCase()
+            .includes(
+              activeArea.toLowerCase()
+            )
+        )
+    );
 
   const filteredListings =
-    searchedListings.filter(
+    searchAndAdvancedMatches.filter(
       (listing) =>
-        matchesFilter(
+        matchesDiscoveryFilter(
           listing,
           activeFilter
         )
@@ -172,66 +272,73 @@ export default async function ExplorePage({
 
   const filters: {
     label: string;
-    value: ExploreFilter;
+    value: DiscoveryFilter;
     count: number;
   }[] = [
     {
       label: "All",
       value: "all",
-      count: searchedListings.length
+      count:
+        searchAndAdvancedMatches.length
     },
     {
       label: "Events",
       value: "events",
-      count: searchedListings.filter(
-        (listing) =>
-          matchesFilter(
-            listing,
-            "events"
-          )
-      ).length
+      count:
+        searchAndAdvancedMatches.filter(
+          (listing) =>
+            matchesDiscoveryFilter(
+              listing,
+              "events"
+            )
+        ).length
     },
     {
       label: "Food & drink",
       value: "food",
-      count: searchedListings.filter(
-        (listing) =>
-          matchesFilter(
-            listing,
-            "food"
-          )
-      ).length
+      count:
+        searchAndAdvancedMatches.filter(
+          (listing) =>
+            matchesDiscoveryFilter(
+              listing,
+              "food"
+            )
+        ).length
     },
     {
       label: "Open now",
       value: "open",
-      count: searchedListings.filter(
-        (listing) =>
-          matchesFilter(
-            listing,
-            "open"
-          )
-      ).length
+      count:
+        searchAndAdvancedMatches.filter(
+          (listing) =>
+            matchesDiscoveryFilter(
+              listing,
+              "open"
+            )
+        ).length
     },
     {
       label: "Verified",
       value: "verified",
-      count: searchedListings.filter(
-        (listing) =>
-          matchesFilter(
-            listing,
-            "verified"
-          )
-      ).length
+      count:
+        searchAndAdvancedMatches.filter(
+          (listing) =>
+            matchesDiscoveryFilter(
+              listing,
+              "verified"
+            )
+        ).length
     }
   ];
 
-  const resultsEyebrow =
-    activeFilter === "all"
+  const resultsEyebrow = newToMe
+    ? "NEW TO YOU"
+    : activeFilter === "all"
       ? "WINNIPEG PICKS"
       : filters.find(
           (filter) =>
-            filter.value === activeFilter
+            filter.value ===
+            activeFilter
         )?.label.toUpperCase() ??
         "RESULTS";
 
@@ -242,6 +349,21 @@ export default async function ExplorePage({
           activeFilter === "open"
         ? "restaurant"
         : "other";
+
+  const interpretedLabels = [
+    activeFilter === "events"
+      ? "Events"
+      : activeFilter === "food"
+        ? "Food & drink"
+        : null,
+    readableWhen(activeWhen),
+    readablePrice(activePrice),
+    activeArea || null,
+    newToMe ? "New to me" : null
+  ].filter(
+    (value): value is string =>
+      Boolean(value)
+  );
 
   return (
     <main className={styles.page}>
@@ -254,21 +376,17 @@ export default async function ExplorePage({
           <h1>Explore Winnipeg</h1>
 
           <p>
-            Search trusted places and upcoming
-            events, then switch between a clean
-            list and a map whenever location
-            matters.
+            Search naturally, shape the results,
+            then switch between list and map when
+            location matters.
           </p>
         </div>
 
         <div
           className={styles.heroBadge}
-          aria-label={`${filteredListings.length} matching listings`}
+          aria-label={`${filteredListings.length} matching listings before visit-history filtering`}
         >
-          <strong>
-            {filteredListings.length}
-          </strong>
-
+          <strong>{filteredListings.length}</strong>
           <span>
             {filteredListings.length === 1
               ? "MATCH"
@@ -303,61 +421,96 @@ export default async function ExplorePage({
             id="explore-search"
             name="q"
             defaultValue={q}
-            placeholder="Restaurant, event, area..."
+            placeholder="Try “free events tonight”"
             autoComplete="off"
           />
-
-          {activeFilter !== "all" ? (
-            <input
-              type="hidden"
-              name="filter"
-              value={activeFilter}
-            />
-          ) : null}
 
           <button type="submit">
             Search
           </button>
         </form>
 
-        {q.trim() ? (
-          <div className={styles.searchSummary}>
-            <span>
-              Results for <strong>“{q.trim()}”</strong>
-            </span>
+        {q.trim() ||
+        interpretedLabels.length > 0 ? (
+          <div
+            className={styles.interpretation}
+          >
+            <div>
+              <span>
+                {intent.interpreted
+                  ? "VENTURE UNDERSTOOD"
+                  : "ACTIVE SEARCH"}
+              </span>
+
+              <p>
+                {intent.cleanedQuery
+                  ? `Searching for “${intent.cleanedQuery}”`
+                  : "Showing the city through your selected filters."}
+              </p>
+            </div>
+
+            {interpretedLabels.length > 0 ? (
+              <div
+                className={styles.intentChips}
+              >
+                {interpretedLabels.map(
+                  (label) => (
+                    <b key={label}>{label}</b>
+                  )
+                )}
+              </div>
+            ) : null}
 
             <Link href="/explore">
-              Clear search
+              Clear
             </Link>
           </div>
         ) : null}
 
         <div
-          className={styles.filterRail}
-          aria-label="Explore filters"
+          className={styles.filterActionRow}
         >
-          {filters.map((filter) => (
-            <Link
-              className={`${styles.filterChip} ${
-                activeFilter === filter.value
-                  ? styles.activeFilter
-                  : ""
-              }`}
-              href={buildExploreHref(
-                filter.value,
-                q
-              )}
-              key={filter.value}
-              aria-current={
-                activeFilter === filter.value
-                  ? "page"
-                  : undefined
-              }
-            >
-              <span>{filter.label}</span>
-              <strong>{filter.count}</strong>
-            </Link>
-          ))}
+          <DiscoveryFilterSheet
+            searchQuery={q}
+            currentFilter={activeFilter}
+            currentWhen={activeWhen}
+            currentPrice={activePrice}
+            currentArea={activeArea}
+            newToMe={newToMe}
+            neighbourhoods={neighbourhoods}
+          />
+
+          <div
+            className={styles.filterRail}
+            aria-label="Explore quick filters"
+          >
+            {filters.map((filter) => (
+              <Link
+                className={`${styles.filterChip} ${
+                  activeFilter === filter.value
+                    ? styles.activeFilter
+                    : ""
+                }`}
+                href={buildExploreHref({
+                  filter: filter.value,
+                  search: q,
+                  when: activeWhen,
+                  price: activePrice,
+                  area: activeArea,
+                  newToMe
+                })}
+                key={filter.value}
+                aria-current={
+                  activeFilter === filter.value
+                    ? "page"
+                    : undefined
+                }
+              >
+                <span>{filter.label}</span>
+                <strong>{filter.count}</strong>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -366,6 +519,7 @@ export default async function ExplorePage({
         eyebrow={resultsEyebrow}
         searchQuery={q.trim()}
         requestType={requestType}
+        newToMeOnly={newToMe}
       />
     </main>
   );

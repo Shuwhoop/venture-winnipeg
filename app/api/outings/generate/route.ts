@@ -50,6 +50,11 @@ type BuildMethod =
   | "mix"
   | "anchor";
 
+type DiscoveryPreference =
+  | "best"
+  | "new-only"
+  | "mix";
+
 type StopKind =
   | "food"
   | "event"
@@ -101,6 +106,9 @@ type GenerateOutingRequest = {
   maxTravelMinutes: number;
   mustIncludeTerms: string[];
   avoidTerms: string[];
+  discoveryPreference: DiscoveryPreference;
+  visitedListingKeys: string[];
+  visitedEventOccurrenceKeys: string[];
   stopMix: StopMix;
   totalStops: number;
   allowedKinds: StopKind[];
@@ -370,6 +378,16 @@ function isBuildMethod(
   );
 }
 
+function isDiscoveryPreference(
+  value: unknown
+): value is DiscoveryPreference {
+  return (
+    value === "best" ||
+    value === "new-only" ||
+    value === "mix"
+  );
+}
+
 function isStopKind(
   value: unknown
 ): value is StopKind {
@@ -493,6 +511,37 @@ function parseRequest(
             )
             .filter(Boolean)
             .slice(0, 8)
+        : null;
+
+  const discoveryPreference =
+    isDiscoveryPreference(
+      body.discoveryPreference
+    )
+      ? body.discoveryPreference
+      : "best";
+
+  const visitedListingKeys =
+    body.visitedListingKeys === undefined
+      ? []
+      : isStringArray(
+          body.visitedListingKeys
+        )
+        ? body.visitedListingKeys
+            .map((key) => key.trim())
+            .filter(Boolean)
+            .slice(0, 1000)
+        : null;
+
+  const visitedEventOccurrenceKeys =
+    body.visitedEventOccurrenceKeys === undefined
+      ? []
+      : isStringArray(
+          body.visitedEventOccurrenceKeys
+        )
+        ? body.visitedEventOccurrenceKeys
+            .map((key) => key.trim())
+            .filter(Boolean)
+            .slice(0, 1000)
         : null;
 
   const mixValue =
@@ -661,6 +710,8 @@ function parseRequest(
       "boolean" ||
     mustIncludeTerms === null ||
     avoidTerms === null ||
+    visitedListingKeys === null ||
+    visitedEventOccurrenceKeys === null ||
     (
       buildMethod === "anchor" &&
       !anchorListingKey
@@ -718,6 +769,9 @@ function parseRequest(
     maxTravelMinutes,
     mustIncludeTerms,
     avoidTerms,
+    discoveryPreference,
+    visitedListingKeys,
+    visitedEventOccurrenceKeys,
     stopMix,
     totalStops,
     allowedKinds:
@@ -1415,6 +1469,86 @@ function getListingKind(
     : "food";
 }
 
+function getEventOccurrenceKey(
+  listing: Listing,
+  fallbackDate: string
+): string | null {
+  if (listing.type !== "event") {
+    return null;
+  }
+
+  if (!listing.startAt) {
+    return `${listing.id}:${fallbackDate}`;
+  }
+
+  const parsed = new Date(listing.startAt);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return `${listing.id}:${fallbackDate}`;
+  }
+
+  const timezone =
+    listing.timezone || WINNIPEG_TIMEZONE;
+
+  const parts = new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }
+  ).formatToParts(parsed);
+
+  const year = parts.find(
+    (part) => part.type === "year"
+  )?.value;
+  const month = parts.find(
+    (part) => part.type === "month"
+  )?.value;
+  const day = parts.find(
+    (part) => part.type === "day"
+  )?.value;
+
+  return year && month && day
+    ? `${listing.id}:${year}-${month}-${day}`
+    : `${listing.id}:${fallbackDate}`;
+}
+
+function isPreviouslyVisited(
+  listing: Listing,
+  draft: GenerateOutingRequest
+) {
+  const listingKey =
+    `${listing.type}-${listing.id}`;
+
+  if (listing.type === "restaurant") {
+    return draft.visitedListingKeys.includes(
+      listingKey
+    );
+  }
+
+  const occurrenceKey =
+    getEventOccurrenceKey(
+      listing,
+      draft.date
+    );
+
+  if (
+    occurrenceKey &&
+    draft.visitedEventOccurrenceKeys.includes(
+      occurrenceKey
+    )
+  ) {
+    return true;
+  }
+
+  return (
+    draft.visitedEventOccurrenceKeys.length === 0 &&
+    draft.visitedListingKeys.includes(listingKey)
+  );
+}
+
 function scoreListing(
   listing: Listing,
   draft: GenerateOutingRequest
@@ -1692,6 +1826,15 @@ function scoreListing(
       "official_source"
   ) {
     score += 3;
+  }
+
+  if (draft.discoveryPreference === "mix") {
+    score += isPreviouslyVisited(
+      listing,
+      draft
+    )
+      ? -5
+      : 9;
   }
 
   if (
@@ -1991,14 +2134,10 @@ function getStopReason(
   draft: GenerateOutingRequest
 ): string {
   if (
-    candidate.matchedInterests.length >
-    0
+    candidate.listing.type ===
+    "event"
   ) {
-    return `Matches ${candidate.matchedInterests
-      .slice(0, 2)
-      .join(
-        " and "
-      )} and fits your selected time.`;
+    return "Happening during your outing window.";
   }
 
   if (
@@ -2010,17 +2149,10 @@ function getStopReason(
         )
     )
   ) {
-    return `Fits your preferred area and is available during the outing.`;
+    return "Keeps the route close to your preferred area.";
   }
 
-  if (
-    candidate.listing.type ===
-    "event"
-  ) {
-    return `A verified Winnipeg event happening during your outing window.`;
-  }
-
-  return `Open during your selected time and compatible with the rest of the route.`;
+  return "Fits the route timing and travel plan.";
 }
 
 function chooseBestCandidate(
@@ -2500,6 +2632,17 @@ function createCandidate(
       listing,
       draft.avoidTerms
     )
+  ) {
+    return null;
+  }
+
+  const listingKey =
+    `${listing.type}-${listing.id}`;
+
+  if (
+    draft.discoveryPreference === "new-only" &&
+    listingKey !== draft.anchorListingKey &&
+    isPreviouslyVisited(listing, draft)
   ) {
     return null;
   }
@@ -4005,6 +4148,17 @@ export async function POST(
           ? "partial"
           : "complete";
 
+  if (
+    draft.discoveryPreference === "new-only" &&
+    planStatus === "partial"
+  ) {
+    warnings.push(
+      `Only ${actualStopCount} new ${
+        actualStopCount === 1 ? "match fits" : "matches fit"
+      } this route. Broaden the area, time, or allow one familiar stop for more options.`
+    );
+  }
+
   if (planStatus === "partial") {
     warnings.unshift(
       `Venture built ${actualStopCount} of ${requestedStopCount} requested ${
@@ -4090,6 +4244,8 @@ export async function POST(
       draft.planningMode,
     buildMethod:
       draft.buildMethod,
+    discoveryPreference:
+      draft.discoveryPreference,
     partySize:
       draft.partySize,
     maxTravelMinutes:
