@@ -18,11 +18,13 @@ export const SAVED_OUTINGS_EVENT =
 export type OutingStopKind =
   | "food"
   | "event"
+  | "activity"
   | "drinks";
 
 export type OutingStopMix = {
   food: number;
   events: number;
+  activities: number;
   drinks: number;
 };
 
@@ -75,6 +77,11 @@ export type GeneratedOutingPlan = {
   planStatus?: OutingPlanStatus;
   anchorListingKey?: string | null;
   anchorListingName?: string | null;
+  anchorDurationMinutes?: number | null;
+  anchorPlacement?:
+    | "before"
+    | "after"
+    | "both";
   soloVibe?:
     | "slow-reset"
     | "curious-explorer"

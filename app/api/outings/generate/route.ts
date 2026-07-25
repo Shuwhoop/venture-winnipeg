@@ -58,11 +58,13 @@ type DiscoveryPreference =
 type StopKind =
   | "food"
   | "event"
+  | "activity"
   | "drinks";
 
 type StopMix = {
   food: number;
   events: number;
+  activities: number;
   drinks: number;
 };
 
@@ -114,6 +116,11 @@ type GenerateOutingRequest = {
   allowedKinds: StopKind[];
   anchorListingKey: string | null;
   anchorListingName: string | null;
+  anchorDurationMinutes: number | null;
+  anchorPlacement:
+    | "before"
+    | "after"
+    | "both";
   soloVibe: SoloVibe | null;
   soloPace: SoloPace | null;
   groupVibe: GroupVibe | null;
@@ -394,6 +401,7 @@ function isStopKind(
   return (
     value === "food" ||
     value === "event" ||
+    value === "activity" ||
     value === "drinks"
   );
 }
@@ -569,6 +577,11 @@ function parseRequest(
           ? 1
           : 0
       ),
+    activities:
+      readCount(
+        mixValue.activities,
+        0
+      ),
     drinks:
       readCount(
         mixValue.drinks,
@@ -619,11 +632,13 @@ function parseRequest(
           true
         ? [
             "food",
-            "event"
+            "event",
+            "activity"
           ] as StopKind[]
         : [
             "food",
             "event",
+            "activity",
             "drinks"
           ] as StopKind[];
 
@@ -640,6 +655,30 @@ function parseRequest(
     body.anchorListingName.trim()
       ? body.anchorListingName.trim()
       : null;
+
+  const anchorDurationMinutes =
+    typeof body.anchorDurationMinutes ===
+      "number" &&
+    Number.isFinite(
+      body.anchorDurationMinutes
+    )
+      ? Math.min(
+          300,
+          Math.max(
+            30,
+            Math.round(
+              body.anchorDurationMinutes / 5
+            ) * 5
+          )
+        )
+      : null;
+
+  const anchorPlacement =
+    body.anchorPlacement === "before" ||
+    body.anchorPlacement === "after" ||
+    body.anchorPlacement === "both"
+      ? body.anchorPlacement
+      : "both";
 
   const soloVibe =
     body.soloVibe ===
@@ -720,6 +759,7 @@ function parseRequest(
       buildMethod === "mix" &&
       stopMix.food +
         stopMix.events +
+        stopMix.activities +
         stopMix.drinks ===
         0
     ) ||
@@ -782,6 +822,8 @@ function parseRequest(
       ),
     anchorListingKey,
     anchorListingName,
+    anchorDurationMinutes,
+    anchorPlacement,
     soloVibe,
     soloPace,
     groupVibe,
@@ -1334,7 +1376,9 @@ function getEventIntervals(
           targetDate,
           timezone
         )
-      : start + 120;
+      : start +
+        (listing.suggestedDurationMinutes ??
+          120);
 
   if (
     !Number.isFinite(start) ||
@@ -1460,6 +1504,13 @@ function getListingKind(
     listing.type === "event"
   ) {
     return "event";
+  }
+
+  if (
+    listing.catalogueKind ===
+    "activity"
+  ) {
+    return "activity";
   }
 
   return isAlcoholFocused(
@@ -2713,6 +2764,29 @@ function getStopDuration(
   start: number,
   windowEnd: number
 ): number | null {
+  const isAnchor =
+    draft.buildMethod === "anchor" &&
+    draft.anchorListingKey ===
+      getListingKey(
+        candidate.listing
+      );
+
+  const requestedAnchorDuration =
+    isAnchor &&
+    draft.anchorDurationMinutes
+      ? draft.anchorDurationMinutes
+      : null;
+
+  const suggestedDuration =
+    requestedAnchorDuration ??
+    candidate.listing
+      .suggestedDurationMinutes ??
+    (candidate.kind === "activity"
+      ? 90
+      : candidate.kind === "event"
+        ? 120
+        : 60);
+
   if (
     candidate.kind === "event"
   ) {
@@ -2729,37 +2803,58 @@ function getStopDuration(
       return null;
     }
 
+    const officialDuration =
+      candidate.listing.endAt
+        ? interval.end - start
+        : suggestedDuration;
+
     const available =
       Math.min(
+        officialDuration,
         interval.end - start,
-        windowEnd - start,
-        120
+        windowEnd - start
       );
 
-    return available >= 45
+    return available >= 30
       ? available
       : null;
   }
 
+  let duration =
+    suggestedDuration;
+
   if (
+    !isAnchor &&
     draft.planningMode ===
       "solo" &&
     draft.soloPace ===
       "relaxed"
   ) {
-    return 75;
+    duration += 15;
   }
 
   if (
+    !isAnchor &&
     draft.planningMode ===
       "solo" &&
     draft.soloPace ===
       "packed"
   ) {
-    return 45;
+    duration = Math.max(
+      30,
+      duration - 15
+    );
   }
 
-  return 60;
+  const available =
+    windowEnd - start;
+
+  return available >= 30
+    ? Math.min(
+        duration,
+        available
+      )
+    : null;
 }
 
 function getLatestAvailableStart(
@@ -2804,6 +2899,8 @@ function countSequence(
     (counts, kind) => {
       if (kind === "event") {
         counts.events += 1;
+      } else if (kind === "activity") {
+        counts.activities += 1;
       } else {
         counts[kind] += 1;
       }
@@ -2813,6 +2910,7 @@ function countSequence(
     {
       food: 0,
       events: 0,
+      activities: 0,
       drinks: 0
     }
   );
@@ -2825,6 +2923,8 @@ function buildMixSequence(
     mix.food;
   let events =
     mix.events;
+  let activities =
+    mix.activities;
   let drinks =
     mix.drinks;
 
@@ -2849,6 +2949,11 @@ function buildMixSequence(
       sequence.push("food");
       food -= 1;
     }
+  }
+
+  while (activities > 0) {
+    sequence.push("activity");
+    activities -= 1;
   }
 
   while (drinks > 0) {
@@ -2907,20 +3012,20 @@ function buildSurpriseSequence(
       ],
       3: [
         "food",
-        "event",
-        "drinks"
+        "activity",
+        "event"
       ],
       4: [
         "food",
+        "activity",
         "event",
-        "food",
         "drinks"
       ],
       5: [
         "food",
+        "activity",
         "event",
         "food",
-        "event",
         "drinks"
       ]
     };
@@ -3012,6 +3117,22 @@ function buildRequestedSlots(
           anchorCandidate.listing
         )
     };
+
+  if (
+    draft.anchorPlacement ===
+    "after"
+  ) {
+    slots.unshift(anchorSlot);
+    return slots.slice(0, 5);
+  }
+
+  if (
+    draft.anchorPlacement ===
+    "before"
+  ) {
+    slots.push(anchorSlot);
+    return slots.slice(0, 5);
+  }
 
   if (
     anchorCandidate.kind ===
@@ -3333,9 +3454,12 @@ function chooseBackwardStop(
       travelMinutes;
 
     const baseDuration =
-      candidate.kind === "event"
-        ? 90
-        : draft.planningMode ===
+      candidate.listing.suggestedDurationMinutes ??
+      (candidate.kind === "event"
+        ? 120
+        : candidate.kind === "activity"
+          ? 90
+          : draft.planningMode ===
               "solo" &&
             draft.soloPace ===
               "packed"
@@ -3345,7 +3469,7 @@ function chooseBackwardStop(
               draft.soloPace ===
                 "relaxed"
             ? 75
-            : 60;
+            : 60);
 
     const candidateStart =
       candidate.fixedStart !==

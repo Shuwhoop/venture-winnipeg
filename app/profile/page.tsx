@@ -5,6 +5,7 @@ import NewsletterSignup from "@/components/newsletter-signup/newsletter-signup";
 import { AppStatusCard } from "@/components/app-foundation/app-foundation";
 import { AccountSyncCard } from "@/components/account-sync/account-sync";
 import { VisitHistoryDashboard } from "@/components/visit-history-dashboard";
+import { CommunityRsvpDashboard } from "@/components/community-rsvp-dashboard";
 import NeighbourhoodPicker from "@/components/neighbourhood-picker";
 
 import {
@@ -174,6 +175,8 @@ export default function ProfilePage() {
       <AccountSyncCard />
 
       <VisitHistoryDashboard />
+
+      <CommunityRsvpDashboard />
 
       <section className="preferences-panel">
         <div className="preference-heading">

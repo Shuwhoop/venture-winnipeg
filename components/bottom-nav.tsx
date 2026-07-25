@@ -24,6 +24,7 @@ import {
 type NavIconName =
   | "home"
   | "explore"
+  | "map"
   | "build"
   | "saved"
   | "profile";
@@ -47,10 +48,9 @@ const items: NavItem[] = [
     icon: "explore"
   },
   {
-    href: "/build-outing",
-    label: "Build",
-    icon: "build",
-    special: true
+    href: "/map",
+    label: "Map",
+    icon: "map"
   },
   {
     href: "/saved",
@@ -101,6 +101,18 @@ function NavigationIcon({
         <path
           d="m15.8 8.2-2.2 5.4-5.4 2.2 2.2-5.4 5.4-2.2Z"
         />
+      </svg>
+    );
+  }
+
+  if (name === "map") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="m3.5 6.5 5-2.5 7 2.5 5-2.5v13.5l-5 2.5-7-2.5-5 2.5V6.5Z" />
+        <path d="M8.5 4v13.5M15.5 6.5V20" />
       </svg>
     );
   }

@@ -5,6 +5,10 @@ import {
 } from "@/lib/supabase/admin";
 
 import {
+  createSubmissionPhotoPreview
+} from "@/lib/media/listing-photo-server";
+
+import {
   publishRestaurant,
   rejectRestaurant,
   saveRestaurantDraft
@@ -48,6 +52,12 @@ type SubmissionRow = {
   source_url: string | null;
   submitter_notes: string | null;
   review_notes: string | null;
+  photo_storage_path: string | null;
+  photo_original_name: string | null;
+  photo_alt_text: string | null;
+  photo_rights_confirmed: boolean;
+  photo_rights_note: string | null;
+  photo_preview_url: string | null;
   linked_entity_type: "place" | "event" | null;
   linked_entity_id: string | null;
   approved_entity_type: "place" | "event" | null;
@@ -282,6 +292,11 @@ const supabase =
             source_url,
             submitter_notes,
             review_notes,
+            photo_storage_path,
+            photo_original_name,
+            photo_alt_text,
+            photo_rights_confirmed,
+            photo_rights_note,
             linked_entity_type,
             linked_entity_id,
             approved_entity_type,
@@ -424,10 +439,21 @@ const supabase =
   }
 
   const submissions =
-    (
-      submissionsResult.data ??
-      []
-    ) as SubmissionRow[];
+    await Promise.all(
+      ((
+        submissionsResult.data ??
+        []
+      ) as Omit<SubmissionRow, "photo_preview_url">[])
+        .map(async (submission) => ({
+          ...submission,
+          photo_preview_url:
+            submission.photo_storage_path
+              ? await createSubmissionPhotoPreview(
+                  submission.photo_storage_path
+                )
+              : null
+        }))
+    );
 
   const imports =
     (
@@ -1349,6 +1375,40 @@ function SubmissionCard({
             Open the complete Venture editor, or use the queue actions below for a faster decision.
           </span>
         </div>
+
+        {submission.photo_preview_url ? (
+          <section className={styles.submittedPhoto}>
+            <img
+              src={submission.photo_preview_url}
+              alt={
+                submission.photo_alt_text ||
+                "Submitted listing photo"
+              }
+            />
+
+            <div>
+              <span>SUBMITTED PHOTO</span>
+              <strong>
+                {submission.photo_original_name ||
+                  "Listing photo"}
+              </strong>
+              <p>
+                {submission.photo_alt_text ||
+                  "No image description was provided."}
+              </p>
+              <small>
+                {submission.photo_rights_confirmed
+                  ? "Submitter confirmed ownership or permission."
+                  : "Permission has not been confirmed."}
+              </small>
+              {submission.photo_rights_note ? (
+                <em>
+                  {submission.photo_rights_note}
+                </em>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
 
         <details className={styles.inlineEditor}>
           <summary>

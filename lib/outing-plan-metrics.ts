@@ -40,6 +40,13 @@ export function getOutingStopKind(
     return "event";
   }
 
+  if (
+    stop.listing.catalogueKind ===
+    "activity"
+  ) {
+    return "activity";
+  }
+
   const text = getListingSearchText(stop);
 
   return (
@@ -67,6 +74,8 @@ export function countOutingMix(
 
       if (kind === "event") {
         mix.events += 1;
+      } else if (kind === "activity") {
+        mix.activities += 1;
       } else {
         mix[kind] += 1;
       }
@@ -76,6 +85,7 @@ export function countOutingMix(
     {
       food: 0,
       events: 0,
+      activities: 0,
       drinks: 0
     }
   );
@@ -88,7 +98,12 @@ export function countMix(
     return 0;
   }
 
-  return mix.food + mix.events + mix.drinks;
+  return (
+    (mix.food ?? 0) +
+    (mix.events ?? 0) +
+    (mix.activities ?? 0) +
+    (mix.drinks ?? 0)
+  );
 }
 
 export function resolveRequestedStopCount(
@@ -112,11 +127,15 @@ export function decrementMix(
   const next: OutingStopMix = {
     food: mix?.food ?? 0,
     events: mix?.events ?? 0,
+    activities:
+      mix?.activities ?? 0,
     drinks: mix?.drinks ?? 0
   };
 
   if (kind === "event") {
     next.events = Math.max(0, next.events - 1);
+  } else if (kind === "activity") {
+    next.activities = Math.max(0, next.activities - 1);
   } else {
     next[kind] = Math.max(0, next[kind] - 1);
   }

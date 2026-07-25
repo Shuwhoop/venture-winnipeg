@@ -6,6 +6,11 @@ import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
 
+import {
+  uploadSubmissionPhoto
+} from "@/lib/media/listing-photo-server";
+
+
 
 const MAX_BODY_LENGTH =
   60_000;
@@ -406,50 +411,100 @@ function parseEvent(
 export async function POST(
   request: Request
 ) {
-  let rawBody: string;
-
-  try {
-    rawBody =
-      await request.text();
-  } catch {
-    return NextResponse.json(
-      {
-        error:
-          "The submission could not be read."
-      },
-      {
-        status:
-          400
-      }
-    );
-  }
-
-  if (
-    rawBody.length >
-    MAX_BODY_LENGTH
-  ) {
-    return NextResponse.json(
-      {
-        error:
-          "The submission is too large."
-      },
-      {
-        status:
-          413
-      }
-    );
-  }
-
   let body: unknown;
+  let photo: File | null = null;
+
+  const contentType =
+    request.headers
+      .get("content-type") ??
+    "";
 
   try {
-    body =
-      JSON.parse(rawBody);
-  } catch {
+    if (
+      contentType.includes(
+        "multipart/form-data"
+      )
+    ) {
+      const formData =
+        await request.formData();
+
+      const submissionValue =
+        formData.get(
+          "submission"
+        );
+
+      if (
+        typeof submissionValue !==
+        "string"
+      ) {
+        throw new Error(
+          "The submission details are missing."
+        );
+      }
+
+      if (
+        submissionValue.length >
+        MAX_BODY_LENGTH
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "The submission is too large."
+          },
+          {
+            status:
+              413
+          }
+        );
+      }
+
+      body =
+        JSON.parse(
+          submissionValue
+        );
+
+      const photoValue =
+        formData.get(
+          "photo"
+        );
+
+      if (
+        photoValue instanceof File &&
+        photoValue.size > 0
+      ) {
+        photo =
+          photoValue;
+      }
+    } else {
+      const rawBody =
+        await request.text();
+
+      if (
+        rawBody.length >
+        MAX_BODY_LENGTH
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "The submission is too large."
+          },
+          {
+            status:
+              413
+          }
+        );
+      }
+
+      body =
+        JSON.parse(rawBody);
+    }
+  } catch (error) {
     return NextResponse.json(
       {
         error:
-          "The submission was not valid JSON."
+          error instanceof Error
+            ? error.message
+            : "The submission could not be read."
       },
       {
         status:
@@ -549,6 +604,41 @@ export async function POST(
       {
         error:
           "Check your contact details, relationship, source link, and confirmation."
+      },
+      {
+        status:
+          400
+      }
+    );
+  }
+
+  const photoAltText =
+    optionalText(
+      body.photoAltText,
+      300
+    );
+
+  const photoRightsNote =
+    optionalText(
+      body.photoRightsNote,
+      1000
+    );
+
+  const photoRightsConfirmed =
+    body.photoRightsConfirmed ===
+    true;
+
+  if (
+    photo &&
+    (
+      !photoAltText ||
+      !photoRightsConfirmed
+    )
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "Describe the photo and confirm that you have permission to submit it."
       },
       {
         status:
@@ -664,6 +754,87 @@ export async function POST(
             500
         }
       );
+    }
+
+    if (photo) {
+      let storedPhotoPath:
+        string | null = null;
+
+      try {
+        const storedPhoto =
+          await uploadSubmissionPhoto({
+            submissionId:
+              data.id,
+            file:
+              photo
+          });
+
+        storedPhotoPath =
+          storedPhoto.storagePath;
+
+        const updateResult =
+          await supabase
+            .from(
+              "listing_submissions"
+            )
+            .update({
+              photo_storage_path:
+                storedPhoto.storagePath,
+              photo_original_name:
+                storedPhoto.originalName,
+              photo_mime_type:
+                storedPhoto.mimeType,
+              photo_size_bytes:
+                storedPhoto.sizeBytes,
+              photo_alt_text:
+                photoAltText,
+              photo_rights_confirmed:
+                true,
+              photo_rights_note:
+                photoRightsNote
+            })
+            .eq(
+              "id",
+              data.id
+            );
+
+        if (updateResult.error) {
+          throw new Error(
+            updateResult.error.message
+          );
+        }
+      } catch (photoError) {
+        if (storedPhotoPath) {
+          await supabase.storage
+            .from("submission-media")
+            .remove([
+              storedPhotoPath
+            ]);
+        }
+
+        await supabase
+          .from(
+            "listing_submissions"
+          )
+          .delete()
+          .eq(
+            "id",
+            data.id
+          );
+
+        return NextResponse.json(
+          {
+            error:
+              photoError instanceof Error
+                ? photoError.message
+                : "Venture could not save the photo."
+          },
+          {
+            status:
+              500
+          }
+        );
+      }
     }
 
     return NextResponse.json(

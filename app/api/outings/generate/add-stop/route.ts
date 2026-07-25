@@ -1135,11 +1135,19 @@ function getListingKind(
 ):
   | "food"
   | "event"
+  | "activity"
   | "drinks" {
   if (
     listing.type === "event"
   ) {
     return "event";
+  }
+
+  if (
+    listing.catalogueKind ===
+    "activity"
+  ) {
+    return "activity";
   }
 
   return isAlcoholFocused(
@@ -1616,6 +1624,7 @@ function createReason(
 type AddStopKind =
   | "food"
   | "event"
+  | "activity"
   | "drinks";
 
 type AddStopRequest = {
@@ -1677,6 +1686,7 @@ function parseAddRequest(
   if (
     requestedKind !== "food" &&
     requestedKind !== "event" &&
+    requestedKind !== "activity" &&
     requestedKind !== "drinks"
   ) {
     return null;
@@ -1766,6 +1776,7 @@ function incrementMix(
     | {
         food: number;
         events: number;
+        activities: number;
         drinks: number;
       }
     | undefined,
@@ -1773,6 +1784,7 @@ function incrementMix(
 ): {
   food: number;
   events: number;
+  activities: number;
   drinks: number;
 } {
   const next = {
@@ -1780,12 +1792,16 @@ function incrementMix(
       mix?.food ?? 0,
     events:
       mix?.events ?? 0,
+    activities:
+      mix?.activities ?? 0,
     drinks:
       mix?.drinks ?? 0
   };
 
   if (kind === "event") {
     next.events += 1;
+  } else if (kind === "activity") {
+    next.activities += 1;
   } else {
     next[kind] += 1;
   }
@@ -1943,7 +1959,8 @@ function findSlotForListing(
 
         const duration =
           Math.min(
-            120,
+            listing.suggestedDurationMinutes ??
+              120,
             interval.end -
               start,
             latestEnd -
@@ -1976,7 +1993,11 @@ function findSlotForListing(
           interval.start
         );
 
-      const duration = 60;
+      const duration =
+        listing.suggestedDurationMinutes ??
+        (listing.catalogueKind === "activity"
+          ? 90
+          : 60);
 
       if (
         start + duration <=

@@ -262,7 +262,11 @@ export function DiscoveryFilterSheet({
                       [
                         ["all", "Everything"],
                         ["events", "Events"],
-                        ["food", "Food"],
+                        ["food", "Food & drink"],
+                        ["activities", "Activities"],
+                        ["nightlife", "Nightlife"],
+                        ["attractions", "Attractions"],
+                        ["shopping", "Shopping"],
                         ["verified", "Verified"]
                       ] as const
                     ).map(

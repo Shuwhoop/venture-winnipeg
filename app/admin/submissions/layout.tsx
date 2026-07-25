@@ -70,6 +70,12 @@ export default async function SubmissionAdminLayout({
           </Link>
 
           <Link
+            href="/admin/submissions/photos"
+          >
+            Photo portal
+          </Link>
+
+          <Link
             href="/submit"
           >
             Public form

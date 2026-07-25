@@ -344,3 +344,64 @@
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
+
+/* VENTURE OPTIONAL SUBMISSION PHOTO */
+.sectionIntro {
+  max-width: 620px;
+  margin: 8px 0 0;
+  color: #6b6263;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.photoDetails {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.photoDetails > label:not(.photoPermission) {
+  display: grid;
+  gap: 7px;
+  color: #544b4c;
+  font-size: 0.77rem;
+  font-weight: 800;
+}
+
+.photoDetails input[type="text"],
+.photoDetails input:not([type]) {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 13px;
+  border: 1.5px solid #bdb1aa;
+  border-radius: 13px;
+  background: #fff;
+  color: #241f20;
+  font: inherit;
+  font-size: 0.93rem;
+}
+
+.photoDetails input:focus {
+  outline: 3px solid rgba(255, 207, 0, 0.42);
+  border-color: #241f20;
+}
+
+.photoPermission {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 14px;
+  border: 1.5px solid #efc65b;
+  border-radius: 15px;
+  background: #fff8d8;
+  color: #5c4a07;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.photoOptionalNote {
+  margin: 13px 0 0;
+  color: #776d6e;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}

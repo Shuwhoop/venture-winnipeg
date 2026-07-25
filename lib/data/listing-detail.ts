@@ -35,6 +35,7 @@ export type PublicListingDetailBase = {
   warningMessage: string | null;
   sourceCheckedAt: string | null;
   freshnessExpiresAt: string | null;
+  imageUrl: string | null;
   accessibilityNotes: string | null;
   parkingNotes: string | null;
   transitNotes: string | null;
@@ -118,6 +119,8 @@ type PlaceRow = {
   warning_message: string | null;
   source_checked_at: string | null;
   freshness_expires_at: string | null;
+  image_url: string | null;
+  image_alt_text: string | null;
 };
 
 type VenueRow = {
@@ -154,6 +157,7 @@ type EventRow = {
   ticket_status: string;
   age_label: string;
   indoor_outdoor: string;
+  image_url: string | null;
   accessibility_notes: string | null;
   parking_notes: string | null;
   transit_notes: string | null;
@@ -201,7 +205,9 @@ const placeFields = `
   verification_status,
   warning_message,
   source_checked_at,
-  freshness_expires_at
+  freshness_expires_at,
+  image_url,
+  image_alt_text
 `;
 
 const eventFields = `
@@ -226,6 +232,7 @@ const eventFields = `
   ticket_status,
   age_label,
   indoor_outdoor,
+  image_url,
   accessibility_notes,
   parking_notes,
   transit_notes,
@@ -339,6 +346,42 @@ async function getPrimarySourceUrl(
   return data?.source_url ?? null;
 }
 
+function isTommysPizzeriaDetail(
+  value: {
+    slug: string;
+    name: string;
+  }
+): boolean {
+  const slug =
+    value.slug.toLowerCase();
+  const listingName =
+    value.name.toLowerCase();
+
+  return (
+    slug.includes("tommy") &&
+    slug.includes("pizz")
+  ) || (
+    listingName.includes("tommy") &&
+    listingName.includes("pizz")
+  );
+}
+
+function getPlaceImageUrl(
+  row: {
+    slug: string;
+    name: string;
+    image_url?: string | null;
+  }
+): string | null {
+  if (row.image_url) {
+    return row.image_url;
+  }
+
+  return isTommysPizzeriaDetail(row)
+    ? "/listing-icons/tommys-pizzeria.jpg"
+    : null;
+}
+
 function placeToDetail(
   row: PlaceRow,
   primarySourceUrl: string | null
@@ -375,6 +418,7 @@ function placeToDetail(
       row.source_checked_at,
     freshnessExpiresAt:
       row.freshness_expires_at,
+    imageUrl: getPlaceImageUrl(row),
     accessibilityNotes:
       row.accessibility_notes,
     parkingNotes: row.parking_notes,
@@ -449,6 +493,7 @@ function eventToDetail(
       row.source_checked_at,
     freshnessExpiresAt:
       row.freshness_expires_at,
+    imageUrl: row.image_url,
     accessibilityNotes:
       row.accessibility_notes,
     parkingNotes: row.parking_notes,

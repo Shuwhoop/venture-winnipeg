@@ -48,6 +48,7 @@ type ExploreExperienceProps = {
   eyebrow: string;
   searchQuery: string;
   newToMeOnly?: boolean;
+  initialView?: ExploreView;
   requestType?:
     | "restaurant"
     | "event"
@@ -104,6 +105,7 @@ export function ExploreExperience({
   eyebrow,
   searchQuery,
   newToMeOnly = false,
+  initialView = "list",
   requestType = "other"
 }: ExploreExperienceProps) {
   const workbenchRef =
@@ -116,7 +118,7 @@ export function ExploreExperience({
     useRef<number | null>(null);
 
   const [view, setView] =
-    useState<ExploreView>("list");
+    useState<ExploreView>(initialView);
 
   const [selectedListingKey, setSelectedListingKey] =
     useState<string | null>(null);
@@ -144,6 +146,10 @@ export function ExploreExperience({
 
   const [userLocation, setUserLocation] =
     useState<GeoPoint | null>(null);
+
+  useEffect(() => {
+    setView(initialView);
+  }, [initialView]);
 
   useEffect(() => {
     function refreshVisitHistory() {
@@ -686,7 +692,7 @@ export function ExploreExperience({
 
             <div className={styles.mapTip}>
               <span aria-hidden="true">↔</span>
-              Swipe cards to move between pins
+              Swipe cards to explore nearby places
             </div>
           </div>
 
@@ -698,11 +704,10 @@ export function ExploreExperience({
               onScroll={handleRailScroll}
             >
               {visibleListings.map(
-                (listing, index) => (
+                (listing) => (
                   <ExploreMapCard
                     key={getListingKey(listing)}
                     listing={listing}
-                    index={index}
                     selected={
                       selectedListingKey ===
                       getListingKey(listing)

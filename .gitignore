@@ -44,3 +44,5 @@ out/
 # Operating-system clutter
 Thumbs.db
 *.backup-*
+*.broken-*
+tsconfig.tsbuildinfo

@@ -28,6 +28,7 @@ const trustedStatuses =
 type StopKind =
   | "food"
   | "event"
+  | "activity"
   | "drinks";
 
 function normalize(
@@ -91,6 +92,13 @@ function getListingKind(
     "event"
   ) {
     return "event";
+  }
+
+  if (
+    listing.catalogueKind ===
+    "activity"
+  ) {
+    return "activity";
   }
 
   return isAlcoholFocused(
@@ -346,7 +354,9 @@ export async function GET(
           listing.timeOrHours,
         price: listing.price,
         startAt:
-          listing.startAt
+          listing.startAt,
+        suggestedDurationMinutes:
+          listing.suggestedDurationMinutes
       })
     );
 
@@ -362,6 +372,12 @@ export async function GET(
         (option) =>
           option.kind ===
           "event"
+      ).length,
+    activity:
+      options.filter(
+        (option) =>
+          option.kind ===
+          "activity"
       ).length,
     drinks:
       options.filter(

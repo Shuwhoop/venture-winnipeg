@@ -2519,3 +2519,80 @@ h4,
 .neighbourhood-search-row > button {
   box-shadow: 3px 3px 0 var(--venture-yellow);
 }
+
+
+/* VENTURE WIDE ADMIN WORKSPACE */
+
+body.venture-admin-route {
+  background:
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(239, 156, 153, 0.24),
+      transparent 31%
+    ),
+    linear-gradient(
+      180deg,
+      #f4f0e8 0%,
+      #fffaf2 100%
+    );
+}
+
+body.venture-admin-route .app-shell {
+  width: min(
+    calc(100% - 28px),
+    1360px
+  );
+
+  max-width: none;
+  min-height: calc(100vh - 28px);
+
+  margin: 14px auto;
+  padding-bottom: 0;
+
+  border: 3px solid #241f20;
+  border-radius: 28px;
+
+  background: #fffdf8;
+
+  box-shadow:
+    10px 12px 0 rgba(36, 31, 32, 0.16);
+
+  overflow: clip;
+}
+
+body.venture-admin-route .app-header {
+  position: relative;
+  top: auto;
+
+  padding: 15px 22px;
+
+  border-bottom: 2px solid #241f20;
+
+  background: #fffaf2;
+  backdrop-filter: none;
+}
+
+body.venture-admin-route .page-content {
+  width: 100%;
+  padding: 24px 28px 40px;
+}
+
+@media (max-width: 760px) {
+  body.venture-admin-route .app-shell {
+    width: 100%;
+    min-height: 100vh;
+
+    margin: 0;
+
+    border: 0;
+    border-radius: 0;
+
+    box-shadow: none;
+  }
+
+  body.venture-admin-route .page-content {
+    padding: 16px 0 32px;
+  }
+}
+
+/* END VENTURE WIDE ADMIN WORKSPACE */

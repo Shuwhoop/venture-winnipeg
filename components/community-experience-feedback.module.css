@@ -1,0 +1,149 @@
+.panel {
+  display: grid;
+  gap: 18px;
+  overflow: hidden;
+  border: 2.5px solid #241f20;
+  border-radius: 24px;
+  padding: 19px;
+  background: #241f20;
+  color: #ffffff;
+  box-shadow: 6px 7px 0 #ef9c99;
+}
+
+.intro {
+  display: grid;
+  gap: 7px;
+}
+
+.intro > span {
+  color: #ffcf00;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+}
+
+.intro h2 {
+  max-width: 13ch;
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.75rem;
+  line-height: 0.95;
+  letter-spacing: -0.052em;
+}
+
+.intro p,
+.success p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.form fieldset {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.form legend,
+.form label {
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.form label {
+  display: grid;
+  gap: 7px;
+}
+
+.ratings {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.ratings button {
+  min-height: 44px;
+  border: 2px solid #fffaf2;
+  border-radius: 12px;
+  background: transparent;
+  color: #ffffff;
+  font-weight: 950;
+}
+
+.ratings button:hover,
+.ratings button:focus-visible,
+.ratings .selected {
+  border-color: #241f20;
+  background: #ffcf00;
+  color: #241f20;
+  box-shadow: 2px 3px 0 #d01013;
+}
+
+.form fieldset small {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.62rem;
+  line-height: 1.4;
+}
+
+.form textarea {
+  width: 100%;
+  min-height: 104px;
+  resize: vertical;
+  border: 2px solid #fffaf2;
+  border-radius: 14px;
+  padding: 12px;
+  background: #fffaf2;
+  color: #241f20;
+  font: inherit;
+  line-height: 1.45;
+}
+
+.form > button {
+  min-height: 49px;
+  border: 2.5px solid #241f20;
+  border-radius: 14px;
+  padding: 10px 13px;
+  background: #ffcf00;
+  color: #241f20;
+  font-weight: 950;
+  box-shadow: 4px 4px 0 #d01013;
+}
+
+.form > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.error {
+  margin: 0;
+  border: 2px solid #ff8d58;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fffaf2;
+  color: #8d1014;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.success {
+  display: grid;
+  gap: 7px;
+  border: 2px solid #ffcf00;
+  border-radius: 16px;
+  padding: 15px;
+  background: rgba(255, 207, 0, 0.1);
+}
+
+.success strong {
+  color: #ffcf00;
+  font-size: 1.05rem;
+}

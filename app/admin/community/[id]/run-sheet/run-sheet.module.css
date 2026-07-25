@@ -1,0 +1,262 @@
+.page {
+  display: grid;
+  gap: 22px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 18px 24px 60px;
+  color: #241f20;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.controls a,
+.controls button {
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 2px solid #241f20;
+  border-radius: 12px;
+  background: #ffcf00;
+  color: #241f20;
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.controls button {
+  background: #d01013;
+  color: #ffffff;
+}
+
+.hero {
+  padding: 25px;
+  border: 3px solid #241f20;
+  border-radius: 24px;
+  background: #fffaf2;
+  box-shadow: 7px 8px 0 #ffcf00;
+}
+
+.hero p,
+.section header span,
+.summary article > span {
+  margin: 0;
+  color: #d01013;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+}
+
+.hero h1 {
+  margin: 8px 0 14px;
+  font-size: clamp(2.2rem, 6vw, 4.2rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+}
+
+.hero > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero > div span {
+  padding: 7px 9px;
+  border: 2px solid #241f20;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summary article {
+  padding: 15px;
+  border: 2px solid #241f20;
+  border-radius: 17px;
+  background: #ffffff;
+}
+
+.summary article:nth-child(1) {
+  background: #fff1bd;
+}
+
+.summary article:nth-child(2) {
+  background: #dff3dd;
+}
+
+.summary article:nth-child(3) {
+  background: #ffd7c5;
+}
+
+.summary strong {
+  display: block;
+  margin-top: 7px;
+}
+
+.summary p {
+  margin: 6px 0 0;
+  color: #62595d;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+  padding: 19px;
+  border: 2px solid #241f20;
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+.section header h2 {
+  margin: 5px 0 0;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.timeline {
+  display: grid;
+  gap: 9px;
+}
+
+.timeline article {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 11px;
+  padding: 12px;
+  border: 2px solid #241f20;
+  border-radius: 15px;
+  background: #fffaf2;
+}
+
+.timeline b {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #241f20;
+  border-radius: 12px;
+  background: #ffcf00;
+}
+
+.timeline small,
+.timeline strong {
+  display: block;
+}
+
+.timeline small {
+  color: #d01013;
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+
+.timeline p {
+  margin: 4px 0 0;
+  color: #62595d;
+  font-size: 0.7rem;
+}
+
+.guestTable {
+  overflow: hidden;
+  border: 2px solid #241f20;
+  border-radius: 15px;
+}
+
+.tableHeader,
+.guestTable article {
+  display: grid;
+  grid-template-columns: 1.1fr 0.35fr 0.55fr 1.4fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+.tableHeader {
+  background: #241f20;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 950;
+}
+
+.guestTable article {
+  border-top: 1px solid #d8cbc1;
+  background: #ffffff;
+}
+
+.guestTable article:first-of-type {
+  border-top: 0;
+}
+
+.guestTable small,
+.guestTable strong {
+  display: block;
+}
+
+.guestTable small {
+  margin-top: 3px;
+  color: #62595d;
+  font-size: 0.58rem;
+}
+
+.guestTable article > span {
+  text-transform: capitalize;
+}
+
+.guestTable p {
+  margin: 0;
+  color: #62595d;
+  font-size: 0.64rem;
+  line-height: 1.4;
+}
+
+.empty {
+  margin: 0;
+  padding: 14px;
+  border: 2px dashed #241f20;
+  border-radius: 14px;
+  color: #62595d;
+}
+
+@media (max-width: 760px) {
+  .summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tableHeader {
+    display: none;
+  }
+
+  .guestTable article {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media print {
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+
+  .controls,
+  :global(.app-header),
+  :global(.admin-command-bar) {
+    display: none !important;
+  }
+
+  .hero,
+  .section,
+  .summary article {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}

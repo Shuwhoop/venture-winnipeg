@@ -1723,3 +1723,101 @@
     transition: none;
   }
 }
+
+/* VENTURE ACTIVITY + ANCHOR PLAN CONTROLS */
+.wizardV4 :global(.outing-count-activity) {
+  background: linear-gradient(145deg, #ffd9d3, #fffaf2);
+  box-shadow: 4px 4px 0 #d01013;
+}
+
+.wizardV4 :global(.outing-count-activity .outing-count-icon),
+.wizardV4 :global(.kind-activity) {
+  background: #ef9c99;
+  color: #241f20;
+}
+
+.wizardV4 :global(.outing-anchor-plan-controls) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+
+.wizardV4 :global(.outing-anchor-duration-control),
+.wizardV4 :global(.outing-anchor-placement-control) {
+  min-width: 0;
+  padding: 13px;
+  border: 2px solid #241f20;
+  border-radius: 17px;
+  background: #fffaf2;
+  box-shadow: 3px 3px 0 #ffcf00;
+}
+
+.wizardV4 :global(.outing-anchor-duration-control > span),
+.wizardV4 :global(.outing-anchor-placement-control legend) {
+  display: block;
+  margin-bottom: 8px;
+  color: #d01013;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.wizardV4 :global(.outing-anchor-duration-control > div),
+.wizardV4 :global(.outing-anchor-placement-control > div) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.wizardV4 :global(.outing-anchor-duration-control button),
+.wizardV4 :global(.outing-anchor-placement-control button) {
+  min-height: 38px;
+  border: 2px solid #241f20;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #241f20;
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.wizardV4 :global(.outing-anchor-duration-control strong) {
+  text-align: center;
+  font-size: 0.86rem;
+}
+
+.wizardV4 :global(.outing-anchor-placement-control > div) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wizardV4 :global(.outing-anchor-placement-control button.selected) {
+  background: #d01013;
+  color: #ffffff;
+  box-shadow: 2px 2px 0 #ffcf00;
+}
+
+@media (max-width: 430px) {
+  .wizardV4 :global(.outing-anchor-plan-controls) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* END VENTURE ACTIVITY + ANCHOR PLAN CONTROLS */
+
+/* CATALOGUE ANCHOR DETAILS */
+.wizardV4 :global(.outing-anchor-copy em) {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 5px;
+  padding: 4px 7px;
+  border: 1px solid rgba(36, 31, 32, 0.25);
+  border-radius: 999px;
+  background: #fff7d5;
+  color: #4b4142;
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+}
+/* END CATALOGUE ANCHOR DETAILS */

@@ -2034,6 +2034,10 @@
   background: linear-gradient(135deg, #ffdeda 0%, #ffb7b0 100%) !important;
 }
 
+.activityChoice {
+  background: linear-gradient(135deg, #ffe8a3 0%, #ffcf00 100%) !important;
+}
+
 .drinksChoice {
   background: linear-gradient(135deg, #eee5ff 0%, #d3c0ff 100%) !important;
 }
@@ -2889,7 +2893,8 @@
 }
 
 .foodChoice { border-left-color: #edb200 !important; }
-.eventChoice { border-left-color: #7654d8 !important; }
+.eventChoice { border-left-color: #d01013 !important; }
+.activityChoice { border-left-color: #edb200 !important; }
 .drinksChoice { border-left-color: #0f8a4b !important; }
 
 .addStopChoice:hover:not(:disabled),

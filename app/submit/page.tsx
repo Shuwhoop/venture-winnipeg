@@ -6,6 +6,10 @@ import {
   useState
 } from "react";
 
+import {
+  ListingPhotoUpload
+} from "@/components/listing-photo-upload/listing-photo-upload";
+
 import styles from "./page.module.css";
 
 
@@ -152,6 +156,38 @@ export default function SubmitListingPage() {
       initialEvent
     );
 
+  const [
+    photo,
+    setPhoto
+  ] =
+    useState<File | null>(
+      null
+    );
+
+  const [
+    photoResetToken,
+    setPhotoResetToken
+  ] = useState(0);
+
+  const [
+    photoAltText,
+    setPhotoAltText
+  ] =
+    useState("");
+
+  const [
+    photoRightsConfirmed,
+    setPhotoRightsConfirmed
+  ] =
+    useState(false);
+
+  const [
+    photoRightsNote,
+    setPhotoRightsNote
+  ] =
+    useState("");
+
+
   const heading =
     useMemo(
       () =>
@@ -211,6 +247,13 @@ export default function SubmitListingPage() {
     setEvent(
       initialEvent
     );
+    setPhoto(null);
+    setPhotoResetToken(
+      (current) => current + 1
+    );
+    setPhotoAltText("");
+    setPhotoRightsConfirmed(false);
+    setPhotoRightsNote("");
   }
 
   async function handleSubmit(
@@ -239,35 +282,57 @@ export default function SubmitListingPage() {
           };
 
     try {
+      if (
+        photo &&
+        !photoRightsConfirmed
+      ) {
+        throw new Error(
+          "Confirm that you own the photo or have permission to submit it."
+        );
+      }
+
+      const submission = {
+        submissionType,
+        submitterName,
+        submitterEmail,
+        submitterPhone,
+        organizationName,
+        submitterRelationship:
+          relationship,
+        sourceUrl,
+        submitterNotes:
+          notes,
+        consentToContact,
+        termsAccepted,
+        website,
+        payload,
+        photoAltText,
+        photoRightsConfirmed,
+        photoRightsNote
+      };
+
+      const body =
+        new FormData();
+
+      body.set(
+        "submission",
+        JSON.stringify(submission)
+      );
+
+      if (photo) {
+        body.set(
+          "photo",
+          photo
+        );
+      }
+
       const response =
         await fetch(
           "/api/submissions",
           {
             method:
               "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body:
-              JSON.stringify({
-                submissionType,
-                submitterName,
-                submitterEmail,
-                submitterPhone,
-                organizationName,
-                submitterRelationship:
-                  relationship,
-                sourceUrl,
-                submitterNotes:
-                  notes,
-                consentToContact,
-                termsAccepted,
-                website,
-                payload
-              })
+            body
           }
         );
 
@@ -1058,6 +1123,122 @@ export default function SubmitListingPage() {
                 />
               </label>
             </div>
+          )}
+        </section>
+
+        <section
+          className={
+            styles.section
+          }
+        >
+          <div
+            className={
+              styles.sectionHeading
+            }
+          >
+            <span>
+              OPTIONAL PHOTO
+            </span>
+
+            <h2>
+              Help people recognize it.
+            </h2>
+
+            <p
+              className={
+                styles.sectionIntro
+              }
+            >
+              Add one clear photo of the restaurant, venue, poster, or event. Venture reviews every image before it appears publicly.
+            </p>
+          </div>
+
+          <ListingPhotoUpload
+            label="Choose a photo"
+            onFileReady={
+              setPhoto
+            }
+            resetToken={
+              photoResetToken
+            }
+          />
+
+          {photo ? (
+            <div
+              className={
+                styles.photoDetails
+              }
+            >
+              <label>
+                <span>
+                  Describe the photo
+                </span>
+
+                <input
+                  required
+                  maxLength={300}
+                  placeholder="Example: Tommy’s Pizzeria storefront on Corydon Avenue"
+                  value={
+                    photoAltText
+                  }
+                  onChange={(inputEvent) =>
+                    setPhotoAltText(
+                      inputEvent.target.value
+                    )
+                  }
+                />
+              </label>
+
+              <label>
+                <span>
+                  Permission note
+                </span>
+
+                <input
+                  maxLength={1000}
+                  placeholder="Optional: I took this photo, or the organizer gave me permission."
+                  value={
+                    photoRightsNote
+                  }
+                  onChange={(inputEvent) =>
+                    setPhotoRightsNote(
+                      inputEvent.target.value
+                    )
+                  }
+                />
+              </label>
+
+              <label
+                className={
+                  styles.photoPermission
+                }
+              >
+                <input
+                  required
+                  type="checkbox"
+                  checked={
+                    photoRightsConfirmed
+                  }
+                  onChange={(inputEvent) =>
+                    setPhotoRightsConfirmed(
+                      inputEvent.target.checked
+                    )
+                  }
+                />
+
+                <span>
+                  I took this photo or have permission to provide it to Venture for use with this listing.
+                </span>
+              </label>
+            </div>
+          ) : (
+            <p
+              className={
+                styles.photoOptionalNote
+              }
+            >
+              No photo is required. The listing can still be submitted and reviewed.
+            </p>
           )}
         </section>
 

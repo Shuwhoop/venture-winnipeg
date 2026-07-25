@@ -6,6 +6,10 @@ import type {
   VerificationStatus
 } from "@/lib/types";
 
+import {
+  getSuggestedDurationProfile
+} from "@/lib/catalogue";
+
 type VenueRow = {
   name: string;
   neighbourhood: string | null;
@@ -51,6 +55,7 @@ type EventRow = {
   verification_status: VerificationStatus;
   warning_message: string | null;
   source_checked_at: string | null;
+  image_url: string | null;
 
   venue: VenueRow | VenueRow[] | null;
 };
@@ -80,6 +85,7 @@ const eventFields = `
   verification_status,
   warning_message,
   source_checked_at,
+  image_url,
   venue:places (
     name,
     neighbourhood,
@@ -297,6 +303,26 @@ function eventToListing(event: EventRow): Listing {
   const venue = getVenue(event.venue);
   const statusLabel = getStatusLabel(event);
 
+  const durationProfile =
+    getSuggestedDurationProfile({
+      type: "event",
+      name: event.title,
+      category: event.primary_category,
+      subtitle: event.primary_category,
+      description:
+        event.full_description ??
+        event.short_description,
+      placeType: undefined,
+      searchTerms: [
+        event.primary_category,
+        ...(event.secondary_categories ?? []),
+        ...(event.tags ?? [])
+      ],
+      startAt: event.start_at,
+      endAt: event.end_at ?? undefined,
+      catalogueKind: "event"
+    });
+
   const setting =
     event.indoor_outdoor === "indoor"
       ? "Indoor"
@@ -334,10 +360,24 @@ function eventToListing(event: EventRow): Listing {
       event.timezone
     ),
 
-    imageClass: "image-concert",
+    imageClass: event.image_url ? "image-uploaded" : "image-concert",
+
+    imageUrl: event.image_url,
 
     neighbourhood:
       venue?.neighbourhood ?? "Winnipeg",
+
+    catalogueKind: "event",
+    suggestedDurationMinutes:
+      durationProfile.suggestedMinutes,
+    minimumDurationMinutes:
+      durationProfile.minimumMinutes,
+    maximumDurationMinutes:
+      durationProfile.maximumMinutes,
+    durationSource:
+      durationProfile.source,
+    isFixedTime:
+      durationProfile.isFixedTime,
 
     description:
       event.full_description ??

@@ -1288,3 +1288,73 @@
     min-height: 48px;
   }
 }
+
+
+/* VENTURE SUBMITTED PHOTO REVIEW */
+.submittedPhoto {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 15px;
+  align-items: center;
+  padding: 14px;
+  border: 2px solid #241f20;
+  border-radius: 18px;
+  background: #fff4c7;
+}
+
+.submittedPhoto img {
+  width: 150px;
+  height: 120px;
+  object-fit: cover;
+  border: 2px solid #241f20;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.submittedPhoto > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.submittedPhoto span {
+  color: #d01013;
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+}
+
+.submittedPhoto strong,
+.submittedPhoto p,
+.submittedPhoto small,
+.submittedPhoto em {
+  overflow-wrap: anywhere;
+}
+
+.submittedPhoto p {
+  margin: 0;
+  color: #5f5657;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.submittedPhoto small {
+  color: #166534;
+  font-weight: 800;
+}
+
+.submittedPhoto em {
+  color: #6f6566;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 560px) {
+  .submittedPhoto {
+    grid-template-columns: 1fr;
+  }
+
+  .submittedPhoto img {
+    width: 100%;
+    height: 190px;
+  }
+}

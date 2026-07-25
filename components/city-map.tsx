@@ -14,6 +14,12 @@ import {
 } from "@/lib/explore-map-utils";
 
 import {
+  getCatalogueIcon,
+  getCatalogueKind,
+  getCatalogueLabel
+} from "@/lib/catalogue";
+
+import {
   getVentureMapConfiguration
 } from "@/lib/venture-map-style";
 
@@ -77,8 +83,7 @@ function getListingKey(
 }
 
 function createPopupContent(
-  listing: Listing,
-  index: number
+  listing: Listing
 ): HTMLDivElement {
   const popupContent =
     document.createElement("div");
@@ -89,12 +94,14 @@ function createPopupContent(
   const eyebrow =
     document.createElement("span");
 
+  const catalogueKind =
+    listing.catalogueKind ??
+    getCatalogueKind(listing);
+
   eyebrow.textContent =
-    `${index + 1} · ${
-      listing.type === "event"
-        ? "EVENT"
-        : listing.category.toUpperCase()
-    }`;
+    getCatalogueLabel(
+      catalogueKind
+    ).toUpperCase();
 
   const heading =
     document.createElement("strong");
@@ -509,7 +516,7 @@ export function CityMap({
       let markerCount = 0;
 
       listings.forEach(
-        (listing, index) => {
+        (listing) => {
           const point =
             getListingPoint(listing);
 
@@ -542,26 +549,35 @@ export function CityMap({
                 : styles.placeMarker
             }`;
 
-          const markerNumber =
+          const catalogueKind =
+            listing.catalogueKind ??
+            getCatalogueKind(listing);
+
+          markerButton.dataset.kind =
+            catalogueKind;
+
+          const markerIcon =
             document.createElement(
               "span"
             );
 
-          markerNumber.textContent =
-            String(index + 1);
+          markerIcon.textContent =
+            getCatalogueIcon(
+              catalogueKind
+            );
 
-          markerNumber.setAttribute(
+          markerIcon.setAttribute(
             "aria-hidden",
             "true"
           );
 
           markerButton.append(
-            markerNumber
+            markerIcon
           );
 
           markerButton.setAttribute(
             "aria-label",
-            `${index + 1}. Show ${listing.name}`
+            `Show ${listing.name}`
           );
 
           markerButton.addEventListener(
@@ -585,8 +601,7 @@ export function CityMap({
               .setLngLat(coordinates)
               .setDOMContent(
                 createPopupContent(
-                  listing,
-                  index
+                  listing
                 )
               );
 

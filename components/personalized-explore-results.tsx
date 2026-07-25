@@ -543,7 +543,7 @@ export function PersonalizedExploreResults({
       {rankedListings.length > 0 ? (
         <div className="vertical-list">
           {rankedListings.map(
-            (listing, index) => (
+            (listing) => (
           <ListingCard
             key={`${listing.type}-${listing.id}`}
             listing={listing}
@@ -552,11 +552,6 @@ export function PersonalizedExploreResults({
               `${listing.type}-${listing.id}`
             }
             onSelect={onSelectListing}
-            mapIndex={
-              onSelectListing
-                ? index
-                : undefined
-            }
           />
             )
           )}

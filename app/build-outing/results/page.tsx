@@ -66,11 +66,13 @@ const GENERATED_OUTING_KEY =
 type StopKind =
   | "food"
   | "event"
+  | "activity"
   | "drinks";
 
 type StopMix = {
   food: number;
   events: number;
+  activities: number;
   drinks: number;
 };
 
@@ -111,6 +113,13 @@ type OutingDraft = {
   anchorListingName?:
     | string
     | null;
+  anchorDurationMinutes?:
+    | number
+    | null;
+  anchorPlacement?:
+    | "before"
+    | "after"
+    | "both";
   soloVibe?: string | null;
   soloPace?: string | null;
   groupVibe?: string | null;
@@ -287,6 +296,13 @@ function getStopKind(
     return "event";
   }
 
+  if (
+    stop.listing.catalogueKind ===
+    "activity"
+  ) {
+    return "activity";
+  }
+
   const text =
     getListingSearchText(
       stop.listing
@@ -323,6 +339,13 @@ function getKindDetails(
     return {
       label: "EVENT",
       icon: "🎟"
+    };
+  }
+
+  if (kind === "activity") {
+    return {
+      label: "ACTIVITY",
+      icon: "⚡"
     };
   }
 
@@ -374,6 +397,13 @@ function formatMixSummary(
             : "events"
         }`
       : "",
+    (mix.activities ?? 0) > 0
+      ? `${mix.activities ?? 0} ${
+          (mix.activities ?? 0) === 1
+            ? "activity"
+            : "activities"
+        }`
+      : "",
     mix.drinks > 0
       ? `${mix.drinks} drinks`
       : ""
@@ -409,6 +439,10 @@ function getRecipeItems(
     items.push({ key: `event-${index}`, icon: "🎟", label: "Event" });
   }
 
+  for (let index = 0; index < (mix.activities ?? 0); index += 1) {
+    items.push({ key: `activity-${index}`, icon: "⚡", label: "Activity" });
+  }
+
   for (let index = 0; index < mix.drinks; index += 1) {
     items.push({ key: `drinks-${index}`, icon: "🍸", label: "Drinks" });
   }
@@ -428,9 +462,10 @@ function countRequestedStops(
   }
 
   return (
-    mix.food +
-    mix.events +
-    mix.drinks
+    (mix.food ?? 0) +
+    (mix.events ?? 0) +
+    (mix.activities ?? 0) +
+    (mix.drinks ?? 0)
   );
 }
 
@@ -615,6 +650,12 @@ function AddStopIcon({
         <>
           <path d="M4.5 7.5h15v9h-15z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
           <path d="M8 7.5V5.2M16 7.5V5.2M8.2 11h2.2M13.6 11h2.2M8.2 14h2.2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </>
+      ) : null}
+      {kind === "activity" ? (
+        <>
+          <path d="M12 3.5 14 8l4.5 2-4.5 2-2 4.5-2-4.5-4.5-2 4.5-2 2-4.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+          <path d="m17.5 15 .8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2Z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
         </>
       ) : null}
       {kind === "drinks" ? (
@@ -2932,6 +2973,12 @@ export default function OutingResultsPage() {
                   },
                   {
                     kind:
+                      "activity" as const,
+                    icon: "⚡",
+                    label: "Activity"
+                  },
+                  {
+                    kind:
                       "drinks" as const,
                     icon: "🍸",
                     label: "Drinks"
@@ -2947,7 +2994,9 @@ export default function OutingResultsPage() {
                         ? styles.foodChoice
                         : option.kind === "event"
                           ? styles.eventChoice
-                          : styles.drinksChoice
+                          : option.kind === "activity"
+                            ? styles.activityChoice
+                            : styles.drinksChoice
                     }`}
                     disabled={
                       addingKind !== null ||
@@ -2983,7 +3032,9 @@ export default function OutingResultsPage() {
                           ? "A nearby place to eat"
                           : option.kind === "event"
                             ? "An event that fits the timing"
-                            : "A drinks stop near the route"}
+                            : option.kind === "activity"
+                              ? "A hands-on experience near the route"
+                              : "A drinks stop near the route"}
                       </small>
                     </span>
 

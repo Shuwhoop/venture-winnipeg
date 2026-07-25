@@ -1,6 +1,7 @@
 import type {
   Metadata
 } from "next";
+import Link from "next/link";
 import {
   notFound
 } from "next/navigation";
@@ -9,17 +10,40 @@ import {
   ClaimListingForm
 } from "@/components/claim-listing-form";
 import {
+  ListingCard
+} from "@/components/listing-card";
+import {
+  ListingDetailActionDock
+} from "@/components/listing-detail-action-dock";
+import {
+  ListingDetailMap
+} from "@/components/listing-detail-map";
+import {
   ReportIssueForm
 } from "@/components/report-issue-form";
 import {
   VisitButton
 } from "@/components/visit-button";
 import {
+  getPublishedEventListings
+} from "@/lib/data/events";
+import {
   getPublishedListingDetailBySlug,
   type PublicEventDetail,
   type PublicListingDetail,
   type PublicPlaceDetail
 } from "@/lib/data/listing-detail";
+import {
+  getPublishedPlaceListings
+} from "@/lib/data/places";
+import {
+  formatDurationMinutes,
+  getCatalogueKind,
+  getSuggestedDurationProfile
+} from "@/lib/catalogue";
+import type {
+  Listing
+} from "@/lib/types";
 
 import styles from "./page.module.css";
 
@@ -482,6 +506,98 @@ function verificationLabel(
   );
 }
 
+
+function isFreshnessExpired(
+  detail: PublicListingDetail
+): boolean {
+  if (!detail.freshnessExpiresAt) {
+    return false;
+  }
+
+  const expiry = new Date(
+    detail.freshnessExpiresAt
+  ).getTime();
+
+  return Number.isFinite(expiry) &&
+    expiry < Date.now();
+}
+
+async function getRelatedListings(
+  detail: PublicListingDetail
+): Promise<Listing[]> {
+  const [places, events] =
+    await Promise.all([
+      getPublishedPlaceListings(35),
+      getPublishedEventListings(35)
+    ]);
+
+  const currentType =
+    detail.entityType === "place"
+      ? "restaurant"
+      : "event";
+
+  const detailTerms = new Set(
+    [
+      detail.primaryCategory,
+      ...detail.secondaryCategories,
+      ...detail.tags
+    ].map((value) =>
+      value.toLowerCase()
+    )
+  );
+
+  return [...places, ...events]
+    .filter(
+      (listing) =>
+        listing.slug !== detail.slug
+    )
+    .map((listing) => {
+      let score = 0;
+
+      if (
+        listing.neighbourhood &&
+        detail.neighbourhood &&
+        listing.neighbourhood.toLowerCase() ===
+          detail.neighbourhood.toLowerCase()
+      ) {
+        score += 6;
+      }
+
+      if (
+        listing.category.toLowerCase() ===
+        detail.primaryCategory.toLowerCase()
+      ) {
+        score += 5;
+      }
+
+      if (listing.type === currentType) {
+        score += 2;
+      }
+
+      for (const term of
+        listing.searchTerms ?? []) {
+        if (
+          detailTerms.has(
+            term.toLowerCase()
+          )
+        ) {
+          score += 1;
+        }
+      }
+
+      return {
+        listing,
+        score
+      };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((left, right) =>
+      right.score - left.score
+    )
+    .slice(0, 6)
+    .map(({ listing }) => listing);
+}
+
 export async function generateMetadata({
   params
 }: PageProps): Promise<Metadata> {
@@ -517,6 +633,8 @@ export default async function ListingPage({
     notFound();
   }
 
+  const relatedListings =
+    await getRelatedListings(detail);
   const address =
     fullAddress(detail);
   const categories = [
@@ -550,6 +668,104 @@ export default async function ListingPage({
     detail.entityType === "place"
       ? detail.reservationUrl
       : detail.ticketUrl;
+  const detailDirectionsUrl =
+    address ||
+    (detail.latitude !== null &&
+      detail.longitude !== null)
+      ? directionsUrl(detail)
+      : null;
+  const freshnessExpired =
+    isFreshnessExpired(detail);
+  const experienceTags =
+    detail.entityType === "place"
+      ? [
+          ...detail.dietaryOptions,
+          ...detail.atmosphereTags,
+          ...detail.goodFor
+        ]
+      : [
+          detail.ageLabel,
+          detail.indoorOutdoor,
+          detail.organizerName
+        ];
+  const mergedExperienceTags = [
+    ...experienceTags,
+    ...categories
+  ]
+    .filter(Boolean)
+    .filter(
+      (value, index, values) =>
+        values.indexOf(value) === index
+    );
+  const normalizedShortDescription =
+    detail.shortDescription
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ");
+  const normalizedFullDescription =
+    detail.fullDescription
+      ?.trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ") ?? "";
+  const shouldShowFullDescription =
+    Boolean(detail.fullDescription) &&
+    normalizedFullDescription !==
+      normalizedShortDescription &&
+    !normalizedFullDescription.startsWith(
+      normalizedShortDescription
+    );
+  const isBrandIcon =
+    detail.imageUrl?.startsWith(
+      "/listing-icons/"
+    ) ?? false;
+  const heroMediaStyle = detail.imageUrl
+    ? {
+        backgroundImage: `url("${detail.imageUrl.replaceAll(
+          '"',
+          "%22"
+        )}")`
+      }
+    : undefined;
+
+  const durationInput = {
+    type:
+      detail.entityType === "place"
+        ? "restaurant" as const
+        : "event" as const,
+    name: detail.name,
+    category: detail.primaryCategory,
+    subtitle: detail.shortDescription,
+    description:
+      detail.fullDescription ??
+      detail.shortDescription,
+    placeType:
+      detail.entityType === "place"
+        ? detail.placeType
+        : undefined,
+    searchTerms: categories,
+    startAt:
+      detail.entityType === "event"
+        ? detail.startAt
+        : undefined,
+    endAt:
+      detail.entityType === "event"
+        ? detail.endAt ?? undefined
+        : undefined
+  };
+
+  const catalogueKind =
+    getCatalogueKind(durationInput);
+
+  const durationProfile =
+    getSuggestedDurationProfile({
+      ...durationInput,
+      catalogueKind
+    });
+
+  const suggestedTimeLabel =
+    formatDurationMinutes(
+      durationProfile.suggestedMinutes
+    );
 
   const listingSnapshot = {
     id: detail.id,
@@ -579,8 +795,20 @@ export default async function ListingPage({
     lastChecked:
       detail.sourceCheckedAt ?? "",
     imageClass: "listing-detail",
+    imageUrl: detail.imageUrl,
     neighbourhood:
       detail.neighbourhood ?? "Winnipeg",
+    catalogueKind,
+    suggestedDurationMinutes:
+      durationProfile.suggestedMinutes,
+    minimumDurationMinutes:
+      durationProfile.minimumMinutes,
+    maximumDurationMinutes:
+      durationProfile.maximumMinutes,
+    durationSource:
+      durationProfile.source,
+    isFixedTime:
+      durationProfile.isFixedTime,
     venueName:
       detail.entityType === "event"
         ? detail.venueName ?? undefined
@@ -646,9 +874,35 @@ export default async function ListingPage({
 
   return (
     <main className={styles.page}>
-      <section className={styles.hero}>
-        <div className={styles.heroGlow} aria-hidden="true" />
-        <div className={styles.heroTop}>
+      <section
+        className={`${styles.hero} ${
+          detail.imageUrl
+            ? styles.heroWithMedia
+            : ""
+        }`}
+      >
+        {detail.imageUrl ? (
+          <div
+            className={`${styles.heroMedia} ${
+              isBrandIcon
+                ? styles.heroMediaLogo
+                : ""
+            }`}
+            style={heroMediaStyle}
+            role="img"
+            aria-label={`Photo of ${detail.name}`}
+          >
+            <span className={styles.heroMediaBadge}>
+              {detail.entityType === "event"
+                ? "EVENT"
+                : detail.primaryCategory}
+            </span>
+          </div>
+        ) : null}
+
+        <div className={styles.heroBody}>
+          <div className={styles.heroGlow} aria-hidden="true" />
+          <div className={styles.heroTop}>
           <div>
             <p className={styles.eyebrow}>
               {detail.primaryCategory}
@@ -677,7 +931,23 @@ export default async function ListingPage({
             </div>
           </div>
         ) : null}
+        </div>
       </section>
+
+      {freshnessExpired ? (
+        <section
+          className={styles.freshnessAlert}
+          role="status"
+        >
+          <span aria-hidden="true">!</span>
+          <div>
+            <strong>Details need a fresh check</strong>
+            <p>
+              Venture has kept this listing visible, but some hours, prices or event details may have changed. Confirm before heading out.
+            </p>
+          </div>
+        </section>
+      ) : null}
 
       <section
         className={styles.factGrid}
@@ -693,21 +963,24 @@ export default async function ListingPage({
           </div>
         </article>
 
-        <article className={`${styles.fact} ${styles.factNeighbourhood}`}>
-          <span className={styles.factIcon}><Icon name="pin" /></span>
-          <div>
-            <strong title={detail.neighbourhood || "Winnipeg"}>
-              {detail.neighbourhood || "Winnipeg"}
-            </strong>
-            <span>Neighbourhood</span>
-          </div>
-        </article>
 
         <article className={`${styles.fact} ${styles.factPrice}`}>
           <span className={styles.factIcon}><Icon name="price" /></span>
           <div>
             <strong>{currentPrice}</strong>
             <span>Price</span>
+          </div>
+        </article>
+
+        <article className={`${styles.fact} ${styles.factDuration}`}>
+          <span className={styles.factIcon}><Icon name="clock" /></span>
+          <div>
+            <strong>{suggestedTimeLabel}</strong>
+            <span>
+              {durationProfile.source === "official"
+                ? "Official duration"
+                : "Suggested time"}
+            </span>
           </div>
         </article>
 
@@ -718,34 +991,32 @@ export default async function ListingPage({
               {cuisineOrVenue}
             </strong>
             <span>
-              {detail.entityType === "place" ? "Cuisine" : "Venue"}
+              {detail.entityType !== "place"
+                ? "Venue"
+                : catalogueKind === "food"
+                  ? "Cuisine"
+                  : catalogueKind === "activity"
+                    ? "Experience"
+                    : catalogueKind === "nightlife"
+                      ? "Nightlife type"
+                      : "Category"}
             </span>
           </div>
         </article>
       </section>
 
+
+      <ListingDetailActionDock
+        listing={listingSnapshot}
+      />
+
       <section className={styles.actionSection}>
         <div className={styles.sectionHeadingCompact}>
-          <span>QUICK ACTIONS</span>
-          <h2>Make the next move</h2>
+          <span>USEFUL LINKS</span>
+          <h2>Book, contact or mark it visited</h2>
         </div>
 
         <div className={styles.primaryActions}>
-          {address ? (
-            <a
-              className={styles.actionPrimary}
-              href={directionsUrl(detail)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className={styles.actionIcon}><Icon name="directions" /></span>
-              <div>
-                <strong>Directions</strong>
-                <small>{detail.neighbourhood || detail.city}</small>
-              </div>
-            </a>
-          ) : null}
-
           {reservationOrTicketUrl ? (
             <a
               className={styles.actionAccent}
@@ -821,15 +1092,15 @@ export default async function ListingPage({
         </div>
 
         <p className={styles.compassNote}>
-          Directions may open in Google Maps. Venture uses maps as a compass, while listing facts come from official or independently verified sources.
+          Booking and contact options open through the listing’s official channels whenever available.
         </p>
       </section>
 
-      {detail.fullDescription ? (
+      {shouldShowFullDescription ? (
         <section className={`${styles.section} ${styles.revealSection}`}>
           <div className={styles.sectionHeading}>
-            <span>ABOUT</span>
-            <h2>Why it is worth knowing</h2>
+            <span>ABOUT THIS PLACE</span>
+            <h2>The fuller picture</h2>
           </div>
           <details className={styles.storyDisclosure}>
             <summary>
@@ -927,30 +1198,31 @@ export default async function ListingPage({
         </section>
       )}
 
-      {address ||
-      detail.accessibilityNotes ||
+      {detail.accessibilityNotes ||
       detail.transitNotes ||
-      detail.parkingNotes ? (
-        <section className={`${styles.section} ${styles.revealSection}`}>
+      detail.parkingNotes ||
+      (detailDirectionsUrl &&
+        detail.latitude !== null &&
+        detail.longitude !== null) ? (
+        <section className={`${styles.section} ${styles.revealSection} ${styles.arrivalSection}`}>
           <div className={styles.sectionHeading}>
-            <span>PLAN THE VISIT</span>
-            <h2>Getting there and access</h2>
+            <span>GETTING THERE</span>
+            <h2>Map, transit and access</h2>
           </div>
 
-          {address ? (
-            <a
-              className={styles.addressCard}
-              href={directionsUrl(detail)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span aria-hidden="true">⌖</span>
-              <div>
-                <strong>{address}</strong>
-                <small>Open directions</small>
-              </div>
-              <b aria-hidden="true">↗</b>
-            </a>
+          {detailDirectionsUrl &&
+          detail.latitude !== null &&
+          detail.longitude !== null ? (
+            <ListingDetailMap
+              latitude={detail.latitude}
+              longitude={detail.longitude}
+              name={detail.name}
+              neighbourhood={
+                detail.neighbourhood ||
+                detail.city
+              }
+              directionsUrl={detailDirectionsUrl}
+            />
           ) : null}
 
           <div className={styles.visitDisclosures}>
@@ -990,17 +1262,57 @@ export default async function ListingPage({
         </section>
       ) : null}
 
-      {categories.length > 0 ? (
-        <section className={`${styles.section} ${styles.revealSection}`}>
+      {mergedExperienceTags.length > 0 ? (
+        <section className={`${styles.section} ${styles.revealSection} ${styles.experienceSection}`}>
           <div className={styles.sectionHeading}>
-            <span>GOOD TO KNOW</span>
-            <h2>Categories and atmosphere</h2>
+            <span>WHAT TO EXPECT</span>
+            <h2>Experience, atmosphere and fit</h2>
           </div>
-          <div className={styles.chips}>
-            {categories.map((category) => (
-              <span key={category}>
-                {readable(category)}
-              </span>
+          <div className={styles.experienceChips}>
+            {mergedExperienceTags
+              .slice(0, 12)
+              .map((value, index) => (
+                <span
+                  className={
+                    index % 4 === 0
+                      ? styles.experienceYellow
+                      : index % 4 === 1
+                        ? styles.experiencePink
+                        : index % 4 === 2
+                          ? styles.experienceGreen
+                          : styles.experienceCream
+                  }
+                  key={value}
+                >
+                  {readable(value)}
+                </span>
+              ))}
+          </div>
+        </section>
+      ) : null}
+
+      {relatedListings.length > 0 ? (
+        <section className={`${styles.section} ${styles.relatedSection}`}>
+          <div className={styles.relatedHeading}>
+            <div className={styles.sectionHeading}>
+              <span>KEEP EXPLORING</span>
+              <h2>Nearby and similar picks</h2>
+            </div>
+
+            <Link href="/explore">
+              Explore all
+              <b aria-hidden="true">→</b>
+            </Link>
+          </div>
+
+          <div className={styles.relatedRail}>
+            {relatedListings.map((listing) => (
+              <div
+                className={styles.relatedCard}
+                key={`${listing.type}-${listing.id}`}
+              >
+                <ListingCard listing={listing} />
+              </div>
             ))}
           </div>
         </section>
@@ -1008,8 +1320,8 @@ export default async function ListingPage({
 
       <section className={`${styles.trustSection} ${styles.revealSection}`}>
         <div className={styles.sectionHeading}>
-          <span>SAFE & TRANSPARENT</span>
-          <h2>How Venture handles this listing</h2>
+          <span>SOURCE & UPDATES</span>
+          <h2>Where the information comes from</h2>
         </div>
 
         <div className={styles.trustRows}>
@@ -1028,7 +1340,7 @@ export default async function ListingPage({
             <div>
               <strong>Official or traceable source</strong>
               <small>
-                Venture stores source information separately from organic ranking and paid promotion.
+                Listing facts are kept separate from paid promotion and can be reported when something changes.
               </small>
             </div>
           </div>

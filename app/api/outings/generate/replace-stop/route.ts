@@ -1137,11 +1137,18 @@ function getListingKind(
 ):
   | "food"
   | "event"
+  | "activity"
   | "drinks" {
   if (
     listing.type === "event"
   ) {
     return "event";
+  }
+
+  if (
+    listing.catalogueKind === "activity"
+  ) {
+    return "activity";
   }
 
   return isAlcoholFocused(
