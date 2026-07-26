@@ -31,7 +31,6 @@ const SECTIONS = [
       ["/admin/inventory-plan", "▦", "Inventory plan", "See which categories and neighbourhoods need depth next."],
       ["/admin/import", "⇧", "Import inventory", "Preview and import draft places or events from CSV."],
       ["/admin/submissions", "+", "Submissions", "Review community place and event submissions."],
-      ["/admin/community", "✦", "Venture is Building", "Create the monthly community experience, itinerary, RSVP capacity, and attendance."],
       ["/admin/reports", "!", "Incorrect-info reports", "Review factual corrections from public listing pages."],
       ["/admin/claims", "✓", "Business claims", "Verify owners and authorized business representatives."]
     ]

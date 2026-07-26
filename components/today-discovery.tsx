@@ -25,16 +25,11 @@ import type {
   Listing
 } from "@/lib/types";
 
-import type {
-  CommunityExperience
-} from "@/lib/community-types";
-
 import styles from "./today-discovery.module.css";
 
 type TodayDiscoveryProps = {
   events: Listing[];
   places: Listing[];
-  community: CommunityExperience | null;
 };
 
 function getDaypart() {
@@ -296,8 +291,7 @@ function FeaturedListing({
 
 export function TodayDiscovery({
   events,
-  places,
-  community
+  places
 }: TodayDiscoveryProps) {
   const [visitVersion, setVisitVersion] =
     useState(0);
@@ -418,8 +412,6 @@ export function TodayDiscovery({
           <i>✦</i>
           <span>EVENTS</span>
           <i>✦</i>
-          <span>ACTIVITIES</span>
-          <i>✦</i>
           <span>OUTINGS</span>
           <i>✦</i>
           <span>NEW TO YOU</span>
@@ -474,262 +466,104 @@ export function TodayDiscovery({
         </form>
       </section>
 
-      <section className={styles.catalogueSection}>
-        <header>
-          <div>
-            <span>THE CITY CATALOGUE</span>
-            <h2>What are you looking for?</h2>
-          </div>
-
-          <Link href="/explore">
-            Browse all
-            <b aria-hidden="true">→</b>
-          </Link>
-        </header>
-
-        <nav
-          className={styles.catalogueRail}
-          aria-label="Browse Venture categories"
+      <nav
+        className={styles.modeGrid}
+        aria-label="Quick discovery choices"
+      >
+        <Link
+          className={styles.modeTonight}
+          href="/explore?when=tonight"
         >
-          <Link
-            className={`${styles.catalogueCard} ${styles.catalogueEvents}`}
-            href="/explore?filter=events"
-          >
-            <div className={styles.catalogueCardTop}>
-              <span className={styles.catalogueIcon}>
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <rect
-                    x="4"
-                    y="5"
-                    width="16"
-                    height="15"
-                    rx="3"
-                  />
-                  <path d="M8 3v4M16 3v4M4 10h16" />
-                  <path d="M8 14h3M13 14h3M8 17h3" />
-                </svg>
-              </span>
-
-              <span
-                className={styles.catalogueArrow}
-                aria-hidden="true"
-              >
-                ↗
-              </span>
-            </div>
-
-            <div className={styles.catalogueCopy}>
-              <small>HAPPENING NOW</small>
-              <strong>Events</strong>
-              <p>
-                Concerts, markets, festivals and
-                things worth showing up for.
-              </p>
-            </div>
-          </Link>
-
-          <Link
-            className={`${styles.catalogueCard} ${styles.catalogueFood}`}
-            href="/explore?filter=food"
-          >
-            <div className={styles.catalogueCardTop}>
-              <span className={styles.catalogueIcon}>
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M7 3v7M4 3v4c0 2 1 3 3 3s3-1 3-3V3" />
-                  <path d="M7 10v11" />
-                  <path d="M16 3v18" />
-                  <path d="M16 3c3 2 4 5 4 8h-4" />
-                </svg>
-              </span>
-
-              <span
-                className={styles.catalogueArrow}
-                aria-hidden="true"
-              >
-                ↗
-              </span>
-            </div>
-
-            <div className={styles.catalogueCopy}>
-              <small>GOOD EATS</small>
-              <strong>Food &amp; Drink</strong>
-              <p>
-                Restaurants, cafés, bars and local
-                places worth trying.
-              </p>
-            </div>
-          </Link>
-
-          <Link
-            className={`${styles.catalogueCard} ${styles.catalogueActivities}`}
-            href="/explore?filter=activities"
-          >
-            <div className={styles.catalogueCardTop}>
-              <span className={styles.catalogueIcon}>
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M8 8h8a5 5 0 0 1 5 5v2a3 3 0 0 1-5 2l-2-2h-4l-2 2a3 3 0 0 1-5-2v-2a5 5 0 0 1 5-5Z" />
-                  <path d="M7 12h4M9 10v4" />
-                  <circle cx="16.5" cy="11.5" r="1" />
-                  <circle cx="18.5" cy="13.5" r="1" />
-                </svg>
-              </span>
-
-              <span
-                className={styles.catalogueArrow}
-                aria-hidden="true"
-              >
-                ↗
-              </span>
-            </div>
-
-            <div className={styles.catalogueCopy}>
-              <small>GO DO SOMETHING</small>
-              <strong>Activities</strong>
-              <p>
-                Escape rooms, games, axe throwing
-                and hands-on experiences.
-              </p>
-            </div>
-          </Link>
-
-          <Link
-            className={`${styles.catalogueCard} ${styles.catalogueNightlife}`}
-            href="/explore?filter=nightlife"
-          >
-            <div className={styles.catalogueCardTop}>
-              <span className={styles.catalogueIcon}>
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M20 15.5A8 8 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z" />
-                  <path d="m17 4 .5 1.5L19 6l-1.5.5L17 8l-.5-1.5L15 6l1.5-.5Z" />
-                </svg>
-              </span>
-
-              <span
-                className={styles.catalogueArrow}
-                aria-hidden="true"
-              >
-                ↗
-              </span>
-            </div>
-
-            <div className={styles.catalogueCopy}>
-              <small>AFTER DARK</small>
-              <strong>Nightlife</strong>
-              <p>
-                Bars, lounges, dance floors and
-                Winnipeg after hours.
-              </p>
-            </div>
-          </Link>
-        </nav>
-      </section>
-
-      
-
-
-
-      {community ? (
-        <section className={styles.communityFeature}>
-          <div className={styles.communityFeatureTop}>
-            <div>
-              <span>VENTURE IS BUILDING</span>
-              <small>ONE COMMUNITY PLAN THIS MONTH</small>
-            </div>
-
-            <b aria-hidden="true">MONTHLY</b>
+          <span>◷</span>
+          <div>
+            <small>RIGHT NOW</small>
+            <strong>Tonight</strong>
           </div>
+          <b aria-hidden="true">→</b>
+        </Link>
 
-          <h2>{community.title}</h2>
-
-          <p>{community.summary}</p>
-
-          {community.stops.length > 0 ? (
-            <ol
-              className={styles.communityFeatureRoute}
-              aria-label="Community experience route preview"
-            >
-              {community.stops
-                .slice(0, 3)
-                .map((stop, index) => (
-                  <li key={stop.id}>
-                    <b>{index + 1}</b>
-                    <span>{stop.listingName}</span>
-                  </li>
-                ))}
-            </ol>
-          ) : null}
-
-          <div className={styles.communityFeatureMeta}>
-            <span>
-              {new Intl.DateTimeFormat(
-                "en-CA",
-                {
-                  timeZone: "America/Winnipeg",
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit"
-                }
-              ).format(
-                new Date(
-                  community.startsAt
-                )
-              )}
-            </span>
-
-            <span>
-              {community.neighbourhood ??
-                "Winnipeg"}
-            </span>
-
-            <span>
-              {community.remainingSpots > 0
-                ? `${community.remainingSpots} spaces left`
-                : "Waitlist open"}
-            </span>
+        <Link
+          className={styles.modeNew}
+          href="/explore?new=1"
+        >
+          <span>✦</span>
+          <div>
+            <small>FRESH TERRITORY</small>
+            <strong>New to me</strong>
           </div>
+          <b aria-hidden="true">→</b>
+        </Link>
 
-          <Link
-            className={styles.communityFeatureLink}
-            href={`/community/${community.slug}`}
-          >
-            Open this month’s experience
-            <b aria-hidden="true">→</b>
-          </Link>
-        </section>
-      ) : null}
+        <Link
+          className={styles.modeBudget}
+          href="/explore?price=under-40"
+        >
+          <span>$</span>
+          <div>
+            <small>KEEP IT LIGHT</small>
+            <strong>Under $40</strong>
+          </div>
+          <b aria-hidden="true">→</b>
+        </Link>
+
+        <Link
+          className={styles.modeOpen}
+          href="/explore?when=open"
+        >
+          <span>OPEN</span>
+          <div>
+            <small>NO WAITING AROUND</small>
+            <strong>Open now</strong>
+          </div>
+          <b aria-hidden="true">→</b>
+        </Link>
+      </nav>
 
       {featured ? (
         <FeaturedListing listing={featured} />
       ) : null}
 
-      <section className={styles.planningNudge}>
-        <div>
-          <span>NEED A FULL PLAN?</span>
-          <strong>Choose any listing, then build around it.</strong>
-          <p>
-            Fixed-time events stay anchored while Venture adds food,
-            activities, or another stop before and after.
-          </p>
+      <section className={styles.builderCard}>
+        <div className={styles.builderStamp}>
+          BUILT FOR YOU
         </div>
 
-        <Link href="/build-outing">
-          Build an outing
-          <b aria-hidden="true">＋</b>
-        </Link>
+        <div className={styles.builderCopy}>
+          <span>VENTURE BUILDER</span>
+          <h2>
+            One tap from
+            <em> “what do we do?” </em>
+            to a full plan.
+          </h2>
+          <p>
+            Choose the mood, budget and timing.
+            Venture builds the route, then you can
+            drag, replace or remove every stop.
+          </p>
+
+          <div className={styles.builderActions}>
+            <Link href="/build-outing">
+              Build my outing
+              <b aria-hidden="true">→</b>
+            </Link>
+
+            <Link href="/explore">
+              Browse first
+            </Link>
+          </div>
+        </div>
+
+        <div
+          className={styles.routeIllustration}
+          aria-hidden="true"
+        >
+          <span>1</span>
+          <i />
+          <span>2</span>
+          <i />
+          <span>3</span>
+          <b>GO!</b>
+        </div>
       </section>
 
       {visitData.stats.totalVisits > 0 ? (

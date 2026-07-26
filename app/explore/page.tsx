@@ -43,7 +43,6 @@ type ExplorePageProps = {
     price?: string;
     area?: string;
     new?: string;
-    view?: string;
   }>;
 };
 
@@ -54,10 +53,6 @@ function getValidFilter(
     value === "all" ||
     value === "events" ||
     value === "food" ||
-    value === "activities" ||
-    value === "nightlife" ||
-    value === "attractions" ||
-    value === "shopping" ||
     value === "open" ||
     value === "verified"
   ) {
@@ -190,8 +185,7 @@ export default async function ExplorePage({
     when: requestedWhen,
     price: requestedPrice,
     area: requestedArea = "",
-    new: requestedNew,
-    view: requestedView
+    new: requestedNew
   } = await searchParams;
 
   const intent =
@@ -312,54 +306,6 @@ export default async function ExplorePage({
         ).length
     },
     {
-      label: "Activities",
-      value: "activities",
-      count:
-        searchAndAdvancedMatches.filter(
-          (listing) =>
-            matchesDiscoveryFilter(
-              listing,
-              "activities"
-            )
-        ).length
-    },
-    {
-      label: "Nightlife",
-      value: "nightlife",
-      count:
-        searchAndAdvancedMatches.filter(
-          (listing) =>
-            matchesDiscoveryFilter(
-              listing,
-              "nightlife"
-            )
-        ).length
-    },
-    {
-      label: "Attractions",
-      value: "attractions",
-      count:
-        searchAndAdvancedMatches.filter(
-          (listing) =>
-            matchesDiscoveryFilter(
-              listing,
-              "attractions"
-            )
-        ).length
-    },
-    {
-      label: "Shopping",
-      value: "shopping",
-      count:
-        searchAndAdvancedMatches.filter(
-          (listing) =>
-            matchesDiscoveryFilter(
-              listing,
-              "shopping"
-            )
-        ).length
-    },
-    {
       label: "Open now",
       value: "open",
       count:
@@ -402,27 +348,14 @@ export default async function ExplorePage({
       : activeFilter === "food" ||
           activeFilter === "open"
         ? "restaurant"
-        : activeFilter === "activities" ||
-            activeFilter === "nightlife" ||
-            activeFilter === "attractions" ||
-            activeFilter === "shopping"
-          ? "place"
-          : "other";
+        : "other";
 
   const interpretedLabels = [
     activeFilter === "events"
       ? "Events"
       : activeFilter === "food"
         ? "Food & drink"
-        : activeFilter === "activities"
-          ? "Activities"
-          : activeFilter === "nightlife"
-            ? "Nightlife"
-            : activeFilter === "attractions"
-              ? "Attractions"
-              : activeFilter === "shopping"
-                ? "Shopping"
-                : null,
+        : null,
     readableWhen(activeWhen),
     readablePrice(activePrice),
     activeArea || null,
@@ -443,9 +376,9 @@ export default async function ExplorePage({
           <h1>Explore Winnipeg</h1>
 
           <p>
-            Browse Winnipeg events, restaurants,
-            activities and attractions, then use the
-            map when location matters.
+            Search naturally, shape the results,
+            then switch between list and map when
+            location matters.
           </p>
         </div>
 
@@ -488,7 +421,7 @@ export default async function ExplorePage({
             id="explore-search"
             name="q"
             defaultValue={q}
-            placeholder="Try “escape rooms” or “free events tonight”"
+            placeholder="Try “free events tonight”"
             autoComplete="off"
           />
 
@@ -587,11 +520,6 @@ export default async function ExplorePage({
         searchQuery={q.trim()}
         requestType={requestType}
         newToMeOnly={newToMe}
-        initialView={
-          requestedView === "map"
-            ? "map"
-            : "list"
-        }
       />
     </main>
   );

@@ -10,26 +10,20 @@ import {
   getPublishedPlaceListings
 } from "@/lib/data/places";
 
-import {
-  getFeaturedCommunityExperience
-} from "@/lib/community";
-
 export const dynamic =
   "force-dynamic";
 
 export default async function HomePage() {
-  const [events, places, community] =
+  const [events, places] =
     await Promise.all([
       getPublishedEventListings(40),
-      getPublishedPlaceListings(40),
-      getFeaturedCommunityExperience()
+      getPublishedPlaceListings(40)
     ]);
 
   return (
     <TodayDiscovery
       events={events}
       places={places}
-      community={community}
     />
   );
 }

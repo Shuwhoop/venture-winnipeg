@@ -1,10 +1,6 @@
 "use client";
 
 import {
-  useEffect
-} from "react";
-
-import {
   usePathname
 } from "next/navigation";
 
@@ -20,9 +16,6 @@ import {
 import {
   BottomNav
 } from "@/components/bottom-nav";
-import {
-  FloatingBuildAction
-} from "@/components/floating-build-action";
 import {
   AppFoundationRuntime
 } from "@/components/app-foundation/app-foundation";
@@ -59,25 +52,6 @@ export function AdminRouteChrome() {
     isAdminAuth
   } = useRouteKind();
 
-  useEffect(() => {
-    const shouldUseWideAdmin =
-      isAdmin && !isAdminAuth;
-
-    document.body.classList.toggle(
-      "venture-admin-route",
-      shouldUseWideAdmin
-    );
-
-    return () => {
-      document.body.classList.remove(
-        "venture-admin-route"
-      );
-    };
-  }, [
-    isAdmin,
-    isAdminAuth
-  ]);
-
   if (!isAdmin || isAdminAuth) {
     return null;
   }
@@ -105,7 +79,6 @@ export function PublicRouteChrome({
     <>
       <AppFoundationRuntime showInstall={pathname === "/"} />
       <AccountSyncRuntime />
-      <FloatingBuildAction />
       <BottomNav />
       {analyticsEnabled ? (
         <VentureAnalytics />

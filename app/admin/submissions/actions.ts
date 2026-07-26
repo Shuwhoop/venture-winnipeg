@@ -16,10 +16,6 @@ import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
 
-import {
-  promoteSubmissionPhoto
-} from "@/lib/media/listing-photo-server";
-
 
 type SubmissionType =
   | "restaurant"
@@ -1373,70 +1369,6 @@ export async function openSubmissionInEditor(
   );
 }
 
-async function attachApprovedSubmissionPhoto({
-  submissionId,
-  entityType,
-  entityId,
-  actorId
-}: {
-  submissionId: string;
-  entityType: "place" | "event";
-  entityId: string;
-  actorId: string;
-}): Promise<void> {
-  await promoteSubmissionPhoto({
-    submissionId,
-    entityType,
-    entityId,
-    actorId
-  });
-}
-
-async function getApprovedSubmissionEntity(
-  submissionId: string
-): Promise<{
-  entityType: "place" | "event";
-  entityId: string;
-} | null> {
-  const supabase =
-    getSupabaseAdminClient();
-
-  const { data, error } =
-    await supabase
-      .from("listing_submissions")
-      .select(
-        "approved_entity_type,approved_entity_id,linked_entity_type,linked_entity_id"
-      )
-      .eq("id", submissionId)
-      .maybeSingle();
-
-  if (error) {
-    throw new Error(
-      `Could not read the published submission: ${error.message}`
-    );
-  }
-
-  const entityType =
-    data?.approved_entity_type ??
-    data?.linked_entity_type;
-  const entityId =
-    data?.approved_entity_id ??
-    data?.linked_entity_id;
-
-  if (
-    (entityType !== "place" &&
-      entityType !== "event") ||
-    !entityId
-  ) {
-    return null;
-  }
-
-  return {
-    entityType,
-    entityId
-  };
-}
-
 export async function completeLinkedSubmission(
   formData: FormData
 ) {
@@ -1496,13 +1428,6 @@ export async function completeLinkedSubmission(
       "Publish the linked listing in the full editor before marking this submission complete."
     );
   }
-
-  await attachApprovedSubmissionPhoto({
-    submissionId: id,
-    entityType,
-    entityId,
-    actorId: admin.id
-  });
 
   const now = new Date().toISOString();
   const updateResult = await supabase
@@ -1579,15 +1504,7 @@ export async function rejectSubmission(
 export async function publishRestaurantSubmission(
   formData: FormData
 ) {
-  const admin =
-    await requireVentureAdmin();
-
-  const submissionId =
-    requiredText(
-      formData,
-      "id",
-      80
-    );
+  await requireVentureAdmin();
 
   const placeType =
     requiredText(
@@ -1616,7 +1533,11 @@ export async function publishRestaurantSubmission(
       "publish_restaurant_submission",
       {
         p_submission_id:
-          submissionId,
+          requiredText(
+            formData,
+            "id",
+            80
+          ),
 
         p_payload:
           restaurantPayload(
@@ -1655,23 +1576,6 @@ export async function publishRestaurantSubmission(
     );
   }
 
-  const approvedEntity =
-    await getApprovedSubmissionEntity(
-      submissionId
-    );
-
-  if (approvedEntity) {
-    await attachApprovedSubmissionPhoto({
-      submissionId,
-      entityType:
-        approvedEntity.entityType,
-      entityId:
-        approvedEntity.entityId,
-      actorId:
-        admin.id
-    });
-  }
-
   revalidatePath(
     "/admin/submissions"
   );
@@ -1689,15 +1593,7 @@ export async function publishRestaurantSubmission(
 export async function publishEventSubmission(
   formData: FormData
 ) {
-  const admin =
-    await requireVentureAdmin();
-
-  const submissionId =
-    requiredText(
-      formData,
-      "id",
-      80
-    );
+  await requireVentureAdmin();
 
   const existingVenueId =
     optionalText(
@@ -1716,7 +1612,11 @@ export async function publishEventSubmission(
       "publish_event_submission",
       {
         p_submission_id:
-          submissionId,
+          requiredText(
+            formData,
+            "id",
+            80
+          ),
 
         p_payload:
           eventPayload(
@@ -1753,23 +1653,6 @@ export async function publishEventSubmission(
     throw new Error(
       `Could not publish the event: ${error.message}`
     );
-  }
-
-  const approvedEntity =
-    await getApprovedSubmissionEntity(
-      submissionId
-    );
-
-  if (approvedEntity) {
-    await attachApprovedSubmissionPhoto({
-      submissionId,
-      entityType:
-        approvedEntity.entityType,
-      entityId:
-        approvedEntity.entityId,
-      actorId:
-        admin.id
-    });
   }
 
   revalidatePath(

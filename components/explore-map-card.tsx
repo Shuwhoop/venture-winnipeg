@@ -3,18 +3,20 @@
 import Link from "next/link";
 
 import {
+  ListingShareButton
+} from "@/components/listing-share-button";
+
+import {
   SaveButton
 } from "@/components/save-button";
 
 import {
-  trackBetaEvent
-} from "@/lib/beta/client";
+  VisitButton
+} from "@/components/visit-button";
 
 import {
-  getCatalogueIcon,
-  getCatalogueKind,
-  getCatalogueLabel
-} from "@/lib/catalogue";
+  trackBetaEvent
+} from "@/lib/beta/client";
 
 import {
   getListingProximity,
@@ -29,6 +31,7 @@ import styles from "@/app/explore/explore.module.css";
 
 type ExploreMapCardProps = {
   listing: Listing;
+  index: number;
   selected: boolean;
   userLocation: GeoPoint | null;
   onFocus: (listing: Listing) => void;
@@ -36,6 +39,7 @@ type ExploreMapCardProps = {
 
 export function ExploreMapCard({
   listing,
+  index,
   selected,
   userLocation,
   onFocus
@@ -49,10 +53,6 @@ export function ExploreMapCard({
   const listingKey =
     `${listing.type}-${listing.id}`;
 
-  const catalogueKind =
-    listing.catalogueKind ??
-    getCatalogueKind(listing);
-
   return (
     <article
       className={`${styles.mapResultCard} ${
@@ -61,7 +61,7 @@ export function ExploreMapCard({
           : ""
       }`}
       data-listing-key={listingKey}
-      aria-label={listing.name}
+      aria-label={`${index + 1}. ${listing.name}`}
     >
       <button
         type="button"
@@ -74,17 +74,21 @@ export function ExploreMapCard({
       />
 
       <div
-        className={`${styles.mapResultCategoryIcon} ${styles[`mapResultCategory_${catalogueKind}`] ?? ""}`}
+        className={`${styles.mapResultNumber} ${
+          listing.type === "event"
+            ? styles.mapResultNumberEvent
+            : styles.mapResultNumberPlace
+        }`}
         aria-hidden="true"
       >
-        {getCatalogueIcon(catalogueKind)}
+        {index + 1}
       </div>
 
       <div className={styles.mapResultCopy}>
         <span className={styles.mapResultType}>
-          {getCatalogueLabel(
-            catalogueKind
-          ).toUpperCase()}
+          {listing.type === "event"
+            ? "EVENT"
+            : listing.category.toUpperCase()}
         </span>
 
         <h3>{listing.name}</h3>
@@ -115,8 +119,20 @@ export function ExploreMapCard({
         </div>
       </div>
 
-      <div className={styles.mapResultSaveAction}>
+      <div className={styles.mapResultUtilityActions}>
         <SaveButton listing={listing} />
+
+        <ListingShareButton
+          listing={listing}
+        />
+
+        <VisitButton
+          listing={listing}
+          fallbackEventDate={
+            listing.startAt ?? null
+          }
+          compact
+        />
       </div>
 
       <div className={styles.mapResultPrimaryActions}>
@@ -140,8 +156,34 @@ export function ExploreMapCard({
             });
           }}
         >
-          View details
+          Details
           <span aria-hidden="true">→</span>
+        </Link>
+
+        <Link
+          className={styles.mapResultBuildAction}
+          href={`/build-outing?anchor=${encodeURIComponent(
+            listingKey
+          )}`}
+          onClick={() => {
+            trackBetaEvent({
+              eventName:
+                "outing_builder_opened",
+              pagePath:
+                window.location.pathname,
+              properties: {
+                listingId: listing.id,
+                listingSlug: listing.slug,
+                listingType: listing.type,
+                listingName: listing.name,
+                source:
+                  "explore-map-card"
+              }
+            });
+          }}
+        >
+          Build around this
+          <span aria-hidden="true">＋</span>
         </Link>
       </div>
     </article>

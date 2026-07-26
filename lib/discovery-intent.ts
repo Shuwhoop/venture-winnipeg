@@ -6,10 +6,6 @@ export type DiscoveryFilter =
   | "all"
   | "events"
   | "food"
-  | "activities"
-  | "nightlife"
-  | "attractions"
-  | "shopping"
   | "open"
   | "verified";
 
@@ -100,46 +96,10 @@ export function parseDiscoveryIntent(
 
   const eventPattern =
     /\b(events?|concerts?|shows?|festivals?|comedy|sports?)\b/gi;
-  const activityPattern =
-    /\b(activities|activity|escape\s*rooms?|axe\s*throwing|board[-\s]?game\s*cafes?|bowling|arcades?|mini\s*golf|laser\s*tag|karaoke|go[-\s]?karts?|climbing|paintball|pottery)\b/gi;
-  const nightlifePattern =
-    /\b(nightlife|nightclubs?|cocktail\s*bars?|bars?|pubs?|breweries|drinks?)\b/gi;
-  const attractionPattern =
-    /\b(attractions?|museums?|galleries|landmarks?|zoo|gardens?|tours?)\b/gi;
-  const shoppingPattern =
-    /\b(shopping|markets?|boutiques?|shops?|retail)\b/gi;
   const foodPattern =
-    /\b(restaurants?|food|dinner|lunch|brunch|cafes?|coffee|bakeries|dessert)\b/gi;
+    /\b(restaurants?|food|dinner|lunch|brunch|cafes?|coffee|bars?|drinks?)\b/gi;
 
-  if (activityPattern.test(working)) {
-    inferredFilter = "activities";
-    interpreted = true;
-    working = working.replace(
-      activityPattern,
-      " "
-    );
-  } else if (nightlifePattern.test(working)) {
-    inferredFilter = "nightlife";
-    interpreted = true;
-    working = working.replace(
-      nightlifePattern,
-      " "
-    );
-  } else if (attractionPattern.test(working)) {
-    inferredFilter = "attractions";
-    interpreted = true;
-    working = working.replace(
-      attractionPattern,
-      " "
-    );
-  } else if (shoppingPattern.test(working)) {
-    inferredFilter = "shopping";
-    interpreted = true;
-    working = working.replace(
-      shoppingPattern,
-      " "
-    );
-  } else if (eventPattern.test(working)) {
+  if (eventPattern.test(working)) {
     inferredFilter = "events";
     interpreted = true;
     working = working.replace(
@@ -302,19 +262,7 @@ export function matchesDiscoveryFilter(
       return listing.type === "event";
 
     case "food":
-      return listing.catalogueKind === "food";
-
-    case "activities":
-      return listing.catalogueKind === "activity";
-
-    case "nightlife":
-      return listing.catalogueKind === "nightlife";
-
-    case "attractions":
-      return listing.catalogueKind === "attraction";
-
-    case "shopping":
-      return listing.catalogueKind === "shopping";
+      return listing.type === "restaurant";
 
     case "open":
       return (

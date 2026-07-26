@@ -6,11 +6,6 @@ import type {
   VerificationStatus
 } from "@/lib/types";
 
-import {
-  getCatalogueKind,
-  getSuggestedDurationProfile
-} from "@/lib/catalogue";
-
 type PlaceRow = {
   id: string;
   slug: string;
@@ -26,7 +21,6 @@ type PlaceRow = {
   verification_status: VerificationStatus;
   warning_message: string | null;
   source_checked_at: string | null;
-  image_url: string | null;
   latitude: number;
   longitude: number;
 };
@@ -452,26 +446,6 @@ function getLastCheckedLabel(
   return `Checked ${formattedDate}`;
 }
 
-function isTommysPizzeria(
-  value: {
-    slug: string;
-    name: string;
-  }
-): boolean {
-  const slug =
-    value.slug.toLowerCase();
-  const listingName =
-    value.name.toLowerCase();
-
-  return (
-    slug.includes("tommy") &&
-    slug.includes("pizz")
-  ) || (
-    listingName.includes("tommy") &&
-    listingName.includes("pizz")
-  );
-}
-
 function convertPlaceToListing(
   place: PlaceRow
 ): Listing {
@@ -487,30 +461,6 @@ function convertPlaceToListing(
       place.primary_category,
     price
   ];
-
-  const baseListing = {
-    type: "restaurant" as const,
-    name: place.name,
-    category: place.primary_category,
-    subtitle: subtitleParts.join(" · "),
-    description: place.short_description,
-    placeType: place.place_type,
-    searchTerms: [
-      place.primary_category,
-      place.cuisine_primary ?? "",
-      place.place_type,
-      place.neighbourhood ?? ""
-    ].filter(Boolean)
-  };
-
-  const catalogueKind =
-    getCatalogueKind(baseListing);
-
-  const durationProfile =
-    getSuggestedDurationProfile({
-      ...baseListing,
-      catalogueKind
-    });
 
   return {
     id: place.id,
@@ -548,26 +498,7 @@ function convertPlaceToListing(
         place.source_checked_at
       ),
 
-    imageClass:
-      place.image_url
-        ? "image-uploaded"
-        : isTommysPizzeria(place)
-          ? "image-tommys-pizzeria"
-          : catalogueKind === "activity"
-            ? "image-activity"
-            : catalogueKind === "attraction"
-              ? "image-attraction"
-              : catalogueKind === "nightlife"
-                ? "image-nightlife"
-                : catalogueKind === "shopping"
-                  ? "image-shopping"
-                  : "image-food",
-
-    imageUrl:
-      place.image_url ??
-      (isTommysPizzeria(place)
-        ? "/listing-icons/tommys-pizzeria.jpg"
-        : null),
+    imageClass: "image-food",
 
     neighbourhood:
       place.neighbourhood ??
@@ -575,18 +506,6 @@ function convertPlaceToListing(
 
     description:
       place.short_description,
-
-    catalogueKind,
-    suggestedDurationMinutes:
-      durationProfile.suggestedMinutes,
-    minimumDurationMinutes:
-      durationProfile.minimumMinutes,
-    maximumDurationMinutes:
-      durationProfile.maximumMinutes,
-    durationSource:
-      durationProfile.source,
-    isFixedTime:
-      durationProfile.isFixedTime,
 
     latitude: place.latitude,
     longitude: place.longitude,
@@ -624,7 +543,6 @@ const placeFields = `
   verification_status,
   warning_message,
   source_checked_at,
-  image_url,
   latitude,
   longitude
   `;
@@ -654,9 +572,7 @@ export async function getPublishedPlaceListings(
         "fast_casual",
         "fine_dining",
         "late_night_food",
-        "market",
-        "activity",
-        "attraction"
+        "market"
       ])
       .order("published_at", {
         ascending: false

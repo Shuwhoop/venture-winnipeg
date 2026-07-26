@@ -9,20 +9,6 @@ export type ListingType =
   | "event"
   | "restaurant";
 
-export type CatalogueKind =
-  | "event"
-  | "food"
-  | "activity"
-  | "nightlife"
-  | "attraction"
-  | "shopping";
-
-export type ListingDurationSource =
-  | "official"
-  | "category_default"
-  | "editor_estimate"
-  | "venture_aggregate";
-
 export type Listing = {
   id: string;
   slug: string;
@@ -51,15 +37,7 @@ export type Listing = {
   ratingCount?: number;
 
   imageClass: string;
-  imageUrl?: string | null;
   neighbourhood: string;
-
-  catalogueKind?: CatalogueKind;
-  suggestedDurationMinutes?: number;
-  minimumDurationMinutes?: number;
-  maximumDurationMinutes?: number;
-  durationSource?: ListingDurationSource;
-  isFixedTime?: boolean;
 
   venueName?: string;
   address?: string;

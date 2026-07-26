@@ -29,10 +29,6 @@ import {
   getVisitedListingKeys
 } from "@/lib/visit-history";
 
-import {
-  formatDurationMinutes
-} from "@/lib/catalogue";
-
 const OUTING_DRAFT_KEY =
   "venture:outing-draft:v1";
 
@@ -107,7 +103,6 @@ type BuildMethod =
 type StopKind =
   | "food"
   | "event"
-  | "activity"
   | "drinks";
 
 type DiscoveryPreference =
@@ -118,7 +113,6 @@ type DiscoveryPreference =
 type StopMix = {
   food: number;
   events: number;
-  activities: number;
   drinks: number;
 };
 
@@ -160,7 +154,6 @@ type AnchorOption = {
   timeOrHours: string;
   price: string;
   startAt?: string;
-  suggestedDurationMinutes?: number;
 };
 
 type OutingDraft = {
@@ -188,11 +181,6 @@ type OutingDraft = {
   allowedKinds: StopKind[];
   anchorListingKey: string | null;
   anchorListingName: string | null;
-  anchorDurationMinutes: number | null;
-  anchorPlacement:
-    | "before"
-    | "after"
-    | "both";
   soloVibe: SoloVibe | null;
   soloPace: SoloPace | null;
   groupVibe: GroupVibe | null;
@@ -568,15 +556,7 @@ const stopKindDetails: Record<
       "events",
     icon: "🎟",
     description:
-      "Shows, sports, markets, festivals, and scheduled happenings"
-  },
-  activity: {
-    label: "Activities",
-    shortLabel:
-      "activities",
-    icon: "⚡",
-    description:
-      "Escape rooms, axe throwing, games, bowling, and hands-on experiences"
+      "Shows, sports, markets, festivals, and activities"
   },
   drinks: {
     label:
@@ -673,7 +653,6 @@ function getMixTotal(
   return (
     mix.food +
     mix.events +
-    mix.activities +
     mix.drinks
   );
 }
@@ -690,13 +669,6 @@ function formatMix(
           mix.events === 1
             ? "event"
             : "events"
-        }`
-      : "",
-    mix.activities > 0
-      ? `${mix.activities} ${
-          mix.activities === 1
-            ? "activity"
-            : "activities"
         }`
       : "",
     mix.drinks > 0
@@ -1062,7 +1034,6 @@ export default function BuildOutingPage() {
   ] = useState<StopMix>({
     food: 1,
     events: 1,
-    activities: 0,
     drinks: 1
   });
 
@@ -1077,7 +1048,6 @@ export default function BuildOutingPage() {
   ] = useState<StopKind[]>([
     "food",
     "event",
-    "activity",
     "drinks"
   ]);
 
@@ -1148,18 +1118,6 @@ export default function BuildOutingPage() {
   ] = useState<
     StopKind | "all"
   >("all");
-
-  const [
-    anchorDurationMinutes,
-    setAnchorDurationMinutes
-  ] = useState(90);
-
-  const [
-    anchorPlacement,
-    setAnchorPlacement
-  ] = useState<
-    "before" | "after" | "both"
-  >("both");
 
   useEffect(() => {
     const loadedPreferences =
@@ -1413,19 +1371,6 @@ export default function BuildOutingPage() {
         anchorOptions
       ]
     );
-
-  useEffect(() => {
-    if (
-      selectedAnchor?.suggestedDurationMinutes
-    ) {
-      setAnchorDurationMinutes(
-        selectedAnchor.suggestedDurationMinutes
-      );
-    }
-  }, [
-    selectedAnchor?.key,
-    selectedAnchor?.suggestedDurationMinutes
-  ]);
 
   const filteredAnchorOptions =
     useMemo(
@@ -1736,13 +1681,6 @@ export default function BuildOutingPage() {
         selectedAnchor?.name ??
         null,
 
-      anchorDurationMinutes:
-        buildMethod === "anchor"
-          ? anchorDurationMinutes
-          : null,
-
-      anchorPlacement,
-
       soloVibe:
         planningMode === "solo"
           ? soloVibe
@@ -2014,7 +1952,6 @@ export default function BuildOutingPage() {
                         ) {
                           setStopMix({
                             food: 1,
-                            activities: 0,
                             events: 0,
                             drinks: 1
                           });
@@ -2289,20 +2226,6 @@ export default function BuildOutingPage() {
                 />
 
                 <CountStepper
-                  kind="activity"
-                  value={
-                    stopMix.activities
-                  }
-                  onChange={
-                    (value) =>
-                      updateMix(
-                        "activities",
-                        value
-                      )
-                  }
-                />
-
-                <CountStepper
                   kind="drinks"
                   value={
                     stopMix.drinks
@@ -2350,7 +2273,6 @@ export default function BuildOutingPage() {
                       "all",
                       "food",
                       "event",
-                      "activity",
                       "drinks"
                     ] as const
                   ).map(
@@ -2461,14 +2383,6 @@ export default function BuildOutingPage() {
                                   option
                                 )} • {option.price}
                               </i>
-
-                              {option.suggestedDurationMinutes ? (
-                                <em>
-                                  Suggested time: {formatDurationMinutes(
-                                    option.suggestedDurationMinutes
-                                  )}
-                                </em>
-                              ) : null}
                             </span>
 
                             <span className="outing-anchor-check">
@@ -2499,7 +2413,7 @@ export default function BuildOutingPage() {
                 <section className="outing-anchor-addons">
                   <div className="outing-anchor-selected">
                     <span>
-                      OUTING ANCHOR
+                      STARTING POINT
                     </span>
 
                     <strong>
@@ -2507,101 +2421,9 @@ export default function BuildOutingPage() {
                     </strong>
 
                     <small>
-                      Venture keeps this listing in the plan and adds
-                      compatible stops before, after, or on both sides.
+                      Add up to four more stops
+                      around this listing.
                     </small>
-                  </div>
-
-                  <div className="outing-anchor-plan-controls">
-                    <div className="outing-anchor-duration-control">
-                      <span>
-                        SUGGESTED TIME
-                      </span>
-
-                      <div>
-                        <button
-                          type="button"
-                          aria-label="Reduce anchor time"
-                          onClick={() =>
-                            setAnchorDurationMinutes(
-                              (current) =>
-                                Math.max(
-                                  30,
-                                  current - 15
-                                )
-                            )
-                          }
-                        >
-                          −
-                        </button>
-
-                        <strong>
-                          {Math.floor(
-                            anchorDurationMinutes / 60
-                          ) > 0
-                            ? `${Math.floor(
-                                anchorDurationMinutes / 60
-                              )} hr${
-                                anchorDurationMinutes % 60
-                                  ? ` ${anchorDurationMinutes % 60} min`
-                                  : ""
-                              }`
-                            : `${anchorDurationMinutes} min`}
-                        </strong>
-
-                        <button
-                          type="button"
-                          aria-label="Add anchor time"
-                          onClick={() =>
-                            setAnchorDurationMinutes(
-                              (current) =>
-                                Math.min(
-                                  300,
-                                  current + 15
-                                )
-                            )
-                          }
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-
-                    <fieldset className="outing-anchor-placement-control">
-                      <legend>
-                        What should Venture add?
-                      </legend>
-
-                      <div>
-                        {(
-                          [
-                            ["before", "Before anchor"],
-                            ["after", "After anchor"],
-                            ["both", "Both sides"]
-                          ] as const
-                        ).map(
-                          ([value, label]) => (
-                            <button
-                              type="button"
-                              key={value}
-                              className={
-                                anchorPlacement === value
-                                  ? "selected"
-                                  : ""
-                              }
-                              aria-pressed={
-                                anchorPlacement === value
-                              }
-                              onClick={() =>
-                                setAnchorPlacement(value)
-                              }
-                            >
-                              {label}
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </fieldset>
                   </div>
 
                   <div className="outing-count-grid">
@@ -2628,20 +2450,6 @@ export default function BuildOutingPage() {
                         (value) =>
                           updateMix(
                             "events",
-                            value
-                          )
-                      }
-                    />
-
-                    <CountStepper
-                      kind="activity"
-                      value={
-                        stopMix.activities
-                      }
-                      onChange={
-                        (value) =>
-                          updateMix(
-                            "activities",
                             value
                           )
                       }

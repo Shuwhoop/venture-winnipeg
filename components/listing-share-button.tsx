@@ -18,13 +18,11 @@ import styles from "./listing-share-button.module.css";
 type ListingShareButtonProps = {
   listing: Listing;
   className?: string;
-  source?: string;
 };
 
 export function ListingShareButton({
   listing,
-  className = "",
-  source = "listing-share-button"
+  className = ""
 }: ListingShareButtonProps) {
   const [message, setMessage] =
     useState("");
@@ -84,7 +82,7 @@ export function ListingShareButton({
           listingSlug: listing.slug,
           listingType: listing.type,
           listingName: listing.name,
-          source
+          source: "explore-map-card"
         }
       });
     } catch (error) {

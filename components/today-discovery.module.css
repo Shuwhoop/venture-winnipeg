@@ -1109,695 +1109,704 @@
   }
 }
 
+/* VENTURE QUICK CARD COLOUR REFRESH */
 
-
-
-
-
-
-
-
-
-
-
-/* VENTURE PREMIUM CATEGORY CARDS */
-
-.catalogueSection {
-  display: grid;
-  gap: 15px;
-
-  margin-top: 14px;
+.modeGrid {
+  gap: 12px !important;
 }
 
-.catalogueSection > header {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    auto;
-
-  align-items: end;
-  gap: 14px;
-
-  padding: 0 2px;
-}
-
-.catalogueSection > header > div {
-  display: grid;
-  gap: 5px;
-
-  min-width: 0;
-}
-
-.catalogueSection > header span {
-  color: var(--home-red);
-
-  font-size: 0.57rem;
-  font-weight: 950;
-  letter-spacing: 0.14em;
-}
-
-.catalogueSection > header h2 {
-  max-width: 13ch;
-  margin: 0;
-
-  color: var(--home-ink);
-
-  font-size:
-    clamp(
-      1.7rem,
-      7.5vw,
-      2.15rem
-    );
-
-  line-height: 0.92;
-  letter-spacing: -0.06em;
-}
-
-/* Quieter browse-all button */
-
-.catalogueSection > header > a {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-
-  min-height: 38px;
-  padding: 7px 8px 7px 11px;
-
-  border: 2px solid var(--home-ink);
-  border-radius: 12px;
-
-  background: #fffaf2;
-  color: var(--home-ink);
-
-  font-size: 0.63rem;
-  font-weight: 900;
-  text-decoration: none;
-
-  box-shadow:
-    3px 3px 0
-    var(--home-yellow);
-
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.catalogueSection > header > a b {
-  display: grid;
-  place-items: center;
-
-  width: 23px;
-  height: 23px;
-
-  border-radius: 8px;
-
-  background: var(--home-red);
-  color: #ffffff;
-
-  font-size: 0.82rem;
-}
-
-.catalogueSection > header > a:hover {
-  transform: translateY(-2px);
-
-  box-shadow:
-    3px 5px 0
-    var(--home-yellow);
-}
-
-/* Four balanced editorial cards */
-
-.catalogueRail {
-  display: grid;
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(0, 1fr)
-    );
-
-  gap: 13px;
-
-  overflow: visible;
-  padding: 0;
-}
-
-.catalogueCard {
-  position: relative;
+.modeGrid a {
   isolation: isolate;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  gap: 18px;
-
-  min-height: 176px;
-  padding: 15px;
-
-  overflow: hidden;
-
-  border: 2px solid var(--home-ink);
-  border-radius: 22px;
-
-  color: var(--home-ink);
-  text-decoration: none;
-
-  box-shadow:
-    0 5px 0
-    var(--home-ink);
-
-  animation:
-    ventureCatalogueCardIn
-    480ms
-    cubic-bezier(
-      0.22,
-      1,
-      0.36,
-      1
-    )
-    both;
+  min-height: 96px !important;
+  padding: 13px !important;
+  border: 2.5px solid var(--home-ink) !important;
+  border-radius: 21px !important;
 
   transition:
     transform 180ms ease,
-    box-shadow 180ms ease;
+    box-shadow 180ms ease,
+    filter 180ms ease !important;
 }
 
-.catalogueCard:nth-child(1) {
-  animation-delay: 30ms;
-}
-
-.catalogueCard:nth-child(2) {
-  animation-delay: 90ms;
-}
-
-.catalogueCard:nth-child(3) {
-  animation-delay: 150ms;
-}
-
-.catalogueCard:nth-child(4) {
-  animation-delay: 210ms;
-}
-
-/* Small bottom colour strip */
-
-.catalogueCard::after {
+.modeGrid a::before {
   position: absolute;
-  right: 15px;
-  bottom: 12px;
-  left: 15px;
+  z-index: 0;
+  top: -22px;
+  right: -19px;
 
-  height: 4px;
+  width: 86px;
+  height: 86px;
 
+  border: 2px solid rgba(36, 31, 32, 0.18);
   border-radius: 999px;
 
-  background: currentColor;
-
   content: "";
-  opacity: 0.15;
+  pointer-events: none;
 }
 
-.catalogueCardTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+.modeGrid a::after {
+  right: -19px !important;
+  bottom: -27px !important;
+
+  width: 72px !important;
+  height: 72px !important;
+
+  border-width: 14px !important;
+  opacity: 0.8;
 }
 
-.catalogueIcon {
-  display: grid;
-  place-items: center;
+.modeGrid a > span {
+  width: 42px !important;
+  height: 42px !important;
 
-  width: 45px;
-  height: 45px;
-
-  border: 2px solid var(--home-ink);
-  border-radius: 14px;
+  border: 2.5px solid var(--home-ink) !important;
+  border-radius: 13px !important;
 
   box-shadow:
     2px 2px 0
-    rgba(36, 31, 32, 0.16);
+    rgba(36, 31, 32, 0.14);
 
   transition:
-    transform 180ms ease;
+    transform 180ms ease,
+    background 180ms ease !important;
 }
 
-.catalogueIcon svg {
-  width: 23px;
-  height: 23px;
+.modeGrid a > b {
+  display: grid !important;
+  place-items: center !important;
 
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.catalogueArrow {
-  display: grid;
-  place-items: center;
-
-  width: 35px;
-  height: 35px;
+  width: 31px !important;
+  height: 31px !important;
 
   border: 2px solid var(--home-ink);
   border-radius: 999px;
 
-  font-size: 1rem;
-  font-weight: 950;
-
-  transition:
-    transform 180ms ease;
-}
-
-.catalogueCopy {
-  display: grid;
-  gap: 5px;
-
-  padding-bottom: 9px;
-}
-
-.catalogueCopy small {
-  color: inherit;
-
-  font-size: 0.5rem;
-  font-weight: 950;
-  letter-spacing: 0.11em;
+  font-size: 0.9rem !important;
   line-height: 1;
 
-  opacity: 0.72;
+  box-shadow:
+    2px 2px 0
+    rgba(36, 31, 32, 0.15);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease !important;
 }
 
-.catalogueCopy strong {
-  color: inherit;
-
-  font-size: 1.15rem;
-  font-weight: 950;
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+.modeGrid small {
+  margin-bottom: 1px;
+  font-size: 0.49rem !important;
+  letter-spacing: 0.1em !important;
 }
 
-.catalogueCopy p {
-  max-width: 24ch;
-  margin: 0;
-
-  color: inherit;
-
-  font-size: 0.65rem;
-  line-height: 1.38;
-
-  opacity: 0.74;
+.modeGrid strong {
+  font-size: 0.94rem !important;
+  letter-spacing: -0.025em;
 }
 
-/* Events */
+/* TONIGHT */
 
-.catalogueEvents {
-  background: var(--home-red);
-  color: #ffffff;
-}
+.modeTonight {
+  background:
+    linear-gradient(
+      135deg,
+      #d01013 0%,
+      #d01013 68%,
+      #ed4f52 68%,
+      #ed4f52 100%
+    ) !important;
 
-.catalogueEvents .catalogueIcon {
-  background: var(--home-yellow);
-  color: var(--home-ink);
-}
-
-.catalogueEvents .catalogueArrow {
-  background: #fffaf2;
-  color: var(--home-red);
-}
-
-/* Food */
-
-.catalogueFood {
-  background: var(--home-yellow);
-  color: var(--home-ink);
-}
-
-.catalogueFood .catalogueIcon {
-  background: var(--home-red);
-  color: #ffffff;
-}
-
-.catalogueFood .catalogueArrow {
-  background: #fffaf2;
-  color: var(--home-ink);
-}
-
-/* Activities */
-
-.catalogueActivities {
-  background: #fffaf2;
-  color: var(--home-ink);
-}
-
-.catalogueActivities .catalogueIcon {
-  background: #ff8d58;
-  color: var(--home-ink);
-}
-
-.catalogueActivities .catalogueArrow {
-  background: var(--home-yellow);
-  color: var(--home-ink);
-}
-
-/* Nightlife */
-
-.catalogueNightlife {
-  background: var(--home-ink);
-  color: #ffffff;
-}
-
-.catalogueNightlife .catalogueIcon {
-  border-color: #ffffff;
-
-  background: var(--home-pink);
-  color: var(--home-ink);
-}
-
-.catalogueNightlife .catalogueArrow {
-  border-color: #ffffff;
-
-  background: var(--home-yellow);
-  color: var(--home-ink);
-}
-
-/* Clean, restrained movement */
-
-.catalogueCard:hover,
-.catalogueCard:focus-visible {
-  transform:
-    translateY(-5px);
+  color: #ffffff !important;
 
   box-shadow:
-    0 10px 0
-    var(--home-ink);
+    5px 6px 0
+    var(--home-yellow) !important;
 }
 
-.catalogueCard:hover .catalogueIcon,
-.catalogueCard:focus-visible .catalogueIcon {
+.modeTonight small {
+  color: #fff3c4 !important;
+}
+
+.modeTonight > span {
+  background: var(--home-yellow) !important;
+  color: var(--home-ink) !important;
+}
+
+.modeTonight > b {
+  background: #ffffff !important;
+  color: var(--home-red) !important;
+}
+
+/* NEW TO ME */
+
+.modeNew {
+  background:
+    linear-gradient(
+      135deg,
+      var(--home-yellow) 0%,
+      var(--home-yellow) 70%,
+      #ffe889 70%,
+      #ffe889 100%
+    ) !important;
+
+  color: var(--home-ink) !important;
+
+  box-shadow:
+    5px 6px 0
+    var(--home-red) !important;
+}
+
+.modeNew small {
+  color: #9c1013 !important;
+}
+
+.modeNew > span {
+  background: #ffffff !important;
+  color: var(--home-red) !important;
+}
+
+.modeNew > b {
+  background: var(--home-red) !important;
+  color: #ffffff !important;
+}
+
+/* UNDER $40 */
+
+.modeBudget {
+  background:
+    linear-gradient(
+      135deg,
+      #fffaf2 0%,
+      #fffaf2 70%,
+      #ffd9d3 70%,
+      #ffd9d3 100%
+    ) !important;
+
+  color: var(--home-ink) !important;
+
+  box-shadow:
+    5px 6px 0
+    var(--home-pink) !important;
+}
+
+.modeBudget small {
+  color: var(--home-red) !important;
+}
+
+.modeBudget > span {
+  background: var(--home-yellow) !important;
+  color: var(--home-red) !important;
+}
+
+.modeBudget > b {
+  background: var(--home-ink) !important;
+  color: var(--home-yellow) !important;
+}
+
+/* OPEN NOW */
+
+.modeOpen {
+  background:
+    linear-gradient(
+      135deg,
+      #ef9c99 0%,
+      #ef9c99 68%,
+      #ffc9bd 68%,
+      #ffc9bd 100%
+    ) !important;
+
+  color: var(--home-ink) !important;
+
+  box-shadow:
+    5px 6px 0
+    var(--home-red) !important;
+}
+
+.modeOpen small {
+  color: #9c1013 !important;
+}
+
+.modeOpen > span {
+  background: #ffffff !important;
+  color: var(--home-red) !important;
+}
+
+.modeOpen > b {
+  background: var(--home-yellow) !important;
+  color: var(--home-ink) !important;
+}
+
+/* INTERACTIONS */
+
+.modeGrid a:hover {
+  filter: saturate(1.05);
+  transform:
+    translateY(-3px)
+    rotate(-0.5deg) !important;
+}
+
+.modeGrid a:hover > span {
   transform:
     rotate(-5deg)
     scale(1.06);
 }
 
-.catalogueCard:hover .catalogueArrow,
-.catalogueCard:focus-visible .catalogueArrow {
+.modeGrid a:hover > b {
   transform:
-    translate(3px, -3px);
+    translateX(3px)
+    rotate(-8deg);
 }
 
-.catalogueCard:active {
-  transform:
-    translateY(3px);
-
+.modeGrid a:active {
   box-shadow:
-    0 2px 0
-    var(--home-ink);
+    2px 2px 0
+    var(--home-ink) !important;
+
+  transform:
+    translate(3px, 3px)
+    rotate(0deg) !important;
 }
 
-.catalogueCard:focus-visible {
+.modeGrid a:focus-visible {
   outline:
     4px solid
-    rgba(208, 16, 19, 0.22);
+    rgba(208, 16, 19, 0.24);
 
-  outline-offset: 4px;
+  outline-offset: 3px;
 }
 
-@keyframes ventureCatalogueCardIn {
-  from {
-    opacity: 0;
+/* SEARCH BUTTON */
 
-    transform:
-      translateY(18px)
-      scale(0.97);
-  }
+.search button {
+  position: relative;
+  overflow: hidden;
 
-  to {
-    opacity: 1;
+  min-width: 70px !important;
 
-    transform:
-      translateY(0)
-      scale(1);
-  }
+  background:
+    linear-gradient(
+      135deg,
+      var(--home-red) 0%,
+      var(--home-red) 72%,
+      #f04f52 72%,
+      #f04f52 100%
+    ) !important;
+
+  color: #ffffff !important;
+
+  box-shadow:
+    3px 4px 0
+    var(--home-yellow) !important;
+
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease !important;
 }
 
-/* Smaller phones */
-
-@media (max-width: 380px) {
-  .catalogueRail {
-    gap: 9px;
-  }
-
-  .catalogueCard {
-    min-height: 158px;
-    padding: 12px;
-
-    border-radius: 19px;
-  }
-
-  .catalogueIcon {
-    width: 40px;
-    height: 40px;
-
-    border-radius: 12px;
-  }
-
-  .catalogueIcon svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .catalogueArrow {
-    width: 31px;
-    height: 31px;
-  }
-
-  .catalogueCopy strong {
-    font-size: 0.98rem;
-  }
-
-  .catalogueCopy p {
-    font-size: 0.57rem;
-  }
-
-  .catalogueSection > header > a {
-    padding-left: 8px;
-
-    font-size: 0.56rem;
-  }
+.search button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    3px 6px 0
+    var(--home-yellow) !important;
 }
 
-@media (max-width: 335px) {
-  .catalogueRail {
-    grid-template-columns:
-      minmax(0, 1fr);
+.search button span {
+  display: grid;
+  place-items: center;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 999px;
+
+  background: var(--home-yellow);
+  color: var(--home-ink);
+}
+
+/* OUTING BUILDER BUTTONS */
+
+.builderActions a {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 47px !important;
+
+  border: 2.5px solid
+    var(--home-ink) !important;
+
+  border-radius: 14px !important;
+
+  transition:
+    transform 170ms ease,
+    box-shadow 170ms ease !important;
+}
+
+.builderActions a:first-child {
+  background:
+    linear-gradient(
+      135deg,
+      var(--home-red) 0%,
+      var(--home-red) 76%,
+      #ef4b4e 76%,
+      #ef4b4e 100%
+    ) !important;
+
+  color: #ffffff !important;
+
+  box-shadow:
+    4px 4px 0
+    var(--home-ink) !important;
+}
+
+.builderActions a:first-child b {
+  display: grid;
+  place-items: center;
+
+  width: 24px;
+  height: 24px;
+
+  border-radius: 999px;
+
+  background: var(--home-yellow);
+  color: var(--home-ink);
+}
+
+.builderActions a:last-child {
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #ffffff 76%,
+      #ffd7d2 76%,
+      #ffd7d2 100%
+    ) !important;
+
+  color: var(--home-red) !important;
+
+  box-shadow:
+    4px 4px 0
+    var(--home-pink) !important;
+}
+
+.builderActions a:hover {
+  transform:
+    translateY(-2px)
+    rotate(-0.4deg);
+}
+
+.builderActions a:active {
+  box-shadow:
+    1px 1px 0
+    var(--home-ink) !important;
+
+  transform:
+    translate(3px, 3px);
+}
+
+/* SMALL PHONES */
+
+@media (max-width: 370px) {
+  .modeGrid {
+    gap: 9px !important;
   }
 
-  .catalogueCard {
-    min-height: 145px;
+  .modeGrid a {
+    min-height: 90px !important;
+    padding: 10px !important;
+  }
+
+  .modeGrid a > span {
+    width: 37px !important;
+    height: 37px !important;
+  }
+
+  .modeGrid a > b {
+    width: 27px !important;
+    height: 27px !important;
+  }
+
+  .modeGrid strong {
+    font-size: 0.84rem !important;
+  }
+
+  .modeGrid small {
+    font-size: 0.43rem !important;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .catalogueCard,
-  .catalogueIcon,
-  .catalogueArrow,
-  .catalogueSection > header > a {
-    animation: none;
-    transition: none;
+  .modeGrid a,
+  .modeGrid a > span,
+  .modeGrid a > b,
+  .search button,
+  .builderActions a {
+    transition: none !important;
   }
 }
 
-/* END VENTURE PREMIUM CATEGORY CARDS */
+/* END VENTURE QUICK CARD COLOUR REFRESH */
 
+/* VENTURE CLEAN DISCOVERY BUTTONS */
 
-/* VENTURE MONTHLY COMMUNITY FEATURE */
+/* Remove the decorative circles inside every discovery card */
 
-.communityFeature {
-  position: relative;
-  display: grid;
-  gap: 12px;
-  margin-top: 7px;
-  overflow: hidden;
-  border: 3px solid var(--home-ink);
-  border-radius: 25px;
-  padding: 19px;
-  background:
-    linear-gradient(
-      145deg,
-      var(--home-ink) 0 76%,
-      #3a3234 76% 100%
-    );
-  color: #ffffff;
-  box-shadow: 6px 7px 0 var(--home-red);
+.modeGrid a::before,
+.modeGrid a::after {
+  display: none !important;
+  content: none !important;
 }
 
-.communityFeature::before {
-  position: absolute;
-  top: -58px;
-  right: -45px;
-  width: 142px;
-  height: 142px;
-  border: 25px solid rgba(255, 207, 0, 0.2);
-  border-radius: 999px;
-  content: "";
+/* Keep the cards clean and graphic */
+
+.modeGrid a {
+  overflow: hidden !important;
 }
 
-.communityFeature > * {
+.modeGrid a > span,
+.modeGrid a > b {
   position: relative;
   z-index: 2;
 }
 
-.communityFeatureTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+/* Consistent left-side icon buttons */
+
+.modeGrid a > span {
+  display: grid !important;
+  place-items: center !important;
+
+  width: 44px !important;
+  height: 44px !important;
+
+  padding: 0 !important;
+
+  border: 2.5px solid var(--home-ink) !important;
+  border-radius: 13px !important;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif !important;
+
+  font-size: 0 !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+
+  box-shadow:
+    2px 3px 0
+    rgba(36, 31, 32, 0.22) !important;
 }
 
-.communityFeatureTop > div {
-  display: grid;
-  gap: 4px;
-}
+/* Replace inconsistent old icon characters */
 
-.communityFeatureTop > div > span {
-  color: var(--home-yellow);
-  font-size: 0.58rem;
-  font-weight: 950;
-  letter-spacing: 0.14em;
-}
-
-.communityFeatureTop > div > small {
-  color: rgba(255, 255, 255, 0.56);
-  font-size: 0.48rem;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-}
-
-.communityFeatureTop > b {
-  flex-shrink: 0;
-  border: 2px solid #ffffff;
-  border-radius: 999px;
-  padding: 5px 8px;
-  background: var(--home-red);
-  color: #ffffff;
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
-}
-
-.communityFeature h2 {
-  max-width: 13ch;
-  margin: 1px 0 0;
-  color: #ffffff;
-  font-size: clamp(1.95rem, 8.5vw, 2.7rem);
-  line-height: 0.92;
-  letter-spacing: -0.06em;
-}
-
-.communityFeature > p {
-  max-width: 42ch;
-  margin: 0;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.76rem;
-  line-height: 1.52;
-}
-
-.communityFeatureRoute {
-  display: grid;
-  gap: 6px;
-  margin: 1px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.communityFeatureRoute li {
-  display: grid;
-  grid-template-columns: 27px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  border: 1.8px solid rgba(255, 255, 255, 0.72);
-  border-radius: 11px;
-  padding: 4px 9px 4px 4px;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.communityFeatureRoute li > b {
+.modeGrid a > span::after {
   display: grid;
   place-items: center;
-  width: 27px;
-  height: 27px;
-  border: 2px solid var(--home-ink);
-  border-radius: 8px;
-  background: var(--home-yellow);
-  color: var(--home-ink);
-  font-size: 0.58rem;
-}
 
-.communityFeatureRoute li > span {
-  overflow: hidden;
-  color: #ffffff;
-  font-size: 0.64rem;
+  width: 100%;
+  height: 100%;
+
+  font-size: 1.08rem;
   font-weight: 900;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1;
+
+  content: "";
 }
 
-.communityFeatureMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+/* Tonight clock */
+
+.modeTonight > span {
+  background: var(--home-yellow) !important;
+  color: var(--home-ink) !important;
 }
 
-.communityFeatureMeta span {
-  border: 1.8px solid var(--home-ink);
-  border-radius: 999px;
-  padding: 6px 8px;
-  background: #fffaf2;
-  color: var(--home-ink);
-  font-size: 0.56rem;
+.modeTonight > span::after {
+  content: "◷";
+  transform: translateY(-1px);
+}
+
+/* New to Me sparkle */
+
+.modeNew > span {
+  background: var(--home-red) !important;
+  color: #ffffff !important;
+}
+
+.modeNew > span::after {
+  content: "✦";
+  font-size: 1.15rem;
+}
+
+/* Under $40 */
+
+.modeBudget > span {
+  background: var(--home-yellow) !important;
+  color: var(--home-ink) !important;
+}
+
+.modeBudget > span::after {
+  content: "$";
+  font-size: 1.05rem;
+}
+
+/* Open now */
+
+.modeOpen > span {
+  background: var(--home-red) !important;
+  color: #ffffff !important;
+}
+
+.modeOpen > span::after {
+  content: "OPEN";
+  font-size: 0.62rem;
+  letter-spacing: -0.04em;
+}
+
+/* Fill every right arrow button */
+
+.modeGrid a > b {
+  display: grid !important;
+  place-items: center !important;
+
+  width: 36px !important;
+  height: 36px !important;
+
+  padding: 0 !important;
+
+  border: 2.5px solid var(--home-ink) !important;
+  border-radius: 12px !important;
+
+  font-size: 0 !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+
+  box-shadow:
+    2px 3px 0
+    rgba(36, 31, 32, 0.2) !important;
+}
+
+/* Replace every old arrow character */
+
+.modeGrid a > b::after {
+  display: block;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  font-size: 1.05rem;
   font-weight: 900;
+  line-height: 1;
+
+  content: "→";
 }
 
-.communityFeatureLink {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-height: 49px;
-  border: 2.5px solid #ffffff;
-  border-radius: 14px;
-  padding: 9px 10px 9px 13px;
-  background: var(--home-yellow);
-  color: var(--home-ink);
-  font-size: 0.71rem;
-  font-weight: 950;
-  text-decoration: none;
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease;
+/* Card-specific arrow colours */
+
+.modeTonight > b {
+  background: var(--home-yellow) !important;
+  color: var(--home-ink) !important;
 }
 
-.communityFeatureLink:hover,
-.communityFeatureLink:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 var(--home-red);
+.modeNew > b {
+  background: var(--home-red) !important;
+  color: #ffffff !important;
 }
 
-.communityFeatureLink b {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 2px solid var(--home-ink);
-  border-radius: 9px;
-  background: var(--home-red);
-  color: #ffffff;
+.modeBudget > b {
+  background: var(--home-ink) !important;
+  color: var(--home-yellow) !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .communityFeatureLink {
-    transition: none;
+.modeOpen > b {
+  background: var(--home-yellow) !important;
+  color: var(--home-ink) !important;
+}
+
+/* Slight colour cleanup */
+
+.modeTonight {
+  background: var(--home-red) !important;
+}
+
+.modeNew {
+  background: var(--home-yellow) !important;
+}
+
+.modeBudget {
+  background: #fffaf2 !important;
+}
+
+.modeOpen {
+  background: var(--home-pink) !important;
+}
+
+/* Keep the text readable */
+
+.modeTonight small,
+.modeTonight strong {
+  color: #ffffff !important;
+}
+
+.modeNew small {
+  color: var(--home-red) !important;
+}
+
+.modeNew strong,
+.modeBudget strong,
+.modeOpen strong {
+  color: var(--home-ink) !important;
+}
+
+.modeBudget small,
+.modeOpen small {
+  color: var(--home-red) !important;
+}
+
+/* Button motion */
+
+.modeGrid a:hover > b {
+  transform:
+    translateX(3px)
+    rotate(-4deg) !important;
+}
+
+.modeGrid a:hover > span {
+  transform:
+    translateY(-2px)
+    rotate(-3deg) !important;
+}
+
+.modeGrid a:active > b,
+.modeGrid a:active > span {
+  box-shadow:
+    1px 1px 0
+    rgba(36, 31, 32, 0.2) !important;
+}
+
+/* Small phones */
+
+@media (max-width: 370px) {
+  .modeGrid a > span {
+    width: 39px !important;
+    height: 39px !important;
+  }
+
+  .modeGrid a > b {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .modeGrid a > span::after,
+  .modeGrid a > b::after {
+    font-size: 0.94rem;
+  }
+
+  .modeOpen > span::after {
+    font-size: 0.55rem;
   }
 }
 
-/* END VENTURE MONTHLY COMMUNITY FEATURE */
+/* END VENTURE CLEAN DISCOVERY BUTTONS */
+
