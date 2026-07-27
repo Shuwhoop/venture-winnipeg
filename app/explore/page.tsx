@@ -216,7 +216,7 @@ export default async function ExplorePage({
   const [databaseEvents, databasePlaces] =
     await Promise.all([
       getPublishedEventListings(100),
-      getPublishedPlaceListings(100)
+      getPublishedPlaceListings(500)
     ]);
 
   const combinedListings: Listing[] = [
