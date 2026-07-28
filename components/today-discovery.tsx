@@ -148,6 +148,13 @@ function CompactListingCard({
 
       <div
         className={`listing-image ${listing.imageClass} ${styles.cardVisual}`}
+        style={
+          listing.imageUrl
+            ? {
+                backgroundImage: `linear-gradient(180deg, rgba(20, 16, 18, 0.08), rgba(20, 16, 18, 0.34)), url("${listing.imageUrl.replaceAll('"', '%22')}")`
+              }
+            : undefined
+        }
       >
         <span
           className={`${styles.status} ${
@@ -260,6 +267,13 @@ function FeaturedListing({
 
         <div
           className={`listing-image ${listing.imageClass} ${styles.featuredVisual}`}
+          style={
+            listing.imageUrl
+              ? {
+                  backgroundImage: `linear-gradient(180deg, rgba(20, 16, 18, 0.08), rgba(20, 16, 18, 0.52)), url("${listing.imageUrl.replaceAll('"', '%22')}")`
+                }
+              : undefined
+          }
         >
           <div className={styles.featuredTopline}>
             <span>{listing.statusLabel}</span>

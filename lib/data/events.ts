@@ -14,7 +14,7 @@ type VenueRow = {
   longitude: number;
 };
 
-type EventRow = {
+export type EventRow = {
   id: string;
   slug: string;
   title: string;
@@ -51,11 +51,12 @@ type EventRow = {
   verification_status: VerificationStatus;
   warning_message: string | null;
   source_checked_at: string | null;
+  image_url: string | null;
 
   venue: VenueRow | VenueRow[] | null;
 };
 
-const eventFields = `
+export const eventFields = `
   id,
   slug,
   title,
@@ -80,6 +81,7 @@ const eventFields = `
   verification_status,
   warning_message,
   source_checked_at,
+  image_url,
   venue:places (
     name,
     neighbourhood,
@@ -293,7 +295,7 @@ function formatLastChecked(
   return `Source checked ${checkedDate}`;
 }
 
-function eventToListing(event: EventRow): Listing {
+export function eventToListing(event: EventRow): Listing {
   const venue = getVenue(event.venue);
   const statusLabel = getStatusLabel(event);
 
@@ -334,7 +336,9 @@ function eventToListing(event: EventRow): Listing {
       event.timezone
     ),
 
-    imageClass: "image-concert",
+    imageClass: event.image_url ? "image-uploaded" : "image-concert",
+
+    imageUrl: event.image_url,
 
     neighbourhood:
       venue?.neighbourhood ?? "Winnipeg",

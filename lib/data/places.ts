@@ -6,7 +6,7 @@ import type {
   VerificationStatus
 } from "@/lib/types";
 
-type PlaceRow = {
+export type PlaceRow = {
   id: string;
   slug: string;
   place_type: string;
@@ -21,6 +21,7 @@ type PlaceRow = {
   verification_status: VerificationStatus;
   warning_message: string | null;
   source_checked_at: string | null;
+  image_url: string | null;
   latitude: number;
   longitude: number;
 };
@@ -446,7 +447,25 @@ function getLastCheckedLabel(
   return `Checked ${formattedDate}`;
 }
 
-function convertPlaceToListing(
+function isTommysPizzeria(
+  value: {
+    slug: string;
+    name: string;
+  }
+): boolean {
+  const slug = value.slug.toLowerCase();
+  const listingName = value.name.toLowerCase();
+
+  return (
+    slug.includes("tommy") &&
+    slug.includes("pizz")
+  ) || (
+    listingName.includes("tommy") &&
+    listingName.includes("pizz")
+  );
+}
+
+export function convertPlaceToListing(
   place: PlaceRow
 ): Listing {
   const price = getPriceLabel(
@@ -498,7 +517,18 @@ function convertPlaceToListing(
         place.source_checked_at
       ),
 
-    imageClass: "image-food",
+    imageClass:
+      place.image_url
+        ? "image-uploaded"
+        : isTommysPizzeria(place)
+          ? "image-tommys-pizzeria"
+          : "image-food",
+
+    imageUrl:
+      place.image_url ??
+      (isTommysPizzeria(place)
+        ? "/listing-icons/tommys-pizzeria.jpg"
+        : null),
 
     neighbourhood:
       place.neighbourhood ??
@@ -528,7 +558,7 @@ function convertPlaceToListing(
   };
 }
 
-const placeFields = `
+export const placeFields = `
   id,
   slug,
   place_type,
@@ -543,6 +573,7 @@ const placeFields = `
   verification_status,
   warning_message,
   source_checked_at,
+  image_url,
   latitude,
   longitude
   `;

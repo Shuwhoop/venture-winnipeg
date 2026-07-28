@@ -105,6 +105,13 @@ export function ListingCard({
 
       <div
         className={`listing-image ${listing.imageClass}`}
+        style={
+          listing.imageUrl
+            ? {
+                backgroundImage: `linear-gradient(180deg, rgba(20, 16, 18, 0.06), rgba(20, 16, 18, 0.34)), url("${listing.imageUrl.replaceAll('"', '%22')}")`
+              }
+            : undefined
+        }
       >
         <span
           className={`status-badge ${listing.statusTone}`}

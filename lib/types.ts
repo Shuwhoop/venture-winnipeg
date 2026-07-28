@@ -37,6 +37,7 @@ export type Listing = {
   ratingCount?: number;
 
   imageClass: string;
+  imageUrl?: string | null;
   neighbourhood: string;
 
   venueName?: string;

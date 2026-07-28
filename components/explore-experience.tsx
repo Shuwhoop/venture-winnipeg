@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   useCallback,
   useEffect,
@@ -54,6 +56,9 @@ type ExploreExperienceProps = {
     | "bar"
     | "place"
     | "other";
+  hasMore?: boolean;
+  loadMoreHref?: string | null;
+  pageSize?: number;
 };
 
 type ExploreView =
@@ -104,7 +109,10 @@ export function ExploreExperience({
   eyebrow,
   searchQuery,
   newToMeOnly = false,
-  requestType = "other"
+  requestType = "other",
+  hasMore = false,
+  loadMoreHref = null,
+  pageSize = 24
 }: ExploreExperienceProps) {
   const workbenchRef =
     useRef<HTMLElement>(null);
@@ -553,6 +561,10 @@ export function ExploreExperience({
             <small>
               Visited matches are hidden.
             </small>
+          ) : hasMore ? (
+            <small>
+              More matches are available.
+            </small>
           ) : null}
         </div>
 
@@ -772,6 +784,23 @@ export function ExploreExperience({
           </button>
         </section>
       )}
+
+      {hasMore && loadMoreHref ? (
+        <div className={styles.loadMorePanel}>
+          <div>
+            <span>KEEP EXPLORING</span>
+            <strong>More Winnipeg is waiting</strong>
+            <small>
+              Add the next {pageSize} matches without losing your search.
+            </small>
+          </div>
+
+          <Link href={loadMoreHref}>
+            Show {pageSize} more
+            <b aria-hidden="true">↓</b>
+          </Link>
+        </div>
+      ) : null}
 
       {hasBaseMatches ? (
         <ExploreMissingListingRequest

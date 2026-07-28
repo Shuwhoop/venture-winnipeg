@@ -1935,3 +1935,103 @@
 }
 
 /* ---------- End synchronized map discovery v0.9 ---------- */
+
+/* VENTURE DATABASE SEARCH + PAGINATION */
+
+.loadMorePanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 2.5px solid #241f20;
+  border-radius: 19px;
+  background: #ffcf00;
+  box-shadow: 5px 5px 0 #d01013;
+}
+
+.loadMorePanel > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.loadMorePanel span {
+  color: #d01013;
+  font-size: 0.54rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.loadMorePanel strong {
+  color: #241f20;
+  font-size: 0.88rem;
+  font-weight: 950;
+  line-height: 1.05;
+}
+
+.loadMorePanel small {
+  color: #55494b;
+  font-size: 0.61rem;
+  line-height: 1.35;
+}
+
+.loadMorePanel > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 8px 10px 8px 12px;
+  border: 2px solid #241f20;
+  border-radius: 12px;
+  background: #fffaf2;
+  color: #241f20;
+  font-size: 0.67rem;
+  font-weight: 950;
+  text-decoration: none;
+  box-shadow: 3px 3px 0 #241f20;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.loadMorePanel > a b {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 8px;
+  background: #d01013;
+  color: #ffffff;
+  font-size: 0.85rem;
+}
+
+.loadMorePanel > a:hover,
+.loadMorePanel > a:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 3px 5px 0 #241f20;
+}
+
+.loadMorePanel > a:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #241f20;
+}
+
+@media (max-width: 430px) {
+  .loadMorePanel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .loadMorePanel > a {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loadMorePanel > a {
+    transition: none;
+  }
+}
+
+/* END VENTURE DATABASE SEARCH + PAGINATION */

@@ -6,6 +6,9 @@ export type DiscoveryFilter =
   | "all"
   | "events"
   | "food"
+  | "activities"
+  | "nightlife"
+  | "attractions"
   | "open"
   | "verified";
 
@@ -253,6 +256,37 @@ export function isVerifiedListing(
   );
 }
 
+function isFoodPlace(
+  listing: Listing
+) {
+  return [
+    "restaurant",
+    "cafe",
+    "bakery_dessert",
+    "bar_pub",
+    "brewery",
+    "food_truck",
+    "fast_casual",
+    "fine_dining",
+    "late_night_food",
+    "market"
+  ].includes(
+    listing.placeType ?? ""
+  );
+}
+
+function isNightlifePlace(
+  listing: Listing
+) {
+  return [
+    "bar_pub",
+    "brewery",
+    "late_night_food"
+  ].includes(
+    listing.placeType ?? ""
+  );
+}
+
 export function matchesDiscoveryFilter(
   listing: Listing,
   filter: DiscoveryFilter
@@ -262,7 +296,28 @@ export function matchesDiscoveryFilter(
       return listing.type === "event";
 
     case "food":
-      return listing.type === "restaurant";
+      return (
+        listing.type === "restaurant" &&
+        isFoodPlace(listing)
+      );
+
+    case "activities":
+      return (
+        listing.type === "restaurant" &&
+        listing.placeType === "activity"
+      );
+
+    case "nightlife":
+      return (
+        listing.type === "restaurant" &&
+        isNightlifePlace(listing)
+      );
+
+    case "attractions":
+      return (
+        listing.type === "restaurant" &&
+        listing.placeType === "attraction"
+      );
 
     case "open":
       return (
