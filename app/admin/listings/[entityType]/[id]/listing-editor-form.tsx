@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   useMemo,
@@ -19,6 +19,8 @@ import {
   WINNIPEG_NEIGHBOURHOOD_GROUPS,
   WINNIPEG_NEIGHBOURHOODS
 } from "@/lib/winnipeg-neighbourhoods";
+
+import { ListingPhotoEditor } from "@/components/admin/listing-photo-editor";
 
 import styles from "./page.module.css";
 
@@ -1284,6 +1286,17 @@ export default function ListingEditorForm({
           />
         </label>
       </section>
+
+      <ListingPhotoEditor
+        entityType={record.entityType}
+        entityId={record.id}
+        listingName={
+          record.entityType === "place"
+            ? record.name
+            : record.title
+        }
+        publicPath={publicPath}
+      />
 
       {record.entityType === "place" ? (
         <>

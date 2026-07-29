@@ -1,4 +1,4 @@
-﻿.page {
+.page {
   --home-pink: #e88d8b;
   --home-paper: #fffaf2;
   --home-cream: #fff7e8;
@@ -1810,3 +1810,7 @@
 
 /* END VENTURE CLEAN DISCOVERY BUTTONS */
 
+
+.featuredCopy > div.featuredActionsNoPrice {
+  justify-content: flex-end;
+}

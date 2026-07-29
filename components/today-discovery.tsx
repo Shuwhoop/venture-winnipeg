@@ -285,12 +285,26 @@ function FeaturedListing({
             <h2>{listing.name}</h2>
             <p>
               {listing.neighbourhood}
-              {" · "}
-              {listing.timeOrHours}
+              {!["hours not confirmed", "hours unknown"].includes(
+                listing.timeOrHours.trim().toLowerCase()
+              ) ? (
+                <>
+                  {" · "}
+                  {listing.timeOrHours}
+                </>
+              ) : null}
             </p>
 
-            <div>
-              <span>{listing.price}</span>
+            <div
+              className={
+                listing.price === "Price unavailable"
+                  ? styles.featuredActionsNoPrice
+                  : undefined
+              }
+            >
+              {listing.price !== "Price unavailable" ? (
+                <span>{listing.price}</span>
+              ) : null}
               <b>
                 Take a look
                 <i aria-hidden="true">↗</i>
@@ -415,25 +429,6 @@ export function TodayDiscovery({
 
   return (
     <main className={styles.page}>
-      <div
-        className={styles.cityTicker}
-        aria-hidden="true"
-      >
-        <div>
-          <span>WINNIPEG IS MOVING</span>
-          <i>✦</i>
-          <span>FOOD</span>
-          <i>✦</i>
-          <span>EVENTS</span>
-          <i>✦</i>
-          <span>OUTINGS</span>
-          <i>✦</i>
-          <span>NEW TO YOU</span>
-          <i>✦</i>
-          <span>WINNIPEG IS MOVING</span>
-        </div>
-      </div>
-
       <section className={styles.hero}>
         <div className={styles.heroShapes} aria-hidden="true">
           <i />
@@ -479,59 +474,6 @@ export function TodayDiscovery({
           </button>
         </form>
       </section>
-
-      <nav
-        className={styles.modeGrid}
-        aria-label="Quick discovery choices"
-      >
-        <Link
-          className={styles.modeTonight}
-          href="/explore?when=tonight"
-        >
-          <span>◷</span>
-          <div>
-            <small>RIGHT NOW</small>
-            <strong>Tonight</strong>
-          </div>
-          <b aria-hidden="true">→</b>
-        </Link>
-
-        <Link
-          className={styles.modeNew}
-          href="/explore?new=1"
-        >
-          <span>✦</span>
-          <div>
-            <small>FRESH TERRITORY</small>
-            <strong>New to me</strong>
-          </div>
-          <b aria-hidden="true">→</b>
-        </Link>
-
-        <Link
-          className={styles.modeBudget}
-          href="/explore?price=under-40"
-        >
-          <span>$</span>
-          <div>
-            <small>KEEP IT LIGHT</small>
-            <strong>Under $40</strong>
-          </div>
-          <b aria-hidden="true">→</b>
-        </Link>
-
-        <Link
-          className={styles.modeOpen}
-          href="/explore?when=open"
-        >
-          <span>OPEN</span>
-          <div>
-            <small>NO WAITING AROUND</small>
-            <strong>Open now</strong>
-          </div>
-          <b aria-hidden="true">→</b>
-        </Link>
-      </nav>
 
       {featured ? (
         <FeaturedListing listing={featured} />
