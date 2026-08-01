@@ -1,35 +1,20 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useState,
-  type CSSProperties
-} from "react";
-
 import Link from "next/link";
+import { useMemo, type CSSProperties } from "react";
 
-import {
-  SaveButton
-} from "@/components/save-button";
-
-import {
-  getEventOccurrenceKey,
-  getVisitHistory,
-  getVisitHistoryStats,
-  VISIT_HISTORY_EVENT,
-  visitListingKey
-} from "@/lib/visit-history";
-
-import type {
-  Listing
-} from "@/lib/types";
+import { SaveButton } from "@/components/save-button";
+import type { Listing } from "@/lib/types";
 
 import styles from "./today-discovery.module.css";
 
 type TodayDiscoveryProps = {
   events: Listing[];
   places: Listing[];
+};
+
+type ListingWithImage = Listing & {
+  imageUrl?: string | null;
 };
 
 function getDaypart() {
@@ -42,20 +27,16 @@ function getDaypart() {
     }).format(now)
   );
 
-  const dateLabel = new Intl.DateTimeFormat(
-    "en-CA",
-    {
-      timeZone: "America/Winnipeg",
-      weekday: "long",
-      month: "short",
-      day: "numeric"
-    }
-  ).format(now);
+  const dateLabel = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Winnipeg",
+    weekday: "short",
+    month: "short",
+    day: "numeric"
+  }).format(now);
 
   if (hour < 12) {
     return {
       greeting: "Good morning",
-      prompt: "Winnipeg is warming up. Pick your first move.",
       dateLabel
     };
   }
@@ -63,196 +44,112 @@ function getDaypart() {
   if (hour < 17) {
     return {
       greeting: "Good afternoon",
-      prompt: "There is still plenty of city left to spend.",
       dateLabel
     };
   }
 
   return {
     greeting: "Good evening",
-    prompt: "The city is awake. Let’s find your next story.",
     dateLabel
   };
 }
 
-function listingIsVisited(
-  listing: Listing,
-  visits: ReturnType<
-    typeof getVisitHistory
-  >
-) {
-  const key = visitListingKey(listing);
-
-  if (listing.type === "restaurant") {
-    return visits.some(
-      (visit) =>
-        visit.listingKey === key
-    );
-  }
-
-  const occurrence =
-    getEventOccurrenceKey(listing);
-
-  return visits.some(
-    (visit) =>
-      visit.listingKey === key &&
-      (
-        !occurrence ||
-        !visit.eventOccurrenceKey ||
-        visit.eventOccurrenceKey ===
-          occurrence
-      )
-  );
+function getListingHref(listing: Listing) {
+  return `/listings/${listing.slug}`;
 }
 
-function isTonightListing(
-  listing: Listing
-) {
+function getImageStyle(listing: Listing): CSSProperties | undefined {
+  const imageUrl = (listing as ListingWithImage).imageUrl?.trim();
+
+  if (!imageUrl) {
+    return undefined;
+  }
+
+  const safeUrl = imageUrl.replace(/["\\\n\r]/g, "");
+
+  return {
+    backgroundImage: `url("${safeUrl}")`
+  };
+}
+
+function isPlaceholder(value?: string | null) {
+  if (!value) {
+    return true;
+  }
+
+  const normalized = value.trim().toLowerCase();
+
+  return [
+    "price unavailable",
+    "hours not confirmed",
+    "hours unknown",
+    "unknown",
+    "not confirmed",
+    "unavailable"
+  ].includes(normalized);
+}
+
+function getPlaceLine(listing: Listing) {
+  return [
+    listing.neighbourhood,
+    !isPlaceholder(listing.timeOrHours)
+      ? listing.timeOrHours
+      : null
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function getSmallCardLine(listing: Listing) {
+  if (!isPlaceholder(listing.timeOrHours)) {
+    return listing.timeOrHours;
+  }
+
+  return listing.neighbourhood;
+}
+
+function isHappeningNow(listing: Listing) {
   if (listing.type === "restaurant") {
     return listing.isOpenNow === true;
   }
 
-  return (
-    listing.statusLabel === "TODAY" ||
-    listing.statusLabel === "HAPPENING"
-  );
+  const status = listing.statusLabel.trim().toUpperCase();
+
+  return status === "TODAY" || status === "HAPPENING" || status === "LIVE";
 }
 
-function getListingHref(
-  listing: Listing
-) {
-  return `/listings/${listing.slug}`;
+function hasPhoto(listing: Listing) {
+  return Boolean((listing as ListingWithImage).imageUrl?.trim());
 }
 
-function CompactListingCard({
-  listing,
-  newToUser = false,
-  index
-}: {
-  listing: Listing;
-  newToUser?: boolean;
-  index: number;
-}) {
-  return (
-    <article
-      className={styles.listingCard}
-      style={{
-        "--card-index": index
-      } as CSSProperties}
-    >
-      <Link
-        className={styles.cardLink}
-        href={getListingHref(listing)}
-        aria-label={`View ${listing.name}`}
-      />
-
-      <div
-        className={`listing-image ${listing.imageClass} ${styles.cardVisual}`}
-        style={
-          listing.imageUrl
-            ? {
-                backgroundImage: `linear-gradient(180deg, rgba(20, 16, 18, 0.08), rgba(20, 16, 18, 0.34)), url("${listing.imageUrl.replaceAll('"', '%22')}")`
-              }
-            : undefined
-        }
-      >
-        <span
-          className={`${styles.status} ${
-            listing.statusTone === "green"
-              ? styles.statusGreen
-              : ""
-          }`}
-        >
-          {newToUser
-            ? "NEW TO YOU"
-            : listing.statusLabel}
-        </span>
-
-        <SaveButton listing={listing} />
-      </div>
-
-      <div className={styles.cardBody}>
-        <small>{listing.category}</small>
-        <h3>{listing.name}</h3>
-
-        <p>
-          {listing.neighbourhood}
-          {" · "}
-          {listing.price}
-        </p>
-
-        <div>
-          <span>{listing.timeOrHours}</span>
-          <b aria-hidden="true">↗</b>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function ListingRail({
+function SectionHeading({
   title,
-  eyebrow,
-  listings,
-  href,
-  newToUser = false,
-  emptyCopy,
-  tone = "yellow"
+  href
 }: {
   title: string;
-  eyebrow: string;
-  listings: Listing[];
   href: string;
-  newToUser?: boolean;
-  emptyCopy: string;
-  tone?: "yellow" | "red" | "pink";
 }) {
   return (
-    <section
-      className={`${styles.railSection} ${styles[`rail${tone[0].toUpperCase()}${tone.slice(1)}`]}`}
-    >
-      <header className={styles.sectionHeader}>
-        <div>
-          <span>{eyebrow}</span>
-          <h2>{title}</h2>
-        </div>
-
-        <Link href={href}>
-          See all
-          <b aria-hidden="true">→</b>
-        </Link>
-      </header>
-
-      {listings.length > 0 ? (
-        <div className={styles.cardRail}>
-          {listings.map((listing, index) => (
-            <CompactListingCard
-              key={`${listing.type}-${listing.id}`}
-              listing={listing}
-              newToUser={newToUser}
-              index={index}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className={styles.emptyRail}>
-          <span aria-hidden="true">✦</span>
-          <p>{emptyCopy}</p>
-          <Link href={href}>Explore more</Link>
-        </div>
-      )}
-    </section>
+    <header className={styles.sectionHeading}>
+      <h2>{title}</h2>
+      <i aria-hidden="true" />
+      <Link href={href}>See all</Link>
+    </header>
   );
 }
 
-function FeaturedListing({
+function FeaturedCard({
   listing
 }: {
   listing: Listing;
 }) {
+  const status = listing.isOpenNow === true
+    ? "OPEN NOW"
+    : listing.statusLabel;
+
   return (
-    <section className={styles.featuredWrap}>
-      <header className={styles.featuredLabel}>
+    <section className={styles.featuredSection}>
+      <header className={styles.pickHeading}>
         <span>VENTURE PICK</span>
         <i aria-hidden="true" />
         <p>One strong place to start</p>
@@ -260,56 +157,38 @@ function FeaturedListing({
 
       <article className={styles.featuredCard}>
         <Link
-          className={styles.featuredLink}
+          className={styles.cardLink}
           href={getListingHref(listing)}
-          aria-label={`View Venture pick: ${listing.name}`}
+          aria-label={`View ${listing.name}`}
         />
 
         <div
-          className={`listing-image ${listing.imageClass} ${styles.featuredVisual}`}
-          style={
-            listing.imageUrl
-              ? {
-                  backgroundImage: `linear-gradient(180deg, rgba(20, 16, 18, 0.08), rgba(20, 16, 18, 0.52)), url("${listing.imageUrl.replaceAll('"', '%22')}")`
-                }
-              : undefined
-          }
+          className={`listing-image ${listing.imageClass} ${styles.featuredImage}`}
+          style={getImageStyle(listing)}
         >
+          <div className={styles.featuredShade} />
+
           <div className={styles.featuredTopline}>
-            <span>{listing.statusLabel}</span>
-            <SaveButton listing={listing} />
+            <div>
+              <span>{status}</span>
+              <small>{listing.category}</small>
+            </div>
+
+            <SaveButton
+              listing={listing}
+              className={styles.featuredSave}
+            />
           </div>
 
           <div className={styles.featuredCopy}>
-            <small>{listing.category}</small>
             <h2>{listing.name}</h2>
-            <p>
-              {listing.neighbourhood}
-              {!["hours not confirmed", "hours unknown"].includes(
-                listing.timeOrHours.trim().toLowerCase()
-              ) ? (
-                <>
-                  {" · "}
-                  {listing.timeOrHours}
-                </>
-              ) : null}
-            </p>
+            <p>{getPlaceLine(listing)}</p>
 
-            <div
-              className={
-                listing.price === "Price unavailable"
-                  ? styles.featuredActionsNoPrice
-                  : undefined
-              }
-            >
-              {listing.price !== "Price unavailable" ? (
-                <span>{listing.price}</span>
-              ) : null}
-              <b>
-                Take a look
-                <i aria-hidden="true">↗</i>
-              </b>
-            </div>
+            {!isPlaceholder(listing.price) ? (
+              <span className={styles.priceBadge}>
+                {listing.price}
+              </span>
+            ) : null}
           </div>
         </div>
       </article>
@@ -317,149 +196,152 @@ function FeaturedListing({
   );
 }
 
+function MiniCard({
+  listing
+}: {
+  listing: Listing;
+}) {
+  return (
+    <article className={styles.miniCard}>
+      <Link
+        className={styles.cardLink}
+        href={getListingHref(listing)}
+        aria-label={`View ${listing.name}`}
+      />
+
+      <div
+        className={`listing-image ${listing.imageClass} ${styles.miniImage}`}
+        style={getImageStyle(listing)}
+      >
+        <div className={styles.miniShade} />
+
+        <SaveButton
+          listing={listing}
+          className={styles.miniSave}
+        />
+
+        <div className={styles.miniCopy}>
+          <span>{listing.category}</span>
+          <h3>{listing.name}</h3>
+          <p>{getSmallCardLine(listing)}</p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function TrendCard({
+  listing
+}: {
+  listing: Listing;
+}) {
+  return (
+    <article className={styles.trendCard}>
+      <Link
+        className={styles.cardLink}
+        href={getListingHref(listing)}
+        aria-label={`View ${listing.name}`}
+      />
+
+      <div
+        className={`listing-image ${listing.imageClass} ${styles.trendImage}`}
+        style={getImageStyle(listing)}
+      >
+        <SaveButton
+          listing={listing}
+          className={styles.trendSave}
+        />
+      </div>
+
+      <div className={styles.trendCopy}>
+        <span>{listing.category}</span>
+        <h3>{listing.name}</h3>
+        <p>{listing.neighbourhood}</p>
+      </div>
+    </article>
+  );
+}
+
 export function TodayDiscovery({
   events,
   places
 }: TodayDiscoveryProps) {
-  const [visitVersion, setVisitVersion] =
-    useState(0);
-  const [ready, setReady] =
-    useState(false);
-
-  useEffect(() => {
-    function refresh() {
-      setVisitVersion(
-        (current) => current + 1
-      );
-    }
-
-    setReady(true);
-    refresh();
-
-    window.addEventListener(
-      VISIT_HISTORY_EVENT,
-      refresh
-    );
-    window.addEventListener(
-      "storage",
-      refresh
-    );
-
-    return () => {
-      window.removeEventListener(
-        VISIT_HISTORY_EVENT,
-        refresh
-      );
-      window.removeEventListener(
-        "storage",
-        refresh
-      );
-    };
-  }, []);
+  const daypart = useMemo(getDaypart, []);
 
   const allListings = useMemo(
-    () => [...events, ...places],
+    () => [...places, ...events],
     [events, places]
   );
 
-  const visitData = useMemo(() => {
-    if (!ready) {
-      return {
-        visits: [],
-        stats: {
-          totalVisits: 0,
-          uniquePlaces: 0,
-          uniqueEvents: 0,
-          neighbourhoodsExplored: 0,
-          newThisMonth: 0
-        }
-      };
-    }
+  const featured = useMemo(() => {
+    return (
+      places.find(
+        (listing) =>
+          listing.isOpenNow === true && hasPhoto(listing)
+      ) ??
+      places.find(hasPhoto) ??
+      places[0] ??
+      events.find(hasPhoto) ??
+      events[0]
+    );
+  }, [events, places]);
 
-    const visits = getVisitHistory();
+  const happeningNow = useMemo(() => {
+    const current = allListings.filter(isHappeningNow);
+    const remaining = allListings.filter(
+      (listing) =>
+        !current.some((item) => item.id === listing.id)
+    );
 
-    return {
-      visits,
-      stats: getVisitHistoryStats(visits)
-    };
-  }, [ready, visitVersion]);
+    return [...current, ...remaining]
+      .filter(
+        (listing) =>
+          !featured || listing.id !== featured.id
+      )
+      .slice(0, 6);
+  }, [allListings, featured]);
 
-  const tonight = useMemo(
-    () =>
-      allListings
-        .filter(isTonightListing)
-        .slice(0, 5),
-    [allListings]
-  );
-
-  const newToUser = useMemo(
-    () =>
-      allListings
-        .filter(
-          (listing) =>
-            !listingIsVisited(
-              listing,
-              visitData.visits
-            )
-        )
-        .slice(0, 5),
-    [allListings, visitData.visits]
-  );
-
-  const openNow = useMemo(
-    () =>
-      places
-        .filter(
-          (listing) =>
-            listing.isOpenNow === true
-        )
-        .slice(0, 5),
-    [places]
-  );
-
-  const featured =
-    tonight[0] ??
-    newToUser[0] ??
-    allListings[0];
-
-  const daypart = useMemo(
-    getDaypart,
-    []
-  );
+  const trending = useMemo(() => {
+    return [...places, ...events]
+      .filter(
+        (listing) =>
+          !featured || listing.id !== featured.id
+      )
+      .filter(
+        (listing) =>
+          !happeningNow
+            .slice(0, 3)
+            .some((item) => item.id === listing.id)
+      )
+      .sort((a, b) => Number(hasPhoto(b)) - Number(hasPhoto(a)))
+      .slice(0, 8);
+  }, [events, featured, happeningNow, places]);
 
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroShapes} aria-hidden="true">
           <i />
-          <b />
           <span />
+          <b />
         </div>
 
-        <div className={styles.heroMeta}>
-          <span>WINNIPEG · {daypart.dateLabel}</span>
-          <i>
-            <b />
-            LIVE
-          </i>
-        </div>
+        <p className={styles.dateLine}>
+          WINNIPEG · {daypart.dateLabel}
+        </p>
 
-        <div className={styles.heroCopy}>
-          <h1>{daypart.greeting}</h1>
-          <p>{daypart.prompt}</p>
-        </div>
+        <h1>{daypart.greeting}</h1>
 
         <form
           action="/explore"
           className={styles.search}
         >
-          <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="6" />
-            <path d="M16 16 21 21" />
-          </svg>
+          <span className={styles.searchIcon} aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="6" />
+              <path d="M16 16 21 21" />
+            </svg>
+          </span>
 
           <input
             name="q"
@@ -470,117 +352,99 @@ export function TodayDiscovery({
 
           <button type="submit">
             Go
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">→</span>
           </button>
         </form>
+
+        <nav
+          className={styles.quickFilters}
+          aria-label="Quick discovery filters"
+        >
+          <Link href="/explore?when=open">
+            <span className={styles.greenDot} aria-hidden="true" />
+            Open now
+          </Link>
+
+          <Link href="/explore?near=me">
+            <span aria-hidden="true">●</span>
+            Near me
+          </Link>
+
+          <Link href="/explore?price=under-40">
+            <span aria-hidden="true">$</span>
+            Cheap
+          </Link>
+
+          <Link href="/explore?q=date+ideas">
+            <span aria-hidden="true">♥</span>
+            Date ideas
+          </Link>
+
+          <Link href="/explore">
+            More
+            <span aria-hidden="true">⌄</span>
+          </Link>
+        </nav>
       </section>
 
       {featured ? (
-        <FeaturedListing listing={featured} />
+        <FeaturedCard listing={featured} />
       ) : null}
 
-      <section className={styles.builderCard}>
-        <div className={styles.builderStamp}>
-          BUILT FOR YOU
-        </div>
+      <section className={styles.railSection}>
+        <SectionHeading
+          title="Happening now"
+          href="/explore?when=tonight"
+        />
 
-        <div className={styles.builderCopy}>
-          <span>VENTURE BUILDER</span>
-          <h2>
-            One tap from
-            <em> “what do we do?” </em>
-            to a full plan.
-          </h2>
-          <p>
-            Choose the mood, budget and timing.
-            Venture builds the route, then you can
-            drag, replace or remove every stop.
-          </p>
-
-          <div className={styles.builderActions}>
-            <Link href="/build-outing">
-              Build my outing
-              <b aria-hidden="true">→</b>
-            </Link>
-
-            <Link href="/explore">
-              Browse first
-            </Link>
+        {happeningNow.length > 0 ? (
+          <div className={styles.miniRail}>
+            {happeningNow.map((listing) => (
+              <MiniCard
+                key={`${listing.type}-${listing.id}`}
+                listing={listing}
+              />
+            ))}
           </div>
-        </div>
-
-        <div
-          className={styles.routeIllustration}
-          aria-hidden="true"
-        >
-          <span>1</span>
-          <i />
-          <span>2</span>
-          <i />
-          <span>3</span>
-          <b>GO!</b>
-        </div>
+        ) : (
+          <div className={styles.emptyState}>
+            Winnipeg is still loading the marquee. Browse the full city for now.
+          </div>
+        )}
       </section>
 
-      {visitData.stats.totalVisits > 0 ? (
-        <Link
-          className={styles.progressCard}
-          href="/profile#my-venture"
-        >
-          <div className={styles.progressIcon}>
-            <span>✓</span>
+      <section className={styles.railSection}>
+        <SectionHeading
+          title="Trending this week"
+          href="/explore"
+        />
+
+        {trending.length > 0 ? (
+          <div className={styles.trendRail}>
+            {trending.map((listing) => (
+              <TrendCard
+                key={`${listing.type}-${listing.id}`}
+                listing={listing}
+              />
+            ))}
           </div>
-
-          <div>
-            <span>YOUR CITY SO FAR</span>
-            <strong>
-              {visitData.stats.totalVisits}
-              {" "}
-              {visitData.stats.totalVisits === 1
-                ? "visit logged"
-                : "visits logged"}
-            </strong>
-            <p>
-              {visitData.stats.neighbourhoodsExplored}
-              {" "}
-              {visitData.stats.neighbourhoodsExplored === 1
-                ? "neighbourhood"
-                : "neighbourhoods"}
-              {" explored"}
-            </p>
+        ) : (
+          <div className={styles.emptyState}>
+            Fresh listings are on the way.
           </div>
+        )}
+      </section>
 
-          <b aria-hidden="true">→</b>
-        </Link>
-      ) : null}
-
-      <ListingRail
-        eyebrow="THE SHORTLIST"
-        title="Tonight in Winnipeg"
-        listings={tonight}
-        href="/explore?when=tonight"
-        emptyCopy="No live matches are ready yet. Browse the full city instead."
-        tone="red"
-      />
-
-      <ListingRail
-        eyebrow="YOUR UNEXPLORED CITY"
-        title="Fresh territory"
-        listings={newToUser}
-        href="/explore?new=1"
-        newToUser
-        emptyCopy="You have reached the edge of the current catalogue. Fresh listings are on the way."
-        tone="yellow"
-      />
-
-      <ListingRail
-        eyebrow="WALK IN NOW"
-        title="Open right now"
-        listings={openNow}
-        href="/explore?when=open"
-        emptyCopy="Opening-hour data is still being confirmed for current listings."
-        tone="pink"
-      />
+      <Link
+        className={styles.builderBanner}
+        href="/build-outing"
+      >
+        <div>
+          <span>NOT SURE WHERE TO START?</span>
+          <strong>Build me an outing</strong>
+        </div>
+        <b aria-hidden="true">→</b>
+      </Link>
     </main>
   );
 }
