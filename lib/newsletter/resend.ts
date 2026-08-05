@@ -9,20 +9,45 @@ const RESEND_API_BASE =
   "https://api.resend.com";
 
 
+const NEWSLETTER_SEGMENT_NAME =
+  "Confirmed Venture Subscribers";
+
+
+const NEWSLETTER_TOPIC_NAME =
+  "Venture This Weekend";
+
+
 type ResendRequestOptions = {
   method?:
+    | "GET"
     | "POST"
-    | "PATCH";
-  body: Record<
-    string,
-    unknown
-  >;
+    | "PATCH"
+    | "DELETE";
+  body?: unknown;
 };
 
 
-type ResendEmailResult = {
+export type ResendEmailResult = {
   id?: string;
   error?: string;
+};
+
+
+export type ResendResource = {
+  id: string;
+  name: string;
+};
+
+
+export type ResendBroadcastSummary = {
+  id: string;
+  name: string | null;
+  subject: string;
+  status: string;
+  createdAt: string;
+  scheduledAt: string | null;
+  sentAt: string | null;
+  topicId: string | null;
 };
 
 
@@ -30,6 +55,21 @@ export function isNewsletterDeliveryConfigured(): boolean {
   return Boolean(
     process.env.RESEND_API_KEY &&
     process.env.VENTURE_EMAIL_FROM
+  );
+}
+
+
+export function isNewsletterWebhookConfigured(): boolean {
+  return Boolean(
+    process.env.RESEND_WEBHOOK_SECRET
+  );
+}
+
+
+export function isNewsletterPostalAddressConfigured(): boolean {
+  return Boolean(
+    process.env.VENTURE_POSTAL_ADDRESS
+      ?.trim()
   );
 }
 
@@ -42,6 +82,16 @@ export function isUsingResendTestSender(): boolean {
   return from.includes(
     "onboarding@resend.dev"
   );
+}
+
+
+export function getNewsletterSegmentName(): string {
+  return NEWSLETTER_SEGMENT_NAME;
+}
+
+
+export function getNewsletterTopicName(): string {
+  return NEWSLETTER_TOPIC_NAME;
 }
 
 
@@ -59,12 +109,12 @@ function getResendApiKey(): string {
 }
 
 
-async function resendRequest<T>({
+export async function resendApiRequest<T>({
   path,
   options
 }: {
   path: string;
-  options: ResendRequestOptions;
+  options?: ResendRequestOptions;
 }): Promise<{
   ok: boolean;
   status: number;
@@ -77,8 +127,8 @@ async function resendRequest<T>({
         `${RESEND_API_BASE}${path}`,
         {
           method:
-            options.method ??
-            "POST",
+            options?.method ??
+            "GET",
           headers: {
             Authorization:
               `Bearer ${getResendApiKey()}`,
@@ -87,10 +137,15 @@ async function resendRequest<T>({
             "User-Agent":
               "Venture-by-Boogie-Bangers/1.0"
           },
-          body:
-            JSON.stringify(
-              options.body
-            ),
+          ...(options &&
+          options.body !== undefined
+            ? {
+                body:
+                  JSON.stringify(
+                    options.body
+                  )
+              }
+            : {}),
           cache:
             "no-store"
         }
@@ -192,13 +247,15 @@ export async function sendNewsletterEmail({
   }
 
   const result =
-    await resendRequest<{
+    await resendApiRequest<{
       id?: string;
       message?: string;
     }>({
       path:
         "/emails",
       options: {
+        method:
+          "POST",
         body: {
           from,
           to: [to],
@@ -246,13 +303,15 @@ export async function createOrReactivateResendContact({
   }
 
   const createResult =
-    await resendRequest<{
+    await resendApiRequest<{
       id?: string;
       message?: string;
     }>({
       path:
         "/contacts",
       options: {
+        method:
+          "POST",
         body: {
           email,
           first_name:
@@ -271,7 +330,7 @@ export async function createOrReactivateResendContact({
   }
 
   const updateResult =
-    await resendRequest<{
+    await resendApiRequest<{
       id?: string;
       message?: string;
     }>({
@@ -312,7 +371,7 @@ export async function unsubscribeResendContact(
   }
 
   try {
-    await resendRequest({
+    await resendApiRequest({
       path:
         `/contacts/${encodeURIComponent(email)}`,
       options: {
@@ -327,4 +386,345 @@ export async function unsubscribeResendContact(
   } catch {
     /* Supabase remains the source of truth. */
   }
+}
+
+
+export async function listResendSegments(): Promise<{
+  items: ResendResource[];
+  error: string;
+}> {
+  const result =
+    await resendApiRequest<{
+      data?: Array<{
+        id?: string;
+        name?: string;
+      }>;
+    }>({
+      path:
+        "/segments"
+    });
+
+  return {
+    items:
+      (result.data?.data || [])
+        .filter(
+          (item) =>
+            Boolean(
+              item.id &&
+              item.name
+            )
+        )
+        .map(
+          (item) => ({
+            id:
+              item.id as string,
+            name:
+              item.name as string
+          })
+        ),
+    error:
+      result.error
+  };
+}
+
+
+export async function listResendTopics(): Promise<{
+  items: ResendResource[];
+  error: string;
+}> {
+  const result =
+    await resendApiRequest<{
+      data?: Array<{
+        id?: string;
+        name?: string;
+      }>;
+    }>({
+      path:
+        "/topics"
+    });
+
+  return {
+    items:
+      (result.data?.data || [])
+        .filter(
+          (item) =>
+            Boolean(
+              item.id &&
+              item.name
+            )
+        )
+        .map(
+          (item) => ({
+            id:
+              item.id as string,
+            name:
+              item.name as string
+          })
+        ),
+    error:
+      result.error
+  };
+}
+
+
+export async function createResendSegment(
+  name: string
+): Promise<{
+  id?: string;
+  error?: string;
+}> {
+  const result =
+    await resendApiRequest<{
+      id?: string;
+      message?: string;
+    }>({
+      path:
+        "/segments",
+      options: {
+        method:
+          "POST",
+        body: {
+          name
+        }
+      }
+    });
+
+  return result.ok
+    ? {
+        id:
+          result.data?.id
+      }
+    : {
+        error:
+          result.error
+      };
+}
+
+
+export async function createResendTopic(
+  name: string
+): Promise<{
+  id?: string;
+  error?: string;
+}> {
+  const result =
+    await resendApiRequest<{
+      id?: string;
+      message?: string;
+    }>({
+      path:
+        "/topics",
+      options: {
+        method:
+          "POST",
+        body: {
+          name,
+          description:
+            "One useful Winnipeg discovery email every Thursday.",
+          default_subscription:
+            "opt_in"
+        }
+      }
+    });
+
+  return result.ok
+    ? {
+        id:
+          result.data?.id
+      }
+    : {
+        error:
+          result.error
+      };
+}
+
+
+export async function addResendContactToSegment({
+  email,
+  segmentId
+}: {
+  email: string;
+  segmentId: string;
+}): Promise<{
+  ok: boolean;
+  error: string;
+}> {
+  const result =
+    await resendApiRequest({
+      path:
+        `/contacts/${encodeURIComponent(email)}/segments/${encodeURIComponent(segmentId)}`,
+      options: {
+        method:
+          "POST"
+      }
+    });
+
+  return {
+    ok:
+      result.ok,
+    error:
+      result.error
+  };
+}
+
+
+export async function updateResendContactTopic({
+  email,
+  topicId,
+  subscription
+}: {
+  email: string;
+  topicId: string;
+  subscription:
+    | "opt_in"
+    | "opt_out";
+}): Promise<{
+  ok: boolean;
+  error: string;
+}> {
+  const result =
+    await resendApiRequest({
+      path:
+        `/contacts/${encodeURIComponent(email)}/topics`,
+      options: {
+        method:
+          "PATCH",
+        body: [
+          {
+            id:
+              topicId,
+            subscription
+          }
+        ]
+      }
+    });
+
+  return {
+    ok:
+      result.ok,
+    error:
+      result.error
+  };
+}
+
+
+export async function listResendBroadcasts(): Promise<{
+  items: ResendBroadcastSummary[];
+  error: string;
+}> {
+  const result =
+    await resendApiRequest<{
+      data?: Array<{
+        id?: string;
+        name?: string | null;
+        subject?: string;
+        status?: string;
+        created_at?: string;
+        scheduled_at?: string | null;
+        sent_at?: string | null;
+        topic_id?: string | null;
+      }>;
+    }>({
+      path:
+        "/broadcasts"
+    });
+
+  return {
+    items:
+      (result.data?.data || [])
+        .filter(
+          (item) =>
+            Boolean(
+              item.id
+            )
+        )
+        .slice(0, 25)
+        .map(
+          (item) => ({
+            id:
+              item.id as string,
+            name:
+              item.name ||
+              null,
+            subject:
+              item.subject ||
+              "Untitled broadcast",
+            status:
+              item.status ||
+              "unknown",
+            createdAt:
+              item.created_at ||
+              "",
+            scheduledAt:
+              item.scheduled_at ||
+              null,
+            sentAt:
+              item.sent_at ||
+              null,
+            topicId:
+              item.topic_id ||
+              null
+          })
+        ),
+    error:
+      result.error
+  };
+}
+
+
+export async function createResendBroadcastDraft({
+  segmentId,
+  topicId,
+  name,
+  subject,
+  html,
+  text
+}: {
+  segmentId: string;
+  topicId: string;
+  name: string;
+  subject: string;
+  html: string;
+  text: string;
+}): Promise<{
+  id?: string;
+  error?: string;
+}> {
+  const from =
+    process.env.VENTURE_EMAIL_FROM ||
+    "Venture by Boogie Bangers <onboarding@resend.dev>";
+
+  const result =
+    await resendApiRequest<{
+      id?: string;
+      message?: string;
+    }>({
+      path:
+        "/broadcasts",
+      options: {
+        method:
+          "POST",
+        body: {
+          segment_id:
+            segmentId,
+          topic_id:
+            topicId,
+          from,
+          name,
+          subject,
+          html,
+          text
+        }
+      }
+    });
+
+  return result.ok
+    ? {
+        id:
+          result.data?.id
+      }
+    : {
+        error:
+          result.error
+      };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./app-foundation.module.css";
 
@@ -17,6 +17,57 @@ type NavigatorWithStandalone = Navigator & {
 };
 
 const INSTALL_DISMISS_KEY = "venture:pwa-install-dismissed:v1";
+
+type FoundationIconName =
+  | "offline"
+  | "online"
+  | "update";
+
+function FoundationIcon({
+  name
+}: {
+  name: FoundationIconName;
+}) {
+  const paths: Record<FoundationIconName, React.ReactNode> = {
+    offline: (
+      <>
+        <path d="M4 9.5c4.8-4.7 11.2-4.7 16 0" />
+        <path d="M7.5 13c2.7-2.6 6.3-2.6 9 0" />
+        <circle cx="12" cy="17.5" r="1" fill="currentColor" stroke="none" />
+        <path d="m4 4 16 16" />
+      </>
+    ),
+    online: (
+      <>
+        <path d="M4 10c4.8-4.7 11.2-4.7 16 0" />
+        <path d="M7.5 13.5c2.7-2.6 6.3-2.6 9 0" />
+        <circle cx="12" cy="18" r="1" fill="currentColor" stroke="none" />
+      </>
+    ),
+    update: (
+      <>
+        <path d="M19 8a7.5 7.5 0 0 0-12.6-2L4 8" />
+        <path d="M4 4v4h4" />
+        <path d="M5 16a7.5 7.5 0 0 0 12.6 2L20 16" />
+        <path d="M20 20v-4h-4" />
+      </>
+    )
+  };
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
 
 function isStandaloneMode() {
   if (typeof window === "undefined") {
@@ -60,20 +111,45 @@ export function AppFoundationRuntime({
   const [updateReady, setUpdateReady] = useState(false);
   const [installDismissed, setInstallDismissed] = useState(true);
   const [installing, setInstalling] = useState(false);
+  const [reconnected, setReconnected] = useState(false);
+  const wasOfflineRef = useRef(false);
+  const reconnectTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
 
   useEffect(() => {
     setStandalone(isStandaloneMode());
     setIOS(isIOSDevice());
     setSafari(isSafariBrowser());
-    setOnline(window.navigator.onLine);
+    const initiallyOnline = window.navigator.onLine;
+    setOnline(initiallyOnline);
+    wasOfflineRef.current = !initiallyOnline;
     setInstallDismissed(
       window.localStorage.getItem(INSTALL_DISMISS_KEY) === "yes"
     );
 
     const media = window.matchMedia("(display-mode: standalone)");
     const onDisplayModeChange = () => setStandalone(isStandaloneMode());
-    const onOnline = () => setOnline(true);
-    const onOffline = () => setOnline(false);
+    const onOnline = () => {
+      setOnline(true);
+
+      if (wasOfflineRef.current) {
+        setReconnected(true);
+
+        if (reconnectTimerRef.current !== null) {
+          window.clearTimeout(reconnectTimerRef.current);
+        }
+
+        reconnectTimerRef.current = window.setTimeout(() => {
+          setReconnected(false);
+        }, 6500);
+      }
+
+      wasOfflineRef.current = false;
+    };
+    const onOffline = () => {
+      wasOfflineRef.current = true;
+      setReconnected(false);
+      setOnline(false);
+    };
     const onUpdate = () => setUpdateReady(true);
     const onBeforeInstall = (event: Event) => {
       event.preventDefault();
@@ -99,6 +175,10 @@ export function AppFoundationRuntime({
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       window.removeEventListener("appinstalled", onInstalled);
       window.removeEventListener("venture:sw-waiting", onUpdate);
+
+      if (reconnectTimerRef.current !== null) {
+        window.clearTimeout(reconnectTimerRef.current);
+      }
     };
   }, []);
 
@@ -146,8 +226,8 @@ export function AppFoundationRuntime({
   return (
     <>
       {!online ? (
-        <aside className={styles.connectionBanner} role="status">
-          <span aria-hidden="true">◌</span>
+        <aside className={styles.connectionBanner} role="alert">
+          <span aria-hidden="true"><FoundationIcon name="offline" /></span>
           <div>
             <strong>You are offline</strong>
             <small>Saved plans still work. New searches need a connection.</small>
@@ -156,9 +236,28 @@ export function AppFoundationRuntime({
         </aside>
       ) : null}
 
+      {online && reconnected ? (
+        <aside className={styles.restoredBanner} role="status">
+          <span aria-hidden="true"><FoundationIcon name="online" /></span>
+          <div>
+            <strong>Back online</strong>
+            <small>Live search, hours, and route tools are available again.</small>
+          </div>
+          <button type="button" onClick={() => window.location.reload()}>Refresh</button>
+          <button
+            type="button"
+            className={styles.dismissIcon}
+            aria-label="Dismiss connection message"
+            onClick={() => setReconnected(false)}
+          >
+            ×
+          </button>
+        </aside>
+      ) : null}
+
       {updateReady ? (
         <aside className={styles.updatePrompt} role="status">
-          <span className={styles.updateIcon} aria-hidden="true">↻</span>
+          <span className={styles.updateIcon} aria-hidden="true"><FoundationIcon name="update" /></span>
           <div>
             <strong>A fresher Venture is ready</strong>
             <small>Update now to use the latest fixes.</small>

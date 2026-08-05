@@ -140,7 +140,7 @@ export function ExploreMapCard({
           href={`/listings/${listing.slug}`}
           onClick={() => {
             trackBetaEvent({
-              eventName: "listing_detail_opened",
+              eventName: "listing_card_selected",
               pagePath:
                 window.location.pathname,
               properties: {

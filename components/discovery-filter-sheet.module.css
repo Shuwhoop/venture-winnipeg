@@ -367,3 +367,15 @@
     animation: none;
   }
 }
+
+/* VENTURE EXPLORE V1.0 START */
+.newToggle > span svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* VENTURE EXPLORE V1.0 END */

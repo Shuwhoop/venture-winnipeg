@@ -1,10 +1,14 @@
 import "server-only";
 
+import { reportDataAccessError } from "@/lib/network-errors";
 import { createClient } from "@supabase/supabase-js";
 import type {
   Listing,
   VerificationStatus
 } from "@/lib/types";
+import {
+  hasPublishablePhotoRights
+} from "@/lib/media/photo-rights";
 
 export type PlaceRow = {
   id: string;
@@ -22,6 +26,7 @@ export type PlaceRow = {
   warning_message: string | null;
   source_checked_at: string | null;
   image_url: string | null;
+  image_rights_notes: string | null;
   latitude: number;
   longitude: number;
 };
@@ -447,27 +452,16 @@ function getLastCheckedLabel(
   return `Checked ${formattedDate}`;
 }
 
-function isTommysPizzeria(
-  value: {
-    slug: string;
-    name: string;
-  }
-): boolean {
-  const slug = value.slug.toLowerCase();
-  const listingName = value.name.toLowerCase();
-
-  return (
-    slug.includes("tommy") &&
-    slug.includes("pizz")
-  ) || (
-    listingName.includes("tommy") &&
-    listingName.includes("pizz")
-  );
-}
-
 export function convertPlaceToListing(
   place: PlaceRow
 ): Listing {
+  const approvedImageUrl =
+    place.image_url &&
+    hasPublishablePhotoRights(
+      place.image_rights_notes
+    )
+      ? place.image_url
+      : null;
   const price = getPriceLabel(
     place.price_level
   );
@@ -518,17 +512,11 @@ export function convertPlaceToListing(
       ),
 
     imageClass:
-      place.image_url
+      approvedImageUrl
         ? "image-uploaded"
-        : isTommysPizzeria(place)
-          ? "image-tommys-pizzeria"
-          : "image-food",
+        : "image-food",
 
-    imageUrl:
-      place.image_url ??
-      (isTommysPizzeria(place)
-        ? "/listing-icons/tommys-pizzeria.jpg"
-        : null),
+    imageUrl: approvedImageUrl,
 
     neighbourhood:
       place.neighbourhood ??
@@ -574,6 +562,7 @@ export const placeFields = `
   warning_message,
   source_checked_at,
   image_url,
+  image_rights_notes,
   latitude,
   longitude
   `;
@@ -611,8 +600,8 @@ export async function getPublishedPlaceListings(
       .limit(limit);
 
   if (error) {
-    console.error(
-      "Unable to load Venture places:",
+    reportDataAccessError(
+      "Unable to load Venture places",
       error
     );
 
@@ -640,8 +629,8 @@ export async function getPublishedPlaceListingBySlug(
       .maybeSingle();
 
   if (error) {
-    console.error(
-      "Unable to load Venture place:",
+    reportDataAccessError(
+      "Unable to load Venture place",
       error
     );
 

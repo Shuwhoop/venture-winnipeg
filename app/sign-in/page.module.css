@@ -76,9 +76,77 @@
   box-shadow: 0 16px 42px rgba(39, 24, 52, 0.08);
 }
 
+.signInStack,
 .formCard form {
   display: grid;
   gap: 18px;
+}
+
+.signInHeader > span {
+  color: #7b4ca4;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+}
+
+.signInHeader h2 {
+  margin: 5px 0 7px;
+}
+
+.signInHeader p {
+  margin: 0;
+}
+
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  min-height: 54px;
+  border: 1px solid rgba(44, 28, 58, 0.16);
+  border-radius: 16px;
+  padding: 0 18px;
+  background: white;
+  color: #2b1939;
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(39, 24, 52, 0.06);
+}
+
+.googleButton:hover {
+  border-color: rgba(66, 133, 244, 0.5);
+  background: #fbfdff;
+}
+
+.googleButton:focus-visible {
+  outline: 3px solid rgba(66, 133, 244, 0.35);
+  outline-offset: 3px;
+}
+
+.googleIcon {
+  flex: 0 0 auto;
+  width: 21px;
+  height: 21px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #8a7f8f;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: rgba(44, 28, 58, 0.12);
 }
 
 .formCard header > span {
@@ -91,7 +159,8 @@
   font-size: 1.55rem;
 }
 
-.formCard header p {
+.formCard header p,
+.signInHeader p {
   margin: 0;
   color: #716876;
   line-height: 1.48;

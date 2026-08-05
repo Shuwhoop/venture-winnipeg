@@ -1,8 +1,9 @@
-const CACHE_VERSION = "venture-app-v4";
+const CACHE_VERSION = "venture-app-v5";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = "/offline";
 const OFFLINE_SAVED_URL = "/offline/saved";
+const NAVIGATION_TIMEOUT_MS = 8000;
 
 const PRECACHE = [
   "/",
@@ -38,11 +39,37 @@ function isStaticAsset(request, url) {
   );
 }
 
+async function fetchWithTimeout(request, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(request, {
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function cacheSuccessfulResponse(cacheName, request, response) {
+  if (!response || !response.ok) {
+    return;
+  }
+
+  const cache = await caches.open(cacheName);
+  await cache.put(request, response.clone());
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(SHELL_CACHE)
-      .then((cache) => cache.addAll(PRECACHE))
+    caches.open(SHELL_CACHE).then((cache) =>
+      Promise.all(
+        PRECACHE.map((url) =>
+          cache.add(url).catch(() => undefined)
+        )
+      )
+    )
   );
 });
 
@@ -90,26 +117,48 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
+      (async () => {
+        try {
+          const response = await fetchWithTimeout(
+            request,
+            NAVIGATION_TIMEOUT_MS
+          );
+
           if (response.ok) {
-            const copy = response.clone();
-            void caches
-              .open(RUNTIME_CACHE)
-              .then((cache) =>
-                cache.put(request, copy)
-              );
+            event.waitUntil(
+              cacheSuccessfulResponse(
+                RUNTIME_CACHE,
+                request,
+                response
+              )
+            );
           }
 
           return response;
-        })
-        .catch(async () => {
-          const cached =
-            await caches.match(request);
+        } catch {
+          const cachedPage = await caches.match(request);
 
-          return cached ||
-            caches.match(OFFLINE_URL);
-        })
+          if (cachedPage) {
+            return cachedPage;
+          }
+
+          const offlinePage = await caches.match(OFFLINE_URL);
+
+          if (offlinePage) {
+            return offlinePage;
+          }
+
+          return new Response(
+            "Venture is offline. Reconnect and try again.",
+            {
+              status: 503,
+              headers: {
+                "Content-Type": "text/plain; charset=utf-8"
+              }
+            }
+          );
+        }
+      })()
     );
 
     return;
@@ -117,24 +166,43 @@ self.addEventListener("fetch", (event) => {
 
   if (isStaticAsset(request, url)) {
     event.respondWith(
-      caches.match(request).then((cached) => {
-        const network = fetch(request)
-          .then((response) => {
-            if (response.ok) {
-              const copy = response.clone();
-              void caches
-                .open(RUNTIME_CACHE)
-                .then((cache) =>
-                  cache.put(request, copy)
-                );
-            }
+      (async () => {
+        const cached = await caches.match(request);
 
-            return response;
-          })
-          .catch(() => cached);
+        if (cached) {
+          event.waitUntil(
+            fetch(request)
+              .then((response) =>
+                cacheSuccessfulResponse(
+                  RUNTIME_CACHE,
+                  request,
+                  response
+                )
+              )
+              .catch(() => undefined)
+          );
 
-        return cached || network;
-      })
+          return cached;
+        }
+
+        try {
+          const response = await fetch(request);
+
+          if (response.ok) {
+            event.waitUntil(
+              cacheSuccessfulResponse(
+                RUNTIME_CACHE,
+                request,
+                response
+              )
+            );
+          }
+
+          return response;
+        } catch {
+          return new Response("", { status: 504 });
+        }
+      })()
     );
   }
 });

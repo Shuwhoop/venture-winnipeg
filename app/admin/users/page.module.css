@@ -1,0 +1,165 @@
+.page {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.hero,
+.tableCard {
+  border: 2px solid #241f20;
+  border-radius: 24px;
+  background: white;
+  box-shadow: 7px 8px 0 rgba(36, 31, 32, 0.12);
+}
+
+.hero {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  background: #fff3b3;
+}
+
+.hero span,
+.tableCard header span {
+  color: #d01013;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.hero h1,
+.tableCard h2 {
+  margin: 4px 0 0;
+  color: #241f20;
+}
+
+.hero h1 {
+  font-size: clamp(34px, 8vw, 54px);
+  line-height: 1;
+}
+
+.hero p,
+.hero small,
+.tableCard header small,
+.tableCard td small {
+  color: #746c6d;
+}
+
+.hero p {
+  max-width: 720px;
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metrics article {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 2px solid #241f20;
+  border-radius: 18px;
+  background: white;
+}
+
+.metrics article:nth-child(1),
+.metrics article:nth-child(4) {
+  background: #fff3b3;
+}
+
+.metrics strong {
+  color: #d01013;
+  font-size: 26px;
+}
+
+.metrics span {
+  color: #746c6d;
+  font-size: 12px;
+}
+
+.tableCard {
+  overflow: hidden;
+}
+
+.tableCard > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: end;
+  padding: 18px;
+  border-bottom: 2px solid #241f20;
+}
+
+.tableCard h2 {
+  font-size: 25px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.tableWrap table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.tableWrap th,
+.tableWrap td {
+  padding: 13px 16px;
+  border-bottom: 1px solid #eadfd7;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tableWrap th {
+  background: #fff8ef;
+  color: #746c6d;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tableWrap td {
+  color: #241f20;
+  font-size: 13px;
+}
+
+.tableWrap td:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.ready,
+.pending {
+  display: inline-flex;
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.ready {
+  background: #e8f6ed;
+  color: #16834a;
+}
+
+.pending {
+  background: #fff3b3;
+  color: #8a5600;
+}
+
+@media (min-width: 760px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

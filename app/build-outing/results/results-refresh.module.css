@@ -4734,3 +4734,285 @@
 }
 
 /* END VENTURE VISIT HISTORY + NEW TO ME v0.6 */
+
+/* VENTURE OUTING RESULTS V2.0 START */
+.actionToast {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 2px solid var(--result-ink);
+  border-radius: 17px;
+  background: #e8f8ee;
+  color: var(--result-ink);
+  box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.12);
+  animation: v2ToastIn 220ms ease both;
+}
+
+.actionToast p {
+  min-width: 0;
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 850;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.actionToast button {
+  min-height: 35px;
+  padding: 7px 11px;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--result-ink);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.actionToastIcon {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--result-green);
+  font-weight: 950;
+}
+
+.undoToast {
+  background: #fff0ad;
+}
+
+.undoToast .actionToastIcon {
+  color: var(--result-red);
+}
+
+.routeNavigator {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 13px;
+  border: 2px solid var(--result-ink);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fffdf7 0%, #fff5c7 100%);
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.12);
+}
+
+.routeNavigatorHeading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.routeNavigatorHeading span {
+  color: var(--result-red);
+  font-size: 0.61rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.routeNavigatorHeading strong {
+  color: #64595b;
+  font-size: 0.69rem;
+}
+
+.routeNavigator ol {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 2px 1px 5px;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+
+.routeNavigator li {
+  flex: 0 0 min(76vw, 232px);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.routeNavigator button {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 58px;
+  padding: 9px;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 15px;
+  background: #ffffff;
+  color: var(--result-ink);
+  font: inherit;
+  text-align: left;
+  box-shadow: 2px 2px 0 rgba(36, 31, 32, 0.1);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.routeNavigator button:hover,
+.routeNavigator button:focus-visible {
+  transform: translateY(-2px);
+  background: #fffdf2;
+  box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.12);
+}
+
+.routeNavigator button > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--result-ink);
+  border-radius: 11px;
+  background: var(--result-yellow);
+  color: var(--result-ink);
+  font-size: 0.79rem;
+  font-weight: 950;
+}
+
+.routeNavigator button > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.routeNavigator button small {
+  color: var(--result-red);
+  font-size: 0.62rem;
+  font-weight: 950;
+}
+
+.routeNavigator button strong {
+  overflow: hidden;
+  color: var(--result-ink);
+  font-size: 0.76rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kindBadgeIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+.kindBadgeIcon svg,
+.stopQuickFacts i svg,
+.hoursRow > span svg,
+.routeEditNotice > span svg,
+.refreshRoot :global(.outing-stop-controls button span svg),
+.completeIcon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.stopQuickFacts {
+  align-items: stretch;
+}
+
+.stopQuickFacts span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+.stopQuickFacts i {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 17px;
+  width: 17px;
+  height: 17px;
+  font-style: normal;
+}
+
+.hoursRow > span {
+  padding: 7px;
+}
+
+.routeEditNotice > span {
+  padding: 5px;
+}
+
+.refreshRoot :global(.outing-stop-wrapper[id^="outing-stop-"]) {
+  scroll-margin-top: 88px;
+}
+
+.refreshRoot :global(.outing-travel-copy strong) {
+  color: var(--result-ink);
+  font-size: 0.72rem;
+}
+
+.refreshRoot :global(.outing-travel-copy p) {
+  margin-top: 2px;
+  text-transform: capitalize;
+}
+
+.refreshRoot :global(.outing-action-dock button:disabled) {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+@keyframes v2ToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (min-width: 720px) {
+  .routeNavigator li {
+    flex-basis: 220px;
+  }
+
+  .routeNavigator {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 430px) {
+  .actionToast {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .actionToast button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .routeNavigator li {
+    flex-basis: 72vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actionToast,
+  .routeNavigator button {
+    animation: none;
+    transition: none;
+  }
+
+  .routeNavigator button:hover,
+  .routeNavigator button:focus-visible {
+    transform: none;
+  }
+}
+/* VENTURE OUTING RESULTS V2.0 END */

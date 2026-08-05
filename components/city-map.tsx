@@ -70,6 +70,20 @@ const WINNIPEG_CENTER: [
   49.8951
 ];
 
+function mapMotionDuration(
+  duration: number
+): number {
+  if (typeof window === "undefined") {
+    return duration;
+  }
+
+  return window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches
+    ? 0
+    : duration;
+}
+
 function getListingKey(
   listing: Listing
 ): string {
@@ -207,7 +221,9 @@ export function CityMap({
         map.easeTo({
           center: WINNIPEG_CENTER,
           zoom: 10.5,
-          duration: 450
+          duration:
+            mapMotionDuration(450),
+          essential: false
         });
         return;
       }
@@ -220,7 +236,9 @@ export function CityMap({
           left: 48
         },
         maxZoom: 13.5,
-        duration: 550
+        duration:
+          mapMotionDuration(550),
+        essential: false
       });
     }, []);
 
@@ -270,8 +288,9 @@ export function CityMap({
                 12,
               13
             ),
-            duration: 650,
-            essential: true
+            duration:
+              mapMotionDuration(650),
+            essential: false
           });
         },
         (error) => {
@@ -766,8 +785,9 @@ export function CityMap({
           activeMap.getZoom(),
           14
         ),
-        duration: 650,
-        essential: true
+        duration:
+          mapMotionDuration(650),
+        essential: false
       });
     }
 
@@ -795,11 +815,19 @@ export function CityMap({
 
   return (
     <div className={styles.mapShell}>
+      <p
+        id="venture-map-description"
+        className="sr-only"
+      >
+        Interactive map of the listings in the current results. Every mapped place is also available in the listing cards below the map.
+      </p>
+
       <div
         ref={mapContainerRef}
         className={styles.cityMap}
         role="region"
         aria-label="Map of Winnipeg listings"
+        aria-describedby="venture-map-description"
       />
 
       {mapStatus !== "ready" ? (

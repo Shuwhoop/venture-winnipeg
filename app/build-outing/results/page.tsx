@@ -317,26 +317,16 @@ function getKindDetails(
   kind: StopKind
 ): {
   label: string;
-  icon: string;
 } {
   if (kind === "event") {
-    return {
-      label: "EVENT",
-      icon: "🎟"
-    };
+    return { label: "EVENT" };
   }
 
   if (kind === "drinks") {
-    return {
-      label: "DRINKS",
-      icon: "🍸"
-    };
+    return { label: "DRINKS" };
   }
 
-  return {
-    label: "FOOD",
-    icon: "🍽"
-  };
+  return { label: "FOOD" };
 }
 
 function getBuildMethodLabel(
@@ -697,6 +687,85 @@ function TravelModeIcon({
   );
 }
 
+function StopFactIcon({
+  kind
+}: {
+  kind: "location" | "price" | "time" | "duration";
+}) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      {kind === "location" ? (
+        <>
+          <path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+          <circle cx="12" cy="10" r="2.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        </>
+      ) : null}
+      {kind === "price" ? (
+        <>
+          <rect x="3.5" y="6" width="17" height="12" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M6.5 9.5h.01M17.5 14.5h.01" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </>
+      ) : null}
+      {kind === "time" ? (
+        <>
+          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M12 7.5V12l3.2 2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </>
+      ) : null}
+      {kind === "duration" ? (
+        <>
+          <path d="M8 4h8M8 20h8M9 4c0 3.4 1.3 5.4 3 6.4 1.7 1 3 3 3 5.6M15 4c0 3.4-1.3 5.4-3 6.4-1.7 1-3 3-3 5.6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ) : null}
+    </svg>
+  );
+}
+
+function LockRouteIcon({
+  locked
+}: {
+  locked: boolean;
+}) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="5" y="10" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      {locked ? (
+        <path d="M8 10V7.5a4 4 0 0 1 8 0V10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      ) : (
+        <path d="M9 10V7.5a4 4 0 0 1 7.3-2.2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      )}
+      <circle cx="12" cy="15" r="1.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+function CompleteRouteIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="m8.5 12.2 2.2 2.2 4.9-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ReorderRouteIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M8 6h11M8 12h11M8 18h11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="4.5" cy="6" r="1.1" fill="currentColor" />
+      <circle cx="4.5" cy="12" r="1.1" fill="currentColor" />
+      <circle cx="4.5" cy="18" r="1.1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function getStopDomId(
+  stop: GeneratedOutingPlan["stops"][number]
+): string {
+  return `outing-stop-${getOutingStopKey(stop).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
 export default function OutingResultsPage() {
   const [
     status,
@@ -728,6 +797,22 @@ export default function OutingResultsPage() {
     actionMessage,
     setActionMessage
   ] = useState("");
+
+  const [
+    sharing,
+    setSharing
+  ] = useState(false);
+
+  const [
+    removedStopUndo,
+    setRemovedStopUndo
+  ] = useState<{
+    previousPlan: GeneratedOutingPlan;
+    stopName: string;
+  } | null>(null);
+
+  const undoTimerRef =
+    useRef<number | null>(null);
 
   const [
     completionSheetOpen,
@@ -916,6 +1001,12 @@ export default function OutingResultsPage() {
       setStatus("loading");
       setErrorMessage("");
       setActionMessage("");
+      setSharing(false);
+      setRemovedStopUndo(null);
+      if (undoTimerRef.current !== null) {
+        window.clearTimeout(undoTimerRef.current);
+        undoTimerRef.current = null;
+      }
       setCompletionSheetOpen(false);
       setCompletionSelections([]);
       setLoggingCompletion(false);
@@ -1011,6 +1102,28 @@ export default function OutingResultsPage() {
   useEffect(() => {
     planRef.current = plan;
   }, [plan]);
+
+  useEffect(() => {
+    if (!actionMessage || removedStopUndo) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setActionMessage("");
+    }, 4800);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [actionMessage, removedStopUndo]);
+
+  useEffect(() => {
+    return () => {
+      if (undoTimerRef.current !== null) {
+        window.clearTimeout(undoTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     function refreshVisitKeys() {
@@ -1269,6 +1382,12 @@ export default function OutingResultsPage() {
     message: string,
     resetLocks = true
   ) {
+    if (undoTimerRef.current !== null) {
+      window.clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
+    }
+    setRemovedStopUndo(null);
+
     planRef.current = nextPlan;
     setPlan(nextPlan);
 
@@ -1961,12 +2080,12 @@ export default function OutingResultsPage() {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Remove ${stop.listing.name} from this outing?`
-    );
+    const previousPlan = plan;
 
-    if (!confirmed) {
-      return;
+    setRemovedStopUndo(null);
+    if (undoTimerRef.current !== null) {
+      window.clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
     }
 
     setRemovingOrder(stopOrder);
@@ -2003,15 +2122,26 @@ export default function OutingResultsPage() {
         );
       }
 
+      const removedName =
+        result.removedListingName ||
+        stop.listing.name;
+
       setExpandedOrders([]);
       applyPlanUpdate(
         result.plan,
-        `${result.removedListingName || "The stop"} was removed. Your outing now has ${result.plan.stops.length} ${
-          result.plan.stops.length === 1
-            ? "stop"
-            : "stops"
-        }.`
+        `${removedName} was removed.`
       );
+
+      setRemovedStopUndo({
+        previousPlan,
+        stopName: removedName
+      });
+
+      undoTimerRef.current = window.setTimeout(() => {
+        setRemovedStopUndo(null);
+        setActionMessage("");
+        undoTimerRef.current = null;
+      }, 8000);
     } catch (error) {
       setActionMessage(
         error instanceof Error
@@ -2021,6 +2151,25 @@ export default function OutingResultsPage() {
     } finally {
       setRemovingOrder(null);
     }
+  }
+
+  function handleUndoRemove() {
+    if (!removedStopUndo) {
+      return;
+    }
+
+    if (undoTimerRef.current !== null) {
+      window.clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
+    }
+
+    const { previousPlan, stopName } = removedStopUndo;
+    setRemovedStopUndo(null);
+    setExpandedOrders([]);
+    applyPlanUpdate(
+      previousPlan,
+      `${stopName} is back in your route.`
+    );
   }
 
   function toggleStopDetails(
@@ -2329,7 +2478,7 @@ export default function OutingResultsPage() {
   }
 
   async function handleShareOuting() {
-  if (!plan) {
+  if (!plan || sharing) {
     return;
   }
 
@@ -2361,6 +2510,7 @@ export default function OutingResultsPage() {
     return;
   }
 
+  setSharing(true);
   setActionMessage(
     "Creating your share link..."
   );
@@ -2459,6 +2609,8 @@ export default function OutingResultsPage() {
         ? error.message
         : "The outing could not be shared."
     );
+  } finally {
+    setSharing(false);
   }
 }
   return (
@@ -2753,6 +2905,7 @@ export default function OutingResultsPage() {
             <button
               type="button"
               className={styles.shareAction}
+              disabled={sharing}
               onClick={() => {
                 void handleShareOuting();
               }}
@@ -2765,8 +2918,8 @@ export default function OutingResultsPage() {
               </span>
 
               <span className={styles.actionCopy}>
-                <strong>Share</strong>
-                <small>Send the full route</small>
+                <strong>{sharing ? "Creating link..." : "Share"}</strong>
+                <small>{sharing ? "Getting the route ready" : "Send the full route"}</small>
               </span>
             </button>
 
@@ -2779,7 +2932,7 @@ export default function OutingResultsPage() {
                 className={`${styles.actionIcon} ${styles.completeIcon}`}
                 aria-hidden="true"
               >
-                ✓
+                <CompleteRouteIcon />
               </span>
 
               <span className={styles.actionCopy}>
@@ -2819,13 +2972,51 @@ export default function OutingResultsPage() {
           </section>
 
           {actionMessage ? (
-            <p
-              className="outing-action-message"
-              role="status"
+            <div
+              className={`${styles.actionToast} ${removedStopUndo ? styles.undoToast : ""}`}
+              aria-live="polite"
             >
-              {actionMessage}
-            </p>
+              <span className={styles.actionToastIcon} aria-hidden="true">
+                {removedStopUndo ? "−" : "✓"}
+              </span>
+              <p>{actionMessage}</p>
+              {removedStopUndo ? (
+                <button type="button" onClick={handleUndoRemove}>
+                  Undo
+                </button>
+              ) : null}
+            </div>
           ) : null}
+
+          <nav className={styles.routeNavigator} aria-label="Jump to a stop">
+            <div className={styles.routeNavigatorHeading}>
+              <span>QUICK ROUTE</span>
+              <strong>Tap a stop to jump there</strong>
+            </div>
+            <ol>
+              {plan.stops.map((stop) => (
+                <li key={`jump-${getOutingStopKey(stop)}`}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document
+                        .getElementById(getStopDomId(stop))
+                        ?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center"
+                        });
+                    }}
+                  >
+                    <span>{stop.order}</span>
+                    <div>
+                      <small>{stop.startTime}</small>
+                      <strong>{stop.listing.name}</strong>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </nav>
 
           <section className={styles.snapshotSection}>
             <div className={styles.snapshotHeading}>
@@ -3141,7 +3332,7 @@ export default function OutingResultsPage() {
                   className={styles.routeEditNotice}
                   role="status"
                 >
-                  <span aria-hidden="true">☝</span>
+                  <span aria-hidden="true"><ReorderRouteIcon /></span>
                   <p>
                     Hold the dotted grip and drag. Venture updates the numbering, map, travel legs, timing, saved outing, and share data.
                   </p>
@@ -3163,6 +3354,7 @@ export default function OutingResultsPage() {
 
                   return (
                     <div
+                      id={getStopDomId(stop)}
                       className={`outing-stop-wrapper outing-kind-${kind} ${
                         routeEditMode
                           ? styles.reorderableStop
@@ -3189,12 +3381,11 @@ export default function OutingResultsPage() {
                           </span>
 
                           <div className="outing-travel-copy">
-                            <strong>Next stop</strong>
+                            <strong>
+                              {stop.travelFromPreviousMinutes} min to {stop.listing.name}
+                            </strong>
                             <p>
-                              About{" "}
-                              {stop.travelFromPreviousMinutes}{" "}
-                              minutes by{" "}
-                              {plan.transportation.toLowerCase()}
+                              {plan.transportation} · arrive around {stop.startTime}
                             </p>
                           </div>
 
@@ -3273,8 +3464,8 @@ export default function OutingResultsPage() {
 
                             <span className={styles.stopTopActions}>
                               <small className={`outing-kind-badge kind-${kind}`}>
-                                <i aria-hidden="true">
-                                  {kindDetails.icon}
+                                <i className={styles.kindBadgeIcon} aria-hidden="true">
+                                  <AddStopIcon kind={kind} />
                                 </i>
                                 {kindDetails.label}
                               </small>
@@ -3378,15 +3569,20 @@ export default function OutingResultsPage() {
 
                           <div className={styles.stopQuickFacts}>
                             <span>
-                              <i aria-hidden="true">📍</i>
+                              <i aria-hidden="true"><StopFactIcon kind="location" /></i>
                               {stop.listing.neighbourhood || "Winnipeg"}
                             </span>
 
                             <span>
-                              <i aria-hidden="true">💵</i>
+                              <i aria-hidden="true"><StopFactIcon kind="price" /></i>
                               {formatCost(
                                 stop.estimatedCostCad
                               )}
+                            </span>
+
+                            <span>
+                              <i aria-hidden="true"><StopFactIcon kind="duration" /></i>
+                              {stop.durationMinutes} min
                             </span>
                           </div>
 
@@ -3402,8 +3598,8 @@ export default function OutingResultsPage() {
                           >
                             <span>
                               {expanded
-                                ? "Hide details"
-                                : "Show details"}
+                                ? "Close stop plan"
+                                : "Plan this stop"}
                             </span>
                             <i aria-hidden="true">
                               <DetailChevron expanded={expanded} />
@@ -3413,7 +3609,7 @@ export default function OutingResultsPage() {
                           {expanded ? (
                             <div className={styles.stopDetailsPanel}>
                               <div className={styles.hoursRow}>
-                                <span aria-hidden="true">🕒</span>
+                                <span aria-hidden="true"><StopFactIcon kind="time" /></span>
                                 <div>
                                   <small>Hours or event time</small>
                                   <strong>
@@ -3444,11 +3640,9 @@ export default function OutingResultsPage() {
                                   }
                                 >
                                   <span aria-hidden="true">
-                                    {lockedOrders.includes(
-                                      stop.order
-                                    )
-                                      ? "🔒"
-                                      : "🔓"}
+                                    <LockRouteIcon
+                                      locked={lockedOrders.includes(stop.order)}
+                                    />
                                   </span>
 
                                   {lockedOrders.includes(
@@ -3784,7 +3978,7 @@ export default function OutingResultsPage() {
                       </span>
 
                       <span className={styles.addStopOptionFit}>
-                        {option.fitReason}
+                        Fits the current time window and keeps the route moving smoothly.
                       </span>
                     </span>
 
@@ -3909,7 +4103,7 @@ export default function OutingResultsPage() {
                           </span>
 
                           <span className={styles.addStopOptionFit}>
-                            {option.fitReason}
+                            Keeps this part of the outing in the same time window.
                           </span>
                         </span>
 

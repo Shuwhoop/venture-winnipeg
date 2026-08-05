@@ -1,5 +1,7 @@
 import "server-only";
 
+import { reportDataAccessError } from "@/lib/network-errors";
+
 import {
   eventFields,
   eventToListing,
@@ -14,9 +16,11 @@ import {
 
 import {
   matchesDiscoveryFilter,
+  matchesDiscoveryOccasion,
   matchesDiscoveryPrice,
   matchesDiscoveryWhen,
   type DiscoveryFilter,
+  type DiscoveryOccasion,
   type DiscoveryPrice,
   type DiscoveryWhen
 } from "@/lib/discovery-intent";
@@ -71,6 +75,7 @@ type ExploreSearchOptions = {
   filter: DiscoveryFilter;
   when: DiscoveryWhen;
   price: DiscoveryPrice;
+  occasion: DiscoveryOccasion;
   area: string;
   limit: number;
 };
@@ -157,6 +162,7 @@ export async function searchPublishedPlaces({
   filter,
   when,
   price,
+  occasion,
   area,
   limit
 }: ExploreSearchOptions): Promise<ExploreSearchResult> {
@@ -275,8 +281,8 @@ export async function searchPublishedPlaces({
         );
 
     if (error) {
-      console.error(
-        "Unable to search Venture places:",
+      reportDataAccessError(
+        "Unable to search Venture places",
         error
       );
 
@@ -309,6 +315,10 @@ export async function searchPublishedPlaces({
         matchesDiscoveryPrice(
           listing,
           price
+        ) &&
+        matchesDiscoveryOccasion(
+          listing,
+          occasion
         )
       );
 
@@ -335,6 +345,7 @@ export async function searchPublishedEvents({
   filter,
   when,
   price,
+  occasion,
   area,
   limit
 }: ExploreSearchOptions): Promise<ExploreSearchResult> {
@@ -457,8 +468,8 @@ export async function searchPublishedEvents({
         );
 
     if (error) {
-      console.error(
-        "Unable to search Venture events:",
+      reportDataAccessError(
+        "Unable to search Venture events",
         error
       );
 
@@ -491,6 +502,10 @@ export async function searchPublishedEvents({
         matchesDiscoveryPrice(
           listing,
           price
+        ) &&
+        matchesDiscoveryOccasion(
+          listing,
+          occasion
         )
       );
 
@@ -575,8 +590,8 @@ export async function getExploreNeighbourhoods(): Promise<string[]> {
       .limit(1000);
 
   if (error) {
-    console.error(
-      "Unable to load Explore neighbourhoods:",
+    reportDataAccessError(
+      "Unable to load Explore neighbourhoods",
       error
     );
 

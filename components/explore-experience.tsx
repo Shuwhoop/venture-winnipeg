@@ -7,7 +7,8 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
+  type KeyboardEvent
 } from "react";
 
 import {
@@ -27,7 +28,14 @@ import {
 } from "@/components/personalized-explore-results";
 
 import {
+  trackBetaEvent
+} from "@/lib/beta/client";
+
+import {
+  getListingProximity,
   listingIsInsideBounds,
+  NEARBY_LOCATION_STORAGE_KEY,
+  parseStoredGeoPoint,
   type GeoPoint,
   type MapBounds
 } from "@/lib/explore-map-utils";
@@ -59,16 +67,47 @@ type ExploreExperienceProps = {
   hasMore?: boolean;
   loadMoreHref?: string | null;
   pageSize?: number;
+  nearbyRequested?: boolean;
+  resultLimit?: number;
+  analyticsContext?: {
+    filter: string;
+    when: string;
+    price: string;
+    occasion: string;
+    area: string;
+    newToMe: boolean;
+  };
 };
 
 type ExploreView =
   | "list"
   | "map";
 
+type ExploreSort =
+  | "recommended"
+  | "nearest"
+  | "open"
+  | "name";
+
+type NearbyLocationStatus =
+  | "idle"
+  | "missing"
+  | "locating"
+  | "ready"
+  | "error";
+
 function getListingKey(
   listing: Listing
 ): string {
   return `${listing.type}-${listing.id}`;
+}
+
+function preferredScrollBehavior(): ScrollBehavior {
+  return window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches
+    ? "auto"
+    : "smooth";
 }
 
 function hasVisitedListing(
@@ -112,7 +151,10 @@ export function ExploreExperience({
   requestType = "other",
   hasMore = false,
   loadMoreHref = null,
-  pageSize = 24
+  pageSize = 24,
+  nearbyRequested = false,
+  resultLimit = 24,
+  analyticsContext
 }: ExploreExperienceProps) {
   const workbenchRef =
     useRef<HTMLElement>(null);
@@ -123,8 +165,21 @@ export function ExploreExperience({
   const railScrollTimeoutRef =
     useRef<number | null>(null);
 
+  const zeroResultTrackedRef =
+    useRef("");
+
+  const resultViewTrackedRef =
+    useRef("");
+
   const [view, setView] =
     useState<ExploreView>("list");
+
+  const [sort, setSort] =
+    useState<ExploreSort>(
+      nearbyRequested
+        ? "nearest"
+        : "recommended"
+    );
 
   const [selectedListingKey, setSelectedListingKey] =
     useState<string | null>(null);
@@ -152,6 +207,66 @@ export function ExploreExperience({
 
   const [userLocation, setUserLocation] =
     useState<GeoPoint | null>(null);
+
+  const [nearbyLocationStatus, setNearbyLocationStatus] =
+    useState<NearbyLocationStatus>("idle");
+
+  const updateUserLocation =
+    useCallback(
+      (location: GeoPoint) => {
+        setUserLocation(location);
+
+        if (nearbyRequested) {
+          setNearbyLocationStatus("ready");
+
+          try {
+            window.sessionStorage.setItem(
+              NEARBY_LOCATION_STORAGE_KEY,
+              JSON.stringify(location)
+            );
+          } catch {
+            // Distance sorting still works for this render.
+          }
+        }
+      },
+      [nearbyRequested]
+    );
+
+  useEffect(() => {
+    setSort(
+      nearbyRequested
+        ? "nearest"
+        : "recommended"
+    );
+  }, [nearbyRequested]);
+
+  useEffect(() => {
+    if (!nearbyRequested) {
+      setNearbyLocationStatus("idle");
+      setUserLocation(null);
+      return;
+    }
+
+    try {
+      const storedLocation =
+        parseStoredGeoPoint(
+          window.sessionStorage.getItem(
+            NEARBY_LOCATION_STORAGE_KEY
+          )
+        );
+
+      if (storedLocation) {
+        setUserLocation(storedLocation);
+        setNearbyLocationStatus("ready");
+        return;
+      }
+    } catch {
+      setNearbyLocationStatus("error");
+      return;
+    }
+
+    setNearbyLocationStatus("missing");
+  }, [nearbyRequested]);
 
   useEffect(() => {
     function refreshVisitHistory() {
@@ -186,19 +301,42 @@ export function ExploreExperience({
     };
   }, []);
 
+  const distanceReadyListings =
+    useMemo(() => {
+      if (!userLocation) {
+        return listings;
+      }
+
+      return listings.map((listing) => {
+        const proximity =
+          getListingProximity(
+            listing,
+            userLocation
+          );
+
+        return proximity
+          ? {
+              ...listing,
+              distance:
+                proximity.distanceLabel
+            }
+          : listing;
+      });
+    }, [listings, userLocation]);
+
   const historyFilteredListings =
     useMemo(() => {
       if (
         !newToMeOnly ||
         !visitHistoryReady
       ) {
-        return listings;
+        return distanceReadyListings;
       }
 
       const visits =
         getVisitHistory();
 
-      return listings.filter(
+      return distanceReadyListings.filter(
         (listing) =>
           !hasVisitedListing(
             listing,
@@ -206,28 +344,101 @@ export function ExploreExperience({
           )
       );
     }, [
-      listings,
+      distanceReadyListings,
       newToMeOnly,
       visitHistoryReady,
       visitVersion
     ]);
 
-  const visibleListings =
+  const sortedListings =
     useMemo(() => {
-      if (!activeBounds) {
-        return historyFilteredListings;
+      const indexed =
+        historyFilteredListings.map(
+          (listing, index) => ({
+            listing,
+            index
+          })
+        );
+
+      if (sort === "name") {
+        return indexed
+          .sort((first, second) =>
+            first.listing.name.localeCompare(
+              second.listing.name
+            )
+          )
+          .map((entry) => entry.listing);
       }
 
-      return historyFilteredListings.filter(
-        (listing) =>
-          listingIsInsideBounds(
-            listing,
-            activeBounds
+      if (sort === "open") {
+        return indexed
+          .sort((first, second) => {
+            const openDifference =
+              Number(
+                second.listing.isOpenNow ===
+                  true
+              ) -
+              Number(
+                first.listing.isOpenNow ===
+                  true
+              );
+
+            return openDifference !== 0
+              ? openDifference
+              : first.index - second.index;
+          })
+          .map((entry) => entry.listing);
+      }
+
+      if (
+        sort === "nearest" &&
+        userLocation
+      ) {
+        return indexed
+          .map((entry) => ({
+            ...entry,
+            distance:
+              getListingProximity(
+                entry.listing,
+                userLocation
+              )?.distanceKilometres ??
+              Number.POSITIVE_INFINITY
+          }))
+          .sort((first, second) =>
+            first.distance !== second.distance
+              ? first.distance - second.distance
+              : first.index - second.index
           )
+          .map((entry) => entry.listing);
+      }
+
+      return historyFilteredListings;
+    }, [
+      historyFilteredListings,
+      sort,
+      userLocation
+    ]);
+
+  const visibleListings =
+    useMemo(() => {
+      const areaListings = !activeBounds
+        ? sortedListings
+        : sortedListings.filter(
+            (listing) =>
+              listingIsInsideBounds(
+                listing,
+                activeBounds
+              )
+          );
+
+      return areaListings.slice(
+        0,
+        Math.max(1, resultLimit)
       );
     }, [
       activeBounds,
-      historyFilteredListings
+      sortedListings,
+      resultLimit
     ]);
 
   const pendingAreaCount =
@@ -319,7 +530,7 @@ export function ExploreExperience({
               );
 
             card?.scrollIntoView({
-              behavior: "smooth",
+              behavior: preferredScrollBehavior(),
               block: "nearest",
               inline: "center"
             });
@@ -346,10 +557,23 @@ export function ExploreExperience({
         setView("map");
         selectListing(listing);
 
+        trackBetaEvent({
+          eventName:
+            "discovery_view_changed",
+          pagePath:
+            window.location.pathname,
+          properties: {
+            surface: "explore",
+            view: "map",
+            source:
+              "listing-card-map-action"
+          }
+        });
+
         window.requestAnimationFrame(
           () => {
             workbenchRef.current?.scrollIntoView({
-              behavior: "smooth",
+              behavior: preferredScrollBehavior(),
               block: "start"
             });
           }
@@ -467,6 +691,17 @@ export function ExploreExperience({
   ) {
     setView(nextView);
 
+    trackBetaEvent({
+      eventName:
+        "discovery_view_changed",
+      pagePath:
+        window.location.pathname,
+      properties: {
+        surface: "explore",
+        view: nextView
+      }
+    });
+
     if (
       nextView === "map" &&
       !selectedListingKey &&
@@ -476,6 +711,65 @@ export function ExploreExperience({
         visibleListings[0]
       );
     }
+  }
+
+  function handleViewKeyDown(
+    event: KeyboardEvent<HTMLDivElement>
+  ) {
+    if (
+      event.key !== "ArrowLeft" &&
+      event.key !== "ArrowRight"
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const nextView: ExploreView =
+      view === "list"
+        ? "map"
+        : "list";
+
+    changeView(nextView);
+
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById(
+          `explore-${nextView}-tab`
+        )
+        ?.focus();
+    });
+  }
+
+  function handleResultRailKeyDown(
+    event: KeyboardEvent<HTMLDivElement>
+  ) {
+    if (
+      event.key !== "ArrowLeft" &&
+      event.key !== "ArrowRight"
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const reducedMotion =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+    event.currentTarget.scrollBy({
+      left:
+        (event.key === "ArrowRight" ? 1 : -1) *
+        Math.max(
+          240,
+          event.currentTarget.clientWidth * 0.86
+        ),
+      behavior:
+        reducedMotion
+          ? "auto"
+          : "smooth"
+    });
   }
 
   const handleViewportChanged =
@@ -533,8 +827,186 @@ export function ExploreExperience({
     );
   }
 
+  function locateForNearby() {
+    trackBetaEvent({
+      eventName: "discovery_filter_selected",
+      pagePath: window.location.pathname,
+      properties: {
+        surface: "explore",
+        filter: "near-me",
+        interaction: "nearby-location-requested"
+      }
+    });
+
+    if (!navigator.geolocation) {
+      setNearbyLocationStatus("error");
+      return;
+    }
+
+    setNearbyLocationStatus("locating");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        updateUserLocation({
+          latitude:
+            position.coords.latitude,
+          longitude:
+            position.coords.longitude
+        });
+
+        trackBetaEvent({
+          eventName: "discovery_filter_selected",
+          pagePath: window.location.pathname,
+          properties: {
+            surface: "explore",
+            filter: "near-me",
+            interaction: "nearby-location-resolved",
+            result: "granted"
+          }
+        });
+      },
+      (error) => {
+        setNearbyLocationStatus("error");
+
+        trackBetaEvent({
+          eventName: "discovery_filter_selected",
+          pagePath: window.location.pathname,
+          properties: {
+            surface: "explore",
+            filter: "near-me",
+            interaction: "nearby-location-resolved",
+            result:
+              error.code ===
+              error.PERMISSION_DENIED
+                ? "denied"
+                : "unavailable"
+          }
+        });
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    );
+  }
+
   const hasBaseMatches =
     historyFilteredListings.length > 0;
+
+  useEffect(() => {
+    const trackingKey = JSON.stringify([
+      searchQuery,
+      visibleListings.length,
+      hasMore,
+      nearbyRequested,
+      analyticsContext
+    ]);
+
+    if (
+      resultViewTrackedRef.current ===
+      trackingKey
+    ) {
+      return;
+    }
+
+    resultViewTrackedRef.current =
+      trackingKey;
+
+    trackBetaEvent({
+      eventName:
+        "discovery_results_viewed",
+      pagePath:
+        window.location.pathname,
+      properties: {
+        surface: "explore",
+        query:
+          searchQuery.trim(),
+        queryLength:
+          searchQuery.trim().length,
+        resultCount:
+          visibleListings.length,
+        hasMore,
+        nearbyRequested,
+        filter:
+          analyticsContext?.filter ?? "all",
+        when:
+          analyticsContext?.when ?? "any",
+        price:
+          analyticsContext?.price ?? "any",
+        occasion:
+          analyticsContext?.occasion ?? "any",
+        areaSelected:
+          Boolean(analyticsContext?.area),
+        newToMe:
+          analyticsContext?.newToMe ??
+          newToMeOnly
+      }
+    });
+  }, [
+    analyticsContext,
+    hasMore,
+    nearbyRequested,
+    newToMeOnly,
+    searchQuery,
+    visibleListings.length
+  ]);
+
+  useEffect(() => {
+    const normalizedSearch =
+      searchQuery.trim();
+
+    if (
+      hasBaseMatches ||
+      !normalizedSearch
+    ) {
+      return;
+    }
+
+    const trackingKey =
+      `${normalizedSearch}:${requestType}`;
+
+    if (
+      zeroResultTrackedRef.current ===
+      trackingKey
+    ) {
+      return;
+    }
+
+    zeroResultTrackedRef.current =
+      trackingKey;
+
+    trackBetaEvent({
+      eventName: "discovery_zero_results",
+      pagePath: window.location.pathname,
+      properties: {
+        surface: "explore",
+        interaction: "zero-results",
+        query: normalizedSearch,
+        requestType
+      }
+    });
+  }, [
+    hasBaseMatches,
+    requestType,
+    searchQuery
+  ]);
+
+  function changeSort(
+    nextSort: ExploreSort
+  ) {
+    setSort(nextSort);
+
+    trackBetaEvent({
+      eventName: "discovery_sort_changed",
+      pagePath: window.location.pathname,
+      properties: {
+        surface: "explore",
+        interaction: "sort-changed",
+        sort: nextSort
+      }
+    });
+  }
 
   return (
     <section
@@ -542,6 +1014,44 @@ export function ExploreExperience({
       ref={workbenchRef}
       aria-label="Explore results"
     >
+      {nearbyRequested ? (
+        <div
+          className={styles.nearbyStatus}
+          role="status"
+          aria-live="polite"
+        >
+          <span aria-hidden="true">⌖</span>
+
+          <div>
+            <strong>Nearest first</strong>
+            <small>
+              {nearbyLocationStatus === "ready"
+                ? "Sorted by distance. Your coordinates stay in this browser tab."
+                : nearbyLocationStatus === "locating"
+                  ? "Finding your location..."
+                  : nearbyLocationStatus === "error"
+                    ? "Location is unavailable. You can still browse by neighbourhood."
+                    : "Use your location to sort the loaded Winnipeg listings by distance."}
+            </small>
+          </div>
+
+          {nearbyLocationStatus !== "ready" ? (
+            <button
+              type="button"
+              onClick={locateForNearby}
+              disabled={
+                nearbyLocationStatus ===
+                "locating"
+              }
+            >
+              {nearbyLocationStatus === "locating"
+                ? "Locating..."
+                : "Use my location"}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       <header className={styles.viewToolbar}>
         <div className={styles.resultHeading}>
           <span>{eyebrow}</span>
@@ -568,15 +1078,52 @@ export function ExploreExperience({
           ) : null}
         </div>
 
+        <label className={styles.sortControl}>
+          <span>Sort</span>
+
+          <select
+            value={sort}
+            onChange={(event) =>
+              changeSort(
+                event.target.value as
+                  ExploreSort
+              )
+            }
+          >
+            <option value="recommended">
+              Recommended
+            </option>
+
+            {nearbyRequested ? (
+              <option value="nearest">
+                Nearest
+              </option>
+            ) : null}
+
+            <option value="open">
+              Open first
+            </option>
+
+            <option value="name">
+              Name A–Z
+            </option>
+          </select>
+        </label>
+
         <div
           className={styles.viewSwitcher}
           role="tablist"
           aria-label="Choose results view"
+          onKeyDown={handleViewKeyDown}
         >
           <button
             type="button"
+            id="explore-list-tab"
             role="tab"
             aria-selected={view === "list"}
+            aria-controls="explore-list-panel"
+            tabIndex={view === "list" ? 0 : -1}
+            disabled={!hasBaseMatches}
             className={
               view === "list"
                 ? styles.activeView
@@ -592,8 +1139,12 @@ export function ExploreExperience({
 
           <button
             type="button"
+            id="explore-map-tab"
             role="tab"
             aria-selected={view === "map"}
+            aria-controls="explore-map-panel"
+            tabIndex={view === "map" ? 0 : -1}
+            disabled={!hasBaseMatches}
             className={
               view === "map"
                 ? styles.activeView
@@ -640,6 +1191,20 @@ export function ExploreExperience({
                 ? "Broaden the neighbourhood, timing or budget, or turn off New to me to include familiar favourites."
                 : "Try a broader neighbourhood, category, venue, or search term, or send Venture the missing listing below."}
             </p>
+
+            <div className={styles.recoveryLinks}>
+              <Link href="/explore">
+                Show everything
+              </Link>
+
+              <Link href="/explore?occasion=date">
+                Try date ideas
+              </Link>
+
+              <Link href="/explore?when=open">
+                See what is open
+              </Link>
+            </div>
           </section>
 
           <ExploreMissingListingRequest
@@ -648,7 +1213,13 @@ export function ExploreExperience({
           />
         </div>
       ) : view === "map" ? (
-        <div className={styles.mapMode}>
+        <div
+          id="explore-map-panel"
+          className={styles.mapMode}
+          role="tabpanel"
+          aria-labelledby="explore-map-tab"
+          tabIndex={0}
+        >
           <div className={styles.mapFrame}>
             <CityMap
               listings={visibleListings}
@@ -668,7 +1239,7 @@ export function ExploreExperience({
                 handleViewportChanged
               }
               onUserLocationChange={
-                setUserLocation
+                updateUserLocation
               }
             />
 
@@ -706,7 +1277,10 @@ export function ExploreExperience({
             <div
               className={styles.mapResultRail}
               ref={resultRailRef}
-              aria-label="Listings shown on map"
+              role="region"
+              aria-label="Listings shown on map. Use left and right arrow keys to scroll."
+              tabIndex={0}
+              onKeyDown={handleResultRailKeyDown}
               onScroll={handleRailScroll}
             >
               {visibleListings.map(
@@ -751,18 +1325,25 @@ export function ExploreExperience({
           )}
         </div>
       ) : visibleListings.length > 0 ? (
-        <PersonalizedExploreResults
-          listings={visibleListings}
-          eyebrow={eyebrow}
-          selectedListingKey={
-            selectedListingKey
-          }
-          onSelectListing={
-            showListingOnMap
-          }
-          showHeading={false}
-          className={styles.listResults}
-        />
+        <div
+          id="explore-list-panel"
+          role="tabpanel"
+          aria-labelledby="explore-list-tab"
+          tabIndex={0}
+        >
+          <PersonalizedExploreResults
+            listings={visibleListings}
+            eyebrow={eyebrow}
+            selectedListingKey={
+              selectedListingKey
+            }
+            onSelectListing={
+              showListingOnMap
+            }
+            showHeading={false}
+            className={styles.listResults}
+          />
+        </div>
       ) : (
         <section className={styles.emptyState}>
           <div aria-hidden="true">⌖</div>

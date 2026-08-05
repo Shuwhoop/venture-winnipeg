@@ -9,6 +9,8 @@ RESEND_API_KEY=Resend API key
 NEWSLETTER_TOKEN_SECRET=random secret at least 32 characters
 VENTURE_EMAIL_FROM=The Thursday Venture <hello@your-verified-domain.example>
 VENTURE_EMAIL_REPLY_TO=your reply inbox
+VENTURE_POSTAL_ADDRESS=your valid business mailing address
+RESEND_WEBHOOK_SECRET=Resend webhook signing secret
 ```
 
 Never expose `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, or `NEWSLETTER_TOKEN_SECRET` in browser code or commits.
@@ -36,12 +38,15 @@ The migration adds the pending-confirmation state and delivery tracking used by 
 
 `onboarding@resend.dev` is suitable for account testing. Before inviting public subscribers, verify a sending domain in Resend and change `VENTURE_EMAIL_FROM` to an address on that domain.
 
-## Admin review
+## Admin review and production
 
 Open:
 
 ```text
 /admin/newsletter
+/admin/newsletter/studio
 ```
 
-The page shows active, pending, unsubscribed, and delivery-error records.
+The subscriber page shows active, pending, unsubscribed, bounced, complained, and delivery-error records. The studio previews issues, sends private tests, synchronizes the confirmed audience, and creates reviewable Resend Broadcast drafts. It does not automatically send a public campaign.
+
+See `VENTURE_NEWSLETTER_PRODUCTION_V1_0.md` for webhook and first-campaign setup.

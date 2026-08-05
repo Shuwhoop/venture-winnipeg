@@ -172,6 +172,128 @@ export default async function AnalyticsOverviewPage({
         </article>
       </section>
 
+      <section
+        className={styles.metrics}
+        aria-label="Discovery and conversion signals"
+      >
+        <article className={styles.metric}>
+          <span>Searches</span>
+          <strong>
+            {lab.journey.searches}
+          </strong>
+          <small>
+            {lab.journey.resultViews} result sets viewed
+          </small>
+        </article>
+
+        <article className={styles.metric}>
+          <span>Zero-result rate</span>
+          <strong>
+            {lab.journey.zeroResultRate === null
+              ? "—"
+              : `${lab.journey.zeroResultRate}%`}
+          </strong>
+          <small>
+            {lab.journey.zeroResultSearches} searches need catalogue or search repair
+          </small>
+        </article>
+
+        <article className={styles.metric}>
+          <span>Listing save rate</span>
+          <strong>
+            {lab.journey.listingSaveRate === null
+              ? "—"
+              : `${lab.journey.listingSaveRate}%`}
+          </strong>
+          <small>
+            {lab.journey.listingSaves} saves from {lab.journey.listingOpens} detail opens
+          </small>
+        </article>
+
+        <article className={styles.metric}>
+          <span>Plan generation</span>
+          <strong>
+            {lab.journey.generationRate === null
+              ? "—"
+              : `${lab.journey.generationRate}%`}
+          </strong>
+          <small>
+            {lab.journey.outingsGenerated} generated from {lab.journey.builderOpens} builder opens
+          </small>
+        </article>
+      </section>
+
+      <section className={styles.grid}>
+        <article className={styles.card}>
+          <div className={styles.cardHeader}>
+            <div>
+              <p className={styles.kicker}>
+                SEARCH DEMAND
+              </p>
+              <h2>Top search phrases</h2>
+              <p className={styles.cardCopy}>
+                Repeated zero-result phrases point directly to catalogue or search gaps.
+              </p>
+            </div>
+          </div>
+
+          {lab.journey.topSearches.length === 0 ? (
+            <p className={styles.empty}>
+              Search activity will appear here.
+            </p>
+          ) : (
+            <div className={styles.simpleList}>
+              {lab.journey.topSearches.map((item) => (
+                <div
+                  className={styles.statLine}
+                  key={item.query}
+                >
+                  <span>{item.query}</span>
+                  <strong>
+                    {item.count}
+                    {item.zeroResults > 0
+                      ? ` · ${item.zeroResults} empty`
+                      : ""}
+                  </strong>
+                </div>
+              ))}
+            </div>
+          )}
+        </article>
+
+        <article className={styles.card}>
+          <div className={styles.cardHeader}>
+            <div>
+              <p className={styles.kicker}>
+                DISCOVERY CONTROLS
+              </p>
+              <h2>Most-used filters</h2>
+              <p className={styles.cardCopy}>
+                Shows which discovery shortcuts are earning their space.
+              </p>
+            </div>
+          </div>
+
+          {lab.journey.topFilters.length === 0 ? (
+            <p className={styles.empty}>
+              Filter activity will appear here.
+            </p>
+          ) : (
+            <div className={styles.simpleList}>
+              {lab.journey.topFilters.map((item) => (
+                <div
+                  className={styles.statLine}
+                  key={item.filter}
+                >
+                  <span>{item.filter}</span>
+                  <strong>{item.count}</strong>
+                </div>
+              ))}
+            </div>
+          )}
+        </article>
+      </section>
+
       <section className={styles.grid}>
         <article className={styles.card}>
           <div className={styles.cardHeader}>
@@ -188,7 +310,7 @@ export default async function AnalyticsOverviewPage({
 
           <div
             className={styles.trend}
-            aria-label="Daily page view trend"
+            aria-hidden="true"
           >
             {lab.daily.map((day) => (
               <div
@@ -210,6 +332,14 @@ export default async function AnalyticsOverviewPage({
               />
             ))}
           </div>
+
+          <ul className="sr-only">
+            {lab.daily.map((day) => (
+              <li key={day.date}>
+                {day.date}: {day.pageViews} page views and {day.sessions} sessions.
+              </li>
+            ))}
+          </ul>
         </article>
 
         <article className={styles.card}>

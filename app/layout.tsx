@@ -17,6 +17,12 @@ import {
 import {
   ServiceWorkerRegistration
 } from "@/components/service-worker-registration";
+import {
+  RouteAccessibilityRuntime
+} from "@/components/accessibility/route-accessibility";
+import {
+  ProfileHeaderAvatar
+} from "@/components/profile/profile-header-avatar";
 
 export const metadata: Metadata = {
   title: "Venture",
@@ -75,6 +81,15 @@ export default function RootLayout({
         className="venture-body venture-app-first"
         suppressHydrationWarning
       >
+        <a
+          className="skip-link"
+          href="#venture-main-content"
+        >
+          Skip to main content
+        </a>
+
+        <RouteAccessibilityRuntime />
+
         <div className="app-shell">
           <header className="app-header">
             <Link
@@ -98,20 +113,18 @@ export default function RootLayout({
               </span>
             </Link>
 
-            <Link
-              className="avatar"
-              href="/profile"
-              aria-label="Open profile"
-            >
-              PM
-            </Link>
+            <ProfileHeaderAvatar />
           </header>
 
           <AdminRouteChrome />
 
-          <main className="page-content">
+          <div
+            id="venture-main-content"
+            className="page-content"
+            tabIndex={-1}
+          >
             {children}
-          </main>
+          </div>
 
           <PublicRouteChrome
             analyticsEnabled={

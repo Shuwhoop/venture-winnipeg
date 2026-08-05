@@ -56,8 +56,58 @@ export default function SignInPage() {
     useState<
       "idle" | "sending" | "sent" | "error"
     >("idle");
+  const [googleStatus, setGoogleStatus] =
+    useState<"idle" | "redirecting" | "error">("idle");
   const [message, setMessage] =
     useState("");
+
+  async function handleGoogleSignIn() {
+    setGoogleStatus("redirecting");
+    setStatus("idle");
+    setMessage("");
+    setCallbackError(null);
+
+    try {
+      const supabase =
+        getSupabaseBrowserClient();
+
+      const callbackUrl = new URL(
+        "/auth/callback",
+        window.location.origin
+      );
+
+      callbackUrl.searchParams.set(
+        "next",
+        nextPath
+      );
+      callbackUrl.searchParams.set(
+        "provider",
+        "google"
+      );
+
+      const { error } =
+        await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: callbackUrl.toString(),
+            queryParams: {
+              prompt: "select_account"
+            }
+          }
+        });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      setGoogleStatus("error");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Google sign-in could not start."
+      );
+    }
+  }
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>
@@ -74,7 +124,9 @@ export default function SignInPage() {
     }
 
     setStatus("sending");
+    setGoogleStatus("idle");
     setMessage("");
+    setCallbackError(null);
 
     try {
       const supabase =
@@ -88,6 +140,10 @@ export default function SignInPage() {
       callbackUrl.searchParams.set(
         "next",
         nextPath
+      );
+      callbackUrl.searchParams.set(
+        "provider",
+        "email"
       );
 
       const { error } =
@@ -117,6 +173,9 @@ export default function SignInPage() {
       );
     }
   }
+
+  const visibleError =
+    message || callbackError;
 
   return (
     <main className={styles.page}>
@@ -155,48 +214,99 @@ export default function SignInPage() {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit}>
-            <header>
-              <span>NO PASSWORD TO REMEMBER</span>
-              <h2>Email me a sign-in link</h2>
+          <div className={styles.signInStack}>
+            <header className={styles.signInHeader}>
+              <span>QUICK ACCOUNT ACCESS</span>
+              <h2>Continue to Venture</h2>
               <p>
-                Venture uses a one-time secure link. No password cupboard, no
-                forgotten-key drama.
+                Use Google for one-tap access, or keep using Venture&apos;s secure
+                email link.
               </p>
             </header>
 
-            <label>
-              Email address
-              <input
-                type="email"
-                autoComplete="email"
-                inputMode="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(event) => {
-                  setEmail(event.target.value);
-                  setStatus("idle");
-                  setMessage("");
-                }}
-                disabled={status === "sending"}
-              />
-            </label>
-
             <button
-              type="submit"
-              disabled={status === "sending"}
+              className={styles.googleButton}
+              type="button"
+              onClick={() => void handleGoogleSignIn()}
+              disabled={
+                googleStatus === "redirecting" ||
+                status === "sending"
+              }
             >
-              {status === "sending"
-                ? "Sending secure link…"
-                : "Continue with email"}
+              <svg
+                className={styles.googleIcon}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  fill="#4285F4"
+                  d="M21.6 12.23c0-.71-.06-1.23-.2-1.77H12v3.4h5.52c-.11.85-.71 2.13-2.04 2.99l-.02.11 2.96 2.3.2.02c1.84-1.7 2.98-4.2 2.98-7.05Z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 22c2.69 0 4.95-.89 6.6-2.42l-3.14-2.43c-.84.57-1.96.97-3.46.97-2.64 0-4.88-1.79-5.68-4.26l-.11.01-3.08 2.38-.04.1A9.98 9.98 0 0 0 12 22Z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M6.32 13.86A6.02 6.02 0 0 1 6 12c0-.65.11-1.27.3-1.86l-.01-.12-3.12-2.42-.1.05A10 10 0 0 0 2 12c0 1.57.37 3.05 1.09 4.35l3.23-2.49Z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.88c1.87 0 3.13.81 3.84 1.46l2.83-2.76C16.93 2.96 14.69 2 12 2a9.98 9.98 0 0 0-8.93 5.65l3.23 2.49C7.11 7.67 9.35 5.88 12 5.88Z"
+                />
+              </svg>
+              <span>
+                {googleStatus === "redirecting"
+                  ? "Opening Google…"
+                  : "Continue with Google"}
+              </span>
             </button>
 
-            {status === "error" || callbackError ? (
+            <div className={styles.divider} aria-hidden="true">
+              <span>or continue with email</span>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+              <label>
+                Email address
+                <input
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setStatus("idle");
+                    setGoogleStatus("idle");
+                    setMessage("");
+                  }}
+                  disabled={
+                    status === "sending" ||
+                    googleStatus === "redirecting"
+                  }
+                />
+              </label>
+
+              <button
+                type="submit"
+                disabled={
+                  status === "sending" ||
+                  googleStatus === "redirecting"
+                }
+              >
+                {status === "sending"
+                  ? "Sending secure link…"
+                  : "Continue with email"}
+              </button>
+            </form>
+
+            {status === "error" || googleStatus === "error" || callbackError ? (
               <p className={styles.error} role="alert">
-                {message || callbackError}
+                {visibleError}
               </p>
             ) : null}
-          </form>
+          </div>
         )}
       </section>
 

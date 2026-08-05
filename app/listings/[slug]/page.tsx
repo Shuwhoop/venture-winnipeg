@@ -9,6 +9,15 @@ import {
   ClaimListingForm
 } from "@/components/claim-listing-form";
 import {
+  ListingDetailAnalytics
+} from "@/components/analytics/listing-detail-analytics";
+import {
+  ListingDetailActionDock
+} from "@/components/listing-detail-action-dock";
+import {
+  ListingPhotoFrame
+} from "@/components/listing-photo-frame";
+import {
   ReportIssueForm
 } from "@/components/report-issue-form";
 import {
@@ -500,7 +509,17 @@ export async function generateMetadata({
   return {
     title: `${detail.name} | Venture Winnipeg`,
     description:
-      detail.shortDescription
+      detail.shortDescription,
+    openGraph: detail.photo
+      ? {
+          images: [
+            {
+              url: detail.photo.url,
+              alt: detail.photo.altText || detail.name
+            }
+          ]
+        }
+      : undefined
   };
 }
 
@@ -550,6 +569,9 @@ export default async function ListingPage({
     detail.entityType === "place"
       ? detail.reservationUrl
       : detail.ticketUrl;
+  const listingDirectionsUrl = address
+    ? directionsUrl(detail)
+    : null;
 
   const listingSnapshot = {
     id: detail.id,
@@ -578,7 +600,10 @@ export default async function ListingPage({
       detail.verificationStatus,
     lastChecked:
       detail.sourceCheckedAt ?? "",
-    imageClass: "listing-detail",
+    imageClass: detail.photo
+      ? "image-uploaded"
+      : "listing-detail",
+    imageUrl: detail.photo?.url ?? null,
     neighbourhood:
       detail.neighbourhood ?? "Winnipeg",
     venueName:
@@ -646,6 +671,17 @@ export default async function ListingPage({
 
   return (
     <main className={styles.page}>
+      <ListingDetailAnalytics
+        listing={listingSnapshot}
+      />
+
+      <ListingPhotoFrame
+        name={detail.name}
+        entityType={detail.entityType}
+        category={detail.primaryCategory}
+        photo={detail.photo}
+      />
+
       <section className={styles.hero}>
         <div className={styles.heroGlow} aria-hidden="true" />
         <div className={styles.heroTop}>
@@ -734,7 +770,7 @@ export default async function ListingPage({
           {address ? (
             <a
               className={styles.actionPrimary}
-              href={directionsUrl(detail)}
+              href={listingDirectionsUrl ?? undefined}
               target="_blank"
               rel="noreferrer"
             >
@@ -927,11 +963,7 @@ export default async function ListingPage({
         </section>
       )}
 
-      {address ||
-      detail.accessibilityNotes ||
-      detail.transitNotes ||
-      detail.parkingNotes ? (
-        <section className={`${styles.section} ${styles.revealSection}`}>
+      <section className={`${styles.section} ${styles.revealSection}`}>
           <div className={styles.sectionHeading}>
             <span>PLAN THE VISIT</span>
             <h2>Getting there and access</h2>
@@ -940,7 +972,7 @@ export default async function ListingPage({
           {address ? (
             <a
               className={styles.addressCard}
-              href={directionsUrl(detail)}
+              href={listingDirectionsUrl ?? undefined}
               target="_blank"
               rel="noreferrer"
             >
@@ -954,41 +986,43 @@ export default async function ListingPage({
           ) : null}
 
           <div className={styles.visitDisclosures}>
-            {detail.accessibilityNotes ? (
-              <details className={styles.disclosureCard}>
-                <summary>
-                  <span aria-hidden="true">♿</span>
-                  <strong>Accessibility</strong>
-                  <b aria-hidden="true">＋</b>
-                </summary>
-                <p>{detail.accessibilityNotes}</p>
-              </details>
-            ) : null}
+            <details className={styles.disclosureCard}>
+              <summary>
+                <span aria-hidden="true">♿</span>
+                <strong>Accessibility</strong>
+                <b aria-hidden="true">＋</b>
+              </summary>
+              <p>
+                {detail.accessibilityNotes ||
+                  "Accessibility details have not been confirmed yet."}
+              </p>
+            </details>
 
-            {detail.transitNotes ? (
-              <details className={styles.disclosureCard}>
-                <summary>
-                  <span aria-hidden="true">↔</span>
-                  <strong>Transit</strong>
-                  <b aria-hidden="true">＋</b>
-                </summary>
-                <p>{detail.transitNotes}</p>
-              </details>
-            ) : null}
+            <details className={styles.disclosureCard}>
+              <summary>
+                <span aria-hidden="true">↔</span>
+                <strong>Transit</strong>
+                <b aria-hidden="true">＋</b>
+              </summary>
+              <p>
+                {detail.transitNotes ||
+                  "Transit notes have not been confirmed yet."}
+              </p>
+            </details>
 
-            {detail.parkingNotes ? (
-              <details className={styles.disclosureCard}>
-                <summary>
-                  <span aria-hidden="true">P</span>
-                  <strong>Parking</strong>
-                  <b aria-hidden="true">＋</b>
-                </summary>
-                <p>{detail.parkingNotes}</p>
-              </details>
-            ) : null}
+            <details className={styles.disclosureCard}>
+              <summary>
+                <span aria-hidden="true">P</span>
+                <strong>Parking</strong>
+                <b aria-hidden="true">＋</b>
+              </summary>
+              <p>
+                {detail.parkingNotes ||
+                  "Parking information has not been confirmed yet."}
+              </p>
+            </details>
           </div>
         </section>
-      ) : null}
 
       {categories.length > 0 ? (
         <section className={`${styles.section} ${styles.revealSection}`}>
@@ -1049,6 +1083,11 @@ export default async function ListingPage({
           listingName={detail.name}
         />
       </section>
+
+      <ListingDetailActionDock
+        listing={listingSnapshot}
+        directionsUrl={listingDirectionsUrl}
+      />
     </main>
   );
 }

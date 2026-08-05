@@ -24,11 +24,16 @@ export type DiscoveryPrice =
   | "under-20"
   | "under-40";
 
+export type DiscoveryOccasion =
+  | "any"
+  | "date";
+
 export type DiscoveryIntent = {
   cleanedQuery: string;
   inferredFilter: DiscoveryFilter | null;
   inferredWhen: DiscoveryWhen | null;
   inferredPrice: DiscoveryPrice | null;
+  inferredOccasion: DiscoveryOccasion | null;
   newToMe: boolean;
   interpreted: boolean;
 };
@@ -52,6 +57,10 @@ const fillerPatterns = [
   /\bplease\b/gi,
   /\bsomething\b/gi,
   /\bsomewhere\b/gi,
+  /\bthings?\b/gi,
+  /\bnear\b/gi,
+  /\baround\b/gi,
+  /\bin\b/gi,
   /\bto\s+do\b/gi
 ];
 
@@ -60,8 +69,10 @@ function removePatterns(
   patterns: RegExp[]
 ) {
   return patterns.reduce(
-    (current, pattern) =>
-      current.replace(pattern, " "),
+    (current, pattern) => {
+      pattern.lastIndex = 0;
+      return current.replace(pattern, " ");
+    },
     value
   );
 }
@@ -82,7 +93,10 @@ export function parseDiscoveryIntent(
   let interpreted = false;
 
   const newToMe = newToMePatterns.some(
-    (pattern) => pattern.test(working)
+    (pattern) => {
+      pattern.lastIndex = 0;
+      return pattern.test(working);
+    }
   );
 
   if (newToMe) {
@@ -90,6 +104,22 @@ export function parseDiscoveryIntent(
     working = removePatterns(
       working,
       newToMePatterns
+    );
+  }
+
+  let inferredOccasion:
+    | DiscoveryOccasion
+    | null = null;
+
+  const datePattern =
+    /\b(?:date\s*(?:night|ideas?|spot)?|romantic|anniversary)\b/gi;
+
+  if (datePattern.test(working)) {
+    inferredOccasion = "date";
+    interpreted = true;
+    working = working.replace(
+      datePattern,
+      " "
     );
   }
 
@@ -101,6 +131,10 @@ export function parseDiscoveryIntent(
     /\b(events?|concerts?|shows?|festivals?|comedy|sports?)\b/gi;
   const foodPattern =
     /\b(restaurants?|food|dinner|lunch|brunch|cafes?|coffee|bars?|drinks?)\b/gi;
+  const activityPattern =
+    /\b(activities|activity|games?|bowling|escape\s+rooms?|workshops?)\b/gi;
+  const attractionPattern =
+    /\b(attractions?|museums?|galleries|gallery|landmarks?)\b/gi;
 
   if (eventPattern.test(working)) {
     inferredFilter = "events";
@@ -114,6 +148,20 @@ export function parseDiscoveryIntent(
     interpreted = true;
     working = working.replace(
       foodPattern,
+      " "
+    );
+  } else if (activityPattern.test(working)) {
+    inferredFilter = "activities";
+    interpreted = true;
+    working = working.replace(
+      activityPattern,
+      " "
+    );
+  } else if (attractionPattern.test(working)) {
+    inferredFilter = "attractions";
+    interpreted = true;
+    working = working.replace(
+      attractionPattern,
       " "
     );
   }
@@ -206,6 +254,7 @@ export function parseDiscoveryIntent(
     inferredFilter,
     inferredWhen,
     inferredPrice,
+    inferredOccasion,
     newToMe,
     interpreted
   };
@@ -222,6 +271,7 @@ function getListingSearchText(
     listing.description,
     listing.venueName ?? "",
     listing.address ?? "",
+    listing.placeType ?? "",
     ...(listing.searchTerms ?? [])
   ]
     .join(" ")
@@ -232,17 +282,22 @@ export function matchesDiscoverySearch(
   listing: Listing,
   query: string
 ) {
-  const normalized = query
+  const normalizedTokens = query
     .trim()
-    .toLowerCase();
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
 
-  if (!normalized) {
+  if (normalizedTokens.length === 0) {
     return true;
   }
 
-  return getListingSearchText(
-    listing
-  ).includes(normalized);
+  const listingText =
+    getListingSearchText(listing);
+
+  return normalizedTokens.every(
+    (token) => listingText.includes(token)
+  );
 }
 
 export function isVerifiedListing(
@@ -331,6 +386,68 @@ export function matchesDiscoveryFilter(
     default:
       return true;
   }
+}
+
+export function matchesDiscoveryOccasion(
+  listing: Listing,
+  occasion: DiscoveryOccasion
+) {
+  if (occasion === "any") {
+    return true;
+  }
+
+  const listingText =
+    getListingSearchText(listing);
+
+  const dateKeywords = [
+    "date",
+    "romantic",
+    "cozy",
+    "intimate",
+    "cocktail",
+    "wine",
+    "dessert",
+    "dinner",
+    "fine dining",
+    "live music",
+    "theatre",
+    "theater",
+    "gallery",
+    "museum",
+    "scenic",
+    "rooftop"
+  ];
+
+  if (
+    dateKeywords.some((keyword) =>
+      listingText.includes(keyword)
+    )
+  ) {
+    return true;
+  }
+
+  if (listing.type === "event") {
+    return [
+      "music",
+      "comedy",
+      "arts",
+      "theatre",
+      "film"
+    ].some((keyword) =>
+      listingText.includes(keyword)
+    );
+  }
+
+  return [
+    "restaurant",
+    "fine_dining",
+    "cafe",
+    "bakery_dessert",
+    "bar_pub",
+    "brewery",
+    "activity",
+    "attraction"
+  ].includes(listing.placeType ?? "");
 }
 
 function getComparablePrice(

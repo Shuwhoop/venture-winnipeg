@@ -1,10 +1,14 @@
 import "server-only";
 
+import { reportDataAccessError } from "@/lib/network-errors";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import type {
   Listing,
   VerificationStatus
 } from "@/lib/types";
+import {
+  hasPublishablePhotoRights
+} from "@/lib/media/photo-rights";
 
 type VenueRow = {
   name: string;
@@ -52,6 +56,7 @@ export type EventRow = {
   warning_message: string | null;
   source_checked_at: string | null;
   image_url: string | null;
+  image_rights_notes: string | null;
 
   venue: VenueRow | VenueRow[] | null;
 };
@@ -82,6 +87,7 @@ export const eventFields = `
   warning_message,
   source_checked_at,
   image_url,
+  image_rights_notes,
   venue:places (
     name,
     neighbourhood,
@@ -297,6 +303,13 @@ function formatLastChecked(
 
 export function eventToListing(event: EventRow): Listing {
   const venue = getVenue(event.venue);
+  const approvedImageUrl =
+    event.image_url &&
+    hasPublishablePhotoRights(
+      event.image_rights_notes
+    )
+      ? event.image_url
+      : null;
   const statusLabel = getStatusLabel(event);
 
   const setting =
@@ -336,9 +349,9 @@ export function eventToListing(event: EventRow): Listing {
       event.timezone
     ),
 
-    imageClass: event.image_url ? "image-uploaded" : "image-concert",
+    imageClass: approvedImageUrl ? "image-uploaded" : "image-concert",
 
-    imageUrl: event.image_url,
+    imageUrl: approvedImageUrl,
 
     neighbourhood:
       venue?.neighbourhood ?? "Winnipeg",
@@ -415,8 +428,8 @@ export async function getPublishedEventListings(
     .limit(limit);
 
   if (error) {
-    console.error(
-      "Unable to load published events:",
+    reportDataAccessError(
+      "Unable to load published events",
       error
     );
 
@@ -442,8 +455,8 @@ export async function getPublishedEventListingBySlug(
     .maybeSingle();
 
   if (error) {
-    console.error(
-      `Unable to load event ${slug}:`,
+    reportDataAccessError(
+      `Unable to load event ${slug}`,
       error
     );
 

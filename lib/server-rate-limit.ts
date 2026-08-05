@@ -1,0 +1,126 @@
+import "server-only";
+
+type RateLimitEntry = {
+  count: number;
+  resetAt: number;
+};
+
+export type RateLimitResult = {
+  allowed: boolean;
+  limit: number;
+  remaining: number;
+  resetAt: number;
+  retryAfterSeconds: number;
+};
+
+const entries = new Map<string, RateLimitEntry>();
+let lastCleanupAt = 0;
+
+function cleanupExpiredEntries(now: number) {
+  if (now - lastCleanupAt < 5 * 60 * 1000) {
+    return;
+  }
+
+  lastCleanupAt = now;
+
+  for (const [key, entry] of entries) {
+    if (entry.resetAt <= now) {
+      entries.delete(key);
+    }
+  }
+}
+
+export function getRequestAddress(request: Request) {
+  return (
+    request.headers
+      .get("x-forwarded-for")
+      ?.split(",")[0]
+      ?.trim() ||
+    request.headers.get("x-real-ip")?.trim() ||
+    "unknown"
+  );
+}
+
+export function isSameOriginRequest(request: Request) {
+  const origin = request.headers.get("origin");
+
+  if (!origin) {
+    return true;
+  }
+
+  try {
+    return origin === new URL(request.url).origin;
+  } catch {
+    return false;
+  }
+}
+
+export function consumeRateLimit({
+  key,
+  limit,
+  windowMs
+}: {
+  key: string;
+  limit: number;
+  windowMs: number;
+}): RateLimitResult {
+  const now = Date.now();
+  cleanupExpiredEntries(now);
+
+  const current = entries.get(key);
+
+  if (!current || current.resetAt <= now) {
+    const resetAt = now + windowMs;
+
+    entries.set(key, {
+      count: 1,
+      resetAt
+    });
+
+    return {
+      allowed: true,
+      limit,
+      remaining: Math.max(0, limit - 1),
+      resetAt,
+      retryAfterSeconds: Math.max(1, Math.ceil(windowMs / 1000))
+    };
+  }
+
+  if (current.count >= limit) {
+    return {
+      allowed: false,
+      limit,
+      remaining: 0,
+      resetAt: current.resetAt,
+      retryAfterSeconds: Math.max(
+        1,
+        Math.ceil((current.resetAt - now) / 1000)
+      )
+    };
+  }
+
+  current.count += 1;
+  entries.set(key, current);
+
+  return {
+    allowed: true,
+    limit,
+    remaining: Math.max(0, limit - current.count),
+    resetAt: current.resetAt,
+    retryAfterSeconds: Math.max(
+      1,
+      Math.ceil((current.resetAt - now) / 1000)
+    )
+  };
+}
+
+export function rateLimitHeaders(result: RateLimitResult) {
+  return {
+    "X-RateLimit-Limit": String(result.limit),
+    "X-RateLimit-Remaining": String(result.remaining),
+    "X-RateLimit-Reset": String(Math.ceil(result.resetAt / 1000)),
+    ...(result.allowed
+      ? {}
+      : { "Retry-After": String(result.retryAfterSeconds) })
+  };
+}

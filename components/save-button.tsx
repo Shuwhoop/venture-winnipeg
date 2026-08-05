@@ -29,6 +29,9 @@ export function SaveButton({
   const [saved, setSaved] =
     useState(false);
 
+  const [announcement, setAnnouncement] =
+    useState("");
+
   useEffect(() => {
     function refreshSavedState() {
       setSaved(
@@ -66,6 +69,11 @@ export function SaveButton({
       toggleSavedListing(listing);
 
     setSaved(newSavedState);
+    setAnnouncement(
+      newSavedState
+        ? `${listing.name} saved.`
+        : `${listing.name} removed from saved.`
+    );
 
     trackBetaEvent({
       eventName:
@@ -86,27 +94,45 @@ export function SaveButton({
   }
 
   return (
-    <button
+    <>
+      <button
         className={`save-button ${className} ${
-        saved ? "saved" : ""
+          saved ? "saved" : ""
         }`}
-      type="button"
-      aria-label={
-        saved
-          ? `Remove ${listing.name} from saved listings`
-          : `Save ${listing.name}`
-      }
-      aria-pressed={saved}
-      title={
-        saved
-          ? "Remove from saved"
-          : "Save listing"
-      }
-      onClick={handleSave}
-    >
-      <span aria-hidden="true">
-        {saved ? "♥" : "♡"}
+        type="button"
+        aria-label={
+          saved
+            ? `Remove ${listing.name} from saved listings`
+            : `Save ${listing.name}`
+        }
+        aria-pressed={saved}
+        title={
+          saved
+            ? "Remove from saved"
+            : "Save listing"
+        }
+        onClick={handleSave}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill={saved ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+        </svg>
+      </button>
+
+      <span
+        className="sr-only"
+        role="status"
+        aria-live="polite"
+      >
+        {announcement}
       </span>
-    </button>
+    </>
   );
 }

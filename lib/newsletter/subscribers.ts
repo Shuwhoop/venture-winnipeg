@@ -16,6 +16,10 @@ import {
 } from "@/lib/newsletter/tokens";
 
 import {
+  syncSingleNewsletterSubscriber
+} from "@/lib/newsletter/production";
+
+import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
 
@@ -184,6 +188,17 @@ export async function confirmNewsletterToken({
     })
   ]);
 
+  const productionSync =
+    await syncSingleNewsletterSubscriber({
+      email:
+        payload.email,
+      firstName:
+        lookup.data.first_name ||
+        "Subscriber",
+      contactId:
+        contactResult.id
+    });
+
   await supabase
     .from(
       "newsletter_subscribers"
@@ -202,6 +217,7 @@ export async function confirmNewsletterToken({
       welcome_error:
         emailResult.error ||
         contactResult.error ||
+        productionSync.error ||
         null,
       last_delivery_attempt_at:
         now,

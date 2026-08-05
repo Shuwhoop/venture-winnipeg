@@ -210,3 +210,8 @@
     font-size: 0.88rem;
   }
 }
+
+.summaryGrid svg {
+  width: 24px;
+  height: 24px;
+}

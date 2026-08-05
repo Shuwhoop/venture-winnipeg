@@ -17,7 +17,8 @@ export async function proxy(
 export const config = {
   matcher: [
     "/admin/:path*",
-    "/profile",
+    "/api/admin/:path*",
+    "/profile/:path*",
     "/saved/:path*",
     "/sign-in",
     "/auth/:path*"

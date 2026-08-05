@@ -1,15 +1,29 @@
 import "server-only";
 
 import {
+  isTransientNetworkError,
+  reportDataAccessError
+} from "@/lib/network-errors";
+
+import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
 
 import type {
   VerificationStatus
 } from "@/lib/types";
+import {
+  isPublishableRightsBasis
+} from "@/lib/media/photo-rights";
 
 export type PublicWeeklyHours =
   Record<string, unknown>;
+
+export type PublicListingPhoto = {
+  url: string;
+  altText: string;
+  caption: string | null;
+};
 
 export type PublicListingDetailBase = {
   id: string;
@@ -38,6 +52,7 @@ export type PublicListingDetailBase = {
   accessibilityNotes: string | null;
   parkingNotes: string | null;
   transitNotes: string | null;
+  photo: PublicListingPhoto | null;
 };
 
 export type PublicPlaceDetail =
@@ -79,6 +94,13 @@ export type PublicEventDetail =
 export type PublicListingDetail =
   | PublicPlaceDetail
   | PublicEventDetail;
+
+type ListingMediaRow = {
+  public_url: string;
+  alt_text: string;
+  caption: string | null;
+  rights_basis: string;
+};
 
 type PlaceRow = {
   id: string;
@@ -324,13 +346,9 @@ async function getPrimarySourceUrl(
       .maybeSingle();
 
   if (error) {
-    console.error(
-      "Unable to load primary listing source",
-      {
-        entityType,
-        entityId,
-        message: error.message
-      }
+    reportDataAccessError(
+      `Unable to load primary listing source (${entityType}:${entityId})`,
+      error
     );
 
     return null;
@@ -339,9 +357,60 @@ async function getPrimarySourceUrl(
   return data?.source_url ?? null;
 }
 
+async function getApprovedPrimaryPhoto(
+  entityType: "place" | "event",
+  entityId: string
+): Promise<PublicListingPhoto | null> {
+  const supabase =
+    getSupabaseAdminClient();
+
+  const { data, error } =
+    await supabase
+      .from("listing_media")
+      .select(
+        "public_url,alt_text,caption,rights_basis"
+      )
+      .eq("entity_type", entityType)
+      .eq("entity_id", entityId)
+      .eq("status", "active")
+      .eq("is_primary", true)
+      .limit(1)
+      .maybeSingle();
+
+  if (error) {
+    reportDataAccessError(
+      `Unable to load approved listing photo (${entityType}:${entityId})`,
+      error
+    );
+    return null;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const row = data as ListingMediaRow;
+
+  if (
+    !row.public_url ||
+    !isPublishableRightsBasis(
+      row.rights_basis
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    url: row.public_url,
+    altText: row.alt_text || "",
+    caption: row.caption
+  };
+}
+
 function placeToDetail(
   row: PlaceRow,
-  primarySourceUrl: string | null
+  primarySourceUrl: string | null,
+  photo: PublicListingPhoto | null
 ): PublicPlaceDetail {
   return {
     id: row.id,
@@ -379,6 +448,7 @@ function placeToDetail(
       row.accessibility_notes,
     parkingNotes: row.parking_notes,
     transitNotes: row.transit_notes,
+    photo,
     placeType: row.place_type,
     officialPhone: row.official_phone,
     officialEmail: row.official_email,
@@ -402,7 +472,8 @@ function placeToDetail(
 
 function eventToDetail(
   row: EventRow,
-  primarySourceUrl: string | null
+  primarySourceUrl: string | null,
+  photo: PublicListingPhoto | null
 ): PublicEventDetail {
   const venue = getVenue(row.venue);
 
@@ -453,6 +524,7 @@ function eventToDetail(
       row.accessibility_notes,
     parkingNotes: row.parking_notes,
     transitNotes: row.transit_notes,
+    photo,
     organizerName: row.organizer_name,
     startAt: row.start_at,
     endAt: row.end_at,
@@ -492,10 +564,14 @@ export async function getPublishedListingDetailBySlug(
       .maybeSingle();
 
   if (placeResult.error) {
-    console.error(
+    reportDataAccessError(
       "Unable to load public place detail",
       placeResult.error
     );
+
+    if (isTransientNetworkError(placeResult.error)) {
+      return null;
+    }
   }
 
   if (placeResult.data) {
@@ -503,12 +579,24 @@ export async function getPublishedListingDetailBySlug(
       placeResult.data as unknown as
         PlaceRow;
 
-    return placeToDetail(
-      place,
-      await getPrimarySourceUrl(
+    const [
+      primarySourceUrl,
+      photo
+    ] = await Promise.all([
+      getPrimarySourceUrl(
+        "place",
+        place.id
+      ),
+      getApprovedPrimaryPhoto(
         "place",
         place.id
       )
+    ]);
+
+    return placeToDetail(
+      place,
+      primarySourceUrl,
+      photo
     );
   }
 
@@ -525,7 +613,7 @@ export async function getPublishedListingDetailBySlug(
       .maybeSingle();
 
   if (eventResult.error) {
-    console.error(
+    reportDataAccessError(
       "Unable to load public event detail",
       eventResult.error
     );
@@ -539,11 +627,23 @@ export async function getPublishedListingDetailBySlug(
     eventResult.data as unknown as
       EventRow;
 
-  return eventToDetail(
-    event,
-    await getPrimarySourceUrl(
+  const [
+    primarySourceUrl,
+    photo
+  ] = await Promise.all([
+    getPrimarySourceUrl(
+      "event",
+      event.id
+    ),
+    getApprovedPrimaryPhoto(
       "event",
       event.id
     )
+  ]);
+
+  return eventToDetail(
+    event,
+    primarySourceUrl,
+    photo
   );
 }

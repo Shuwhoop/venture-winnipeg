@@ -12,6 +12,10 @@ import {
 } from "next/navigation";
 
 import {
+  trackBetaEvent
+} from "@/lib/beta/client";
+
+import {
   getSavedListingReferences,
   SAVED_LISTINGS_EVENT
 } from "@/lib/saved-listings";
@@ -247,6 +251,31 @@ export function BottomNav() {
                 ? "page"
                 : undefined
             }
+            aria-label={
+              isSavedLink && savedCount > 0
+                ? `${item.label}, ${savedCount} saved ${
+                    savedCount === 1
+                      ? "item"
+                      : "items"
+                  }`
+                : item.label
+            }
+            onClick={() => {
+              trackBetaEvent({
+                eventName:
+                  "navigation_selected",
+                pagePath:
+                  window.location.pathname,
+                properties: {
+                  destination:
+                    item.href,
+                  label:
+                    item.label,
+                  source:
+                    "bottom-navigation"
+                }
+              });
+            }}
           >
             <span className="nav-icon">
               <NavigationIcon
@@ -257,11 +286,7 @@ export function BottomNav() {
               savedCount > 0 ? (
                 <b
                   className="saved-count-badge"
-                  aria-label={`${savedCount} saved ${
-                    savedCount === 1
-                      ? "item"
-                      : "items"
-                  }`}
+                  aria-hidden="true"
                 >
                   {savedCount > 99
                     ? "99+"

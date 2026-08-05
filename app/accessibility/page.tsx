@@ -12,6 +12,61 @@ export const metadata: Metadata = {
 const contactEmail =
   process.env.NEXT_PUBLIC_VENTURE_CONTACT_EMAIL?.trim() || "";
 
+type AccessibilityIconName =
+  | "keyboard"
+  | "readable"
+  | "language"
+  | "repair";
+
+function AccessibilityIcon({
+  name
+}: {
+  name: AccessibilityIconName;
+}) {
+  const paths: Record<
+    AccessibilityIconName,
+    React.ReactNode
+  > = {
+    keyboard: (
+      <>
+        <rect x="3" y="6" width="18" height="12" rx="2" />
+        <path d="M6 10h1M10 10h1M14 10h1M18 10h.1M6 14h9M17 14h1" />
+      </>
+    ),
+    readable: (
+      <>
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m15.5 15.5 4 4M8 8h5M8 11h4M8 14h3" />
+      </>
+    ),
+    language: (
+      <>
+        <path d="M5 5h14v10H9l-4 4V5Z" />
+        <path d="M8 9h8M8 12h5" />
+      </>
+    ),
+    repair: (
+      <>
+        <path d="M14.5 5.5a4 4 0 0 0-5 5L4 16l4 4 5.5-5.5a4 4 0 0 0 5-5l-2.8 2.8-3-3 2.8-2.8Z" />
+      </>
+    )
+  };
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+
 export default function AccessibilityPage() {
   return (
     <main className={styles.page}>
@@ -22,27 +77,27 @@ export default function AccessibilityPage() {
           Venture is working toward a service that can be understood and used by people with
           different disabilities, devices, communication needs, and levels of technical comfort.
         </p>
-        <small>Last reviewed July 21, 2026</small>
+        <small>Last reviewed August 4, 2026</small>
       </header>
 
       <section className={styles.summaryGrid} aria-label="Accessibility summary">
         <article>
-          <span aria-hidden="true">⌨️</span>
+          <span><AccessibilityIcon name="keyboard" /></span>
           <strong>Keyboard use</strong>
           <p>Core actions should remain reachable without a mouse or touchscreen.</p>
         </article>
         <article>
-          <span aria-hidden="true">🔎</span>
+          <span><AccessibilityIcon name="readable" /></span>
           <strong>Readable layouts</strong>
           <p>Mobile sizing, text wrapping, contrast, and zoom are treated as product requirements.</p>
         </article>
         <article>
-          <span aria-hidden="true">🗣️</span>
+          <span><AccessibilityIcon name="language" /></span>
           <strong>Clear language</strong>
           <p>Instructions and status messages aim to be direct and understandable.</p>
         </article>
         <article>
-          <span aria-hidden="true">🧰</span>
+          <span><AccessibilityIcon name="repair" /></span>
           <strong>Continuous repair</strong>
           <p>Accessibility feedback is reviewed alongside bugs and listing corrections.</p>
         </article>
@@ -51,8 +106,8 @@ export default function AccessibilityPage() {
       <section className={styles.contentCard}>
         <h2>Venture's current commitments</h2>
         <ul>
-          <li>Support keyboard navigation for core browsing, saving, and outing-building flows.</li>
-          <li>Use meaningful headings, labels, link text, and accessible names for controls.</li>
+          <li>Support keyboard navigation for core browsing, saving, and outing-building flows, including arrow-key controls for carousels and result views.</li>
+          <li>Use meaningful headings, labels, link text, route announcements, and accessible names for controls.</li>
           <li>Maintain visible focus states and sufficient colour contrast.</li>
           <li>Allow text wrapping and responsive layouts without horizontal scrolling.</li>
           <li>Respect reduced-motion preferences for non-essential animation.</li>

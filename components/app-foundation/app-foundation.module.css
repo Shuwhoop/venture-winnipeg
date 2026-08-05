@@ -315,3 +315,76 @@
 @keyframes ventureUpdateTurn {
   to { transform: rotate(360deg); }
 }
+
+/* VENTURE RELIABILITY V1.0 START */
+.restoredBanner {
+  position: fixed;
+  z-index: 72;
+  left: 50%;
+  bottom: 86px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: min(440px, calc(100vw - 24px));
+  padding: 11px 12px;
+  border: 2px solid #241f20;
+  border-radius: 17px;
+  background: #dcfce7;
+  box-shadow: 4px 4px 0 rgba(22, 131, 74, 0.28);
+}
+
+.restoredBanner > span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #241f20;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.connectionBanner svg,
+.updateIcon svg,
+.restoredBanner svg {
+  width: 21px;
+  height: 21px;
+}
+
+.restoredBanner div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.restoredBanner strong {
+  font-size: 0.77rem;
+}
+
+.restoredBanner small {
+  color: #38624a;
+  font-size: 0.66rem;
+  line-height: 1.3;
+}
+
+.restoredBanner > button:not(.dismissIcon) {
+  padding: 8px 10px;
+  border: 2px solid #241f20;
+  border-radius: 11px;
+  background: #16834a;
+  color: #fff;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+@media (max-width: 390px) {
+  .restoredBanner {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .restoredBanner > button:not(.dismissIcon) {
+    grid-column: 1 / -1;
+  }
+}
+/* VENTURE RELIABILITY V1.0 END */

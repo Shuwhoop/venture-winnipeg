@@ -240,6 +240,10 @@ export default async function AdminNewsletterPage({
           </p>
         </div>
 
+        <Link href="/admin/newsletter/studio">
+          Open campaign studio
+        </Link>
+
         <Link href="/newsletter">
           Open public page
         </Link>

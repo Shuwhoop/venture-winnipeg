@@ -23,6 +23,97 @@ const SESSION_STARTED_EVENT_KEY =
 const SESSION_TIMEOUT_MS =
   30 * 60 * 1000;
 
+const RECENT_EVENT_WINDOW_MS = 900;
+const ANALYTICS_STRING_LIMIT = 180;
+
+const recentEventSignatures =
+  new Map<string, number>();
+
+function sanitizeAnalyticsProperties(
+  properties: Record<string, BetaPrimitive>
+): Record<string, BetaPrimitive> {
+  return Object.fromEntries(
+    Object.entries(properties).map(
+      ([key, value]) => {
+        if (typeof value !== "string") {
+          return [key, value];
+        }
+
+        let safeValue = value
+          .trim()
+          .slice(0, ANALYTICS_STRING_LIMIT);
+
+        if (
+          key.toLowerCase().includes("query")
+        ) {
+          safeValue = safeValue
+            .replace(
+              /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,
+              "[email]"
+            )
+            .replace(
+              /(?:\+?\d[\d\s().-]{7,}\d)/g,
+              "[phone]"
+            );
+        }
+
+        return [key, safeValue];
+      }
+    )
+  );
+}
+
+function eventSignature({
+  eventName,
+  pagePath,
+  properties
+}: {
+  eventName: BetaEventName;
+  pagePath: string;
+  properties: Record<string, BetaPrimitive>;
+}): string {
+  const stableProperties =
+    Object.entries(properties)
+      .sort(([first], [second]) =>
+        first.localeCompare(second)
+      );
+
+  return JSON.stringify([
+    eventName,
+    pagePath,
+    stableProperties
+  ]);
+}
+
+function isRecentDuplicate(
+  signature: string
+): boolean {
+  const now = Date.now();
+  const previous =
+    recentEventSignatures.get(signature);
+
+  recentEventSignatures.set(
+    signature,
+    now
+  );
+
+  for (const [key, timestamp] of
+    recentEventSignatures) {
+    if (
+      now - timestamp >
+      RECENT_EVENT_WINDOW_MS * 4
+    ) {
+      recentEventSignatures.delete(key);
+    }
+  }
+
+  return Boolean(
+    previous &&
+    now - previous <
+      RECENT_EVENT_WINDOW_MS
+  );
+}
+
 const VISITOR_COOKIE =
   "venture_analytics_visitor";
 
@@ -300,6 +391,26 @@ export function trackBetaEvent({
     return;
   }
 
+  if (!navigator.onLine) {
+    return;
+  }
+
+  const safeProperties =
+    sanitizeAnalyticsProperties(
+      properties
+    );
+
+  const signature =
+    eventSignature({
+      eventName,
+      pagePath,
+      properties: safeProperties
+    });
+
+  if (isRecentDuplicate(signature)) {
+    return;
+  }
+
   const identity =
     getBetaIdentity();
 
@@ -312,7 +423,7 @@ export function trackBetaEvent({
     pagePath,
     clientCreatedAt:
       new Date().toISOString(),
-    eventVersion: 2,
+    eventVersion: 3,
     properties: {
       viewportWidth:
         window.innerWidth,
@@ -325,7 +436,7 @@ export function trackBetaEvent({
       environment:
         getAnalyticsEnvironment(),
       eventSource: "client",
-      ...properties
+      ...safeProperties
     }
   };
 
@@ -334,17 +445,20 @@ export function trackBetaEvent({
   if (
     typeof navigator.sendBeacon === "function"
   ) {
-    navigator.sendBeacon(
-      "/api/beta/event",
-      new Blob(
-        [body],
-        {
-          type: "application/json"
-        }
-      )
-    );
+    const accepted =
+      navigator.sendBeacon(
+        "/api/beta/event",
+        new Blob(
+          [body],
+          {
+            type: "application/json"
+          }
+        )
+      );
 
-    return;
+    if (accepted) {
+      return;
+    }
   }
 
   void fetch(

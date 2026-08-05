@@ -1,9 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, type CSSProperties } from "react";
+import {
+  useMemo,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type KeyboardEvent
+} from "react";
 
 import { SaveButton } from "@/components/save-button";
+import { trackBetaEvent } from "@/lib/beta/client";
+import {
+  NEARBY_LOCATION_STORAGE_KEY
+} from "@/lib/explore-map-utils";
 import type { Listing } from "@/lib/types";
 
 import styles from "./today-discovery.module.css";
@@ -15,6 +25,27 @@ type TodayDiscoveryProps = {
 
 type ListingWithImage = Listing & {
   imageUrl?: string | null;
+};
+
+type HomeListingSource =
+  | "venture-pick"
+  | "happening-now"
+  | "worth-checking-out";
+
+type LocationState =
+  | "idle"
+  | "locating"
+  | "error";
+
+const VERIFICATION_SCORE: Record<
+  Listing["verification"],
+  number
+> = {
+  official_source: 6,
+  verified_venture: 5,
+  verified_business: 5,
+  community_reported: 2,
+  unverified: 0
 };
 
 function getDaypart() {
@@ -56,6 +87,10 @@ function getDaypart() {
 
 function getListingHref(listing: Listing) {
   return `/listings/${listing.slug}`;
+}
+
+function getListingKey(listing: Listing) {
+  return `${listing.type}-${listing.id}`;
 }
 
 function getImageStyle(listing: Listing): CSSProperties | undefined {
@@ -115,25 +150,163 @@ function isHappeningNow(listing: Listing) {
 
   const status = listing.statusLabel.trim().toUpperCase();
 
-  return status === "TODAY" || status === "HAPPENING" || status === "LIVE";
+  return status === "HAPPENING" || status === "LIVE";
 }
 
 function hasPhoto(listing: Listing) {
   return Boolean((listing as ListingWithImage).imageUrl?.trim());
 }
 
+function hasCoordinates(listing: Listing) {
+  return (
+    Number.isFinite(Number(listing.latitude)) &&
+    Number.isFinite(Number(listing.longitude))
+  );
+}
+
+function hasSourceCheck(listing: Listing) {
+  const check = listing.lastChecked.trim().toLowerCase();
+
+  return Boolean(check) && !check.includes("pending");
+}
+
+function getListingQualityScore(listing: Listing) {
+  let score = VERIFICATION_SCORE[listing.verification];
+
+  if (hasPhoto(listing)) {
+    score += 5;
+  }
+
+  if (hasSourceCheck(listing)) {
+    score += 3;
+  }
+
+  if (!isPlaceholder(listing.timeOrHours)) {
+    score += 2;
+  }
+
+  if (!isPlaceholder(listing.price)) {
+    score += 1;
+  }
+
+  if (hasCoordinates(listing)) {
+    score += 1;
+  }
+
+  if (listing.description.trim().length >= 80) {
+    score += 1;
+  }
+
+  if (isHappeningNow(listing)) {
+    score += 4;
+  }
+
+  return score;
+}
+
+function rankListings(listings: Listing[]) {
+  return listings
+    .map((listing, index) => ({
+      listing,
+      index,
+      score: getListingQualityScore(listing)
+    }))
+    .sort((first, second) => {
+      if (second.score !== first.score) {
+        return second.score - first.score;
+      }
+
+      return first.index - second.index;
+    })
+    .map((result) => result.listing);
+}
+
+function trackListingOpen(
+  listing: Listing,
+  source: HomeListingSource
+) {
+  trackBetaEvent({
+    eventName: "listing_card_selected",
+    pagePath: window.location.pathname,
+    properties: {
+      listingId: listing.id,
+      listingSlug: listing.slug,
+      listingType: listing.type,
+      listingName: listing.name,
+      category: listing.category,
+      neighbourhood: listing.neighbourhood,
+      source
+    }
+  });
+}
+
+function trackQuickFilter(filter: string) {
+  trackBetaEvent({
+    eventName: "discovery_filter_selected",
+    pagePath: window.location.pathname,
+    properties: {
+      surface: "home",
+      interaction: "quick-filter",
+      filter
+    }
+  });
+}
+
+function handleHorizontalRailKeyDown(
+  event: KeyboardEvent<HTMLDivElement>
+) {
+  if (
+    event.key !== "ArrowLeft" &&
+    event.key !== "ArrowRight"
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const direction =
+    event.key === "ArrowRight"
+      ? 1
+      : -1;
+
+  const reducedMotion =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+  event.currentTarget.scrollBy({
+    left:
+      direction *
+      Math.max(
+        220,
+        event.currentTarget.clientWidth * 0.82
+      ),
+    behavior:
+      reducedMotion
+        ? "auto"
+        : "smooth"
+  });
+}
+
 function SectionHeading({
   title,
-  href
+  href,
+  source
 }: {
   title: string;
   href: string;
+  source: string;
 }) {
   return (
     <header className={styles.sectionHeading}>
       <h2>{title}</h2>
       <i aria-hidden="true" />
-      <Link href={href}>See all</Link>
+      <Link
+        href={href}
+        onClick={() => trackQuickFilter(source)}
+      >
+        See all
+      </Link>
     </header>
   );
 }
@@ -145,14 +318,14 @@ function FeaturedCard({
 }) {
   const status = listing.isOpenNow === true
     ? "OPEN NOW"
-    : listing.statusLabel;
+    : listing.statusLabel || "FEATURED";
 
   return (
     <section className={styles.featuredSection}>
       <header className={styles.pickHeading}>
         <span>VENTURE PICK</span>
         <i aria-hidden="true" />
-        <p>One strong place to start</p>
+        <p>Chosen for trust and strong details</p>
       </header>
 
       <article className={styles.featuredCard}>
@@ -160,6 +333,9 @@ function FeaturedCard({
           className={styles.cardLink}
           href={getListingHref(listing)}
           aria-label={`View ${listing.name}`}
+          onClick={() =>
+            trackListingOpen(listing, "venture-pick")
+          }
         />
 
         <div
@@ -176,7 +352,6 @@ function FeaturedCard({
 
             <SaveButton
               listing={listing}
-              className={styles.featuredSave}
             />
           </div>
 
@@ -207,6 +382,9 @@ function MiniCard({
         className={styles.cardLink}
         href={getListingHref(listing)}
         aria-label={`View ${listing.name}`}
+        onClick={() =>
+          trackListingOpen(listing, "happening-now")
+        }
       />
 
       <div
@@ -217,7 +395,6 @@ function MiniCard({
 
         <SaveButton
           listing={listing}
-          className={styles.miniSave}
         />
 
         <div className={styles.miniCopy}>
@@ -230,7 +407,7 @@ function MiniCard({
   );
 }
 
-function TrendCard({
+function WorthCard({
   listing
 }: {
   listing: Listing;
@@ -241,6 +418,9 @@ function TrendCard({
         className={styles.cardLink}
         href={getListingHref(listing)}
         aria-label={`View ${listing.name}`}
+        onClick={() =>
+          trackListingOpen(listing, "worth-checking-out")
+        }
       />
 
       <div
@@ -249,7 +429,6 @@ function TrendCard({
       >
         <SaveButton
           listing={listing}
-          className={styles.trendSave}
         />
       </div>
 
@@ -262,11 +441,44 @@ function TrendCard({
   );
 }
 
+function FilterIcon({
+  type
+}: {
+  type: "location" | "price" | "heart";
+}) {
+  if (type === "location") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11Z" />
+        <circle cx="12" cy="10" r="2" />
+      </svg>
+    );
+  }
+
+  if (type === "price") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3v18M16 7.2c-.8-1.2-2.1-1.8-4-1.8-2.2 0-3.7 1.1-3.7 2.8 0 4.2 7.7 1.8 7.7 6.2 0 1.8-1.6 3-4.1 3-1.9 0-3.4-.6-4.4-1.9" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20.8 5.8a5 5 0 0 0-7.1 0L12 7.5l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 21l8.8-8.1a5 5 0 0 0 0-7.1Z" />
+    </svg>
+  );
+}
+
 export function TodayDiscovery({
   events,
   places
 }: TodayDiscoveryProps) {
   const daypart = useMemo(getDaypart, []);
+  const [locationState, setLocationState] =
+    useState<LocationState>("idle");
+  const [locationMessage, setLocationMessage] =
+    useState("");
 
   const allListings = useMemo(
     () => [...places, ...events],
@@ -274,48 +486,153 @@ export function TodayDiscovery({
   );
 
   const featured = useMemo(() => {
+    const ranked = rankListings(allListings);
+
     return (
-      places.find(
-        (listing) =>
-          listing.isOpenNow === true && hasPhoto(listing)
-      ) ??
-      places.find(hasPhoto) ??
-      places[0] ??
-      events.find(hasPhoto) ??
-      events[0]
+      ranked.find(hasPhoto) ??
+      ranked[0]
     );
-  }, [events, places]);
+  }, [allListings]);
 
   const happeningNow = useMemo(() => {
-    const current = allListings.filter(isHappeningNow);
-    const remaining = allListings.filter(
-      (listing) =>
-        !current.some((item) => item.id === listing.id)
-    );
-
-    return [...current, ...remaining]
-      .filter(
+    return rankListings(
+      allListings.filter(
         (listing) =>
-          !featured || listing.id !== featured.id
+          isHappeningNow(listing) &&
+          (!featured ||
+            getListingKey(listing) !==
+              getListingKey(featured))
       )
-      .slice(0, 6);
+    ).slice(0, 6);
   }, [allListings, featured]);
 
-  const trending = useMemo(() => {
-    return [...places, ...events]
-      .filter(
+  const worthCheckingOut = useMemo(() => {
+    const usedKeys = new Set([
+      ...(featured
+        ? [getListingKey(featured)]
+        : []),
+      ...happeningNow.map(getListingKey)
+    ]);
+
+    const remainingListings =
+      allListings.filter(
         (listing) =>
-          !featured || listing.id !== featured.id
-      )
-      .filter(
+          !usedKeys.has(
+            getListingKey(listing)
+          )
+      );
+
+    const trustedListings =
+      remainingListings.filter(
         (listing) =>
-          !happeningNow
-            .slice(0, 3)
-            .some((item) => item.id === listing.id)
-      )
-      .sort((a, b) => Number(hasPhoto(b)) - Number(hasPhoto(a)))
-      .slice(0, 8);
-  }, [events, featured, happeningNow, places]);
+          listing.verification ===
+            "official_source" ||
+          listing.verification ===
+            "verified_venture" ||
+          listing.verification ===
+            "verified_business"
+      );
+
+    return rankListings(
+      trustedListings.length >= 3
+        ? trustedListings
+        : remainingListings
+    ).slice(0, 8);
+  }, [allListings, featured, happeningNow]);
+
+  function handleSearchSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
+    const formData = new FormData(event.currentTarget);
+    const query = String(formData.get("q") ?? "").trim();
+
+    trackBetaEvent({
+      eventName: "discovery_search_submitted",
+      pagePath: window.location.pathname,
+      properties: {
+        surface: "home",
+        interaction: "search-submitted",
+        query,
+        queryLength: query.length
+      }
+    });
+  }
+
+  function findNearby() {
+    trackQuickFilter("near-me");
+
+    if (!navigator.geolocation) {
+      setLocationState("error");
+      setLocationMessage(
+        "Location is not available here. Choose a neighbourhood instead."
+      );
+      return;
+    }
+
+    setLocationState("locating");
+    setLocationMessage("Finding what is close to you...");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        try {
+          window.sessionStorage.setItem(
+            NEARBY_LOCATION_STORAGE_KEY,
+            JSON.stringify({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+          );
+        } catch {
+          setLocationState("error");
+          setLocationMessage(
+            "Venture could not keep your location for this search. Browse by neighbourhood instead."
+          );
+          return;
+        }
+
+        trackBetaEvent({
+          eventName: "discovery_filter_selected",
+          pagePath: window.location.pathname,
+          properties: {
+            surface: "home",
+            interaction: "location-resolved",
+            filter: "near-me",
+            result: "granted"
+          }
+        });
+
+        window.location.assign("/explore?near=me");
+      },
+      (error) => {
+        setLocationState("error");
+
+        const denied =
+          error.code === error.PERMISSION_DENIED;
+
+        setLocationMessage(
+          denied
+            ? "Location is off. Browse by neighbourhood instead."
+            : "Venture could not find your location. Browse the city normally instead."
+        );
+
+        trackBetaEvent({
+          eventName: "discovery_filter_selected",
+          pagePath: window.location.pathname,
+          properties: {
+            surface: "home",
+            interaction: "location-resolved",
+            filter: "near-me",
+            result: denied ? "denied" : "unavailable"
+          }
+        });
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    );
+  }
 
   return (
     <main className={styles.page}>
@@ -335,6 +652,7 @@ export function TodayDiscovery({
         <form
           action="/explore"
           className={styles.search}
+          onSubmit={handleSearchSubmit}
         >
           <span className={styles.searchIcon} aria-hidden="true">
             <svg viewBox="0 0 24 24">
@@ -360,31 +678,58 @@ export function TodayDiscovery({
           className={styles.quickFilters}
           aria-label="Quick discovery filters"
         >
-          <Link href="/explore?when=open">
+          <Link
+            href="/explore?when=open"
+            onClick={() => trackQuickFilter("open-now")}
+          >
             <span className={styles.greenDot} aria-hidden="true" />
             Open now
           </Link>
 
-          <Link href="/explore?near=me">
-            <span aria-hidden="true">●</span>
-            Near me
-          </Link>
+          <button
+            type="button"
+            onClick={findNearby}
+            disabled={locationState === "locating"}
+            aria-busy={locationState === "locating"}
+          >
+            <FilterIcon type="location" />
+            {locationState === "locating" ? "Finding…" : "Near me"}
+          </button>
 
-          <Link href="/explore?price=under-40">
-            <span aria-hidden="true">$</span>
+          <Link
+            href="/explore?price=under-40"
+            onClick={() => trackQuickFilter("under-40")}
+          >
+            <FilterIcon type="price" />
             Cheap
           </Link>
 
-          <Link href="/explore?q=date+ideas">
-            <span aria-hidden="true">♥</span>
+          <Link
+            href="/explore?occasion=date"
+            onClick={() => trackQuickFilter("date-ideas")}
+          >
+            <FilterIcon type="heart" />
             Date ideas
           </Link>
 
-          <Link href="/explore">
-            More
-            <span aria-hidden="true">⌄</span>
-          </Link>
         </nav>
+
+        {locationMessage ? (
+          <div
+            className={`${styles.locationMessage} ${
+              locationState === "error"
+                ? styles.locationMessageError
+                : ""
+            }`}
+            role="status"
+            aria-live="polite"
+          >
+            <span>{locationMessage}</span>
+            {locationState === "error" ? (
+              <Link href="/explore">Choose an area</Link>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       {featured ? (
@@ -395,10 +740,17 @@ export function TodayDiscovery({
         <SectionHeading
           title="Happening now"
           href="/explore?when=tonight"
+          source="happening-now-see-all"
         />
 
         {happeningNow.length > 0 ? (
-          <div className={styles.miniRail}>
+          <div
+            className={styles.miniRail}
+            role="region"
+            aria-label="Happening now listings. Use left and right arrow keys to scroll."
+            tabIndex={0}
+            onKeyDown={handleHorizontalRailKeyDown}
+          >
             {happeningNow.map((listing) => (
               <MiniCard
                 key={`${listing.type}-${listing.id}`}
@@ -408,21 +760,28 @@ export function TodayDiscovery({
           </div>
         ) : (
           <div className={styles.emptyState}>
-            Winnipeg is still loading the marquee. Browse the full city for now.
+            Nothing verified is live right now. Explore the full city for the next good move.
           </div>
         )}
       </section>
 
       <section className={styles.railSection}>
         <SectionHeading
-          title="Trending this week"
-          href="/explore"
+          title="Worth checking out"
+          href="/explore?filter=verified"
+          source="worth-checking-out-see-all"
         />
 
-        {trending.length > 0 ? (
-          <div className={styles.trendRail}>
-            {trending.map((listing) => (
-              <TrendCard
+        {worthCheckingOut.length > 0 ? (
+          <div
+            className={styles.trendRail}
+            role="region"
+            aria-label="Worth checking out listings. Use left and right arrow keys to scroll."
+            tabIndex={0}
+            onKeyDown={handleHorizontalRailKeyDown}
+          >
+            {worthCheckingOut.map((listing) => (
+              <WorthCard
                 key={`${listing.type}-${listing.id}`}
                 listing={listing}
               />
@@ -430,7 +789,7 @@ export function TodayDiscovery({
           </div>
         ) : (
           <div className={styles.emptyState}>
-            Fresh listings are on the way.
+            Fresh, dependable picks are on the way.
           </div>
         )}
       </section>
@@ -438,6 +797,15 @@ export function TodayDiscovery({
       <Link
         className={styles.builderBanner}
         href="/build-outing"
+        onClick={() => {
+          trackBetaEvent({
+            eventName: "outing_builder_opened",
+            pagePath: window.location.pathname,
+            properties: {
+              source: "home-builder-banner"
+            }
+          });
+        }}
       >
         <div>
           <span>NOT SURE WHERE TO START?</span>

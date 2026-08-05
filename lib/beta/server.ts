@@ -8,6 +8,7 @@ import {
   type BetaPrimitive
 } from "@/lib/beta/types";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import { isTransientNetworkError } from "@/lib/network-errors";
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -394,6 +395,10 @@ export async function recordServerBetaEvent({
     }
 
     if (error) {
+      if (isTransientNetworkError(error)) {
+        return;
+      }
+
       console.error(
         "Server analytics event insert failed",
         {
@@ -404,6 +409,10 @@ export async function recordServerBetaEvent({
       );
     }
   } catch (error) {
+    if (isTransientNetworkError(error)) {
+      return;
+    }
+
     console.error(
       "Server analytics event failed",
       error

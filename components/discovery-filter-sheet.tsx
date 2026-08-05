@@ -7,15 +7,16 @@ import {
 } from "react";
 
 import {
-  createPortal
-} from "react-dom";
-
-import {
   useRouter
 } from "next/navigation";
 
+import {
+  createPortal
+} from "react-dom";
+
 import type {
   DiscoveryFilter,
+  DiscoveryOccasion,
   DiscoveryPrice,
   DiscoveryWhen
 } from "@/lib/discovery-intent";
@@ -27,8 +28,10 @@ type DiscoveryFilterSheetProps = {
   currentFilter: DiscoveryFilter;
   currentWhen: DiscoveryWhen;
   currentPrice: DiscoveryPrice;
+  currentOccasion: DiscoveryOccasion;
   currentArea: string;
   newToMe: boolean;
+  nearbyRequested?: boolean;
   neighbourhoods: string[];
 };
 
@@ -37,8 +40,10 @@ export function DiscoveryFilterSheet({
   currentFilter,
   currentWhen,
   currentPrice,
+  currentOccasion,
   currentArea,
   newToMe,
+  nearbyRequested = false,
   neighbourhoods
 }: DiscoveryFilterSheetProps) {
   const router = useRouter();
@@ -59,10 +64,14 @@ export function DiscoveryFilterSheet({
     );
   const [price, setPrice] =
     useState(currentPrice);
+  const [occasion, setOccasion] =
+    useState(currentOccasion);
   const [area, setArea] =
     useState(currentArea);
   const [onlyNew, setOnlyNew] =
     useState(newToMe);
+  const [nearby, setNearby] =
+    useState(nearbyRequested);
 
   useEffect(() => {
     if (!open) {
@@ -80,15 +89,19 @@ export function DiscoveryFilterSheet({
         : currentWhen
     );
     setPrice(currentPrice);
+    setOccasion(currentOccasion);
     setArea(currentArea);
     setOnlyNew(newToMe);
+    setNearby(nearbyRequested);
   }, [
     open,
     currentFilter,
     currentWhen,
     currentPrice,
+    currentOccasion,
     currentArea,
-    newToMe
+    newToMe,
+    nearbyRequested
   ]);
 
   useEffect(() => {
@@ -123,14 +136,18 @@ export function DiscoveryFilterSheet({
         currentFilter !== "all",
         currentWhen !== "any",
         currentPrice !== "any",
+        currentOccasion !== "any",
         Boolean(currentArea),
+        nearbyRequested,
         newToMe
       ].filter(Boolean).length,
     [
       currentFilter,
       currentWhen,
       currentPrice,
+      currentOccasion,
       currentArea,
+      nearbyRequested,
       newToMe
     ]
   );
@@ -162,12 +179,23 @@ export function DiscoveryFilterSheet({
         params.set("price", price);
       }
 
+      if (occasion !== "any") {
+        params.set(
+          "occasion",
+          occasion
+        );
+      }
+
       if (area) {
         params.set("area", area);
       }
 
       if (onlyNew) {
         params.set("new", "1");
+      }
+
+      if (nearby) {
+        params.set("near", "me");
       }
     }
 
@@ -187,8 +215,10 @@ export function DiscoveryFilterSheet({
     setFilter("all");
     setWhen("any");
     setPrice("any");
+    setOccasion("any");
     setArea("");
     setOnlyNew(false);
+    setNearby(false);
     setOpen(false);
     router.push(
       buildUrl({
@@ -265,6 +295,7 @@ export function DiscoveryFilterSheet({
                         ["food", "Food"],
                         ["activities", "Activities"],
                         ["nightlife", "Nightlife"],
+                        ["attractions", "Attractions"],
                         ["verified", "Verified"]
                       ] as const
                     ).map(
@@ -361,6 +392,40 @@ export function DiscoveryFilterSheet({
                   </div>
                 </fieldset>
 
+                <fieldset
+                  className={styles.group}
+                >
+                  <legend>Occasion</legend>
+
+                  <div
+                    className={styles.segmented}
+                  >
+                    {(
+                      [
+                        ["any", "Any vibe"],
+                        ["date", "Date ideas"]
+                      ] as const
+                    ).map(
+                      ([value, label]) => (
+                        <button
+                          type="button"
+                          key={value}
+                          className={
+                            occasion === value
+                              ? styles.selected
+                              : ""
+                          }
+                          onClick={() =>
+                            setOccasion(value)
+                          }
+                        >
+                          {label}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </fieldset>
+
                 <label
                   className={styles.selectLabel}
                 >
@@ -390,6 +455,40 @@ export function DiscoveryFilterSheet({
                     )}
                   </select>
                 </label>
+
+                <button
+                  type="button"
+                  className={`${styles.newToggle} ${
+                    nearby
+                      ? styles.newToggleActive
+                      : ""
+                  }`}
+                  aria-pressed={nearby}
+                  onClick={() =>
+                    setNearby(
+                      (current) => !current
+                    )
+                  }
+                >
+                  <span aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" />
+                      <circle cx="12" cy="10" r="2.2" />
+                    </svg>
+                  </span>
+
+                  <p>
+                    <strong>Near me</strong>
+                    <small>
+                      Ask for location only after
+                      you apply this filter.
+                    </small>
+                  </p>
+
+                  <b aria-hidden="true">
+                    {nearby ? "✓" : ""}
+                  </b>
+                </button>
 
                 <button
                   type="button"

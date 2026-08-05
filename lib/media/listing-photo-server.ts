@@ -242,6 +242,15 @@ async function listingIdentity(
   };
 }
 
+function storedRightsSummary(
+  rightsBasis: RightsBasis,
+  rightsNotes: string | null
+): string {
+  return rightsNotes
+    ? `${rightsBasis} · ${rightsNotes}`
+    : rightsBasis;
+}
+
 export async function publishListingPhoto({
   entityType,
   entityId,
@@ -348,6 +357,7 @@ export async function publishListingPhoto({
     id: string;
     public_url: string;
     alt_text: string;
+    rights_basis: RightsBasis;
     rights_notes: string | null;
   } | null = null;
 
@@ -357,7 +367,7 @@ export async function publishListingPhoto({
         await supabase
           .from("listing_media")
           .select(
-            "id,public_url,alt_text,rights_notes"
+            "id,public_url,alt_text,rights_basis,rights_notes"
           )
           .eq(
             "entity_type",
@@ -485,8 +495,10 @@ export async function publishListingPhoto({
             image_alt_text:
               cleanedAltText,
             image_rights_notes:
-              cleanedRightsNotes ||
-              rightsBasis,
+              storedRightsSummary(
+                rightsBasis,
+                cleanedRightsNotes
+              ),
             image_updated_at:
               new Date().toISOString()
           })
@@ -540,7 +552,10 @@ export async function publishListingPhoto({
           image_alt_text:
             previousPrimary.alt_text,
           image_rights_notes:
-            previousPrimary.rights_notes,
+            storedRightsSummary(
+              previousPrimary.rights_basis,
+              previousPrimary.rights_notes
+            ),
           image_updated_at:
             new Date().toISOString()
         })
@@ -715,7 +730,7 @@ export async function archiveListingPhoto({
       await supabase
         .from("listing_media")
         .select(
-          "id,public_url,alt_text,rights_notes"
+          "id,public_url,alt_text,rights_basis,rights_notes"
         )
         .eq(
           "entity_type",
@@ -759,7 +774,12 @@ export async function archiveListingPhoto({
         image_alt_text:
           nextResult.data?.alt_text || null,
         image_rights_notes:
-          nextResult.data?.rights_notes || null,
+          nextResult.data
+            ? storedRightsSummary(
+                nextResult.data.rights_basis as RightsBasis,
+                nextResult.data.rights_notes
+              )
+            : null,
         image_updated_at:
           new Date().toISOString()
       })
@@ -1029,8 +1049,10 @@ export async function setPrimaryListingPhoto({
         image_alt_text:
           mediaResult.data.alt_text,
         image_rights_notes:
-          mediaResult.data.rights_notes ||
-          mediaResult.data.rights_basis,
+          storedRightsSummary(
+            mediaResult.data.rights_basis as RightsBasis,
+            mediaResult.data.rights_notes
+          ),
         image_updated_at:
           new Date().toISOString()
       })

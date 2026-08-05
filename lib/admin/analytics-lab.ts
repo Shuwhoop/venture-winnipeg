@@ -17,11 +17,20 @@ export const ANALYTICS_EVENT_TAXONOMY = [
     group: "Discovery",
     events: [
       ["discovery_viewed", "Explore or Tonight was opened."],
-      ["listing_detail_opened", "A listing detail page was selected."],
+      ["navigation_selected", "A primary navigation destination was selected."],
+      ["discovery_search_submitted", "A discovery search was submitted."],
+      ["discovery_filter_selected", "A discovery filter or location option was selected."],
+      ["discovery_sort_changed", "The Explore result order was changed."],
+      ["discovery_view_changed", "Explore switched between list and map."],
+      ["discovery_results_viewed", "A result set was rendered with its count and active filters."],
+      ["discovery_zero_results", "A discovery request returned no matching listings."],
+      ["listing_card_selected", "A listing card was selected before its detail page loaded."],
+      ["listing_detail_opened", "A listing detail page loaded."],
       ["listing_map_selected", "A listing was selected on the discovery map."],
       ["listing_saved", "A listing was added to saved items."],
       ["listing_unsaved", "A listing was removed from saved items."],
-      ["listing_shared", "A listing was shared from Venture."]
+      ["listing_shared", "A listing was shared from Venture."],
+      ["listing_directions_opened", "Directions were opened from a listing."]
     ]
   },
   {
@@ -180,6 +189,28 @@ export type AnalyticsLab = {
     label: string;
     sessions: number;
   }>;
+  journey: {
+    searches: number;
+    resultViews: number;
+    zeroResultSearches: number;
+    zeroResultRate: number | null;
+    listingSelections: number;
+    listingOpens: number;
+    listingSaves: number;
+    listingSaveRate: number | null;
+    builderOpens: number;
+    outingsGenerated: number;
+    generationRate: number | null;
+    topSearches: Array<{
+      query: string;
+      count: number;
+      zeroResults: number;
+    }>;
+    topFilters: Array<{
+      filter: string;
+      count: number;
+    }>;
+  };
   funnel: Array<{
     key: string;
     label: string;
@@ -650,6 +681,255 @@ function buildDaily(
   return result;
 }
 
+function isLegacyInteraction(
+  event: AnalyticsEventRow,
+  interaction: string
+): boolean {
+  return (
+    event.event_name ===
+      "discovery_viewed" &&
+    asString(
+      event.properties.interaction
+    ) === interaction
+  );
+}
+
+function buildJourneySignals(
+  events: AnalyticsEventRow[]
+): AnalyticsLab["journey"] {
+  const searches = events.filter(
+    (event) =>
+      event.event_name ===
+        "discovery_search_submitted" ||
+      isLegacyInteraction(
+        event,
+        "search-submitted"
+      )
+  );
+
+  const resultViews = events.filter(
+    (event) =>
+      event.event_name ===
+        "discovery_results_viewed"
+  );
+
+  const zeroResults = events.filter(
+    (event) =>
+      event.event_name ===
+        "discovery_zero_results" ||
+      isLegacyInteraction(
+        event,
+        "zero-results"
+      )
+  );
+
+  const filterSelections = events.filter(
+    (event) =>
+      event.event_name ===
+        "discovery_filter_selected" ||
+      isLegacyInteraction(
+        event,
+        "quick-filter"
+      )
+  );
+
+  const listingSelections =
+    events.filter(
+      (event) =>
+        event.event_name ===
+          "listing_card_selected"
+    );
+
+  const listingOpens =
+    events.filter(
+      (event) =>
+        event.event_name ===
+          "listing_detail_opened"
+    );
+
+  const listingSaves =
+    events.filter(
+      (event) =>
+        event.event_name ===
+          "listing_saved"
+    );
+
+  const builderOpens =
+    events.filter(
+      (event) =>
+        event.event_name ===
+          "outing_builder_opened"
+    );
+
+  const outingsGenerated =
+    events.filter(
+      (event) =>
+        event.event_name ===
+          "outing_generated"
+    );
+
+  const zeroByQuery =
+    new Map<string, number>();
+
+  for (const event of zeroResults) {
+    const query = asString(
+      event.properties.query
+    ).trim();
+
+    if (query) {
+      zeroByQuery.set(
+        query,
+        (zeroByQuery.get(query) || 0) + 1
+      );
+    }
+  }
+
+  const searchCounts =
+    new Map<string, number>();
+
+  for (const event of searches) {
+    const query = asString(
+      event.properties.query
+    ).trim();
+
+    if (!query) {
+      continue;
+    }
+
+    searchCounts.set(
+      query,
+      (searchCounts.get(query) || 0) + 1
+    );
+  }
+
+  const filterCounts =
+    new Map<string, number>();
+
+  function addFilter(
+    value: string
+  ) {
+    const filter = value.trim();
+
+    if (
+      !filter ||
+      filter === "all" ||
+      filter === "any"
+    ) {
+      return;
+    }
+
+    filterCounts.set(
+      filter,
+      (filterCounts.get(filter) || 0) + 1
+    );
+  }
+
+  for (const event of filterSelections) {
+    addFilter(
+      asString(
+        event.properties.filter
+      ) ||
+      asString(
+        event.properties.interaction
+      )
+    );
+  }
+
+  for (const event of resultViews) {
+    addFilter(
+      asString(event.properties.filter)
+    );
+    addFilter(
+      asString(event.properties.when)
+    );
+    addFilter(
+      asString(event.properties.price)
+    );
+    addFilter(
+      asString(event.properties.occasion)
+    );
+
+    if (
+      event.properties.nearbyRequested ===
+      true
+    ) {
+      addFilter("near-me");
+    }
+
+    if (
+      event.properties.newToMe === true
+    ) {
+      addFilter("new-to-me");
+    }
+  }
+
+  return {
+    searches: searches.length,
+    resultViews: resultViews.length,
+    zeroResultSearches:
+      zeroResults.length,
+    zeroResultRate:
+      searches.length > 0
+        ? percent(
+            zeroResults.length,
+            searches.length
+          )
+        : null,
+    listingSelections:
+      listingSelections.length,
+    listingOpens:
+      listingOpens.length,
+    listingSaves:
+      listingSaves.length,
+    listingSaveRate:
+      listingOpens.length > 0
+        ? percent(
+            listingSaves.length,
+            listingOpens.length
+          )
+        : null,
+    builderOpens:
+      builderOpens.length,
+    outingsGenerated:
+      outingsGenerated.length,
+    generationRate:
+      builderOpens.length > 0
+        ? percent(
+            outingsGenerated.length,
+            builderOpens.length
+          )
+        : null,
+    topSearches:
+      Array.from(
+        searchCounts.entries()
+      )
+        .map(([query, count]) => ({
+          query,
+          count,
+          zeroResults:
+            zeroByQuery.get(query) || 0
+        }))
+        .sort(
+          (first, second) =>
+            second.count - first.count
+        )
+        .slice(0, 10),
+    topFilters:
+      Array.from(
+        filterCounts.entries()
+      )
+        .map(([filter, count]) => ({
+          filter,
+          count
+        }))
+        .sort(
+          (first, second) =>
+            second.count - first.count
+        )
+        .slice(0, 10)
+  };
+}
+
 function buildFunnel(
   events: AnalyticsEventRow[]
 ): AnalyticsLab["funnel"] {
@@ -667,6 +947,10 @@ function buildFunnel(
       matches: (event: AnalyticsEventRow) =>
         [
           "discovery_viewed",
+          "discovery_search_submitted",
+          "discovery_filter_selected",
+          "discovery_results_viewed",
+          "listing_card_selected",
           "listing_map_selected",
           "listing_detail_opened"
         ].includes(event.event_name)
@@ -698,6 +982,8 @@ function buildFunnel(
       matches: (event: AnalyticsEventRow) =>
         [
           "listing_saved",
+          "listing_shared",
+          "outing_saved",
           "outing_shared",
           "newsletter_signup",
           "feedback_submitted"
@@ -1497,6 +1783,21 @@ export async function getAnalyticsLab(
         daily: [],
         devices: [],
         referrers: [],
+        journey: {
+          searches: 0,
+          resultViews: 0,
+          zeroResultSearches: 0,
+          zeroResultRate: null,
+          listingSelections: 0,
+          listingOpens: 0,
+          listingSaves: 0,
+          listingSaveRate: null,
+          builderOpens: 0,
+          outingsGenerated: 0,
+          generationRate: null,
+          topSearches: [],
+          topFilters: []
+        },
         funnel: [],
         retention: {
           trackedVisitors: 0,
@@ -1705,8 +2006,12 @@ export async function getAnalyticsLab(
         shares:
           selectedEvents.filter(
             (event) =>
-              event.event_name ===
+              [
+                "listing_shared",
                 "outing_shared"
+              ].includes(
+                event.event_name
+              )
           ).length,
         feedbackCount:
           selectedFeedback.length
@@ -1748,6 +2053,10 @@ export async function getAnalyticsLab(
               first.sessions
           )
           .slice(0, 12),
+      journey:
+        buildJourneySignals(
+          selectedEvents
+        ),
       funnel:
         buildFunnel(selectedEvents),
       retention:
@@ -1792,6 +2101,21 @@ export async function getAnalyticsLab(
       daily: [],
       devices: [],
       referrers: [],
+      journey: {
+        searches: 0,
+        resultViews: 0,
+        zeroResultSearches: 0,
+        zeroResultRate: null,
+        listingSelections: 0,
+        listingOpens: 0,
+        listingSaves: 0,
+        listingSaveRate: null,
+        builderOpens: 0,
+        outingsGenerated: 0,
+        generationRate: null,
+        topSearches: [],
+        topFilters: []
+      },
       funnel: [],
       retention: {
         trackedVisitors: 0,

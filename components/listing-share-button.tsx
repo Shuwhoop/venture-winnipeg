@@ -18,11 +18,13 @@ import styles from "./listing-share-button.module.css";
 type ListingShareButtonProps = {
   listing: Listing;
   className?: string;
+  source?: string;
 };
 
 export function ListingShareButton({
   listing,
-  className = ""
+  className = "",
+  source = "listing-share-button"
 }: ListingShareButtonProps) {
   const [message, setMessage] =
     useState("");
@@ -82,7 +84,7 @@ export function ListingShareButton({
           listingSlug: listing.slug,
           listingType: listing.type,
           listingName: listing.name,
-          source: "explore-map-card"
+          source
         }
       });
     } catch (error) {
@@ -112,7 +114,20 @@ export function ListingShareButton({
           void handleShare();
         }}
       >
-        <span aria-hidden="true">↗</span>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <path d="m8.6 10.6 6.8-4.1M8.6 13.4l6.8 4.1" />
+        </svg>
       </button>
 
       {message ? (

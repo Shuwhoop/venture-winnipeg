@@ -2035,3 +2035,182 @@
 }
 
 /* END VENTURE DATABASE SEARCH + PAGINATION */
+
+/* VENTURE NEARBY DISCOVERY V2.5 START */
+.nearbyStatus {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 11px;
+  border: 2px solid #241f20;
+  border-radius: 17px;
+  background: #fff0b3;
+  box-shadow: 3px 4px 0 rgba(208, 16, 19, 0.2);
+}
+
+.nearbyStatus > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #241f20;
+  border-radius: 11px;
+  background: #ffcf00;
+  color: #241f20;
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.nearbyStatus > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nearbyStatus strong {
+  color: #241f20;
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.nearbyStatus small {
+  color: #655b5c;
+  font-size: 0.62rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.nearbyStatus button {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 2px solid #241f20;
+  border-radius: 11px;
+  background: #d01013;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.nearbyStatus button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+@media (max-width: 390px) {
+  .nearbyStatus {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .nearbyStatus button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+/* VENTURE NEARBY DISCOVERY V2.5 END */
+
+/* VENTURE EXPLORE V1.0 START */
+.searchIcon svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.viewToolbar {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.sortControl {
+  display: grid;
+  gap: 3px;
+  min-width: 118px;
+}
+
+.sortControl > span {
+  padding-left: 2px;
+  color: #7a6d72;
+  font-size: 0.52rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sortControl select {
+  width: 100%;
+  min-height: 42px;
+  padding: 7px 28px 7px 10px;
+  border: 1.5px solid #d2c6be;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #241f20;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.recoveryLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 6px;
+}
+
+.recoveryLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1.5px solid #241f20;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #241f20;
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 2px 2px 0 #ffcf00;
+}
+
+.recoveryLinks a:first-child {
+  background: #241f20;
+  color: #ffffff;
+  box-shadow: 2px 2px 0 #d01013;
+}
+
+@media (max-width: 560px) {
+  .viewToolbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .sortControl {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    min-width: 0;
+  }
+
+  .sortControl > span {
+    padding-left: 3px;
+  }
+}
+
+@media (max-width: 390px) {
+  .recoveryLinks {
+    display: grid;
+    width: 100%;
+  }
+
+  .recoveryLinks a {
+    justify-content: center;
+    width: 100%;
+  }
+}
+/* VENTURE EXPLORE V1.0 END */

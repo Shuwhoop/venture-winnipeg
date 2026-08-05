@@ -192,7 +192,8 @@
   gap: 8px;
 }
 
-.quickFilters a {
+.quickFilters a,
+.quickFilters button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -209,12 +210,14 @@
   box-shadow: 2px 2px 0 rgba(36, 31, 32, 0.08);
 }
 
-.quickFilters a:hover {
+.quickFilters a:hover,
+.quickFilters button:hover:not(:disabled) {
   background: var(--home-yellow);
   transform: translateY(-1px);
 }
 
-.quickFilters a span {
+.quickFilters a span,
+.quickFilters button span {
   color: var(--home-red);
   font-size: 0.78rem;
 }
@@ -641,7 +644,8 @@
     font-size: 2.15rem;
   }
 
-  .quickFilters a {
+  .quickFilters a,
+  .quickFilters button {
     padding-inline: 9px;
   }
 }
@@ -651,7 +655,392 @@
   .miniCard,
   .trendCard,
   .builderBanner,
-  .quickFilters a {
+  .quickFilters a,
+  .quickFilters button {
     transition: none;
   }
 }
+/* VENTURE HOME FIRST VIEW V2.4 START */
+.page {
+  gap: 12px;
+  padding: 10px 12px 118px;
+}
+
+.hero {
+  gap: 8px;
+  padding-top: 0;
+}
+
+.heroShapes {
+  top: -27px;
+  right: -2px;
+  width: 106px;
+  height: 118px;
+  transform: scale(0.82);
+  transform-origin: top right;
+}
+
+.dateLine {
+  font-size: 0.59rem;
+}
+
+.hero h1 {
+  max-width: 7.4ch;
+  font-size: clamp(2.55rem, 11.5vw, 3.45rem);
+  line-height: 0.84;
+}
+
+.search {
+  min-height: 48px;
+  margin-top: 0;
+  padding: 4px;
+  border-radius: 14px;
+  box-shadow: 3px 4px 0 var(--home-yellow);
+}
+
+.searchIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+}
+
+.searchIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.search input {
+  height: 36px;
+  font-size: 0.7rem;
+}
+
+.search button {
+  min-width: 64px;
+  min-height: 36px;
+  border-radius: 9px;
+  font-size: 0.67rem;
+}
+
+.search button span {
+  width: 19px;
+  height: 19px;
+}
+
+.quickFilters {
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: calc(100% + 12px);
+  padding: 0 12px 2px 0;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quickFilters::-webkit-scrollbar {
+  display: none;
+}
+
+.quickFilters a,
+.quickFilters button {
+  flex: 0 0 auto;
+  min-height: 29px;
+  padding: 4px 9px;
+  font-size: 0.62rem;
+  scroll-snap-align: start;
+}
+
+.featuredSection,
+.railSection {
+  gap: 7px;
+}
+
+.pickHeading > span,
+.sectionHeading h2 {
+  font-size: 0.58rem;
+}
+
+.pickHeading p,
+.sectionHeading a {
+  font-size: 0.57rem;
+}
+
+.featuredCard {
+  min-height: 208px;
+  border-radius: 22px;
+  box-shadow: 5px 6px 0 var(--home-red);
+}
+
+.featuredImage {
+  height: 208px;
+  min-height: 208px;
+}
+
+.featuredTopline {
+  top: 11px;
+  right: 11px;
+  left: 11px;
+}
+
+.featuredTopline > div {
+  gap: 5px;
+}
+
+.featuredTopline span {
+  padding: 5px 8px;
+  font-size: 0.51rem;
+}
+
+.featuredTopline small {
+  font-size: 0.53rem;
+}
+
+.featuredCopy {
+  right: 68px;
+  bottom: 12px;
+  left: 12px;
+  gap: 5px;
+}
+
+.featuredCopy h2 {
+  max-width: 9ch;
+  font-size: clamp(1.65rem, 7.8vw, 2.4rem);
+  line-height: 0.9;
+}
+
+.featuredCopy p {
+  font-size: 0.6rem;
+}
+
+.priceBadge {
+  padding: 5px 8px;
+  font-size: 0.57rem;
+}
+
+.miniRail,
+.trendRail {
+  gap: 8px;
+  padding-bottom: 6px;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.miniCard {
+  flex-basis: 116px;
+  height: 142px;
+  border-radius: 15px;
+}
+
+.miniImage {
+  min-height: 142px;
+  height: 142px;
+}
+
+.miniCard :global(.save-button) {
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+}
+
+.miniCopy {
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+  gap: 3px;
+}
+
+.miniCopy span,
+.trendCopy span {
+  font-size: 0.44rem;
+}
+
+.miniCopy h3 {
+  font-size: 0.74rem;
+}
+
+.miniCopy p {
+  font-size: 0.5rem;
+}
+
+.trendCard {
+  flex-basis: 154px;
+  border-radius: 15px;
+}
+
+.trendImage {
+  height: 88px;
+  min-height: 88px;
+}
+
+.trendCopy {
+  min-height: 64px;
+  padding: 8px 9px 9px;
+}
+
+.trendCopy h3 {
+  font-size: 0.78rem;
+}
+
+.trendCopy p {
+  font-size: 0.52rem;
+}
+
+.builderBanner {
+  min-height: 82px;
+}
+
+@media (max-height: 760px) {
+  .page {
+    gap: 9px;
+    padding-top: 7px;
+  }
+
+  .hero {
+    gap: 6px;
+  }
+
+  .hero h1 {
+    font-size: 2.35rem;
+  }
+
+  .featuredCard,
+  .featuredImage {
+    min-height: 184px;
+    height: 184px;
+  }
+
+  .featuredCopy h2 {
+    font-size: 1.75rem;
+  }
+
+  .miniCard,
+  .miniImage {
+    height: 124px;
+    min-height: 124px;
+  }
+}
+/* VENTURE HOME FIRST VIEW V2.4 END */
+
+/* VENTURE HOME FUNCTIONALITY V2.5 START */
+.quickFilters button {
+  border: 2px solid var(--home-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.quickFilters button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.quickFilters svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  fill: none;
+  stroke: var(--home-red);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.locationMessage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 2px solid var(--home-ink);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--home-ink);
+  font-size: 0.61rem;
+  font-weight: 850;
+  line-height: 1.3;
+  box-shadow: 2px 3px 0 var(--home-yellow);
+}
+
+.locationMessageError {
+  background: #fff3ef;
+  box-shadow: 2px 3px 0 rgba(216, 16, 22, 0.22);
+}
+
+.locationMessage a {
+  flex: 0 0 auto;
+  color: var(--home-red);
+  font-weight: 950;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quickFilters button {
+    transition: none;
+  }
+}
+/* VENTURE HOME FUNCTIONALITY V2.5 END */
+
+/* VENTURE HOME QUICK FILTERS V2.6 START */
+.quickFilters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  overflow: visible;
+  scroll-snap-type: none;
+}
+
+.quickFilters a,
+.quickFilters button {
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  padding: 5px 6px;
+  gap: 5px;
+  white-space: nowrap;
+  line-height: 1;
+  font-size: clamp(0.56rem, 1.7vw, 0.64rem);
+  scroll-snap-align: unset;
+}
+
+.quickFilters svg {
+  width: 13px;
+  height: 13px;
+  flex-basis: 13px;
+}
+
+.quickFilters .greenDot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+}
+
+@media (max-width: 350px) {
+  .quickFilters {
+    gap: 4px;
+  }
+
+  .quickFilters a,
+  .quickFilters button {
+    min-height: 32px;
+    padding-inline: 4px;
+    gap: 4px;
+    font-size: 0.54rem;
+  }
+
+  .quickFilters svg {
+    width: 12px;
+    height: 12px;
+    flex-basis: 12px;
+  }
+}
+/* VENTURE HOME QUICK FILTERS V2.6 END */
+

@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  Suspense
+} from "react";
+
+import {
   usePathname
 } from "next/navigation";
 
@@ -81,7 +85,9 @@ export function PublicRouteChrome({
       <AccountSyncRuntime />
       <BottomNav />
       {analyticsEnabled ? (
-        <VentureAnalytics />
+        <Suspense fallback={null}>
+          <VentureAnalytics />
+        </Suspense>
       ) : null}
       {betaFeedbackEnabled &&
       pathname === "/" ? (

@@ -2,6 +2,8 @@ import {
   NextResponse
 } from "next/server";
 
+import { isTransientNetworkError } from "@/lib/network-errors";
+
 import {
   checkBetaRateLimit,
   cleanClientCreatedAt,
@@ -136,6 +138,17 @@ export async function POST(
   }
 
   if (error) {
+    if (isTransientNetworkError(error)) {
+      return NextResponse.json(
+        {
+          ok: true,
+          recorded: false,
+          offline: true
+        },
+        { status: 202 }
+      );
+    }
+
     console.error("Beta event insert failed", {
       code: error.code,
       message: error.message

@@ -7,6 +7,65 @@ export type GeoPoint = {
   longitude: number;
 };
 
+export const NEARBY_LOCATION_STORAGE_KEY =
+  "venture:nearby-location:v1";
+
+export function isValidGeoPoint(
+  value: unknown
+): value is GeoPoint {
+  if (
+    !value ||
+    typeof value !== "object"
+  ) {
+    return false;
+  }
+
+  const candidate = value as {
+    latitude?: unknown;
+    longitude?: unknown;
+  };
+
+  const latitude = Number(
+    candidate.latitude
+  );
+  const longitude = Number(
+    candidate.longitude
+  );
+
+  return (
+    Number.isFinite(latitude) &&
+    latitude >= -90 &&
+    latitude <= 90 &&
+    Number.isFinite(longitude) &&
+    longitude >= -180 &&
+    longitude <= 180
+  );
+}
+
+export function parseStoredGeoPoint(
+  value: string | null
+): GeoPoint | null {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const parsed: unknown =
+      JSON.parse(value);
+
+    if (!isValidGeoPoint(parsed)) {
+      return null;
+    }
+
+    return {
+      latitude: Number(parsed.latitude),
+      longitude: Number(parsed.longitude)
+    };
+  } catch {
+    return null;
+  }
+}
+
 export type MapBounds = {
   north: number;
   south: number;

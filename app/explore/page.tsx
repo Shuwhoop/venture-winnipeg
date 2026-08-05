@@ -9,8 +9,13 @@ import {
 } from "@/components/explore-experience";
 
 import {
+  ExploreSearchForm
+} from "@/components/explore-search-form";
+
+import {
   parseDiscoveryIntent,
   type DiscoveryFilter,
+  type DiscoveryOccasion,
   type DiscoveryPrice,
   type DiscoveryWhen
 } from "@/lib/discovery-intent";
@@ -35,8 +40,10 @@ type ExplorePageProps = {
     filter?: string;
     when?: string;
     price?: string;
+    occasion?: string;
     area?: string;
     new?: string;
+    near?: string;
     take?: string;
   }>;
 };
@@ -90,21 +97,39 @@ function getValidPrice(
   return null;
 }
 
+
+function getValidOccasion(
+  value: string | undefined
+): DiscoveryOccasion | null {
+  if (
+    value === "any" ||
+    value === "date"
+  ) {
+    return value;
+  }
+
+  return null;
+}
+
 function buildExploreHref({
   filter,
   search,
   when,
   price,
+  occasion,
   area,
   newToMe,
+  nearbyRequested,
   take
 }: {
   filter: DiscoveryFilter;
   search: string;
   when: DiscoveryWhen;
   price: DiscoveryPrice;
+  occasion: DiscoveryOccasion;
   area: string;
   newToMe: boolean;
+  nearbyRequested?: boolean;
   take?: number;
 }) {
   const params = new URLSearchParams();
@@ -125,12 +150,20 @@ function buildExploreHref({
     params.set("price", price);
   }
 
+  if (occasion !== "any") {
+    params.set("occasion", occasion);
+  }
+
   if (area) {
     params.set("area", area);
   }
 
   if (newToMe) {
     params.set("new", "1");
+  }
+
+  if (nearbyRequested) {
+    params.set("near", "me");
   }
 
   if (
@@ -194,8 +227,10 @@ export default async function ExplorePage({
     filter: requestedFilter,
     when: requestedWhen,
     price: requestedPrice,
+    occasion: requestedOccasion,
     area: requestedArea = "",
     new: requestedNew,
+    near: requestedNear,
     take: requestedTakeValue
   } = await searchParams;
 
@@ -217,12 +252,20 @@ export default async function ExplorePage({
     intent.inferredPrice ??
     "any";
 
+  const activeOccasion =
+    getValidOccasion(requestedOccasion) ??
+    intent.inferredOccasion ??
+    "any";
+
   const activeArea =
     requestedArea.trim();
 
   const newToMe =
     requestedNew === "1" ||
     intent.newToMe;
+
+  const nearbyRequested =
+    requestedNear === "me";
 
   const parsedTake = Number(
     requestedTakeValue ??
@@ -242,10 +285,12 @@ export default async function ExplorePage({
     )
   );
 
-  const sourceLimit = Math.min(
-    MAX_LOADED_RESULTS,
-    requestedTake + 1
-  );
+  const sourceLimit = nearbyRequested
+    ? MAX_LOADED_RESULTS
+    : Math.min(
+        MAX_LOADED_RESULTS,
+        requestedTake + 1
+      );
 
   const [
     eventResult,
@@ -257,6 +302,7 @@ export default async function ExplorePage({
       filter: activeFilter,
       when: activeWhen,
       price: activePrice,
+      occasion: activeOccasion,
       area: activeArea,
       limit: sourceLimit
     }),
@@ -265,6 +311,7 @@ export default async function ExplorePage({
       filter: activeFilter,
       when: activeWhen,
       price: activePrice,
+      occasion: activeOccasion,
       area: activeArea,
       limit: sourceLimit
     }),
@@ -278,11 +325,24 @@ export default async function ExplorePage({
       activeFilter
     );
 
-  const filteredListings =
-    combinedListings.slice(
-      0,
-      requestedTake
-    );
+  const nearbyPool = nearbyRequested
+    ? combinedListings.slice(
+        0,
+        MAX_LOADED_RESULTS
+      )
+    : combinedListings;
+
+  const filteredListings = nearbyRequested
+    ? nearbyPool
+    : nearbyPool.slice(
+        0,
+        requestedTake
+      );
+
+  const loadedResultCount = Math.min(
+    nearbyPool.length,
+    requestedTake
+  );
 
   const hasMore =
     combinedListings.length >
@@ -305,8 +365,10 @@ export default async function ExplorePage({
           search: q,
           when: activeWhen,
           price: activePrice,
+          occasion: activeOccasion,
           area: activeArea,
           newToMe,
+          nearbyRequested,
           take: nextTake
         })
       : null;
@@ -336,6 +398,10 @@ export default async function ExplorePage({
       value: "nightlife"
     },
     {
+      label: "Attractions",
+      value: "attractions"
+    },
+    {
       label: "Open now",
       value: "open"
     },
@@ -345,9 +411,13 @@ export default async function ExplorePage({
     }
   ];
 
-  const resultsEyebrow = newToMe
-    ? "NEW TO YOU"
-    : activeFilter === "all"
+  const resultsEyebrow = nearbyRequested
+    ? "NEAR YOU"
+    : newToMe
+      ? "NEW TO YOU"
+      : activeOccasion === "date"
+        ? "DATE IDEAS"
+        : activeFilter === "all"
       ? "WINNIPEG PICKS"
       : filters.find(
           (filter) =>
@@ -377,10 +447,18 @@ export default async function ExplorePage({
             ? "Nightlife"
             : activeFilter === "attractions"
               ? "Attractions"
-              : null,
+              : activeFilter === "open"
+                ? "Open now"
+                : activeFilter === "verified"
+                  ? "Verified"
+                  : null,
     readableWhen(activeWhen),
     readablePrice(activePrice),
+    activeOccasion === "date"
+      ? "Date ideas"
+      : null,
     activeArea || null,
+    nearbyRequested ? "Nearest first" : null,
     newToMe ? "New to me" : null
   ].filter(
     (value): value is string =>
@@ -406,10 +484,10 @@ export default async function ExplorePage({
 
         <div
           className={styles.heroBadge}
-          aria-label={`${filteredListings.length} matching listings before visit-history filtering`}
+          aria-label={`${loadedResultCount} matching listings before visit-history filtering`}
         >
           <strong>
-            {filteredListings.length}
+            {loadedResultCount}
             {hasMore ? "+" : ""}
           </strong>
           <span>LOADED</span>
@@ -420,36 +498,19 @@ export default async function ExplorePage({
         className={styles.discoveryControls}
         aria-label="Explore search and filters"
       >
-        <form
+        <ExploreSearchForm
+          defaultQuery={q}
+          currentFilter={activeFilter}
+          currentWhen={activeWhen}
+          currentPrice={activePrice}
+          currentOccasion={activeOccasion}
+          currentArea={activeArea}
+          newToMe={newToMe}
+          nearbyRequested={nearbyRequested}
           className={styles.searchForm}
-          action="/explore"
-        >
-          <label
-            className={styles.srOnly}
-            htmlFor="explore-search"
-          >
-            Search Winnipeg listings
-          </label>
-
-          <span
-            className={styles.searchIcon}
-            aria-hidden="true"
-          >
-            ⌕
-          </span>
-
-          <input
-            id="explore-search"
-            name="q"
-            defaultValue={q}
-            placeholder="Try “free events tonight”"
-            autoComplete="off"
-          />
-
-          <button type="submit">
-            Search
-          </button>
-        </form>
+          screenReaderClassName={styles.srOnly}
+          iconClassName={styles.searchIcon}
+        />
 
         {q.trim() ||
         interpretedLabels.length > 0 ? (
@@ -496,8 +557,10 @@ export default async function ExplorePage({
             currentFilter={activeFilter}
             currentWhen={activeWhen}
             currentPrice={activePrice}
+            currentOccasion={activeOccasion}
             currentArea={activeArea}
             newToMe={newToMe}
+            nearbyRequested={nearbyRequested}
             neighbourhoods={neighbourhoods}
           />
 
@@ -505,6 +568,60 @@ export default async function ExplorePage({
             className={styles.filterRail}
             aria-label="Explore quick filters"
           >
+            <Link
+              className={`${styles.filterChip} ${
+                nearbyRequested
+                  ? styles.activeFilter
+                  : ""
+              }`}
+              href={buildExploreHref({
+                filter: activeFilter,
+                search: q,
+                when: activeWhen,
+                price: activePrice,
+                occasion: activeOccasion,
+                area: activeArea,
+                newToMe,
+                nearbyRequested:
+                  !nearbyRequested
+              })}
+              aria-current={
+                nearbyRequested
+                  ? "page"
+                  : undefined
+              }
+            >
+              <span>Near me</span>
+            </Link>
+
+            <Link
+              className={`${styles.filterChip} ${
+                activeOccasion === "date"
+                  ? styles.activeFilter
+                  : ""
+              }`}
+              href={buildExploreHref({
+                filter: activeFilter,
+                search: q,
+                when: activeWhen,
+                price: activePrice,
+                occasion:
+                  activeOccasion === "date"
+                    ? "any"
+                    : "date",
+                area: activeArea,
+                newToMe,
+                nearbyRequested
+              })}
+              aria-current={
+                activeOccasion === "date"
+                  ? "page"
+                  : undefined
+              }
+            >
+              <span>Date ideas</span>
+            </Link>
+
             {filters.map((filter) => (
               <Link
                 className={`${styles.filterChip} ${
@@ -517,8 +634,10 @@ export default async function ExplorePage({
                   search: q,
                   when: activeWhen,
                   price: activePrice,
+                  occasion: activeOccasion,
                   area: activeArea,
-                  newToMe
+                  newToMe,
+                  nearbyRequested
                 })}
                 key={filter.value}
                 aria-current={
@@ -543,6 +662,16 @@ export default async function ExplorePage({
         hasMore={hasMore}
         loadMoreHref={loadMoreHref}
         pageSize={EXPLORE_PAGE_SIZE}
+        nearbyRequested={nearbyRequested}
+        resultLimit={requestedTake}
+        analyticsContext={{
+          filter: activeFilter,
+          when: activeWhen,
+          price: activePrice,
+          occasion: activeOccasion,
+          area: activeArea,
+          newToMe
+        }}
       />
     </main>
   );

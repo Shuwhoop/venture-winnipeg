@@ -1,0 +1,243 @@
+.statePage {
+  display: grid;
+  min-height: min(680px, calc(100dvh - 170px));
+  place-items: center;
+  padding: 10px 0 34px;
+}
+
+.stateCard {
+  position: relative;
+  display: grid;
+  width: 100%;
+  max-width: 440px;
+  gap: 18px;
+  overflow: hidden;
+  padding: 22px;
+  border: 3px solid var(--venture-ink, #241f20);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 92% 6%, rgba(255, 207, 0, 0.38), transparent 28%),
+    linear-gradient(160deg, #fffdf9, #fff7e9);
+  box-shadow: 7px 8px 0 rgba(36, 31, 32, 0.14);
+}
+
+.error .stateCard {
+  background:
+    radial-gradient(circle at 92% 6%, rgba(208, 16, 19, 0.13), transparent 30%),
+    linear-gradient(160deg, #fffdf9, #fff1e8);
+  box-shadow: 7px 8px 0 rgba(208, 16, 19, 0.24);
+}
+
+.missing .stateCard {
+  background:
+    radial-gradient(circle at 92% 6%, rgba(109, 40, 217, 0.13), transparent 30%),
+    linear-gradient(160deg, #fffdf9, #f8f1ff);
+  box-shadow: 7px 8px 0 rgba(109, 40, 217, 0.2);
+}
+
+.illustration {
+  display: grid;
+  width: 112px;
+  height: 112px;
+  place-items: center;
+  border: 3px solid var(--venture-ink, #241f20);
+  border-radius: 31px 31px 38px 26px;
+  background: var(--venture-yellow, #ffcf00);
+  box-shadow: 5px 5px 0 var(--venture-red, #d01013);
+  transform: rotate(-3deg);
+}
+
+.illustration svg {
+  width: 92px;
+  height: 92px;
+  stroke: var(--venture-ink, #241f20);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.errorIllustration {
+  background: #ffd5ce;
+  box-shadow: 5px 5px 0 var(--venture-red, #d01013);
+}
+
+.missingIllustration {
+  background: #e9ddff;
+  box-shadow: 5px 5px 0 #6d28d9;
+}
+
+.offlineIllustration {
+  background: #fff0b6;
+}
+
+.copy {
+  display: grid;
+  gap: 7px;
+}
+
+.copy > span {
+  color: var(--venture-red, #d01013);
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.copy h1 {
+  max-width: 11ch;
+  margin: 0;
+  color: var(--venture-ink, #241f20);
+  font-size: clamp(2.1rem, 10vw, 3.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.065em;
+}
+
+.copy p {
+  max-width: 39ch;
+  margin: 0;
+  color: var(--venture-muted, #746c6d);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.actions a,
+.actions button {
+  display: grid;
+  min-height: 48px;
+  place-items: center;
+  padding: 10px 12px;
+  border: 3px solid var(--venture-ink, #241f20);
+  border-radius: 15px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-align: center;
+  text-decoration: none;
+}
+
+.primaryAction {
+  background: var(--venture-red, #d01013);
+  color: #fff;
+  box-shadow: 3px 3px 0 var(--venture-yellow, #ffcf00);
+}
+
+.secondaryAction {
+  background: #fff;
+  color: var(--venture-ink, #241f20);
+}
+
+.skeleton {
+  display: grid;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.skeleton i {
+  display: block;
+  overflow: hidden;
+  border: 2px solid rgba(36, 31, 32, 0.14);
+  background: #efe7de;
+}
+
+.skeleton i::after {
+  display: block;
+  width: 48%;
+  height: 100%;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  transform: translateX(-120%);
+}
+
+.searchSkeleton {
+  height: 52px;
+  border-radius: 16px;
+}
+
+.chipSkeletons {
+  display: flex;
+  gap: 8px;
+}
+
+.chipSkeletons i {
+  width: 84px;
+  height: 34px;
+  border-radius: 999px;
+}
+
+.cardSkeleton {
+  height: 126px;
+  border-radius: 20px;
+}
+
+.heroSkeleton {
+  height: 220px;
+  border-radius: 23px;
+}
+
+.lineGroup {
+  display: grid;
+  gap: 9px;
+}
+
+.lineGroup i {
+  height: 16px;
+  border-radius: 999px;
+}
+
+.lineGroup i:nth-child(2) {
+  width: 82%;
+}
+
+.lineGroup i:nth-child(3) {
+  width: 58%;
+}
+
+.routeSkeleton {
+  height: 76px;
+  border-radius: 18px;
+}
+
+.stopSkeleton {
+  height: 148px;
+  border-radius: 22px;
+}
+
+@media (max-width: 390px) {
+  .stateCard {
+    padding: 18px;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .loadingIllustration {
+    animation: ventureLoadingFloat 2.8s ease-in-out infinite;
+  }
+
+  .skeleton i::after {
+    animation: ventureSkeletonSweep 1.65s ease-in-out infinite;
+  }
+}
+
+@keyframes ventureLoadingFloat {
+  0%, 100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1deg) translateY(-5px);
+  }
+}
+
+@keyframes ventureSkeletonSweep {
+  to {
+    transform: translateX(240%);
+  }
+}

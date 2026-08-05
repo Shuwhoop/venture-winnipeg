@@ -2519,3 +2519,117 @@ h4,
 .neighbourhood-search-row > button {
   box-shadow: 3px 3px 0 var(--venture-yellow);
 }
+
+/* VENTURE ACCESSIBILITY + ANALYTICS V1.0 START */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 200;
+  top: 10px;
+  left: 50%;
+  padding: 11px 15px;
+  border: 3px solid var(--venture-ink);
+  border-radius: 12px;
+  background: var(--venture-yellow);
+  color: var(--venture-ink);
+  box-shadow: 4px 4px 0 var(--venture-red);
+  font-weight: 950;
+  transform: translate(-50%, -180%);
+}
+
+.skip-link:focus {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+  transform: translate(-50%, 0);
+}
+
+.route-announcer,
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+#venture-main-content:focus {
+  outline: none;
+}
+
+[tabindex="0"][role="region"]:focus-visible,
+[role="tabpanel"]:focus-visible {
+  outline: 3px solid var(--venture-yellow);
+  outline-offset: 4px;
+}
+
+@media (pointer: coarse) {
+  .venture-app-first button,
+  .venture-app-first select,
+  .venture-app-first input:not([type="hidden"]),
+  .venture-app-first .nav-link {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="tab"],
+  [role="region"] {
+    forced-color-adjust: auto;
+  }
+
+  .brand-mark,
+  .avatar,
+  .nav-link.active,
+  .nav-link.special {
+    border: 2px solid CanvasText;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
+/* VENTURE ACCESSIBILITY + ANALYTICS V1.0 END */
+
+.profile-header-avatar {
+  overflow: hidden;
+}
+
+.profile-header-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

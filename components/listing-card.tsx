@@ -87,7 +87,7 @@ export function ListingCard({
           aria-label={`View ${listing.name}`}
           onClick={() => {
             trackBetaEvent({
-              eventName: "listing_detail_opened",
+              eventName: "listing_card_selected",
               pagePath: window.location.pathname,
               properties: {
                 listingId: listing.id,
@@ -164,7 +164,7 @@ export function ListingCard({
               href={`/listings/${listing.slug}`}
               onClick={() => {
                 trackBetaEvent({
-                  eventName: "listing_detail_opened",
+                  eventName: "listing_card_selected",
                   pagePath: window.location.pathname,
                   properties: {
                     listingId: listing.id,

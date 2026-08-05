@@ -3,8 +3,10 @@
 import {
   useEffect
 } from "react";
+
 import {
-  usePathname
+  usePathname,
+  useSearchParams
 } from "next/navigation";
 
 import {
@@ -53,6 +55,22 @@ function getPageGroup(
 
 export function VentureAnalytics() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchKey = searchParams.toString();
+  const query =
+    searchParams.get("q") ?? "";
+  const filter =
+    searchParams.get("filter");
+  const when =
+    searchParams.get("when");
+  const price =
+    searchParams.get("price");
+  const occasion =
+    searchParams.get("occasion");
+  const areaSelected =
+    Boolean(searchParams.get("area"));
+  const nearbyRequested =
+    searchParams.get("near") === "me";
   const isAdmin =
     pathname.startsWith("/admin");
 
@@ -66,7 +84,6 @@ export function VentureAnalytics() {
 
     const timeout =
       window.setTimeout(() => {
-
         if (!hasTrackedSessionStart()) {
           trackBetaEvent({
             eventName:
@@ -91,7 +108,17 @@ export function VentureAnalytics() {
             pathname,
           properties: {
             pageGroup:
-              getPageGroup(pathname)
+              getPageGroup(pathname),
+            hasSearchParameters:
+              searchKey.length > 0,
+            queryLength:
+              query.trim().length,
+            filter,
+            when,
+            price,
+            occasion,
+            areaSelected,
+            nearbyRequested
           }
         });
 
@@ -140,22 +167,6 @@ export function VentureAnalytics() {
               pathname
           });
         } else if (
-          pathname.startsWith("/listings/")
-        ) {
-          trackBetaEvent({
-            eventName:
-              "listing_detail_opened",
-            pagePath:
-              pathname,
-            properties: {
-              listingSlug:
-                pathname
-                  .split("/")
-                  .filter(Boolean)
-                  .at(-1) || ""
-            }
-          });
-        } else if (
           pathname === "/saved"
         ) {
           trackBetaEvent({
@@ -169,7 +180,18 @@ export function VentureAnalytics() {
 
     return () =>
       window.clearTimeout(timeout);
-  }, [isAdmin, pathname]);
+  }, [
+    areaSelected,
+    filter,
+    isAdmin,
+    nearbyRequested,
+    occasion,
+    pathname,
+    price,
+    query,
+    searchKey,
+    when
+  ]);
 
   return null;
 }
