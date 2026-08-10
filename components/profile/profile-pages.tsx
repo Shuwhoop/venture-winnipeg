@@ -16,9 +16,6 @@ import {
   AccountSyncCard
 } from "@/components/account-sync/account-sync";
 import {
-  VisitHistoryDashboard
-} from "@/components/visit-history-dashboard";
-import {
   ProfileAvatarEditor
 } from "@/components/profile/profile-avatar-editor";
 import {
@@ -52,9 +49,6 @@ import {
 import {
   getSupabaseBrowserClient
 } from "@/lib/supabase/client";
-import {
-  getVisitHistory
-} from "@/lib/visit-history";
 import {
   WINNIPEG_NEIGHBOURHOODS
 } from "@/lib/winnipeg-neighbourhoods";
@@ -241,15 +235,13 @@ export function ProfileDashboard() {
   } = useProfileData();
   const [counts, setCounts] = useState({
     listings: 0,
-    outings: 0,
-    visits: 0
+    outings: 0
   });
 
   useEffect(() => {
     setCounts({
       listings: getSavedListingReferences().length,
-      outings: getSavedOutings().length,
-      visits: getVisitHistory().length
+      outings: getSavedOutings().length
     });
   }, []);
 
@@ -265,33 +257,74 @@ export function ProfileDashboard() {
     return <GuestProfile />;
   }
 
-  const { profile, notifications, user } = payload;
+  const { profile, preferences, user } = payload;
+  const vibeTags = Array.from(new Set([
+    ...preferences.interests,
+    ...preferences.outingStyles,
+    ...preferences.cuisines
+  ])).slice(0, 3);
 
   return (
     <>
-      <section className={styles.profileHero}>
-        <ProfileAvatar profile={profile} email={user.email} />
-        <div className={styles.heroCopy}>
-          <span>YOUR VENTURE</span>
-          <h1>{profile.displayName}</h1>
-          <p>
-            {profile.username ? `@${profile.username} ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· ` : ""}
-            {profile.homeNeighbourhood
-              ? `${profile.homeNeighbourhood}, Winnipeg`
-              : "Winnipeg"}
-          </p>
-          {profile.bio ? <small>{profile.bio}</small> : null}
+      <section className={styles.profilePass} aria-labelledby="venture-profile-name">
+        <div className={styles.passTopline}>
+          <span className={styles.passLabel}>VENTURE PASS</span>
+          <span className={styles.passCity}>WINNIPEG</span>
         </div>
-        <Link className={styles.editButton} href="/profile/edit">
-          Edit profile
-        </Link>
+
+        <div className={styles.passIdentity}>
+          <ProfileAvatar profile={profile} email={user.email} />
+          <div className={styles.passIdentityCopy}>
+            <span>YOUR CITY, YOUR PICKS</span>
+            <h1 id="venture-profile-name">{profile.displayName}</h1>
+            <p>
+              {profile.username ? `@${profile.username} · ` : ""}
+              {profile.homeNeighbourhood
+                ? profile.homeNeighbourhood
+                : "Winnipeg explorer"}
+            </p>
+          </div>
+        </div>
+
+        {profile.bio ? (
+          <p className={styles.passBio}>{profile.bio}</p>
+        ) : (
+          <p className={styles.passBioMuted}>
+            Add a short bio so your Venture profile feels more like you.
+          </p>
+        )}
+
+        {vibeTags.length > 0 ? (
+          <div className={styles.vibeRow} aria-label="Your Venture vibe">
+            {vibeTags.map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
+          </div>
+        ) : null}
+
+        <div className={styles.passFooter}>
+          <div className={styles.collectionSummary} aria-label="Your saved Venture activity">
+            <span>
+              <strong>{counts.listings}</strong>
+              saved
+            </span>
+            <i aria-hidden="true" />
+            <span>
+              <strong>{counts.outings}</strong>
+              outings
+            </span>
+          </div>
+          <Link className={styles.passEditLink} href="/profile/edit">
+            Edit profile
+          </Link>
+        </div>
       </section>
 
       {!profile.onboardingCompleted ? (
         <Link className={styles.onboardingBanner} href="/profile/onboarding">
           <span>
-            <strong>Finish your Venture setup</strong>
-            <small>Give recommendations a better starting point.</small>
+            <strong>Finish making Venture yours</strong>
+            <small>A few choices help shape better recommendations.</small>
           </span>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="m9 5 7 7-7 7" />
@@ -299,51 +332,47 @@ export function ProfileDashboard() {
         </Link>
       ) : null}
 
-      <section className={styles.statsGrid} aria-label="Your Venture activity">
-        <article>
-          <strong>{counts.listings}</strong>
-          <span>Saved places + events</span>
-        </article>
-        <article>
-          <strong>{counts.outings}</strong>
-          <span>Saved outings</span>
-        </article>
-        <article>
-          <strong>{counts.visits}</strong>
-          <span>Logged visits</span>
-        </article>
-        <article>
-          <strong>{notifications.newsletterActive ? "ON" : "OFF"}</strong>
-          <span>Thursday Venture</span>
-        </article>
-      </section>
+      <section className={styles.profileHub} aria-labelledby="profile-hub-title">
+        <header className={styles.profileHubHeader}>
+          <span>YOUR PROFILE</span>
+          <h2 id="profile-hub-title">Open what you want to change.</h2>
+          <p>Everything about your Venture life stays neatly tucked into its own place.</p>
+        </header>
 
-      <section className={styles.profileMenu}>
-        <Link href="/profile/preferences">
-          <span className={styles.menuIcon} aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M8 14v6" /></svg>
-          </span>
-          <span><strong>Your preferences</strong><small>Interests, budget, transport, and practical needs</small></span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
-        </Link>
-        <Link href="/saved">
-          <span className={styles.menuIcon} aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M20.5 8.5c0 5.4-8.5 11-8.5 11s-8.5-5.6-8.5-11A4.6 4.6 0 0 1 12 6a4.6 4.6 0 0 1 8.5 2.5Z" /></svg>
-          </span>
-          <span><strong>Saved and outing history</strong><small>Return to the plans and places you kept</small></span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
-        </Link>
-        <Link href="/profile/settings">
-          <span className={styles.menuIcon} aria-hidden="true">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" /></svg>
-          </span>
-          <span><strong>Account and privacy</strong><small>Email, newsletter, data export, and deletion</small></span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
-        </Link>
-      </section>
+        <nav className={styles.profileMenu} aria-label="Profile sections">
+          <Link href="/profile/edit">
+            <span className={`${styles.menuIcon} ${styles.menuIconRed}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" /><path d="M5.5 20c.8-4 3-6 6.5-6s5.7 2 6.5 6" /></svg>
+            </span>
+            <span><strong>About me</strong><small>Photo, name, username, bio, and neighbourhood</small></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+          </Link>
 
-      <AccountSyncCard />
-      <VisitHistoryDashboard />
+          <Link href="/profile/preferences">
+            <span className={`${styles.menuIcon} ${styles.menuIconYellow}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M8 14v6" /></svg>
+            </span>
+            <span><strong>My vibe</strong><small>Interests, food, budget, transport, and outing style</small></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+          </Link>
+
+          <Link href="/saved">
+            <span className={`${styles.menuIcon} ${styles.menuIconSoft}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M20.5 8.5c0 5.4-8.5 11-8.5 11s-8.5-5.6-8.5-11A4.6 4.6 0 0 1 12 6a4.6 4.6 0 0 1 8.5 2.5Z" /></svg>
+            </span>
+            <span><strong>My saves</strong><small>Places, events, and outings you want to come back to</small></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+          </Link>
+
+          <Link href="/profile/settings">
+            <span className={`${styles.menuIcon} ${styles.menuIconInk}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" /></svg>
+            </span>
+            <span><strong>Account & privacy</strong><small>Email, newsletter, notifications, data, and account controls</small></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+          </Link>
+        </nav>
+      </section>
     </>
   );
 }

@@ -825,3 +825,325 @@
     transition: none;
   }
 }
+
+/* Profile Event Hub V1.0 */
+.profilePass {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  overflow: hidden;
+  padding: 18px;
+  border: 2px solid var(--venture-ink);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(208, 16, 19, 0.14) 0 48px, transparent 49px),
+    linear-gradient(145deg, #fff7c7 0%, var(--venture-yellow-soft) 44%, #fffdfa 100%);
+  box-shadow: 7px 8px 0 rgba(36, 31, 32, 0.12);
+}
+
+.profilePass::before,
+.profilePass::after {
+  content: "";
+  position: absolute;
+  top: 68%;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--venture-ink);
+  border-radius: 50%;
+  background: var(--venture-bg, #f7f3ec);
+  z-index: 2;
+}
+
+.profilePass::before {
+  left: -13px;
+}
+
+.profilePass::after {
+  right: -13px;
+}
+
+.passTopline {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.passLabel,
+.passCity,
+.passIdentityCopy > span,
+.profileHubHeader > span {
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+}
+
+.passLabel {
+  display: inline-flex;
+  width: fit-content;
+  padding: 7px 9px;
+  border: 1.5px solid var(--venture-ink);
+  border-radius: 999px;
+  background: var(--venture-red);
+  color: white;
+}
+
+.passCity {
+  color: var(--venture-ink-soft);
+}
+
+.passIdentity {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.profilePass .avatarLarge {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border-width: 3px;
+  font-size: 27px;
+  box-shadow: 4px 5px 0 rgba(36, 31, 32, 0.2);
+}
+
+.passIdentityCopy {
+  min-width: 0;
+}
+
+.passIdentityCopy > span {
+  color: var(--venture-red);
+}
+
+.passIdentityCopy h1 {
+  overflow: hidden;
+  margin: 4px 0 0;
+  color: var(--venture-ink);
+  font-family: var(--venture-display-font);
+  font-size: clamp(31px, 9vw, 44px);
+  line-height: 0.98;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passIdentityCopy p {
+  overflow: hidden;
+  margin: 7px 0 0;
+  color: var(--venture-muted);
+  font-size: 12px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passBio,
+.passBioMuted {
+  max-width: 36rem;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.passBio {
+  color: var(--venture-ink-soft);
+}
+
+.passBioMuted {
+  color: var(--venture-muted);
+  font-style: italic;
+}
+
+.vibeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.vibeRow span {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 7px 10px;
+  border: 1.5px solid var(--venture-ink);
+  border-radius: 999px;
+  background: white;
+  color: var(--venture-ink);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passFooter {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 15px;
+  border-top: 2px dashed rgba(36, 31, 32, 0.28);
+}
+
+.collectionSummary {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+  color: var(--venture-muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.collectionSummary span {
+  display: inline-flex;
+  gap: 4px;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.collectionSummary strong {
+  color: var(--venture-red);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.collectionSummary i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--venture-ink);
+  opacity: 0.35;
+}
+
+.passEditLink {
+  flex: 0 0 auto;
+  padding: 9px 11px;
+  border: 1.5px solid var(--venture-ink);
+  border-radius: 12px;
+  background: white;
+  color: var(--venture-ink);
+  font-size: 11px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.passEditLink:focus-visible {
+  outline: 4px solid rgba(208, 16, 19, 0.25);
+  outline-offset: 3px;
+}
+
+.profileHub {
+  margin-top: 18px;
+}
+
+.profileHubHeader {
+  display: grid;
+  gap: 4px;
+  padding: 0 3px 4px;
+}
+
+.profileHubHeader > span {
+  color: var(--venture-red);
+}
+
+.profileHubHeader h2 {
+  margin: 0;
+  color: var(--venture-ink);
+  font-family: var(--venture-display-font);
+  font-size: 24px;
+  line-height: 1.05;
+}
+
+.profileHubHeader p {
+  margin: 2px 0 0;
+  color: var(--venture-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.profileHub .profileMenu {
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+.profileHub .profileMenu a {
+  grid-template-columns: 46px minmax(0, 1fr) 18px;
+  gap: 11px;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-width: 1.5px;
+  border-radius: 17px;
+  box-shadow: 0 3px 0 rgba(36, 31, 32, 0.06);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.profileHub .profileMenu a:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 rgba(36, 31, 32, 0.08);
+}
+
+.profileHub .profileMenu strong {
+  font-size: 14px;
+}
+
+.profileHub .profileMenu small {
+  margin-top: 2px;
+  font-size: 10.5px;
+}
+
+.profileHub .menuIcon {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--venture-ink);
+  border-radius: 15px;
+}
+
+.menuIconRed {
+  background: var(--venture-red);
+  color: white;
+}
+
+.menuIconYellow {
+  background: var(--venture-yellow);
+  color: var(--venture-ink);
+}
+
+.menuIconSoft {
+  background: var(--venture-yellow-soft);
+  color: var(--venture-red);
+}
+
+.menuIconInk {
+  background: var(--venture-ink);
+  color: white;
+}
+
+@media (max-width: 390px) {
+  .profilePass {
+    padding: 16px;
+  }
+
+  .passIdentity {
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .profilePass .avatarLarge {
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+  }
+
+  .passIdentityCopy h1 {
+    font-size: 30px;
+  }
+
+  .passFooter {
+    align-items: flex-start;
+  }
+
+  .collectionSummary {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+}
