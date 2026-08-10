@@ -9,6 +9,10 @@ import {
 } from "@/components/outing-detail-experience";
 
 import {
+  GroupItineraryPanel
+} from "@/components/group-itinerary-panel";
+
+import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
 
@@ -111,6 +115,19 @@ export default async function SharedOutingPage({
           : "SHARED SOLO OUTING"
       }
       intro="A Venture route built from real Winnipeg listings, timing, and travel information."
+      collaboration={
+        sharedOuting.planning_mode === "group" ? (
+          <GroupItineraryPanel
+            shareCode={shareCode}
+            stops={plan.stops.map((stop) => ({
+              key: `${stop.listing.type}:${stop.listing.id}:${stop.order}`,
+              order: stop.order,
+              name: stop.listing.name,
+              startTime: stop.startTime
+            }))}
+          />
+        ) : null
+      }
       backHref="/"
       backLabel="Discover Venture"
       actions={

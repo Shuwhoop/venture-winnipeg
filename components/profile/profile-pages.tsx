@@ -264,6 +264,18 @@ export function ProfileDashboard() {
     ...preferences.cuisines
   ])).slice(0, 3);
 
+  const completionChecks = [
+    Boolean(profile.avatarUrl),
+    Boolean(profile.displayName.trim() && profile.displayName !== "Guest"),
+    Boolean(profile.username.trim()),
+    Boolean(profile.bio.trim()),
+    Boolean(profile.homeNeighbourhood.trim()),
+    preferences.interests.length > 0 || preferences.outingStyles.length > 0
+  ];
+  const profileCompletion = Math.round(
+    completionChecks.filter(Boolean).length / completionChecks.length * 100
+  );
+
   return (
     <>
       <section className={styles.profilePass} aria-labelledby="venture-profile-name">
@@ -317,6 +329,13 @@ export function ProfileDashboard() {
           <Link className={styles.passEditLink} href="/profile/edit">
             Edit profile
           </Link>
+        </div>
+
+        <div className={styles.profileCompletion}>
+          <span>
+            <strong>{profileCompletion}%</strong> your Venture profile
+          </span>
+          <div aria-hidden="true"><i style={{ width: `${profileCompletion}%` }} /></div>
         </div>
       </section>
 
@@ -454,7 +473,7 @@ export function ProfileEditor() {
         displayName: result.profile.displayName,
         preferences: result.preferences
       });
-      setMessage("Profile saved.");
+      setMessage("About me saved.");
     } catch (caught) {
       setMessage(caught instanceof Error ? caught.message : "Venture could not save the profile.");
     } finally {
@@ -465,10 +484,23 @@ export function ProfileEditor() {
   return (
     <>
       <ProfilePageHeader
-        eyebrow="PROFILE DETAILS"
-        title="Make Venture feel like yours."
-        description="These details stay private in Profile V1.0."
+        eyebrow="ABOUT ME"
+        title="The person behind the plans."
+        description="Keep this light. Your profile is here to make Venture feel personal, not turn into another form to maintain."
       />
+
+      <section className={styles.aboutPreviewCard}>
+        <ProfileAvatar profile={form} email={payload.user.email} />
+        <div>
+          <span>YOUR VENTURE CARD</span>
+          <h2>{form.displayName || "Venture explorer"}</h2>
+          <p>
+            {form.username ? `@${form.username} · ` : ""}
+            {form.homeNeighbourhood || "Winnipeg"}
+          </p>
+          <small>{form.bio || "Add one line that sounds like you."}</small>
+        </div>
+      </section>
 
       <ProfileAvatarEditor
         userId={payload.user.id}
@@ -477,81 +509,103 @@ export function ProfileEditor() {
         onChanged={refresh}
       />
 
-      <form className={styles.formCard} onSubmit={handleSubmit}>
-        <label>
-          Display name
-          <input
-            value={form.displayName}
-            maxLength={60}
-            aria-invalid={Boolean(fieldErrors.displayName)}
-            aria-describedby={fieldErrors.displayName ? "profile-display-name-error" : undefined}
-            onChange={(event) => {
-              setForm({ ...form, displayName: event.target.value });
-              setFieldErrors((current) => ({ ...current, displayName: undefined }));
-            }}
-          />
-          {fieldErrors.displayName ? (
-            <small id="profile-display-name-error" className={styles.fieldError}>
-              {fieldErrors.displayName}
-            </small>
-          ) : null}
-        </label>
+      <form className={styles.profileDetailForm} onSubmit={handleSubmit}>
+        <details className={styles.profileDisclosure} open>
+          <summary>
+            <span><strong>Identity</strong><small>Name and username</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <label>
+              Display name
+              <input
+                value={form.displayName}
+                maxLength={60}
+                aria-invalid={Boolean(fieldErrors.displayName)}
+                aria-describedby={fieldErrors.displayName ? "profile-display-name-error" : undefined}
+                onChange={(event) => {
+                  setForm({ ...form, displayName: event.target.value });
+                  setFieldErrors((current) => ({ ...current, displayName: undefined }));
+                }}
+              />
+              {fieldErrors.displayName ? (
+                <small id="profile-display-name-error" className={styles.fieldError}>
+                  {fieldErrors.displayName}
+                </small>
+              ) : null}
+            </label>
 
-        <label>
-          Username <small>Optional, reserved for future shared collections</small>
-          <div className={styles.usernameField}>
-            <span>@</span>
-            <input
-              value={form.username}
-              maxLength={24}
-              autoCapitalize="none"
-              spellCheck={false}
-              aria-invalid={Boolean(fieldErrors.username)}
-              aria-describedby={fieldErrors.username ? "profile-username-error" : undefined}
-              onChange={(event) => {
-                setForm({ ...form, username: cleanUsername(event.target.value) });
-                setFieldErrors((current) => ({ ...current, username: undefined }));
-              }}
-            />
+            <label>
+              Username <small>Used as your lightweight Venture identity</small>
+              <div className={styles.usernameField}>
+                <span>@</span>
+                <input
+                  value={form.username}
+                  maxLength={24}
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  aria-invalid={Boolean(fieldErrors.username)}
+                  aria-describedby={fieldErrors.username ? "profile-username-error" : undefined}
+                  onChange={(event) => {
+                    setForm({ ...form, username: cleanUsername(event.target.value) });
+                    setFieldErrors((current) => ({ ...current, username: undefined }));
+                  }}
+                />
+              </div>
+              {fieldErrors.username ? (
+                <small id="profile-username-error" className={styles.fieldError}>
+                  {fieldErrors.username}
+                </small>
+              ) : null}
+            </label>
           </div>
-          {fieldErrors.username ? (
-            <small id="profile-username-error" className={styles.fieldError}>
-              {fieldErrors.username}
+        </details>
+
+        <details className={styles.profileDisclosure} open>
+          <summary>
+            <span><strong>A little about you</strong><small>Bio and home neighbourhood</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <label>
+              Short bio <small>{form.bio.length}/180</small>
+              <textarea
+                value={form.bio}
+                maxLength={180}
+                rows={4}
+                placeholder="I am usually looking for good food, music, and something I have not tried yet."
+                onChange={(event) => setForm({ ...form, bio: event.target.value })}
+              />
+            </label>
+
+            <label>
+              Home neighbourhood
+              <select
+                value={form.homeNeighbourhood}
+                onChange={(event) => setForm({ ...form, homeNeighbourhood: event.target.value })}
+              >
+                <option value="">Anywhere in Winnipeg</option>
+                {WINNIPEG_NEIGHBOURHOODS.map((neighbourhood) => (
+                  <option key={neighbourhood} value={neighbourhood}>{neighbourhood}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </details>
+
+        <div className={styles.groupIdentityNote}>
+          <span aria-hidden="true">👥</span>
+          <div>
+            <strong>Shared group plans stay intentional</strong>
+            <small>
+              Your Venture profile stays private. When you deliberately join a shared group itinerary,
+              Venture can show your display name and avatar inside that plan so friends know who is in.
             </small>
-          ) : null}
-        </label>
-
-        <label>
-          Short bio <small>{form.bio.length}/180</small>
-          <textarea
-            value={form.bio}
-            maxLength={180}
-            rows={4}
-            placeholder="What kind of Winnipeg adventures do you enjoy?"
-            onChange={(event) => setForm({ ...form, bio: event.target.value })}
-          />
-        </label>
-
-        <label>
-          Home neighbourhood
-          <select
-            value={form.homeNeighbourhood}
-            onChange={(event) => setForm({ ...form, homeNeighbourhood: event.target.value })}
-          >
-            <option value="">Anywhere in Winnipeg</option>
-            {WINNIPEG_NEIGHBOURHOODS.map((neighbourhood) => (
-              <option key={neighbourhood} value={neighbourhood}>{neighbourhood}</option>
-            ))}
-          </select>
-        </label>
-
-        <div className={styles.privacyBox}>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
-          <span><strong>Private profile</strong><small>Your bio, preferences, saves, and history are not shown to other users.</small></span>
+          </div>
         </div>
 
         <button type="submit" className={styles.primaryButton} disabled={saving}>
-          {saving ? "SavingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Save profile"}
+          {saving ? "Saving…" : "Save about me"}
         </button>
 
         {message ? <p className={styles.formMessage} role="status">{message}</p> : null}
@@ -613,7 +667,7 @@ export function ProfilePreferencesEditor() {
         displayName: result.profile.displayName,
         preferences: result.preferences
       });
-      setMessage("Preferences saved and ready for recommendations.");
+      setMessage("Your Venture vibe is saved.");
     } catch (caught) {
       setMessage(caught instanceof Error ? caught.message : "Venture could not save these preferences.");
     } finally {
@@ -621,91 +675,138 @@ export function ProfilePreferencesEditor() {
     }
   }
 
+  const vibePreview = Array.from(new Set([
+    ...form.interests,
+    ...form.outingStyles,
+    ...form.cuisines
+  ])).slice(0, 6);
+
   return (
     <>
       <ProfilePageHeader
-        eyebrow="PERSONALIZATION"
-        title="Tune the compass, not the whole city."
-        description="These choices influence ranking and defaults without hiding everything else."
+        eyebrow="MY VIBE"
+        title="Tell Venture what tends to hit."
+        description="Open only the section you want. These are defaults, not rules."
       />
 
-      <section className={styles.formCard}>
-        <PreferenceSection title="Interests" description="What do you usually want Venture to surface first?">
-          <OptionChips options={INTEREST_OPTIONS} selected={form.interests} onToggle={(value) => toggle("interests", value)} />
-        </PreferenceSection>
+      <section className={styles.vibePreviewCard}>
+        <span>YOUR CURRENT MIX</span>
+        <h2>{vibePreview.length > 0 ? "A few things Venture knows about you" : "Your vibe is wide open"}</h2>
+        {vibePreview.length > 0 ? (
+          <div className={styles.vibePreviewChips}>
+            {vibePreview.map((item) => <span key={item}>{item}</span>)}
+          </div>
+        ) : (
+          <p>Pick a few things below and recommendations can start closer to your taste.</p>
+        )}
+      </section>
 
-        <PreferenceSection title="Cuisines" description="Helpful for food picks and mixed outing routes.">
-          <OptionChips options={CUISINE_OPTIONS} selected={form.cuisines} onToggle={(value) => toggle("cuisines", value)} />
-        </PreferenceSection>
+      <section className={styles.vibeAccordion}>
+        <details className={styles.profileDisclosure} open>
+          <summary>
+            <span><strong>What I am into</strong><small>Interests and outing styles</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <PreferenceSection title="Interests" description="What should Venture surface first?">
+              <OptionChips options={INTEREST_OPTIONS} selected={form.interests} onToggle={(value) => toggle("interests", value)} />
+            </PreferenceSection>
+            <PreferenceSection title="Outing styles" description="The plans you make most often.">
+              <OptionChips options={OUTING_STYLE_OPTIONS} selected={form.outingStyles} onToggle={(value) => toggle("outingStyles", value)} />
+            </PreferenceSection>
+          </div>
+        </details>
 
-        <PreferenceSection title="Dietary needs" description="Only choose needs that should affect recommendations.">
-          <OptionChips options={DIETARY_OPTIONS} selected={form.dietaryNeeds} onToggle={(value) => toggle("dietaryNeeds", value)} />
-        </PreferenceSection>
+        <details className={styles.profileDisclosure}>
+          <summary>
+            <span><strong>Food & practical needs</strong><small>Cuisine, dietary, and accessibility</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <PreferenceSection title="Cuisines" description="Useful for food picks and mixed routes.">
+              <OptionChips options={CUISINE_OPTIONS} selected={form.cuisines} onToggle={(value) => toggle("cuisines", value)} />
+            </PreferenceSection>
+            <PreferenceSection title="Dietary needs" description="Only needs that should affect recommendations.">
+              <OptionChips options={DIETARY_OPTIONS} selected={form.dietaryNeeds} onToggle={(value) => toggle("dietaryNeeds", value)} />
+            </PreferenceSection>
+            <PreferenceSection title="Accessibility" description="Prioritize listings with matching confirmed details.">
+              <OptionChips options={ACCESSIBILITY_OPTIONS} selected={form.accessibilityNeeds} onToggle={(value) => toggle("accessibilityNeeds", value)} />
+            </PreferenceSection>
+          </div>
+        </details>
 
-        <PreferenceSection title="Accessibility" description="Venture will prioritize listings with matching confirmed details.">
-          <OptionChips options={ACCESSIBILITY_OPTIONS} selected={form.accessibilityNeeds} onToggle={(value) => toggle("accessibilityNeeds", value)} />
-        </PreferenceSection>
+        <details className={styles.profileDisclosure}>
+          <summary>
+            <span><strong>Where & how I go out</strong><small>Neighbourhood, budget, transport, and group size</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <label>
+              Preferred neighbourhoods
+              <select
+                value=""
+                onChange={(event) => {
+                  if (event.target.value) {
+                    toggle("preferredNeighbourhoods", event.target.value);
+                  }
+                }}
+              >
+                <option value="">Add a neighbourhood</option>
+                {WINNIPEG_NEIGHBOURHOODS.filter((item) => !form.preferredNeighbourhoods.includes(item)).map((item) => (
+                  <option key={item} value={item}>{item}</option>
+                ))}
+              </select>
+            </label>
+            {form.preferredNeighbourhoods.length > 0 ? (
+              <OptionChips options={form.preferredNeighbourhoods} selected={form.preferredNeighbourhoods} onToggle={(value) => toggle("preferredNeighbourhoods", value)} />
+            ) : null}
 
-        <PreferenceSection title="Outing styles" description="The kinds of plans you make most often.">
-          <OptionChips options={OUTING_STYLE_OPTIONS} selected={form.outingStyles} onToggle={(value) => toggle("outingStyles", value)} />
-        </PreferenceSection>
+            <div className={styles.twoColumnFields}>
+              <label>
+                Usual budget
+                <select value={form.defaultBudget} onChange={(event) => setForm({ ...form, defaultBudget: event.target.value as VentureUserPreferences["defaultBudget"] })}>
+                  <option value="free">Free first</option>
+                  <option value="under-40">Usually under $40</option>
+                  <option value="under-80">Usually under $80 for two</option>
+                  <option value="flexible">Flexible</option>
+                </select>
+              </label>
+              <label>
+                Usual transport
+                <select value={form.defaultTransport} onChange={(event) => setForm({ ...form, defaultTransport: event.target.value as VentureUserPreferences["defaultTransport"] })}>
+                  <option value="any">Any</option>
+                  <option value="walk">Walk</option>
+                  <option value="transit">Transit</option>
+                  <option value="bike">Bike</option>
+                  <option value="drive">Drive</option>
+                  <option value="rideshare">Rideshare</option>
+                </select>
+              </label>
+            </div>
 
-        <label>
-          Preferred neighbourhoods
-          <select
-            value=""
-            onChange={(event) => {
-              if (event.target.value) {
-                toggle("preferredNeighbourhoods", event.target.value);
-              }
-            }}
-          >
-            <option value="">Add a neighbourhood</option>
-            {WINNIPEG_NEIGHBOURHOODS.filter((item) => !form.preferredNeighbourhoods.includes(item)).map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-          </select>
-        </label>
-        {form.preferredNeighbourhoods.length > 0 ? (
-          <OptionChips options={form.preferredNeighbourhoods} selected={form.preferredNeighbourhoods} onToggle={(value) => toggle("preferredNeighbourhoods", value)} />
-        ) : null}
+            <label>
+              Typical group size
+              <input type="number" min={1} max={20} value={form.defaultGroupSize} onChange={(event) => setForm({ ...form, defaultGroupSize: Math.max(1, Math.min(20, Number(event.target.value) || 1)) })} />
+            </label>
+          </div>
+        </details>
 
-        <div className={styles.twoColumnFields}>
-          <label>
-            Usual budget
-            <select value={form.defaultBudget} onChange={(event) => setForm({ ...form, defaultBudget: event.target.value as VentureUserPreferences["defaultBudget"] })}>
-              <option value="free">Free first</option>
-              <option value="under-40">Usually under $40</option>
-              <option value="under-80">Usually under $80 for two</option>
-              <option value="flexible">Flexible</option>
-            </select>
-          </label>
-          <label>
-            Usual transport
-            <select value={form.defaultTransport} onChange={(event) => setForm({ ...form, defaultTransport: event.target.value as VentureUserPreferences["defaultTransport"] })}>
-              <option value="any">Any</option>
-              <option value="walk">Walk</option>
-              <option value="transit">Transit</option>
-              <option value="bike">Bike</option>
-              <option value="drive">Drive</option>
-              <option value="rideshare">Rideshare</option>
-            </select>
-          </label>
-        </div>
-
-        <label>
-          Typical group size
-          <input type="number" min={1} max={20} value={form.defaultGroupSize} onChange={(event) => setForm({ ...form, defaultGroupSize: Math.max(1, Math.min(20, Number(event.target.value) || 1)) })} />
-        </label>
-
-        <ToggleRow label="Prefer alcohol-free options" description="Prioritize plans that do not depend on drinking." checked={form.alcoholFree} onChange={(checked) => setForm({ ...form, alcoholFree: checked })} />
-        <ToggleRow label="Free events" description="Give free activities a little more weight." checked={form.likesFreeEvents} onChange={(checked) => setForm({ ...form, likesFreeEvents: checked })} />
-        <ToggleRow label="Nightlife" description="Include later hours, bars, and dance options." checked={form.likesNightlife} onChange={(checked) => setForm({ ...form, likesNightlife: checked })} />
-        <ToggleRow label="Outdoor plans" description="Surface parks, walks, markets, and seasonal activities." checked={form.likesOutdoors} onChange={(checked) => setForm({ ...form, likesOutdoors: checked })} />
-        <ToggleRow label="Date ideas" description="Prioritize places and combinations suited to dates." checked={form.likesDateIdeas} onChange={(checked) => setForm({ ...form, likesDateIdeas: checked })} />
+        <details className={styles.profileDisclosure}>
+          <summary>
+            <span><strong>Little preferences</strong><small>Small signals that help ranking</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <ToggleRow label="Prefer alcohol-free options" description="Prioritize plans that do not depend on drinking." checked={form.alcoholFree} onChange={(checked) => setForm({ ...form, alcoholFree: checked })} />
+            <ToggleRow label="Free events" description="Give free activities a little more weight." checked={form.likesFreeEvents} onChange={(checked) => setForm({ ...form, likesFreeEvents: checked })} />
+            <ToggleRow label="Nightlife" description="Include later hours, bars, and dance options." checked={form.likesNightlife} onChange={(checked) => setForm({ ...form, likesNightlife: checked })} />
+            <ToggleRow label="Outdoor plans" description="Surface parks, walks, markets, and seasonal activities." checked={form.likesOutdoors} onChange={(checked) => setForm({ ...form, likesOutdoors: checked })} />
+            <ToggleRow label="Date ideas" description="Prioritize combinations suited to dates." checked={form.likesDateIdeas} onChange={(checked) => setForm({ ...form, likesDateIdeas: checked })} />
+          </div>
+        </details>
 
         <button type="button" className={styles.primaryButton} disabled={saving} onClick={handleSave}>
-          {saving ? "SavingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Save preferences"}
+          {saving ? "Saving…" : "Save my vibe"}
         </button>
         {message ? <p className={styles.formMessage} role="status">{message}</p> : null}
       </section>
@@ -839,7 +940,7 @@ export function ProfileSettings() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: payload.profile.displayName.split(/\s+/)[0] || "Venture reader",
+          firstName: payload.profile.displayName.split(/\\s+/)[0] || "Venture reader",
           email: newsletterEmail,
           consent: true,
           source: "profile-settings",
@@ -906,7 +1007,7 @@ export function ProfileSettings() {
       });
       const result = await response.json() as { error?: string };
       if (!response.ok) {
-        throw new Error(result.error || "Venture could not delete the account.");
+        throw new Error(result.error || "Venture could not delete the profile.");
       }
       const supabase = getSupabaseBrowserClient();
       await supabase.auth.signOut({ scope: "local" });
@@ -914,7 +1015,7 @@ export function ProfileSettings() {
       router.push("/?account=deleted");
       router.refresh();
     } catch (caught) {
-      setMessage(caught instanceof Error ? caught.message : "Venture could not delete the account.");
+      setMessage(caught instanceof Error ? caught.message : "Venture could not delete the profile.");
       setWorking("");
     }
   }
@@ -928,67 +1029,95 @@ export function ProfileSettings() {
   return (
     <>
       <ProfilePageHeader
-        eyebrow="ACCOUNT + PRIVACY"
-        title="Your account, under your control."
-        description="Venture keeps profile details private and gives you direct export and deletion controls."
+        eyebrow="ACCOUNT & PRIVACY"
+        title="The practical stuff, tucked away."
+        description="Open a section only when you need it."
       />
 
-      <section className={styles.settingsCard}>
-        <span className={styles.sectionEyebrow}>EMAIL ACCOUNT</span>
-        <h2>Sign-in email</h2>
-        <label>
-          Email address
-          <input value={email} type="email" onChange={(event) => setEmail(event.target.value)} />
-        </label>
-        <button type="button" className={styles.secondaryButton} disabled={working === "email"} onClick={updateEmail}>
-          {working === "email" ? "Starting changeÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Change email"}
-        </button>
-      </section>
+      <section className={styles.settingsAccordion}>
+        <details className={styles.profileDisclosure} open>
+          <summary>
+            <span><strong>Sign-in & email</strong><small>Your Venture account access</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <label>
+              Email address
+              <input value={email} type="email" onChange={(event) => setEmail(event.target.value)} />
+            </label>
+            <p className={styles.settingsHint}>
+              Google sign-in is simply a way into this Venture account. Changing or deleting Venture does not delete your Google account.
+            </p>
+            <button type="button" className={styles.secondaryButton} disabled={working === "email"} onClick={updateEmail}>
+              {working === "email" ? "Starting change…" : "Change email"}
+            </button>
+          </div>
+        </details>
 
-      <section className={styles.settingsCard}>
-        <span className={styles.sectionEyebrow}>NOTIFICATIONS</span>
-        <h2>Useful nudges only</h2>
-        <ToggleRow label="Weekend digest" description="A compact in-app weekend roundup when available." checked={notifications.weekendDigest} onChange={(checked) => setNotifications({ ...notifications, weekendDigest: checked })} />
-        <ToggleRow label="Saved event reminders" description="Remind you before events you deliberately saved." checked={notifications.savedEventReminders} onChange={(checked) => setNotifications({ ...notifications, savedEventReminders: checked })} />
-        <ToggleRow label="Outing reminders" description="A reminder before a saved outing starts." checked={notifications.outingReminders} onChange={(checked) => setNotifications({ ...notifications, outingReminders: checked })} />
-        <ToggleRow label="Product updates" description="Occasional changes to Venture itself." checked={notifications.productUpdates} onChange={(checked) => setNotifications({ ...notifications, productUpdates: checked })} />
-        <button type="button" className={styles.primaryButton} disabled={working === "notifications"} onClick={saveNotifications}>
-          {working === "notifications" ? "SavingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Save notifications"}
-        </button>
-      </section>
+        <details className={styles.profileDisclosure}>
+          <summary>
+            <span><strong>Notifications</strong><small>Only the nudges you actually want</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <ToggleRow label="Weekend digest" description="A compact in-app weekend roundup when available." checked={notifications.weekendDigest} onChange={(checked) => setNotifications({ ...notifications, weekendDigest: checked })} />
+            <ToggleRow label="Saved event reminders" description="Remind you before events you deliberately saved." checked={notifications.savedEventReminders} onChange={(checked) => setNotifications({ ...notifications, savedEventReminders: checked })} />
+            <ToggleRow label="Outing reminders" description="A reminder before a saved outing starts." checked={notifications.outingReminders} onChange={(checked) => setNotifications({ ...notifications, outingReminders: checked })} />
+            <ToggleRow label="Product updates" description="Occasional changes to Venture itself." checked={notifications.productUpdates} onChange={(checked) => setNotifications({ ...notifications, productUpdates: checked })} />
+            <button type="button" className={styles.primaryButton} disabled={working === "notifications"} onClick={saveNotifications}>
+              {working === "notifications" ? "Saving…" : "Save notifications"}
+            </button>
+          </div>
+        </details>
 
-      <section className={styles.settingsCard}>
-        <span className={styles.sectionEyebrow}>NEWSLETTER</span>
-        <h2>The Thursday Venture</h2>
-        <p>Status: <strong>{notifications.newsletterStatus.replace("-", " ")}</strong></p>
-        <button type="button" className={notifications.newsletterActive ? styles.secondaryButton : styles.primaryButton} disabled={working === "newsletter"} onClick={newsletterAction.action}>
-          {working === "newsletter" ? "UpdatingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : newsletterAction.label}
-        </button>
-      </section>
+        <details className={styles.profileDisclosure}>
+          <summary>
+            <span><strong>The Thursday Venture</strong><small>Newsletter status: {notifications.newsletterStatus.replace("-", " ")}</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <p>Winnipeg picks in your inbox, only when you have opted in.</p>
+            <button type="button" className={notifications.newsletterActive ? styles.secondaryButton : styles.primaryButton} disabled={working === "newsletter"} onClick={newsletterAction.action}>
+              {working === "newsletter" ? "Updating…" : newsletterAction.label}
+            </button>
+          </div>
+        </details>
 
-      <section className={styles.settingsCard}>
-        <span className={styles.sectionEyebrow}>YOUR DATA</span>
-        <h2>Export or sign out</h2>
-        <a className={styles.secondaryButton} href="/api/profile/export">Download my Venture data</a>
-        <button type="button" className={styles.secondaryButton} disabled={working === "signout"} onClick={signOutEverywhere}>
-          {working === "signout" ? "Signing outÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Sign out on every device"}
-        </button>
-      </section>
+        <details className={styles.profileDisclosure}>
+          <summary>
+            <span><strong>My data & sessions</strong><small>Export or sign out everywhere</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <a className={styles.secondaryButton} href="/api/profile/export">Download my Venture data</a>
+            <button type="button" className={styles.secondaryButton} disabled={working === "signout"} onClick={signOutEverywhere}>
+              {working === "signout" ? "Signing out…" : "Sign out on every device"}
+            </button>
+          </div>
+        </details>
 
-      <section className={styles.dangerCard}>
-        <span className={styles.sectionEyebrow}>DANGER ZONE</span>
-        <h2>Delete Venture account</h2>
-        <p>
-          This permanently deletes your profile, preferences, synced saves,
-          outings, visit history, and avatar. Newsletter delivery is stopped.
-        </p>
-        <label>
-          Type DELETE
-          <input value={deleteText} autoComplete="off" onChange={(event) => setDeleteText(event.target.value)} />
-        </label>
-        <button type="button" className={styles.dangerButton} disabled={working === "delete" || deleteText !== "DELETE"} onClick={deleteAccount}>
-          {working === "delete" ? "Deleting safelyÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Delete account permanently"}
-        </button>
+        <details className={`${styles.profileDisclosure} ${styles.deleteDisclosure}`}>
+          <summary>
+            <span><strong>Delete my Venture profile</strong><small>Permanent account deletion</small></span>
+            <b aria-hidden="true">+</b>
+          </summary>
+          <div className={styles.disclosureBody}>
+            <div className={styles.deleteWarning}>
+              <strong>This cannot be undone.</strong>
+              <p>
+                Venture will remove your profile, preferences, synced saves, visit history, avatar,
+                and shared group itineraries you host. Newsletter delivery is stopped. Your Google account itself is untouched.
+              </p>
+            </div>
+            <label>
+              Type DELETE to confirm
+              <input value={deleteText} autoComplete="off" onChange={(event) => setDeleteText(event.target.value)} />
+            </label>
+            <button type="button" className={styles.dangerButton} disabled={working === "delete" || deleteText !== "DELETE"} onClick={deleteAccount}>
+              {working === "delete" ? "Deleting profile…" : "Delete my Venture profile permanently"}
+            </button>
+          </div>
+        </details>
       </section>
 
       {message ? <p className={styles.globalMessage} role="status">{message}</p> : null}

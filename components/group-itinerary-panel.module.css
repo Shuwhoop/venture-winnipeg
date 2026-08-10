@@ -1,0 +1,327 @@
+.panel {
+  display: grid;
+  gap: 16px;
+  margin: 20px 0;
+  padding: 18px;
+  border: 2px solid #211d24;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 92% 6%, rgba(255, 202, 5, 0.42), transparent 25%),
+    linear-gradient(145deg, #fff9df, #fff);
+  box-shadow: 7px 8px 0 rgba(33, 29, 36, 0.08);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.header > div {
+  display: grid;
+  gap: 5px;
+}
+
+.eyebrow,
+.voteSection header > span {
+  color: #d81318;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.header h2,
+.voteSection h3 {
+  margin: 0;
+  color: #211d24;
+}
+
+.header h2 {
+  font-size: clamp(1.25rem, 4.5vw, 1.85rem);
+}
+
+.header p,
+.panel > p {
+  margin: 0;
+  color: rgba(33, 29, 36, 0.66);
+  line-height: 1.45;
+}
+
+.inviteButton,
+.joinActions button,
+.rsvpRow button,
+.panel > button {
+  min-height: 42px;
+  padding: 9px 13px;
+  border: 2px solid #211d24;
+  border-radius: 14px;
+  background: #ffca05;
+  color: #211d24;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #211d24;
+}
+
+.peopleRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+
+.avatarStack {
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+}
+
+.avatar,
+.avatarMore {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  overflow: hidden;
+  margin-left: -7px;
+  border: 2px solid #211d24;
+  border-radius: 50%;
+  background: #fff;
+  color: #211d24;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarMore {
+  background: #7843ad;
+  color: white;
+}
+
+.attendance {
+  display: flex;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: rgba(33, 29, 36, 0.64);
+}
+
+.attendance strong {
+  color: #d81318;
+}
+
+.memberNames {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.memberNames span {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(120, 67, 173, 0.1);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.emptyPeople {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+}
+
+.joinCard {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid rgba(33, 29, 36, 0.24);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.joinCard > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.joinCard small {
+  color: rgba(33, 29, 36, 0.62);
+  line-height: 1.35;
+}
+
+.joinCard > a {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #211d24;
+  color: white;
+  text-decoration: none;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.joinActions,
+.rsvpRow > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.rsvpRow {
+  display: grid;
+  gap: 8px;
+  padding: 13px;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.rsvpRow > span {
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.rsvpRow button {
+  min-height: 36px;
+  padding: 6px 10px;
+  border-width: 1px;
+  background: #fff;
+  box-shadow: none;
+  font-size: 0.76rem;
+}
+
+.rsvpRow .rsvpActive {
+  background: #ffca05;
+}
+
+.voteSection {
+  display: grid;
+  gap: 11px;
+  padding-top: 4px;
+}
+
+.voteSection header {
+  display: grid;
+  gap: 4px;
+}
+
+.stopVotes {
+  display: grid;
+  gap: 9px;
+}
+
+.stopVoteCard {
+  display: grid;
+  gap: 11px;
+  padding: 13px;
+  border: 1px solid rgba(33, 29, 36, 0.25);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.88);
+}
+
+.stopIdentity {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: center;
+}
+
+.stopIdentity > span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 10px;
+  background: #211d24;
+  color: white;
+  font-weight: 900;
+}
+
+.stopIdentity > div {
+  display: grid;
+  gap: 2px;
+}
+
+.stopIdentity small {
+  color: rgba(33, 29, 36, 0.58);
+}
+
+.voteButtons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.voteButtons button {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  align-items: center;
+  min-height: 38px;
+  padding: 7px 5px;
+  border: 1px solid rgba(33, 29, 36, 0.45);
+  border-radius: 12px;
+  background: #fff;
+  color: #211d24;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.voteButtons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.voteButtons .voteActive {
+  border-color: #211d24;
+  background: #ffca05;
+  box-shadow: 2px 2px 0 #211d24;
+}
+
+.voteButtons b {
+  color: #d81318;
+}
+
+.message {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff0ee;
+  color: #8d1519;
+  font-size: 0.82rem;
+}
+
+.loadingLine {
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #eee, #ffec9a, #eee);
+}
+
+@media (max-width: 620px) {
+  .header,
+  .joinCard {
+    grid-template-columns: 1fr;
+  }
+
+  .inviteButton,
+  .joinCard > a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .peopleRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .voteButtons {
+    grid-template-columns: 1fr;
+  }
+}

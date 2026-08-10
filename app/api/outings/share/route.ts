@@ -8,6 +8,10 @@ import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
 
+import {
+  getSupabaseServerClient
+} from "@/lib/supabase/server";
+
 import type {
   GeneratedOutingPlan
 } from "@/lib/saved-outings";
@@ -344,6 +348,56 @@ export async function POST(
     const supabase =
       getSupabaseAdminClient();
 
+    let ownerId: string | null = null;
+    let generatedPlan: Record<string, unknown> = plan;
+
+    try {
+      const auth = await getSupabaseServerClient();
+      const authResult = await auth.auth.getUser();
+      const user = authResult.data.user;
+
+      if (user) {
+        ownerId = user.id;
+
+        if (draft.planningMode === "group") {
+          const profileResult = await supabase
+            .from("profiles")
+            .select("display_name, avatar_path")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          const displayName =
+            typeof profileResult.data?.display_name === "string"
+              ? profileResult.data.display_name.trim().slice(0, 60)
+              : "";
+
+          generatedPlan = {
+            ...plan,
+            collaboration: {
+              version: 1,
+              members: [{
+                userId: user.id,
+                displayName:
+                  displayName ||
+                  user.email?.split("@")[0] ||
+                  "Venture host",
+                avatarPath:
+                  typeof profileResult.data?.avatar_path === "string"
+                    ? profileResult.data.avatar_path
+                    : null,
+                role: "host",
+                rsvp: "going",
+                joinedAt: new Date().toISOString()
+              }],
+              votes: []
+            }
+          };
+        }
+      }
+    } catch {
+      /* Guest sharing remains available. */
+    }
+
     const {
       data,
       error
@@ -351,7 +405,7 @@ export async function POST(
       await supabase
         .from("outings")
         .insert({
-          owner_id: null,
+          owner_id: ownerId,
 
           planning_mode:
             draft.planningMode,
@@ -380,7 +434,7 @@ export async function POST(
             draft,
 
           generated_plan:
-            plan,
+            generatedPlan,
 
           generator_version:
             "v1",

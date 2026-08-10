@@ -96,6 +96,15 @@ export async function POST(request: Request) {
       }
     }
 
+    const hostedOutingsResult = await admin
+      .from("outings")
+      .delete()
+      .eq("owner_id", user.id);
+
+    if (hostedOutingsResult.error) {
+      throw hostedOutingsResult.error;
+    }
+
     if (email) {
       const now = new Date().toISOString();
 

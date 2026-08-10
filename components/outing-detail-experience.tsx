@@ -23,6 +23,7 @@ type OutingDetailExperienceProps = {
   backHref?: string;
   backLabel?: string;
   actions?: ReactNode;
+  collaboration?: ReactNode;
 };
 
 function formatPlanDate(
@@ -130,7 +131,8 @@ export function OutingDetailExperience({
   intro,
   backHref,
   backLabel,
-  actions
+  actions,
+  collaboration
 }: OutingDetailExperienceProps) {
   const orderedStops =
     [...plan.stops].sort(
@@ -202,6 +204,8 @@ export function OutingDetailExperience({
             ))}
         </div>
       </header>
+
+      {collaboration}
 
       <OutingRouteMap plan={plan} />
 
