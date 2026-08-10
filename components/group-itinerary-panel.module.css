@@ -669,3 +669,373 @@
     align-items: start;
   }
 }
+
+
+/* Venture Group Experience V1.3 */
+
+.liveLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.liveBadge {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 4px 7px;
+  border: 1px solid rgba(33, 29, 36, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: rgba(33, 29, 36, 0.68);
+  font-size: 0.66rem;
+  font-weight: 850;
+}
+
+.liveBadge i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #3f9b68;
+  box-shadow: 0 0 0 3px rgba(63, 155, 104, 0.13);
+}
+
+.liveBadge small {
+  color: rgba(33, 29, 36, 0.48);
+  font: inherit;
+}
+
+.peopleDetails {
+  overflow: hidden;
+  border: 1px solid rgba(33, 29, 36, 0.17);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.peopleDetails summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 13px;
+  cursor: pointer;
+  list-style: none;
+  color: #211d24;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.peopleDetails summary::-webkit-details-marker {
+  display: none;
+}
+
+.peopleDetails summary::after {
+  content: "+";
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  margin-left: auto;
+  border-radius: 8px;
+  background: rgba(120, 67, 173, 0.1);
+  color: #7843ad;
+  font-size: 1rem;
+}
+
+.peopleDetails[open] summary::after {
+  content: "−";
+}
+
+.peopleDetails summary small {
+  color: rgba(33, 29, 36, 0.5);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.memberGrid {
+  display: grid;
+  gap: 7px;
+  padding: 0 10px 10px;
+}
+
+.memberCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  padding: 9px 10px;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.memberAvatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(33, 29, 36, 0.18);
+  border-radius: 50%;
+  background: #fff9df;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.memberAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.memberCard > div {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.memberCard strong {
+  overflow: hidden;
+  color: #211d24;
+  font-size: 0.77rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberCard small {
+  color: rgba(33, 29, 36, 0.5);
+  font-size: 0.65rem;
+}
+
+.memberRsvp {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 5px 7px;
+  border-radius: 999px;
+  font-size: 0.64rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.memberRsvp b {
+  font-size: 0.7rem;
+}
+
+.memberGoing {
+  background: rgba(63, 155, 104, 0.12);
+  color: #23633f;
+}
+
+.memberMaybe {
+  background: rgba(255, 202, 5, 0.22);
+  color: #6d5500;
+}
+
+.memberOut {
+  background: rgba(216, 19, 24, 0.09);
+  color: #9a171b;
+}
+
+.planPulseCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 2px solid #211d24;
+  border-radius: 19px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(120, 67, 173, 0.13), transparent 28%),
+    #fff;
+}
+
+.pulseNumber {
+  display: flex;
+  align-items: baseline;
+  min-width: 58px;
+}
+
+.pulseNumber strong {
+  color: #d81318;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.pulseNumber span {
+  color: rgba(33, 29, 36, 0.46);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.pulseCopy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.pulseCopy > span {
+  color: #7843ad;
+  font-size: 0.61rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.pulseCopy > strong {
+  color: #211d24;
+  font-size: 0.84rem;
+}
+
+.pulseCopy > small {
+  color: rgba(33, 29, 36, 0.55);
+  font-size: 0.68rem;
+}
+
+.pulseTrack {
+  height: 6px;
+  overflow: hidden;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: rgba(33, 29, 36, 0.08);
+}
+
+.pulseTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7843ad, #ffca05);
+  transition: width 220ms ease;
+}
+
+.pulseAlert,
+.pulseReady,
+.pulseNeutral {
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 0.64rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.pulseAlert {
+  background: rgba(216, 19, 24, 0.09);
+  color: #a0161b;
+}
+
+.pulseReady {
+  background: rgba(63, 155, 104, 0.12);
+  color: #23633f;
+}
+
+.pulseNeutral {
+  background: rgba(120, 67, 173, 0.09);
+  color: #684091;
+}
+
+.stopVoteHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.verdict {
+  padding: 5px 7px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.verdictLove {
+  background: rgba(216, 19, 24, 0.09);
+  color: #a0161b;
+}
+
+.verdictOkay {
+  background: rgba(63, 155, 104, 0.12);
+  color: #23633f;
+}
+
+.verdictSwap {
+  background: rgba(120, 67, 173, 0.11);
+  color: #684091;
+}
+
+.verdictWaiting {
+  background: rgba(33, 29, 36, 0.06);
+  color: rgba(33, 29, 36, 0.52);
+}
+
+.voteDistribution {
+  display: flex;
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(33, 29, 36, 0.06);
+}
+
+.voteDistribution > span {
+  display: block;
+  height: 100%;
+  transition: width 180ms ease;
+}
+
+.voteLoveBar {
+  background: #d81318;
+}
+
+.voteOkayBar {
+  background: #ffca05;
+}
+
+.voteSwapBar {
+  background: #7843ad;
+}
+
+.voteEmptyBar {
+  width: 100%;
+  background: rgba(33, 29, 36, 0.06);
+}
+
+@media (max-width: 620px) {
+  .planPulseCard {
+    grid-template-columns: auto 1fr;
+  }
+
+  .pulseAlert,
+  .pulseReady,
+  .pulseNeutral {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .stopVoteHeader {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  .attendance {
+    display: grid;
+    gap: 2px;
+  }
+
+  .memberCard {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .memberRsvp {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .stopVoteHeader {
+    display: grid;
+  }
+
+  .verdict {
+    justify-self: start;
+  }
+}

@@ -67,6 +67,48 @@ type GroupStop = {
   startTime: string;
 };
 
+type VoteCounts = {
+  love: number;
+  okay: number;
+  swap: number;
+};
+
+type StopVerdictTone = "love" | "okay" | "swap" | "waiting";
+
+function rsvpLabel(rsvp: Rsvp) {
+  if (rsvp === "going") return "Going";
+  if (rsvp === "maybe") return "Maybe";
+  return "Can't make it";
+}
+
+function rsvpIcon(rsvp: Rsvp) {
+  if (rsvp === "going") return "✓";
+  if (rsvp === "maybe") return "?";
+  return "×";
+}
+
+function stopVerdict(counts: VoteCounts): {
+  label: string;
+  tone: StopVerdictTone;
+} {
+  const positive = counts.love + counts.okay;
+  const total = positive + counts.swap;
+
+  if (total === 0) {
+    return { label: "Waiting on votes", tone: "waiting" };
+  }
+
+  if (counts.swap >= positive && counts.swap > 0) {
+    return { label: "Needs a rethink", tone: "swap" };
+  }
+
+  if (counts.love > 0 && counts.love >= counts.okay && counts.love >= counts.swap) {
+    return { label: "Group loves this", tone: "love" };
+  }
+
+  return { label: "Looks good", tone: "okay" };
+}
+
 function initials(name: string) {
   return name
     .split(/\s+/)
@@ -132,22 +174,44 @@ export function GroupItineraryPanel({
   const [working, setWorking] = useState("");
   const [copied, setCopied] = useState(false);
   const [confirmRemix, setConfirmRemix] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (silent = false) => {
     try {
       const response = await fetch(`/api/outings/${shareCode}/group`, { cache: "no-store" });
       const result = await response.json() as GroupState & { error?: string };
       if (!response.ok) throw new Error(result.error || "The group could not be loaded.");
       setState(result);
-      setStatus("ready");
+      setLastSyncedAt(new Date());
+      if (!silent) {
+        setStatus("ready");
+      }
     } catch (caught) {
-      setMessage(caught instanceof Error ? caught.message : "The group could not be loaded.");
-      setStatus("error");
+      if (!silent) {
+        setMessage(caught instanceof Error ? caught.message : "The group could not be loaded.");
+        setStatus("error");
+      }
     }
   }, [shareCode]);
 
   useEffect(() => {
     void load();
+
+    const refresh = () => {
+      if (document.visibilityState === "visible") {
+        void load(true);
+      }
+    };
+
+    const interval = window.setInterval(refresh, 15000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
   }, [load]);
 
   async function updateGroup(body: Record<string, unknown>, actionKey: string) {
@@ -206,6 +270,50 @@ export function GroupItineraryPanel({
     return counts;
   }, [state]);
 
+  const planPulse = useMemo(() => {
+    let approvedStops = 0;
+    let contestedStops = 0;
+    let totalReactions = 0;
+
+    for (const stop of stops) {
+      const counts = state?.voteSummary[stop.key] ?? { love: 0, okay: 0, swap: 0 };
+      const positive = counts.love + counts.okay;
+      totalReactions += positive + counts.swap;
+
+      if (positive > counts.swap && positive > 0) {
+        approvedStops += 1;
+      }
+
+      if (counts.swap >= positive && counts.swap > 0) {
+        contestedStops += 1;
+      }
+    }
+
+    const percent = stops.length > 0
+      ? Math.round((approvedStops / stops.length) * 100)
+      : 0;
+
+    let headline = "The route is waiting on the crew.";
+
+    if (contestedStops > 0) {
+      headline = `${contestedStops} ${contestedStops === 1 ? "stop needs" : "stops need"} another look.`;
+    } else if (stops.length > 0 && approvedStops === stops.length && rsvpCounts.going >= 2) {
+      headline = "The group is ready to roll.";
+    } else if (approvedStops > 0) {
+      headline = `${approvedStops} of ${stops.length} stops are feeling good.`;
+    } else if ((state?.members.length ?? 0) > 0) {
+      headline = "Everyone is in. Now give the stops a quick vote.";
+    }
+
+    return {
+      approvedStops,
+      contestedStops,
+      totalReactions,
+      percent,
+      headline
+    };
+  }, [rsvpCounts.going, state, stops]);
+
   if (status === "loading") {
     return (
       <section className={styles.panel} aria-busy="true">
@@ -232,9 +340,16 @@ export function GroupItineraryPanel({
     <section className={styles.panel} aria-labelledby="venture-group-title">
       <header className={styles.header}>
         <div>
-          <span className={styles.eyebrow}>GROUP PULSE</span>
-          <h2 id="venture-group-title">Plan together without starting a group chat spreadsheet.</h2>
-          <p>Join with Venture, RSVP, blend the group&apos;s vibe, and give each stop a quick vote.</p>
+          <div className={styles.liveLine}>
+            <span className={styles.eyebrow}>GROUP PULSE</span>
+            <span className={styles.liveBadge}>
+              <i aria-hidden="true" />
+              Live group
+              {lastSyncedAt ? <small>· synced</small> : null}
+            </span>
+          </div>
+          <h2 id="venture-group-title">Your crew, the plan, and the decisions in one place.</h2>
+          <p>RSVP, blend everyone&apos;s vibe, and settle each stop without digging through a group chat.</p>
         </div>
         <button type="button" className={styles.inviteButton} onClick={() => void shareInvite()}>
           {copied ? "Link copied" : "Invite friends"}
@@ -257,16 +372,70 @@ export function GroupItineraryPanel({
       </div>
 
       {state.members.length > 0 ? (
-        <div className={styles.memberNames}>
-          {state.members.slice(0, 8).map((member, index) => (
-            <span key={`${member.displayName}-name-${index}`}>
-              {member.displayName}{member.role === "host" ? " · host" : ""}
-            </span>
-          ))}
-        </div>
+        <details className={styles.peopleDetails}>
+          <summary>
+            <span>Who&apos;s in</span>
+            <small>{state.members.length} {state.members.length === 1 ? "person" : "people"}</small>
+          </summary>
+          <div className={styles.memberGrid}>
+            {state.members.map((member, index) => (
+              <div key={`${member.displayName}-member-${index}`} className={styles.memberCard}>
+                <span className={styles.memberAvatar}>
+                  {member.avatarUrl ? <img src={member.avatarUrl} alt="" /> : initials(member.displayName)}
+                </span>
+                <div>
+                  <strong>
+                    {member.displayName}
+                    {member.isViewer ? " · you" : ""}
+                  </strong>
+                  <small>{member.role === "host" ? "Host" : "Crew member"}</small>
+                </div>
+                <span
+                  className={`${styles.memberRsvp} ${
+                    member.rsvp === "going"
+                      ? styles.memberGoing
+                      : member.rsvp === "maybe"
+                        ? styles.memberMaybe
+                        : styles.memberOut
+                  }`}
+                  title={rsvpLabel(member.rsvp)}
+                >
+                  <b aria-hidden="true">{rsvpIcon(member.rsvp)}</b>
+                  {rsvpLabel(member.rsvp)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
       ) : (
         <p className={styles.emptyPeople}>No one has joined yet. The invite link is ready when the group is.</p>
       )}
+
+      <div className={styles.planPulseCard}>
+        <div className={styles.pulseNumber}>
+          <strong>{planPulse.approvedStops}</strong>
+          <span>/ {Math.max(1, stops.length)}</span>
+        </div>
+        <div className={styles.pulseCopy}>
+          <span>PLAN PULSE</span>
+          <strong>{planPulse.headline}</strong>
+          <small>
+            {planPulse.totalReactions === 0
+              ? "Votes will turn this into a quick group decision meter."
+              : `${planPulse.totalReactions} ${planPulse.totalReactions === 1 ? "reaction" : "reactions"} across the route.`}
+          </small>
+          <div className={styles.pulseTrack} aria-label={`${planPulse.percent}% of stops approved`}>
+            <span style={{ width: `${planPulse.percent}%` }} />
+          </div>
+        </div>
+        {planPulse.contestedStops > 0 ? (
+          <span className={styles.pulseAlert}>{planPulse.contestedStops} to revisit</span>
+        ) : planPulse.percent === 100 && stops.length > 0 ? (
+          <span className={styles.pulseReady}>Ready</span>
+        ) : (
+          <span className={styles.pulseNeutral}>Deciding</span>
+        )}
+      </div>
 
       {!state.viewer.authenticated ? (
         <div className={styles.joinCard}>
@@ -503,14 +672,31 @@ export function GroupItineraryPanel({
           {stops.map((stop) => {
             const counts = state.voteSummary[stop.key] ?? { love: 0, okay: 0, swap: 0 };
             const mine = state.viewer.myVotes[stop.key];
+            const verdict = stopVerdict(counts);
+            const totalVotes = counts.love + counts.okay + counts.swap;
             return (
               <article key={stop.key} className={styles.stopVoteCard}>
-                <div className={styles.stopIdentity}>
-                  <span>{stop.order}</span>
-                  <div>
-                    <strong>{stop.name}</strong>
-                    <small>{stop.startTime}</small>
+                <div className={styles.stopVoteHeader}>
+                  <div className={styles.stopIdentity}>
+                    <span>{stop.order}</span>
+                    <div>
+                      <strong>{stop.name}</strong>
+                      <small>{stop.startTime}</small>
+                    </div>
                   </div>
+                  <span
+                    className={`${styles.verdict} ${
+                      verdict.tone === "love"
+                        ? styles.verdictLove
+                        : verdict.tone === "okay"
+                          ? styles.verdictOkay
+                          : verdict.tone === "swap"
+                            ? styles.verdictSwap
+                            : styles.verdictWaiting
+                    }`}
+                  >
+                    {verdict.label}
+                  </span>
                 </div>
                 <div className={styles.voteButtons}>
                   {([
@@ -529,6 +715,29 @@ export function GroupItineraryPanel({
                       <b>{count}</b>
                     </button>
                   ))}
+                </div>
+                <div className={styles.voteDistribution} aria-label={`${totalVotes} votes on ${stop.name}`}>
+                  {totalVotes > 0 ? (
+                    <>
+                      <span
+                        className={styles.voteLoveBar}
+                        style={{ width: `${(counts.love / totalVotes) * 100}%` }}
+                        title={`${counts.love} love`}
+                      />
+                      <span
+                        className={styles.voteOkayBar}
+                        style={{ width: `${(counts.okay / totalVotes) * 100}%` }}
+                        title={`${counts.okay} fine`}
+                      />
+                      <span
+                        className={styles.voteSwapBar}
+                        style={{ width: `${(counts.swap / totalVotes) * 100}%` }}
+                        title={`${counts.swap} swap`}
+                      />
+                    </>
+                  ) : (
+                    <span className={styles.voteEmptyBar} />
+                  )}
                 </div>
               </article>
             );
