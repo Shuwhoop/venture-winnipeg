@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
 import {
+  protectMutationRequest,
+  unexpectedApiError
+} from "@/lib/api/production-protection";
+
+import {
   recordServerBetaEvent
 } from "@/lib/beta/server";
 
@@ -257,7 +262,7 @@ function getDurationMinutes(
   ) * 60;
 }
 
-export async function POST(
+async function handleGeneratedSharePost(
   request: Request
 ) {
   let rawBody: string;
@@ -469,19 +474,40 @@ export async function POST(
       }
     );
   } catch (error) {
-    console.error(
-      "Unexpected shared outing error:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        error:
-          "Venture could not create the share link."
-      },
-      {
-        status: 500
-      }
+    return unexpectedApiError(
+      "outing-generate-share",
+      request,
+      error,
+      "Venture could not create the share link."
     );
   }
-}   
+}
+
+export async function POST(
+  request: Request
+) {
+  const blocked = protectMutationRequest(
+    request,
+    {
+      scope: "outing-generate-share",
+      limit: 30,
+      windowMs: 10 * 60 * 1000,
+      maxBodyBytes: 250_000
+    }
+  );
+
+  if (blocked) {
+    return blocked;
+  }
+
+  try {
+    return await handleGeneratedSharePost(request);
+  } catch (error) {
+    return unexpectedApiError(
+      "outing-generate-share",
+      request,
+      error,
+      "Venture could not share this outing right now."
+    );
+  }
+}

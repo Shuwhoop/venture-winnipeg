@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 
 import {
+  protectMutationRequest,
+  readProtectedJson,
+  unexpectedApiError
+} from "@/lib/api/production-protection";
+
+import {
+  validateOutingMutationShape
+} from "@/lib/api/request-validation";
+
+import {
   recordServerBetaEvent
 } from "@/lib/beta/server";
 
@@ -2000,23 +2010,28 @@ function findSlotForListing(
   return null;
 }
 
-export async function POST(
+async function handleAddStopPost(
   request: Request
 ) {
-  let rawBody: unknown;
+  const bodyResult = await readProtectedJson(
+    request,
+    {
+      maxBodyBytes: 300_000,
+      invalidJsonMessage: "The add-stop request was not valid JSON."
+    }
+  );
 
-  try {
-    rawBody =
-      await request.json();
-  } catch {
+  if (!bodyResult.ok) {
+    return bodyResult.response;
+  }
+
+  const rawBody = bodyResult.value;
+  const requestShape = validateOutingMutationShape(rawBody);
+
+  if (!requestShape.ok) {
     return NextResponse.json(
-      {
-        error:
-          "The add-stop request was not valid JSON."
-      },
-      {
-        status: 400
-      }
+      { error: requestShape.error },
+      { status: 400 }
     );
   }
 
@@ -2500,4 +2515,33 @@ export async function POST(
     candidateCount:
       candidates.length
   });
+}
+
+export async function POST(
+  request: Request
+) {
+  const blocked = protectMutationRequest(
+    request,
+    {
+      scope: "outing-add-stop",
+      limit: 80,
+      windowMs: 10 * 60 * 1000,
+      maxBodyBytes: 300_000
+    }
+  );
+
+  if (blocked) {
+    return blocked;
+  }
+
+  try {
+    return await handleAddStopPost(request);
+  } catch (error) {
+    return unexpectedApiError(
+      "outing-add-stop",
+      request,
+      error,
+      "Venture could not add that stop right now."
+    );
+  }
 }

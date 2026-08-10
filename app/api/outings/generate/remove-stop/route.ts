@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 
 import {
+  protectMutationRequest,
+  readProtectedJson,
+  unexpectedApiError
+} from "@/lib/api/production-protection";
+
+import {
+  validateOutingMutationShape
+} from "@/lib/api/request-validation";
+
+import {
   recordServerBetaEvent
 } from "@/lib/beta/server";
 
@@ -181,19 +191,26 @@ function rebuildTravel(
   }));
 }
 
-export async function POST(request: Request) {
-  let body: unknown;
+async function handleRemoveStopPost(request: Request) {
+  const bodyResult = await readProtectedJson(
+    request,
+    {
+      maxBodyBytes: 300_000,
+      invalidJsonMessage: "The remove-stop request was not valid JSON."
+    }
+  );
 
-  try {
-    body = await request.json();
-  } catch {
+  if (!bodyResult.ok) {
+    return bodyResult.response;
+  }
+
+  const body = bodyResult.value;
+  const requestShape = validateOutingMutationShape(body);
+
+  if (!requestShape.ok) {
     return NextResponse.json(
-      {
-        error: "The remove-stop request was not valid JSON."
-      },
-      {
-        status: 400
-      }
+      { error: requestShape.error },
+      { status: 400 }
     );
   }
 
@@ -304,4 +321,33 @@ export async function POST(request: Request) {
     removedKind,
     removedListingName: removedStop.listing.name
   });
+}
+
+export async function POST(
+  request: Request
+) {
+  const blocked = protectMutationRequest(
+    request,
+    {
+      scope: "outing-remove-stop",
+      limit: 80,
+      windowMs: 10 * 60 * 1000,
+      maxBodyBytes: 300_000
+    }
+  );
+
+  if (blocked) {
+    return blocked;
+  }
+
+  try {
+    return await handleRemoveStopPost(request);
+  } catch (error) {
+    return unexpectedApiError(
+      "outing-remove-stop",
+      request,
+      error,
+      "Venture could not remove that stop right now."
+    );
+  }
 }

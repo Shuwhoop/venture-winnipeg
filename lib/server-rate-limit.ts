@@ -14,6 +14,7 @@ export type RateLimitResult = {
 };
 
 const entries = new Map<string, RateLimitEntry>();
+const MAX_RATE_LIMIT_ENTRIES = 10_000;
 let lastCleanupAt = 0;
 
 function cleanupExpiredEntries(now: number) {
@@ -31,14 +32,15 @@ function cleanupExpiredEntries(now: number) {
 }
 
 export function getRequestAddress(request: Request) {
-  return (
+  const address =
     request.headers
       .get("x-forwarded-for")
       ?.split(",")[0]
       ?.trim() ||
     request.headers.get("x-real-ip")?.trim() ||
-    "unknown"
-  );
+    "unknown";
+
+  return address.slice(0, 128);
 }
 
 export function isSameOriginRequest(request: Request) {
@@ -71,6 +73,24 @@ export function consumeRateLimit({
 
   if (!current || current.resetAt <= now) {
     const resetAt = now + windowMs;
+
+    if (entries.size >= MAX_RATE_LIMIT_ENTRIES) {
+      cleanupExpiredEntries(now);
+
+      if (entries.size >= MAX_RATE_LIMIT_ENTRIES) {
+        const overflow = Math.max(1, Math.ceil(MAX_RATE_LIMIT_ENTRIES * 0.1));
+        let removed = 0;
+
+        for (const entryKey of entries.keys()) {
+          entries.delete(entryKey);
+          removed += 1;
+
+          if (removed >= overflow) {
+            break;
+          }
+        }
+      }
+    }
 
     entries.set(key, {
       count: 1,

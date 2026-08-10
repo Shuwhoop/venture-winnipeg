@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 
 import {
+  protectMutationRequest,
+  readProtectedJson,
+  unexpectedApiError
+} from "@/lib/api/production-protection";
+
+import {
+  validateOutingMutationShape
+} from "@/lib/api/request-validation";
+
+import {
   recordServerBetaEvent
 } from "@/lib/beta/server";
 
@@ -1614,23 +1624,28 @@ function createReason(
   return "Fits the open time and travel window.";
 }
 
-export async function POST(
+async function handleReplaceStopPost(
   request: Request
 ) {
-  let rawBody: unknown;
+  const bodyResult = await readProtectedJson(
+    request,
+    {
+      maxBodyBytes: 300_000,
+      invalidJsonMessage: "The replacement request was not valid JSON."
+    }
+  );
 
-  try {
-    rawBody =
-      await request.json();
-  } catch {
+  if (!bodyResult.ok) {
+    return bodyResult.response;
+  }
+
+  const rawBody = bodyResult.value;
+  const requestShape = validateOutingMutationShape(rawBody);
+
+  if (!requestShape.ok) {
     return NextResponse.json(
-      {
-        error:
-          "The replacement request was not valid JSON."
-      },
-      {
-        status: 400
-      }
+      { error: requestShape.error },
+      { status: 400 }
     );
   }
 
@@ -2105,4 +2120,33 @@ export async function POST(
     candidateCount:
       candidates.length
   });
+}
+
+export async function POST(
+  request: Request
+) {
+  const blocked = protectMutationRequest(
+    request,
+    {
+      scope: "outing-replace-stop",
+      limit: 80,
+      windowMs: 10 * 60 * 1000,
+      maxBodyBytes: 300_000
+    }
+  );
+
+  if (blocked) {
+    return blocked;
+  }
+
+  try {
+    return await handleReplaceStopPost(request);
+  } catch (error) {
+    return unexpectedApiError(
+      "outing-replace-stop",
+      request,
+      error,
+      "Venture could not replace that stop right now."
+    );
+  }
 }

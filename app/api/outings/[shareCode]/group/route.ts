@@ -3,6 +3,16 @@ import {
 } from "next/server";
 
 import {
+  protectMutationRequest,
+  readProtectedJson,
+  unexpectedApiError
+} from "@/lib/api/production-protection";
+
+import {
+  validateGroupActionShape
+} from "@/lib/api/request-validation";
+
+import {
   requireProfileUser
 } from "@/lib/profile-server";
 import {
@@ -14,7 +24,6 @@ import {
 import {
   consumeRateLimit,
   getRequestAddress,
-  isSameOriginRequest,
   rateLimitHeaders
 } from "@/lib/server-rate-limit";
 
@@ -674,8 +683,19 @@ export async function POST(
   request: Request,
   context: RouteContext
 ) {
-  if (!isSameOriginRequest(request)) {
-    return NextResponse.json({ error: "This group update came from an untrusted origin." }, { status: 403 });
+  const blocked = protectMutationRequest(
+    request,
+    {
+      scope: "group-action-ip",
+      limit: 120,
+      windowMs: 60 * 60 * 1000,
+      maxBodyBytes: 32_000,
+      rateLimitMessage: "Too many group updates were sent from this connection. Try again shortly."
+    }
+  );
+
+  if (blocked) {
+    return blocked;
   }
 
   const { shareCode } = await context.params;
@@ -683,11 +703,24 @@ export async function POST(
     return NextResponse.json({ error: "That group plan link is not valid." }, { status: 400 });
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "The group update could not be read." }, { status: 400 });
+  const bodyResult = await readProtectedJson(
+    request,
+    {
+      maxBodyBytes: 32_000,
+      invalidJsonMessage: "The group update was not valid JSON.",
+      readErrorMessage: "The group update could not be read."
+    }
+  );
+
+  if (!bodyResult.ok) {
+    return bodyResult.response;
+  }
+
+  const body = bodyResult.value;
+  const actionShape = validateGroupActionShape(body);
+
+  if (!actionShape.ok) {
+    return NextResponse.json({ error: actionShape.error }, { status: 400 });
   }
 
   if (!isRecord(body) || typeof body.action !== "string") {
@@ -835,7 +868,7 @@ export async function POST(
 
       const remixLimit = consumeRateLimit({
         key: `group-remix:${shareCode}:${user.id}:${getRequestAddress(request)}`,
-        limit: 8,
+        limit: 6,
         windowMs: 60 * 60 * 1000
       });
 
@@ -916,7 +949,12 @@ export async function POST(
     if (error instanceof Error && error.message === "REMIX_GENERATOR_INVALID") {
       return NextResponse.json({ error: "Venture built a route, but it did not pass the shared-plan safety check." }, { status: 500 });
     }
-    console.error("Unable to update Venture group collaboration:", error);
-    return NextResponse.json({ error: "Venture could not update the group right now." }, { status: 500 });
+    return unexpectedApiError(
+      "group-collaboration",
+      request,
+      error,
+      "Venture could not update the group right now.",
+      { shareCode }
+    );
   }
 }

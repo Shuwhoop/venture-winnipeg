@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 
 import {
+  protectMutationRequest,
+  readProtectedJson,
+  unexpectedApiError
+} from "@/lib/api/production-protection";
+
+import {
+  validateGenerateOutingShape
+} from "@/lib/api/request-validation";
+
+import {
   recordServerBetaEvent
 } from "@/lib/beta/server";
 
@@ -3782,23 +3792,28 @@ function getPlanTitle(
   return `${draft.outingTypeTitle} in Winnipeg`;
 }
 
-export async function POST(
+async function handleGeneratePost(
   request: Request
 ) {
-  let rawBody: unknown;
+  const bodyResult = await readProtectedJson(
+    request,
+    {
+      maxBodyBytes: 256_000,
+      invalidJsonMessage: "The outing request was not valid JSON."
+    }
+  );
 
-  try {
-    rawBody =
-      await request.json();
-  } catch {
+  if (!bodyResult.ok) {
+    return bodyResult.response;
+  }
+
+  const rawBody = bodyResult.value;
+  const requestShape = validateGenerateOutingShape(rawBody);
+
+  if (!requestShape.ok) {
     return NextResponse.json(
-      {
-        error:
-          "The outing request was not valid JSON."
-      },
-      {
-        status: 400
-      }
+      { error: requestShape.error },
+      { status: 400 }
     );
   }
 
@@ -4287,4 +4302,34 @@ export async function POST(
     candidateCount:
       candidates.length
   });
+}
+
+export async function POST(
+  request: Request
+) {
+  const blocked = protectMutationRequest(
+    request,
+    {
+      scope: "outing-generate",
+      limit: 18,
+      windowMs: 10 * 60 * 1000,
+      maxBodyBytes: 256_000,
+      rateLimitMessage: "You have generated several outings quickly. Give Venture a moment before building another."
+    }
+  );
+
+  if (blocked) {
+    return blocked;
+  }
+
+  try {
+    return await handleGeneratePost(request);
+  } catch (error) {
+    return unexpectedApiError(
+      "outing-generate",
+      request,
+      error,
+      "Venture could not build this outing right now. Try again in a moment."
+    );
+  }
 }
