@@ -374,7 +374,7 @@ export async function POST(
           generatedPlan = {
             ...plan,
             collaboration: {
-              version: 1,
+              version: 2,
               members: [{
                 userId: user.id,
                 displayName:
@@ -389,7 +389,9 @@ export async function POST(
                 rsvp: "going",
                 joinedAt: new Date().toISOString()
               }],
-              votes: []
+              votes: [],
+              vibes: [],
+              lastBlendRemixAt: null
             }
           };
         }

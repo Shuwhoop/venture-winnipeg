@@ -27,6 +27,78 @@ type DeleteBody = {
   confirmation?: unknown;
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+async function scrubSharedGroupIdentity(
+  admin: ReturnType<typeof getSupabaseAdminClient>,
+  userId: string
+) {
+  const result = await admin
+    .from("outings")
+    .select("id, owner_id, generated_plan")
+    .eq("planning_mode", "group")
+    .eq("visibility", "shared")
+    .limit(500);
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  for (const row of result.data ?? []) {
+    if (row.owner_id === userId || !isRecord(row.generated_plan)) {
+      continue;
+    }
+
+    const collaboration = isRecord(row.generated_plan.collaboration)
+      ? row.generated_plan.collaboration
+      : null;
+
+    if (!collaboration) {
+      continue;
+    }
+
+    const members = Array.isArray(collaboration.members)
+      ? collaboration.members.filter((item) => !(isRecord(item) && item.userId === userId))
+      : [];
+    const votes = Array.isArray(collaboration.votes)
+      ? collaboration.votes.filter((item) => !(isRecord(item) && item.userId === userId))
+      : [];
+    const vibes = Array.isArray(collaboration.vibes)
+      ? collaboration.vibes.filter((item) => !(isRecord(item) && item.userId === userId))
+      : [];
+
+    const hadIdentity =
+      (Array.isArray(collaboration.members) && members.length !== collaboration.members.length) ||
+      (Array.isArray(collaboration.votes) && votes.length !== collaboration.votes.length) ||
+      (Array.isArray(collaboration.vibes) && vibes.length !== collaboration.vibes.length);
+
+    if (!hadIdentity) {
+      continue;
+    }
+
+    const updateResult = await admin
+      .from("outings")
+      .update({
+        generated_plan: {
+          ...row.generated_plan,
+          collaboration: {
+            ...collaboration,
+            members,
+            votes,
+            vibes
+          }
+        }
+      })
+      .eq("id", row.id);
+
+    if (updateResult.error) {
+      throw updateResult.error;
+    }
+  }
+}
+
 export async function POST(request: Request) {
   if (!isSameOriginRequest(request)) {
     return NextResponse.json(
@@ -95,6 +167,8 @@ export async function POST(request: Request) {
         throw removeResult.error;
       }
     }
+
+    await scrubSharedGroupIdentity(admin, user.id);
 
     const hostedOutingsResult = await admin
       .from("outings")

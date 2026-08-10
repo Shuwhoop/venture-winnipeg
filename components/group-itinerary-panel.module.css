@@ -24,7 +24,9 @@
 }
 
 .eyebrow,
-.voteSection header > span {
+.voteSection header > span,
+.blendHeading > span,
+.blendResultHeader span {
   color: #d81318;
   font-size: 0.68rem;
   font-weight: 900;
@@ -32,7 +34,8 @@
 }
 
 .header h2,
-.voteSection h3 {
+.voteSection h3,
+.blendHeading h3 {
   margin: 0;
   color: #211d24;
 }
@@ -42,7 +45,8 @@
 }
 
 .header p,
-.panel > p {
+.panel > p,
+.blendHeading p {
   margin: 0;
   color: rgba(33, 29, 36, 0.66);
   line-height: 1.45;
@@ -51,7 +55,10 @@
 .inviteButton,
 .joinActions button,
 .rsvpRow button,
-.panel > button {
+.panel > button,
+.blendConsentActions button,
+.remixButton,
+.remixConfirm button {
   min-height: 42px;
   padding: 9px 13px;
   border: 2px solid #211d24;
@@ -62,6 +69,16 @@
   font-weight: 900;
   cursor: pointer;
   box-shadow: 3px 3px 0 #211d24;
+}
+
+.inviteButton:disabled,
+.joinActions button:disabled,
+.rsvpRow button:disabled,
+.blendConsentActions button:disabled,
+.remixButton:disabled,
+.remixConfirm button:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .peopleRow {
@@ -157,7 +174,8 @@
   line-height: 1.35;
 }
 
-.joinCard > a {
+.joinCard > a,
+.blendCallout > a {
   padding: 10px 12px;
   border-radius: 12px;
   background: #211d24;
@@ -168,7 +186,9 @@
 }
 
 .joinActions,
-.rsvpRow > div {
+.rsvpRow > div,
+.blendConsentActions,
+.remixConfirm > div:last-child {
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
@@ -198,6 +218,309 @@
 
 .rsvpRow .rsvpActive {
   background: #ffca05;
+}
+
+.blendCard {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  overflow: hidden;
+  border: 2px solid #211d24;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 96% 4%, rgba(255, 202, 5, 0.72), transparent 22%),
+    radial-gradient(circle at 5% 100%, rgba(120, 67, 173, 0.18), transparent 32%),
+    #fff;
+  box-shadow: 5px 5px 0 rgba(33, 29, 36, 0.08);
+}
+
+.blendTop {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.blendIcon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 2px solid #211d24;
+  border-radius: 15px;
+  background: #7843ad;
+  color: white;
+  font-size: 1.35rem;
+  box-shadow: 3px 3px 0 #211d24;
+}
+
+.blendHeading {
+  display: grid;
+  gap: 4px;
+}
+
+.blendHeading h3 {
+  font-size: 1.12rem;
+}
+
+.blendHeading p {
+  max-width: 48ch;
+  font-size: 0.82rem;
+}
+
+.blendMeter {
+  display: grid;
+  min-width: 70px;
+  padding: 8px 10px;
+  border: 1px solid rgba(33, 29, 36, 0.2);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.82);
+  text-align: center;
+}
+
+.blendMeter strong {
+  color: #d81318;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.blendMeter span,
+.blendMeter small {
+  color: rgba(33, 29, 36, 0.62);
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.blendConsentRow,
+.remixArea,
+.blendCallout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 13px;
+  border-radius: 17px;
+  background: rgba(255, 248, 220, 0.72);
+}
+
+.blendConsentRow > div:first-child,
+.remixArea > div:first-child,
+.blendCallout {
+  gap: 3px;
+}
+
+.blendConsentRow strong,
+.remixArea strong,
+.blendWaiting strong,
+.privateNeeds strong,
+.blendResultHeader strong {
+  color: #211d24;
+}
+
+.blendConsentRow small,
+.remixArea small,
+.blendWaiting small,
+.privateNeeds small,
+.blendResultHeader small {
+  color: rgba(33, 29, 36, 0.62);
+  line-height: 1.4;
+}
+
+.blendConsentActions button,
+.remixConfirm button {
+  min-height: 38px;
+  padding: 7px 10px;
+  box-shadow: 2px 2px 0 #211d24;
+  font-size: 0.76rem;
+}
+
+.blendConsentActions .quietButton,
+.remixConfirm .quietButton {
+  border-color: rgba(33, 29, 36, 0.35);
+  background: #fff;
+  box-shadow: none;
+}
+
+.blendWaiting {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border: 1px dashed rgba(33, 29, 36, 0.34);
+  border-radius: 17px;
+  background: rgba(255,255,255,0.66);
+}
+
+.blendProgressTrack {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(33, 29, 36, 0.1);
+}
+
+.blendProgressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7843ad, #ffca05);
+  transition: width 180ms ease;
+}
+
+.blendResults {
+  display: grid;
+  gap: 12px;
+}
+
+.blendResultHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: end;
+}
+
+.blendResultHeader > div {
+  display: grid;
+  gap: 3px;
+}
+
+.blendRows {
+  display: grid;
+  gap: 8px;
+}
+
+.blendRow {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 9px;
+  align-items: start;
+}
+
+.blendRow > b {
+  padding-top: 5px;
+  color: rgba(33, 29, 36, 0.58);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.blendRow > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.blendChip,
+.blendEmptyChip {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 5px 8px;
+  border: 1px solid rgba(33, 29, 36, 0.16);
+  border-radius: 999px;
+  background: #fff;
+  color: #211d24;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.blendChip b {
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 999px;
+  background: #ffca05;
+  font-size: 0.62rem;
+}
+
+.blendEmptyChip {
+  color: rgba(33, 29, 36, 0.52);
+  font-weight: 700;
+}
+
+.blendFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.blendFacts span {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 7px 9px;
+  border-radius: 11px;
+  background: #211d24;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.blendFacts i {
+  color: #ffca05;
+  font-style: normal;
+  font-weight: 950;
+}
+
+.privateNeeds {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: start;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: rgba(120, 67, 173, 0.09);
+}
+
+.privateNeeds > div {
+  display: grid;
+  gap: 2px;
+}
+
+.remixArea {
+  border: 1px solid rgba(33, 29, 36, 0.18);
+  background: linear-gradient(120deg, rgba(255, 202, 5, 0.19), rgba(120, 67, 173, 0.08));
+}
+
+.remixArea > div:first-child {
+  display: grid;
+}
+
+.remixButton {
+  white-space: nowrap;
+}
+
+.remixConfirm {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.remixConfirm > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.memberBlendNote {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 13px;
+  background: rgba(255, 202, 5, 0.16);
+}
+
+.memberBlendNote span {
+  color: #7843ad;
+  font-weight: 900;
+}
+
+.memberBlendNote p {
+  margin: 0;
+  color: rgba(33, 29, 36, 0.66);
+  font-size: 0.76rem;
+  line-height: 1.4;
 }
 
 .voteSection {
@@ -306,22 +629,43 @@
 
 @media (max-width: 620px) {
   .header,
-  .joinCard {
+  .joinCard,
+  .blendConsentRow,
+  .remixArea,
+  .remixConfirm {
     grid-template-columns: 1fr;
   }
 
   .inviteButton,
-  .joinCard > a {
+  .joinCard > a,
+  .remixButton {
     width: 100%;
     text-align: center;
   }
 
   .peopleRow {
     align-items: flex-start;
-    flex-direction: column;
   }
 
-  .voteButtons {
+  .blendTop {
+    grid-template-columns: auto 1fr;
+  }
+
+  .blendMeter {
+    grid-column: 1 / -1;
+    grid-template-columns: auto auto 1fr;
+    gap: 4px;
+    align-items: baseline;
+    text-align: left;
+  }
+
+  .blendRow {
     grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .blendResultHeader {
+    display: grid;
+    align-items: start;
   }
 }

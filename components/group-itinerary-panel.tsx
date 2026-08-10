@@ -12,6 +12,7 @@ import styles from "./group-itinerary-panel.module.css";
 
 type Rsvp = "going" | "maybe" | "not-going";
 type VoteChoice = "love" | "okay" | "swap";
+type Budget = "free" | "under-40" | "under-80" | "flexible";
 
 type GroupMember = {
   displayName: string;
@@ -21,15 +22,41 @@ type GroupMember = {
   isViewer: boolean;
 };
 
+type PopularValue = {
+  label: string;
+  count: number;
+};
+
+type BlendSummary = {
+  contributorCount: number;
+  memberCount: number;
+  ready: boolean;
+  interests: PopularValue[];
+  cuisines: PopularValue[];
+  neighbourhoods: PopularValue[];
+  outingStyles: PopularValue[];
+  budget: Budget | null;
+  transportation: string | null;
+  alcoholFree: boolean;
+  likesFreeEvents: boolean;
+  likesNightlife: boolean;
+  likesOutdoors: boolean;
+  likesDateIdeas: boolean;
+  protectedNeedsCount: number;
+  lastRemixedAt: string | null;
+};
+
 type GroupState = {
   members: GroupMember[];
   voteSummary: Record<string, { love: number; okay: number; swap: number }>;
+  blend: BlendSummary;
   viewer: {
     authenticated: boolean;
     joined: boolean;
     role: "host" | "member" | null;
     rsvp: Rsvp | null;
     myVotes: Record<string, VoteChoice>;
+    contributedVibe: boolean;
   };
 };
 
@@ -49,6 +76,49 @@ function initials(name: string) {
     .join("") || "V";
 }
 
+function budgetLabel(budget: Budget | null) {
+  if (budget === "free") return "Free-first";
+  if (budget === "under-40") return "Under $40";
+  if (budget === "under-80") return "Under $80";
+  if (budget === "flexible") return "Flexible";
+  return "Waiting on the group";
+}
+
+function formatBlendTime(value: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en-CA", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
+}
+
+function PreferenceChips({
+  items,
+  emptyLabel
+}: {
+  items: PopularValue[];
+  emptyLabel: string;
+}) {
+  if (items.length === 0) {
+    return <span className={styles.blendEmptyChip}>{emptyLabel}</span>;
+  }
+
+  return (
+    <>
+      {items.map((item) => (
+        <span key={item.label} className={styles.blendChip}>
+          {item.label}
+          {item.count > 1 ? <b>{item.count}</b> : null}
+        </span>
+      ))}
+    </>
+  );
+}
+
 export function GroupItineraryPanel({
   shareCode,
   stops
@@ -61,6 +131,7 @@ export function GroupItineraryPanel({
   const [message, setMessage] = useState("");
   const [working, setWorking] = useState("");
   const [copied, setCopied] = useState(false);
+  const [confirmRemix, setConfirmRemix] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -88,13 +159,19 @@ export function GroupItineraryPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
-      const result = await response.json() as GroupState & { error?: string };
+      const result = await response.json() as GroupState & { error?: string; remixed?: boolean };
       if (!response.ok) throw new Error(result.error || "The group could not be updated.");
       setState(result);
+
+      if (result.remixed) {
+        setMessage("Fresh route built from the group blend. Reloading the itinerary…");
+        window.location.reload();
+      }
     } catch (caught) {
       setMessage(caught instanceof Error ? caught.message : "The group could not be updated.");
     } finally {
       setWorking("");
+      setConfirmRemix(false);
     }
   }
 
@@ -102,7 +179,7 @@ export function GroupItineraryPanel({
     const url = window.location.href;
     const data = {
       title: "Join my Venture plan",
-      text: "Open the group itinerary, RSVP, and vote on the stops.",
+      text: "Open the group itinerary, RSVP, blend your vibe, and vote on the stops.",
       url
     };
 
@@ -149,13 +226,15 @@ export function GroupItineraryPanel({
     );
   }
 
+  const blendTime = formatBlendTime(state.blend.lastRemixedAt);
+
   return (
     <section className={styles.panel} aria-labelledby="venture-group-title">
       <header className={styles.header}>
         <div>
           <span className={styles.eyebrow}>GROUP PULSE</span>
           <h2 id="venture-group-title">Plan together without starting a group chat spreadsheet.</h2>
-          <p>Join with your Venture account, RSVP, and give each stop a quick vote.</p>
+          <p>Join with Venture, RSVP, blend the group&apos;s vibe, and give each stop a quick vote.</p>
         </div>
         <button type="button" className={styles.inviteButton} onClick={() => void shareInvite()}>
           {copied ? "Link copied" : "Invite friends"}
@@ -226,6 +305,193 @@ export function GroupItineraryPanel({
           </div>
         </div>
       )}
+
+      <section className={styles.blendCard} aria-labelledby="venture-blend-title">
+        <div className={styles.blendTop}>
+          <div className={styles.blendIcon} aria-hidden="true">✦</div>
+          <div className={styles.blendHeading}>
+            <span>BLEND OUR VIBES</span>
+            <h3 id="venture-blend-title">Let the group shape the plan.</h3>
+            <p>
+              Each person opts in. Venture combines the overlap without showing anyone&apos;s individual preference sheet.
+            </p>
+          </div>
+          <div className={styles.blendMeter} aria-label={`${state.blend.contributorCount} of ${Math.max(1, state.blend.memberCount)} group members shared their vibe`}>
+            <strong>{state.blend.contributorCount}</strong>
+            <span>of {Math.max(1, state.blend.memberCount)}</span>
+            <small>blended</small>
+          </div>
+        </div>
+
+        {!state.viewer.authenticated ? (
+          <div className={styles.blendCallout}>
+            <span>Sign in and join the plan to add your vibe.</span>
+            <Link href={`/sign-in?next=/outings/${shareCode}`}>Sign in</Link>
+          </div>
+        ) : !state.viewer.joined ? (
+          <div className={styles.blendCallout}>
+            <span>Join the itinerary first, then choose whether your profile preferences join the blend.</span>
+          </div>
+        ) : (
+          <div className={styles.blendConsentRow}>
+            <div>
+              <strong>{state.viewer.contributedVibe ? "Your vibe is in the mix" : "Add your Venture vibe"}</strong>
+              <small>
+                {state.viewer.contributedVibe
+                  ? "Update it anytime from your current profile preferences, or pull it back out."
+                  : "Shares a private snapshot of your event preferences with this plan only. Others only see the group blend."}
+              </small>
+            </div>
+            <div className={styles.blendConsentActions}>
+              <button
+                type="button"
+                disabled={Boolean(working)}
+                onClick={() => void updateGroup({ action: "contribute-vibe" }, "contribute-vibe")}
+              >
+                {working === "contribute-vibe"
+                  ? "Blending…"
+                  : state.viewer.contributedVibe
+                    ? "Refresh my vibe"
+                    : "Add my vibe"}
+              </button>
+              {state.viewer.contributedVibe ? (
+                <button
+                  type="button"
+                  className={styles.quietButton}
+                  disabled={Boolean(working)}
+                  onClick={() => void updateGroup({ action: "remove-vibe" }, "remove-vibe")}
+                >
+                  Remove
+                </button>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+        {!state.blend.ready ? (
+          <div className={styles.blendWaiting}>
+            <div className={styles.blendProgressTrack}>
+              <span style={{ width: `${Math.min(100, state.blend.contributorCount * 50)}%` }} />
+            </div>
+            <strong>
+              {state.blend.contributorCount === 0
+                ? "The blend starts when someone opts in."
+                : "One more vibe unlocks the group blend."}
+            </strong>
+            <small>Detailed preferences stay hidden until at least two people contribute, so one person&apos;s choices are not displayed as the whole group.</small>
+          </div>
+        ) : (
+          <div className={styles.blendResults}>
+            <div className={styles.blendResultHeader}>
+              <div>
+                <span>THE OVERLAP</span>
+                <strong>This is what Venture hears from the group.</strong>
+              </div>
+              {blendTime ? <small>Last remix · {blendTime}</small> : null}
+            </div>
+
+            <div className={styles.blendRows}>
+              <div className={styles.blendRow}>
+                <b>Do more of</b>
+                <div>
+                  <PreferenceChips items={state.blend.interests} emptyLabel="Open-minded" />
+                </div>
+              </div>
+
+              <div className={styles.blendRow}>
+                <b>Food energy</b>
+                <div>
+                  <PreferenceChips items={state.blend.cuisines} emptyLabel="Anything good" />
+                </div>
+              </div>
+
+              <div className={styles.blendRow}>
+                <b>Where</b>
+                <div>
+                  <PreferenceChips items={state.blend.neighbourhoods} emptyLabel="Anywhere in Winnipeg" />
+                </div>
+              </div>
+
+              <div className={styles.blendRow}>
+                <b>Plan style</b>
+                <div>
+                  <PreferenceChips items={state.blend.outingStyles} emptyLabel="Flexible" />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.blendFacts}>
+              <span><i aria-hidden="true">$</i>{budgetLabel(state.blend.budget)}</span>
+              <span><i aria-hidden="true">↗</i>{state.blend.transportation || "Mixed transport"}</span>
+              {state.blend.alcoholFree ? <span><i aria-hidden="true">0%</i>Alcohol-free</span> : null}
+              {state.blend.likesNightlife ? <span><i aria-hidden="true">☾</i>Nightlife energy</span> : null}
+              {state.blend.likesOutdoors ? <span><i aria-hidden="true">☀</i>Outdoor-friendly</span> : null}
+              {state.blend.likesFreeEvents ? <span><i aria-hidden="true">✦</i>Free finds welcome</span> : null}
+              {state.blend.likesDateIdeas ? <span><i aria-hidden="true">♡</i>Date energy</span> : null}
+            </div>
+
+            {state.blend.protectedNeedsCount > 0 ? (
+              <div className={styles.privateNeeds}>
+                <span aria-hidden="true">🔒</span>
+                <div>
+                  <strong>{state.blend.protectedNeedsCount} private practical {state.blend.protectedNeedsCount === 1 ? "need" : "needs"} flagged</strong>
+                  <small>Dietary and accessibility details are not shown to the group. Venture flags them for confirmation rather than exposing who selected what.</small>
+                </div>
+              </div>
+            ) : null}
+
+            {state.viewer.role === "host" ? (
+              <div className={styles.remixArea}>
+                {!confirmRemix ? (
+                  <>
+                    <div>
+                      <strong>Host control</strong>
+                      <small>Remix keeps the date and time, rebuilds the stops around the group blend, and clears the old stop votes.</small>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.remixButton}
+                      disabled={Boolean(working)}
+                      onClick={() => setConfirmRemix(true)}
+                    >
+                      Remix this itinerary
+                    </button>
+                  </>
+                ) : (
+                  <div className={styles.remixConfirm}>
+                    <div>
+                      <strong>Ready to reshuffle the route?</strong>
+                      <small>The current shared link stays the same. The stops change and everyone votes again.</small>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        disabled={Boolean(working)}
+                        onClick={() => void updateGroup({ action: "remix" }, "remix")}
+                      >
+                        {working === "remix" ? "Venture is blending…" : "Yes, remix it"}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.quietButton}
+                        disabled={Boolean(working)}
+                        onClick={() => setConfirmRemix(false)}
+                      >
+                        Keep this plan
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className={styles.memberBlendNote}>
+                <span aria-hidden="true">✦</span>
+                <p>The host can remix this same shared itinerary from the blend when the group is ready.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
 
       <div className={styles.voteSection}>
         <header>
