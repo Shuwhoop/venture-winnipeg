@@ -334,9 +334,7 @@ export default function SavedPage() {
   const [undoItem, setUndoItem] =
     useState<UndoItem | null>(null);
 
-  const undoTimer = useRef<
-    ReturnType<typeof window.setTimeout> | null
-  >(null);
+  const undoTimer = useRef<number | null>(null);
 
   const refreshSaved = useCallback(
     async () => {
@@ -676,7 +674,7 @@ export default function SavedPage() {
               aria-label="Clear saved search"
               onClick={() => setSearch("")}
             >
-              ×
+              Ãƒâ€”
             </button>
           ) : null}
         </div>

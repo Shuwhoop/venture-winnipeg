@@ -275,7 +275,7 @@ export function ProfileDashboard() {
           <span>YOUR VENTURE</span>
           <h1>{profile.displayName}</h1>
           <p>
-            {profile.username ? `@${profile.username} · ` : ""}
+            {profile.username ? `@${profile.username} ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· ` : ""}
             {profile.homeNeighbourhood
               ? `${profile.homeNeighbourhood}, Winnipeg`
               : "Winnipeg"}
@@ -384,6 +384,11 @@ export function ProfileEditor() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!form) {
+      return;
+    }
+
     const cleanedUsername = cleanUsername(form.username);
     const nextErrors: {
       displayName?: string;
@@ -517,7 +522,7 @@ export function ProfileEditor() {
         </div>
 
         <button type="submit" className={styles.primaryButton} disabled={saving}>
-          {saving ? "Saving…" : "Save profile"}
+          {saving ? "SavingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Save profile"}
         </button>
 
         {message ? <p className={styles.formMessage} role="status">{message}</p> : null}
@@ -567,6 +572,10 @@ export function ProfilePreferencesEditor() {
   async function handleSave() {
     setSaving(true);
     setMessage("");
+
+    if (!form) {
+      return;
+    }
 
     try {
       const result = await update({ preferences: form });
@@ -667,7 +676,7 @@ export function ProfilePreferencesEditor() {
         <ToggleRow label="Date ideas" description="Prioritize places and combinations suited to dates." checked={form.likesDateIdeas} onChange={(checked) => setForm({ ...form, likesDateIdeas: checked })} />
 
         <button type="button" className={styles.primaryButton} disabled={saving} onClick={handleSave}>
-          {saving ? "Saving…" : "Save preferences"}
+          {saving ? "SavingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Save preferences"}
         </button>
         {message ? <p className={styles.formMessage} role="status">{message}</p> : null}
       </section>
@@ -749,6 +758,10 @@ export function ProfileSettings() {
   async function saveNotifications() {
     setWorking("notifications");
     setMessage("");
+    if (!notifications) {
+      return;
+    }
+
     try {
       const result = await update({ notifications });
       setNotifications(result.notifications);
@@ -786,13 +799,19 @@ export function ProfileSettings() {
   async function joinNewsletter() {
     setWorking("newsletter");
     setMessage("");
+    const newsletterEmail = payload.user?.email;
+
+    if (!newsletterEmail) {
+      return;
+    }
+
     try {
       const response = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName: payload.profile.displayName.split(/\s+/)[0] || "Venture reader",
-          email: payload.user.email,
+          email: newsletterEmail,
           consent: true,
           source: "profile-settings",
           website: ""
@@ -893,7 +912,7 @@ export function ProfileSettings() {
           <input value={email} type="email" onChange={(event) => setEmail(event.target.value)} />
         </label>
         <button type="button" className={styles.secondaryButton} disabled={working === "email"} onClick={updateEmail}>
-          {working === "email" ? "Starting change…" : "Change email"}
+          {working === "email" ? "Starting changeÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Change email"}
         </button>
       </section>
 
@@ -905,7 +924,7 @@ export function ProfileSettings() {
         <ToggleRow label="Outing reminders" description="A reminder before a saved outing starts." checked={notifications.outingReminders} onChange={(checked) => setNotifications({ ...notifications, outingReminders: checked })} />
         <ToggleRow label="Product updates" description="Occasional changes to Venture itself." checked={notifications.productUpdates} onChange={(checked) => setNotifications({ ...notifications, productUpdates: checked })} />
         <button type="button" className={styles.primaryButton} disabled={working === "notifications"} onClick={saveNotifications}>
-          {working === "notifications" ? "Saving…" : "Save notifications"}
+          {working === "notifications" ? "SavingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Save notifications"}
         </button>
       </section>
 
@@ -914,7 +933,7 @@ export function ProfileSettings() {
         <h2>The Thursday Venture</h2>
         <p>Status: <strong>{notifications.newsletterStatus.replace("-", " ")}</strong></p>
         <button type="button" className={notifications.newsletterActive ? styles.secondaryButton : styles.primaryButton} disabled={working === "newsletter"} onClick={newsletterAction.action}>
-          {working === "newsletter" ? "Updating…" : newsletterAction.label}
+          {working === "newsletter" ? "UpdatingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : newsletterAction.label}
         </button>
       </section>
 
@@ -923,7 +942,7 @@ export function ProfileSettings() {
         <h2>Export or sign out</h2>
         <a className={styles.secondaryButton} href="/api/profile/export">Download my Venture data</a>
         <button type="button" className={styles.secondaryButton} disabled={working === "signout"} onClick={signOutEverywhere}>
-          {working === "signout" ? "Signing out…" : "Sign out on every device"}
+          {working === "signout" ? "Signing outÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Sign out on every device"}
         </button>
       </section>
 
@@ -939,7 +958,7 @@ export function ProfileSettings() {
           <input value={deleteText} autoComplete="off" onChange={(event) => setDeleteText(event.target.value)} />
         </label>
         <button type="button" className={styles.dangerButton} disabled={working === "delete" || deleteText !== "DELETE"} onClick={deleteAccount}>
-          {working === "delete" ? "Deleting safely…" : "Delete account permanently"}
+          {working === "delete" ? "Deleting safelyÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Delete account permanently"}
         </button>
       </section>
 
@@ -998,15 +1017,26 @@ export function ProfileOnboarding() {
     setSaving(true);
     setMessage("");
 
+    if (!payload.user || !profile || !preferences || !notifications) {
+      setMessage("Your profile data is still loading. Please try again.");
+      setSaving(false);
+      return;
+    }
+
+    const currentUser = payload.user;
+    const currentProfile = profile;
+    const currentPreferences = preferences;
+    const currentNotifications = notifications;
+
     try {
       const updated = await update({
         profile: {
-          ...profile,
-          displayName: profile.displayName.trim() || "Venture explorer",
+          ...currentProfile,
+          displayName: currentProfile.displayName.trim() || "Venture explorer",
           onboardingCompleted: true
         },
-        preferences,
-        notifications
+        preferences: currentPreferences,
+        notifications: currentNotifications
       });
 
       writeLegacyProfilePreferences({
@@ -1014,13 +1044,13 @@ export function ProfileOnboarding() {
         preferences: updated.preferences
       });
 
-      if (newsletterOptIn && !notifications.newsletterActive) {
+      if (newsletterOptIn && !currentNotifications.newsletterActive) {
         const response = await fetch("/api/newsletter/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            firstName: profile.displayName.split(/\s+/)[0] || "Venture reader",
-            email: payload.user.email,
+            firstName: currentProfile.displayName.split(/\s+/)[0] || "Venture reader",
+            email: currentUser.email,
             consent: true,
             source: skip ? "profile-onboarding-skip" : "profile-onboarding",
             website: ""
@@ -1048,7 +1078,7 @@ export function ProfileOnboarding() {
     <section className={styles.onboardingShell}>
       <header className={styles.onboardingHeader}>
         <div>
-          <span>PROFILE SETUP · {progress}</span>
+          <span>PROFILE SETUP ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· {progress}</span>
           <h1>
             {step === 1 ? "Start with the basics." :
              step === 2 ? "What pulls you out of the house?" :
@@ -1102,7 +1132,7 @@ export function ProfileOnboarding() {
 
       <footer className={styles.onboardingFooter}>
         {step > 1 ? <button type="button" className={styles.textButton} onClick={() => setStep(step - 1)}>Back</button> : <button type="button" className={styles.textButton} disabled={saving} onClick={() => void finish(true)}>Skip for now</button>}
-        {step < 4 ? <button type="button" className={styles.primaryButton} onClick={() => setStep(step + 1)}>Continue</button> : <button type="button" className={styles.primaryButton} disabled={saving} onClick={() => void finish(false)}>{saving ? "Saving profile…" : "Finish setup"}</button>}
+        {step < 4 ? <button type="button" className={styles.primaryButton} onClick={() => setStep(step + 1)}>Continue</button> : <button type="button" className={styles.primaryButton} disabled={saving} onClick={() => void finish(false)}>{saving ? "Saving profileÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦" : "Finish setup"}</button>}
       </footer>
 
       {message ? <p className={styles.globalMessage} role="status">{message}</p> : null}

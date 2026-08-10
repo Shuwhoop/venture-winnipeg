@@ -113,7 +113,7 @@ export function AppFoundationRuntime({
   const [installing, setInstalling] = useState(false);
   const [reconnected, setReconnected] = useState(false);
   const wasOfflineRef = useRef(false);
-  const reconnectTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const reconnectTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     setStandalone(isStandaloneMode());
@@ -250,7 +250,7 @@ export function AppFoundationRuntime({
             aria-label="Dismiss connection message"
             onClick={() => setReconnected(false)}
           >
-            ×
+            Ã—
           </button>
         </aside>
       ) : null}
@@ -269,7 +269,7 @@ export function AppFoundationRuntime({
             aria-label="Dismiss update prompt"
             onClick={() => setUpdateReady(false)}
           >
-            ×
+            Ã—
           </button>
         </aside>
       ) : null}
@@ -299,10 +299,10 @@ export function AppFoundationRuntime({
           <div className={styles.installActions}>
             {installEvent ? (
               <button type="button" onClick={installApp} disabled={installing}>
-                {installing ? "Opening…" : "Install Venture"}
+                {installing ? "Openingâ€¦" : "Install Venture"}
               </button>
             ) : (
-              <span className={styles.iosHint}>Share ↑ · Add to Home Screen</span>
+              <span className={styles.iosHint}>Share â†‘ Â· Add to Home Screen</span>
             )}
 
             <button type="button" className={styles.laterButton} onClick={dismissInstall}>
@@ -358,21 +358,21 @@ export function AppStatusCard() {
 
       <div className={styles.statusGrid}>
         <article>
-          <span aria-hidden="true">▣</span>
+          <span aria-hidden="true">â–£</span>
           <div>
             <strong>{standalone ? "Installed" : "Browser mode"}</strong>
             <small>{standalone ? "Running as a standalone app" : "Add Venture to your home screen"}</small>
           </div>
         </article>
         <article>
-          <span aria-hidden="true">⌁</span>
+          <span aria-hidden="true">âŒ</span>
           <div>
             <strong>{online ? "Connected" : "Offline"}</strong>
             <small>{online ? "Live discovery is available" : "Using saved local information"}</small>
           </div>
         </article>
         <article>
-          <span aria-hidden="true">↻</span>
+          <span aria-hidden="true">â†»</span>
           <div>
             <strong>{serviceWorker ? "Offline support ready" : "Browser limited"}</strong>
             <small>Build {build}</small>
