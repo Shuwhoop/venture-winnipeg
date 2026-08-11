@@ -172,7 +172,9 @@ export function ExploreExperience({
     useRef("");
 
   const [view, setView] =
-    useState<ExploreView>("list");
+    useState<ExploreView>("map");
+
+  // VENTURE EXPLORE MAP-FIRST V1.0
 
   const [sort, setSort] =
     useState<ExploreSort>(
@@ -1118,6 +1120,26 @@ export function ExploreExperience({
         >
           <button
             type="button"
+            id="explore-map-tab"
+            role="tab"
+            aria-selected={view === "map"}
+            aria-controls="explore-map-panel"
+            tabIndex={view === "map" ? 0 : -1}
+            disabled={!hasBaseMatches}
+            className={
+              view === "map"
+                ? styles.activeView
+                : ""
+            }
+            onClick={() =>
+              changeView("map")
+            }
+          >
+            <span aria-hidden="true">⌖</span>
+            Map
+          </button>
+                  <button
+            type="button"
             id="explore-list-tab"
             role="tab"
             aria-selected={view === "list"}
@@ -1137,27 +1159,7 @@ export function ExploreExperience({
             List
           </button>
 
-          <button
-            type="button"
-            id="explore-map-tab"
-            role="tab"
-            aria-selected={view === "map"}
-            aria-controls="explore-map-panel"
-            tabIndex={view === "map" ? 0 : -1}
-            disabled={!hasBaseMatches}
-            className={
-              view === "map"
-                ? styles.activeView
-                : ""
-            }
-            onClick={() =>
-              changeView("map")
-            }
-          >
-            <span aria-hidden="true">⌖</span>
-            Map
-          </button>
-        </div>
+          </div>
       </header>
 
       <div

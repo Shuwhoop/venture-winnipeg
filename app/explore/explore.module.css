@@ -2214,3 +2214,84 @@
   }
 }
 /* VENTURE EXPLORE V1.0 END */
+
+
+/* =========================================================
+   VENTURE EXPLORE MAP-FIRST V1.0
+   Search first. Map first. List stays one tap away.
+   ========================================================= */
+
+.page {
+  gap: 12px;
+  padding-top: 10px;
+}
+
+.discoveryControls {
+  position: relative;
+  z-index: 2;
+  gap: 10px;
+  padding: 11px;
+  border: 1px solid var(--venture-line, #dce4ec);
+  border-radius: 18px;
+  background: rgba(255, 252, 248, 0.98);
+  box-shadow: 0 8px 24px rgba(7, 26, 51, 0.055);
+}
+
+.searchForm {
+  min-height: 58px;
+  border-color: var(--venture-navy, #0b2b50);
+  background: #ffffff;
+  box-shadow:
+    3px 4px 0 rgba(220, 47, 59, 0.16);
+}
+
+.searchForm input {
+  font-size: 0.86rem;
+}
+
+.filterActionRow {
+  padding-top: 1px;
+}
+
+.workbench {
+  gap: 10px;
+}
+
+.viewToolbar {
+  top: 8px;
+  border: 1px solid var(--venture-line, #dce4ec);
+  background: rgba(255, 252, 248, 0.97);
+  box-shadow: 0 7px 20px rgba(7, 26, 51, 0.07);
+}
+
+.viewSwitcher {
+  border-color: #ccd7e1;
+  background: #f5f8fb;
+}
+
+.viewSwitcher .activeView {
+  background: var(--venture-navy, #0b2b50);
+  color: #ffffff;
+  box-shadow: 2px 2px 0 var(--venture-red, #dc2f3b);
+}
+
+.mapFrame {
+  border-color: var(--venture-navy, #0b2b50);
+  box-shadow:
+    4px 5px 0 rgba(220, 47, 59, 0.17);
+}
+
+@media (max-width: 390px) {
+  .page {
+    padding-top: 8px;
+  }
+
+  .discoveryControls {
+    padding: 10px;
+  }
+
+  .viewToolbar {
+    gap: 7px;
+    padding: 8px;
+  }
+}

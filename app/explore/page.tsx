@@ -467,32 +467,6 @@ export default async function ExplorePage({
 
   return (
     <main className={styles.page}>
-      <section className={styles.hero}>
-        <div className={styles.heroCopy}>
-          <span className={styles.eyebrow}>
-            DISCOVER YOUR CITY
-          </span>
-
-          <h1>Explore Winnipeg</h1>
-
-          <p>
-            Search naturally, shape the results,
-            then switch between list and map when
-            location matters.
-          </p>
-        </div>
-
-        <div
-          className={styles.heroBadge}
-          aria-label={`${loadedResultCount} matching listings before visit-history filtering`}
-        >
-          <strong>
-            {loadedResultCount}
-            {hasMore ? "+" : ""}
-          </strong>
-          <span>LOADED</span>
-        </div>
-      </section>
 
       <section
         className={styles.discoveryControls}
