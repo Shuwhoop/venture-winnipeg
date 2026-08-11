@@ -5979,3 +5979,301 @@
     align-items: center;
   }
 }
+
+/* =========================================================
+   VENTURE RESULTS ACTIONS V1.5
+   Cleaner City Pulse treatment for route status + action dock.
+   ========================================================= */
+
+/* Route-ready status card */
+.refreshRoot :global(.outing-completeness-card.complete) {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #cfd9e3;
+  background:
+    radial-gradient(
+      circle at 96% 6%,
+      rgba(25, 135, 84, 0.10),
+      transparent 28%
+    ),
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f3faf6 100%
+    );
+  box-shadow: 0 7px 20px rgba(7, 26, 51, 0.055);
+}
+
+.refreshRoot :global(.outing-completeness-card.complete)::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  border-radius: 999px 0 0 999px;
+  background: #198754;
+  content: "";
+}
+
+.refreshRoot :global(.outing-completeness-card.complete .outing-completeness-kicker) {
+  color: #198754;
+}
+
+.refreshRoot :global(.outing-completeness-card.complete strong),
+.refreshRoot :global(.outing-completeness-card.complete h2) {
+  color: #0b2b50;
+}
+
+/* Action dock container */
+.refreshRoot :global(.outing-action-dock) {
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid #d4dee7;
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(244, 162, 97, 0.09),
+      transparent 32%
+    ),
+    #fffaf5;
+  box-shadow: 0 8px 22px rgba(7, 26, 51, 0.055);
+}
+
+/* Shared button foundation */
+.refreshRoot :global(.outing-action-dock button) {
+  position: relative;
+  min-height: 70px;
+  padding: 11px 12px;
+  overflow: hidden;
+  border: 1px solid #d2dde6;
+  border-radius: 15px;
+  background: #ffffff !important;
+  color: #0b2b50 !important;
+  box-shadow: none !important;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
+}
+
+.refreshRoot :global(.outing-action-dock button:hover:not(:disabled)),
+.refreshRoot :global(.outing-action-dock button:focus-visible) {
+  transform: translateY(-1px);
+  border-color: #0b2b50;
+  box-shadow: 0 6px 15px rgba(7, 26, 51, 0.08) !important;
+}
+
+.refreshRoot :global(.outing-action-dock button:active:not(:disabled)) {
+  transform: translateY(0);
+}
+
+/* Thin colored edge instead of full saturated blocks */
+.refreshRoot :global(.outing-action-dock button)::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  border-radius: 15px 0 0 15px;
+  background: #0b2b50;
+  content: "";
+}
+
+/* Save */
+.primaryAction {
+  border-color: #efc5c8 !important;
+  background:
+    radial-gradient(
+      circle at 94% 10%,
+      rgba(220, 47, 59, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #fffdfb 0%,
+      #fff3f1 100%
+    ) !important;
+  color: #0b2b50 !important;
+  box-shadow: none !important;
+}
+
+.primaryAction::before {
+  background: #dc2f3b !important;
+}
+
+.primaryAction .actionCopy strong {
+  color: #0b2b50;
+}
+
+.primaryAction .actionCopy small {
+  color: #74818d !important;
+}
+
+.saveIcon {
+  border: 0 !important;
+  background: #fde9e8 !important;
+  color: #dc2f3b !important;
+  box-shadow: none !important;
+}
+
+/* Share */
+.shareAction {
+  border-color: #cddae5 !important;
+  background:
+    radial-gradient(
+      circle at 94% 8%,
+      rgba(79, 131, 182, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f3f8fc 100%
+    ) !important;
+  box-shadow: none !important;
+}
+
+.shareAction::before {
+  background: #4f83b6 !important;
+}
+
+.shareIcon {
+  border: 0 !important;
+  background: #eaf3fb !important;
+  color: #0b2b50 !important;
+}
+
+/* Complete keeps green meaning, but loses the giant solid block */
+.completeAction {
+  border-color: #c7dfd2 !important;
+  background:
+    radial-gradient(
+      circle at 94% 8%,
+      rgba(25, 135, 84, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f1f9f4 100%
+    ) !important;
+  color: #0b2b50 !important;
+  box-shadow: none !important;
+}
+
+.completeAction::before {
+  background: #198754 !important;
+}
+
+.completeAction .actionCopy strong {
+  color: #0b2b50;
+}
+
+.completeAction .actionCopy small {
+  color: #6f7f78 !important;
+}
+
+.completeIcon {
+  border: 0 !important;
+  background: #e5f4eb !important;
+  color: #146c43 !important;
+  box-shadow: none !important;
+}
+
+/* Refresh becomes cool/navy rather than another saturated slab */
+.refreshAction {
+  grid-column: auto;
+  border-color: #cbd9e5 !important;
+  background:
+    radial-gradient(
+      circle at 94% 8%,
+      rgba(27, 75, 120, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #eef5fb 100%
+    ) !important;
+  color: #0b2b50 !important;
+  box-shadow: none !important;
+}
+
+.refreshAction::before {
+  background: #0b2b50 !important;
+}
+
+.refreshAction .actionCopy strong {
+  color: #0b2b50;
+}
+
+.refreshAction .actionCopy small {
+  color: #6d7d8c !important;
+}
+
+.refreshIcon {
+  border: 0 !important;
+  background: #eaf3fb !important;
+  color: #0b2b50 !important;
+  box-shadow: none !important;
+}
+
+/* Stronger icon rhythm, less bulky */
+.actionIcon,
+.saveIcon,
+.shareIcon,
+.completeIcon,
+.refreshIcon {
+  width: 38px !important;
+  height: 38px !important;
+  flex: 0 0 38px !important;
+  border-radius: 12px !important;
+}
+
+.actionCopy {
+  gap: 2px;
+}
+
+.actionCopy strong {
+  font-size: 0.80rem;
+  line-height: 1.15;
+}
+
+.actionCopy small {
+  font-size: 0.62rem;
+  line-height: 1.35;
+}
+
+/* Saved state still reads clearly */
+.primaryAction[aria-pressed="true"],
+.primaryAction.saved {
+  border-color: #dc2f3b !important;
+  background: #fff0ef !important;
+}
+
+/* Disabled = visibly quieter, not muddy */
+.refreshRoot :global(.outing-action-dock button:disabled) {
+  opacity: 0.48;
+  transform: none;
+  cursor: not-allowed;
+}
+
+@media (max-width: 380px) {
+  .refreshRoot :global(.outing-action-dock) {
+    gap: 8px;
+    padding: 9px;
+  }
+
+  .refreshRoot :global(.outing-action-dock button) {
+    min-height: 66px;
+    padding: 10px;
+  }
+
+  .actionIcon,
+  .saveIcon,
+  .shareIcon,
+  .completeIcon,
+  .refreshIcon {
+    width: 35px !important;
+    height: 35px !important;
+    flex-basis: 35px !important;
+  }
+}
