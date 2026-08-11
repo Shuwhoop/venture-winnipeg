@@ -5016,3 +5016,430 @@
   }
 }
 /* VENTURE OUTING RESULTS V2.0 END */
+
+/* =========================================================
+   VENTURE CITY PULSE V1.2 - OUTING RESULTS INTEGRATION
+   Color/theming pass only. Layout and behavior unchanged.
+   ========================================================= */
+
+.refreshRoot {
+  --result-ink: #0b2b50;
+  --result-red: #dc2f3b;
+  --result-yellow: #ffd6b3;
+  --result-cream: #fff7ee;
+  --result-purple: #4f83b6;
+  --result-green: #198754;
+
+  background:
+    radial-gradient(circle at 7% 8%, rgba(244, 162, 97, 0.20), transparent 22rem),
+    radial-gradient(circle at 94% 28%, rgba(220, 47, 59, 0.075), transparent 19rem),
+    radial-gradient(circle at 88% 72%, rgba(79, 131, 182, 0.065), transparent 24rem),
+    linear-gradient(180deg, #fffaf5 0%, #fff7ee 100%);
+}
+
+/* Route recipe / hero: this is now the strongest brand moment. */
+.routeRecipeCard {
+  border-color: #071a33;
+  background:
+    radial-gradient(circle at 82% 22%, rgba(244, 162, 97, 0.35), transparent 26%),
+    radial-gradient(circle at 72% 80%, rgba(220, 47, 59, 0.22), transparent 27%),
+    linear-gradient(135deg, #071a33 0%, #0b2b50 58%, #173f6d 100%);
+  box-shadow: 6px 6px 0 rgba(220, 47, 59, 0.88);
+}
+
+.routeRecipeCard::before {
+  border-color: rgba(255, 255, 255, 0.11);
+}
+
+.routeRecipeCard::after {
+  border-top-color: rgba(244, 162, 97, 0.74);
+}
+
+.routeRecipeCopy > span {
+  color: #ff7a70;
+}
+
+.routeRecipeCopy strong {
+  color: #ffffff;
+}
+
+.routeRecipeCopy small {
+  color: #dbe8f4;
+}
+
+.routeRecipeIcons span {
+  border-color: rgba(255, 255, 255, 0.78);
+  background: #fffcf8;
+  color: #0b2b50;
+  box-shadow: 3px 3px 0 rgba(220, 47, 59, 0.65);
+}
+
+/* The completeness state should feel informative, not like a yellow warning block. */
+.refreshRoot :global(.outing-completeness-card) {
+  border-color: #0b2b50;
+  box-shadow: 4px 4px 0 rgba(11, 43, 80, 0.10);
+}
+
+.refreshRoot :global(.outing-completeness-card.partial) {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(244, 162, 97, 0.20), transparent 28%),
+    linear-gradient(145deg, #fffaf5 0%, #ffe9d5 100%);
+}
+
+.refreshRoot :global(.outing-completeness-card.complete) {
+  background: linear-gradient(145deg, #f2fbf5 0%, #dff4e8 100%);
+}
+
+.refreshRoot :global(.outing-completeness-card.empty) {
+  background: linear-gradient(145deg, #fff4f3 0%, #ffe1df 100%);
+}
+
+.statusPill.partial {
+  background: #fff0e2;
+  color: #8d4c18;
+}
+
+.refreshRoot :global(.outing-completeness-card a) {
+  border-color: #0b2b50;
+  background: #fffcf8;
+  color: #0b2b50;
+}
+
+/* Action dock: unmistakably Venture, while preserving semantic green. */
+.refreshRoot :global(.outing-action-dock button) {
+  border-color: #0b2b50;
+  background: #fffcf8;
+  color: #0b2b50;
+  box-shadow: 3px 3px 0 rgba(11, 43, 80, 0.10);
+}
+
+.primaryAction {
+  border-color: #dc2f3b !important;
+  background:
+    radial-gradient(circle at 90% 12%, rgba(255,255,255,0.20), transparent 25%),
+    linear-gradient(135deg, #dc2f3b 0%, #c42331 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 4px 4px 0 #0b2b50 !important;
+}
+
+.primaryAction .actionCopy small {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.saveIcon {
+  border-color: rgba(255, 255, 255, 0.78) !important;
+  background: #fffcf8 !important;
+  color: #dc2f3b !important;
+}
+
+.shareAction {
+  background:
+    radial-gradient(circle at 90% 8%, rgba(79, 131, 182, 0.11), transparent 28%),
+    #fffcf8 !important;
+  box-shadow: 4px 4px 0 rgba(79, 131, 182, 0.32) !important;
+}
+
+.shareIcon {
+  color: #0b2b50;
+  background: linear-gradient(145deg, #ffffff 0%, #eaf3fb 100%);
+}
+
+.completeAction {
+  background: #198754 !important;
+  border-color: #198754 !important;
+  box-shadow: 4px 4px 0 #0b2b50 !important;
+}
+
+.completeIcon {
+  color: #0b2b50 !important;
+  background: #fff0e2 !important;
+  border-color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.refreshAction {
+  grid-column: auto;
+  border-color: #1b4b78 !important;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(255,255,255,0.14), transparent 28%),
+    linear-gradient(135deg, #1b4b78 0%, #4f83b6 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 4px 4px 0 rgba(220, 47, 59, 0.30) !important;
+}
+
+.refreshAction .actionCopy small {
+  color: rgba(255, 255, 255, 0.80);
+}
+
+.refreshIcon {
+  color: #0b2b50;
+  background: linear-gradient(145deg, #fff7ee 0%, #ffffff 100%);
+}
+
+/* Quick route: warm-paper navigator with red route energy. */
+.routeNavigator {
+  border-color: #0b2b50;
+  background:
+    radial-gradient(circle at 96% 10%, rgba(244, 162, 97, 0.13), transparent 30%),
+    linear-gradient(145deg, #fffcf8 0%, #fff5ec 100%);
+  box-shadow: 4px 4px 0 rgba(220, 47, 59, 0.16);
+}
+
+.routeNavigatorHeading span {
+  color: #dc2f3b;
+}
+
+.routeNavigatorHeading strong {
+  color: #617183;
+}
+
+.routeNavigator button {
+  border-color: #0b2b50;
+  background: #ffffff;
+  color: #0b2b50;
+  box-shadow: 2px 2px 0 rgba(11, 43, 80, 0.10);
+}
+
+.routeNavigator button:hover,
+.routeNavigator button:focus-visible {
+  background: #fff7ee;
+  box-shadow: 4px 4px 0 rgba(220, 47, 59, 0.16);
+}
+
+.routeNavigator button > span {
+  border-color: #0b2b50;
+  background: #ffe1c7;
+  color: #0b2b50;
+}
+
+.routeNavigator button small {
+  color: #dc2f3b;
+}
+
+/* Adventure Snapshot: warm canvas, navy structure, red rhythm. */
+.snapshotSection {
+  border-color: #0b2b50;
+  background:
+    radial-gradient(circle at 93% 6%, rgba(244, 162, 97, 0.13), transparent 24%),
+    linear-gradient(180deg, #fffcf8 0%, #fff7ee 100%);
+  box-shadow: 5px 5px 0 rgba(11, 43, 80, 0.10);
+}
+
+.snapshotBadge {
+  border-color: #0b2b50;
+  background: #ffffff;
+  box-shadow: 2px 2px 0 rgba(220, 47, 59, 0.72);
+}
+
+.snapshotBadge > span:last-child {
+  color: #dc2f3b;
+}
+
+.snapshotSpark {
+  background: #ffe1c7;
+  color: #0b2b50 !important;
+}
+
+.snapshotRouteLine span {
+  background: #e4ebf1;
+}
+
+.snapshotRouteLine span::after {
+  background: linear-gradient(90deg, #0b2b50 0%, #dc2f3b 68%, #f4a261 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard {
+  border-color: #0b2b50;
+  box-shadow: 4px 4px 0 rgba(11, 43, 80, 0.11);
+}
+
+.whenCard {
+  background:
+    radial-gradient(circle at 94% 10%, rgba(244, 162, 97, 0.22), transparent 28%),
+    linear-gradient(135deg, #fff4e8 0%, #ffe1c7 100%) !important;
+  --stat-accent: #dc2f3b;
+}
+
+.whenTime {
+  border-color: rgba(11, 43, 80, 0.24);
+  background: rgba(255, 252, 248, 0.76);
+  box-shadow: inset 0 -2px 0 rgba(220, 47, 59, 0.08);
+}
+
+.whenMain > span,
+.whenTime > span {
+  color: #dc2f3b;
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).peopleCard {
+  background: linear-gradient(145deg, #f4f9fd 0%, #dbeaf6 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).lengthCard {
+  background: linear-gradient(145deg, #fffaf5 0%, #ffe9d7 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).travelCard {
+  background: linear-gradient(145deg, #edf5fb 0%, #cfe2f2 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).priceCard {
+  background: linear-gradient(145deg, #fff4ec 0%, #ffd8d0 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).groupCard {
+  background:
+    radial-gradient(circle at 92% 10%, rgba(244, 162, 97, 0.18), transparent 28%),
+    linear-gradient(145deg, #fff7ee 0%, #eaf3fb 100%);
+}
+
+.refreshRoot :global(.outing-plan-summary-v3 > div).statCard > span,
+.whenMain > span,
+.whenTime > span {
+  color: #dc2f3b;
+}
+
+.statIcon {
+  border-color: #0b2b50;
+  background: #ffffff;
+  color: #0b2b50;
+  box-shadow: 2px 2px 0 rgba(220, 47, 59, 0.12);
+}
+
+/* Timeline / stop cards */
+.refreshRoot :global(.outing-timeline-v3) {
+  border-color: #0b2b50;
+  background:
+    radial-gradient(circle at 94% 2%, rgba(244, 162, 97, 0.12), transparent 23%),
+    radial-gradient(circle at 2% 48%, rgba(79, 131, 182, 0.07), transparent 20%),
+    linear-gradient(180deg, #fffcf8 0%, #fff7ee 100%);
+  box-shadow: 6px 6px 0 rgba(11, 43, 80, 0.10);
+}
+
+.refreshRoot :global(.outing-timeline-v3)::before {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #dc2f3b 0 13px,
+      #0b2b50 13px 25px,
+      #f4a261 25px 37px
+    );
+  opacity: 0.34;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading) {
+  border-color: #0b2b50;
+  background:
+    radial-gradient(circle at 90% 15%, rgba(255,255,255,0.18), transparent 28%),
+    linear-gradient(135deg, #0b2b50 0%, #173f6d 100%);
+  color: #ffffff;
+  box-shadow: 4px 4px 0 #dc2f3b;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading span) {
+  color: #ff8d83;
+}
+
+.refreshRoot :global(.outing-timeline-v3 .section-heading h2),
+.refreshRoot :global(.outing-timeline-v3 .section-heading p) {
+  color: #ffffff;
+}
+
+.refreshRoot :global(.outing-stop-card-v3) {
+  border-color: #dbe3ea;
+  background: linear-gradient(180deg, #ffffff 0%, #fffaf5 100%);
+  box-shadow: 3px 4px 0 rgba(11, 43, 80, 0.08);
+}
+
+.refreshRoot :global(.outing-stop-order) {
+  background: #0b2b50;
+  color: #ffffff;
+  box-shadow: 3px 3px 0 #dc2f3b;
+}
+
+.refreshRoot :global(.outing-kind-food .outing-stop-order) {
+  background: #ffd8d3;
+  color: #0b2b50;
+}
+
+.refreshRoot :global(.outing-kind-event .outing-stop-order) {
+  background: #dbeaf6;
+  color: #0b2b50;
+}
+
+.refreshRoot :global(.outing-kind-drinks .outing-stop-order) {
+  background: #d8f1e5;
+  color: #0b2b50;
+}
+
+.refreshRoot :global(.outing-travel-row) {
+  border-left-color: rgba(27, 75, 120, 0.34);
+}
+
+.refreshRoot :global(.outing-travel-row > span) {
+  background: #eaf3fb;
+  color: #0b2b50;
+}
+
+.stopQuickFacts span,
+.stopDetailsPanel {
+  border-color: #dbe3ea;
+  background: #ffffff;
+  color: #4f6173;
+}
+
+.detailsToggle {
+  border-color: #c8d4df;
+  background: #fffaf5;
+  color: #0b2b50;
+}
+
+.detailsToggle i,
+.hoursRow > span {
+  background: #ffe1c7;
+  color: #0b2b50;
+}
+
+.refreshRoot :global(.outing-stop-link) {
+  border-color: #0b2b50;
+  background: #0b2b50;
+  color: #ffffff;
+}
+
+/* Message and sheet details stay warm, not purple-heavy. */
+.refreshRoot :global(.outing-action-message) {
+  border-color: #c8d8e7;
+  background: #eef6fc;
+  color: #234f73;
+}
+
+.actionToast {
+  border-color: #0b2b50;
+  box-shadow: 3px 3px 0 rgba(11, 43, 80, 0.10);
+}
+
+.undoToast {
+  background: #fff0e2;
+}
+
+.completionBackdrop {
+  background: rgba(7, 26, 51, 0.52);
+}
+
+.completionSheet {
+  border-color: #cdd9e4;
+  background:
+    radial-gradient(circle at 100% 0, rgba(244, 162, 97, 0.18), transparent 31%),
+    linear-gradient(165deg, #fffaf5 0%, #eef6fc 100%);
+  box-shadow: 0 -18px 52px rgba(7, 26, 51, 0.24);
+}
+
+.completionHeader > span {
+  color: #dc2f3b;
+}
+
+/* Keep responsive behavior from the existing page exactly as-is. */
+@media (max-width: 420px) {
+  .refreshAction {
+    grid-column: auto;
+  }
+}
