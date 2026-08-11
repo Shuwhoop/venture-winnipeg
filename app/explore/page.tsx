@@ -29,6 +29,7 @@ import {
 
 import styles from "./explore.module.css";
 
+import { ExploreInteractionPolish } from "@/components/explore-interaction-polish";
 export const dynamic = "force-dynamic";
 
 const EXPLORE_PAGE_SIZE = 24;
@@ -467,6 +468,7 @@ export default async function ExplorePage({
 
   return (
     <main className={styles.page}>
+      <ExploreInteractionPolish />
 
       <section
         className={styles.discoveryControls}

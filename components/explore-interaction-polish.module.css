@@ -1,0 +1,113 @@
+.behaviorMarker {
+  display: none;
+}
+
+/*
+ * Venture Explore Listing Details-First V1.1
+ *
+ * The card itself opens details.
+ * "Show on map" stays the secondary action.
+ */
+
+:global(
+  [data-venture-explore-detail-card]
+) {
+  cursor: pointer;
+}
+
+:global(
+  [data-venture-explore-detail-card]:focus-visible
+) {
+  outline: 3px solid
+    rgba(220, 47, 59, 0.28);
+  outline-offset: 3px;
+}
+
+:global(
+  [data-venture-explore-detail-card]:hover
+) {
+  border-color: #0b2b50;
+}
+
+:global(
+  [data-venture-detail-link="true"]
+) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+:global(
+  [data-venture-hidden-rank="true"]
+) {
+  display: none !important;
+}
+
+/*
+ * Numberless map markers.
+ * The existing marker element stays clickable. Only its
+ * numeric rank is removed and replaced by a simple pin dot.
+ */
+:global(
+  [data-venture-unnumbered-marker="true"]
+) {
+  position: relative !important;
+  display: grid !important;
+  width: 22px !important;
+  min-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0 !important;
+  place-items: center !important;
+  border: 2px solid #0b2b50 !important;
+  border-radius: 999px !important;
+  background: #dc2f3b !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  box-shadow:
+    2px 3px 0
+    rgba(7, 26, 51, 0.20) !important;
+}
+
+:global(
+  [data-venture-unnumbered-marker="true"]::after
+) {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #fffaf5;
+  content: "";
+}
+
+:global(
+  [data-venture-explore-detail-card]
+  a
+),
+:global(
+  [data-venture-explore-detail-card]
+  button
+) {
+  cursor: pointer;
+}
+
+/*
+ * Keep "Show on map" visually secondary.
+ */
+:global(
+  [data-venture-explore-detail-card]
+  a:not([data-venture-detail-link])
+),
+:global(
+  [data-venture-explore-detail-card]
+  button
+) {
+  position: relative;
+  z-index: 2;
+}
