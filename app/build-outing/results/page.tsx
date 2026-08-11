@@ -3019,13 +3019,14 @@ export default function OutingResultsPage() {
           </nav>
 
           <section className={styles.snapshotSection}>
+            {/* VENTURE ADVENTURE SNAPSHOT V1.4 */}
             <div className={styles.snapshotHeading}>
               <div className={styles.snapshotBadge}>
                 <span className={styles.snapshotSpark} aria-hidden="true">✦</span>
                 <span>ADVENTURE SNAPSHOT</span>
               </div>
-              <h2>The plan, without the clutter</h2>
-              <p>Everything you need before you head out.</p>
+              <h2>Your outing at a glance</h2>
+              <p>The useful details, lined up before you head out.</p>
             </div>
 
             <div className={styles.snapshotRouteLine} aria-hidden="true">
@@ -3040,26 +3041,26 @@ export default function OutingResultsPage() {
                 <div className={styles.whenMain}>
                   <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="date" /></i> DATE</span>
                   <strong>{formatPlanDate(plan.date)}</strong>
-                  <small>Your Venture day</small>
+                  <small>Your date</small>
                 </div>
 
                 <div className={styles.whenTime}>
                   <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="start" /></i> START</span>
                   <strong>{plan.requestedStartTime}</strong>
-                  <small>Meet-up time</small>
+                  <small>Start time</small>
                 </div>
               </div>
 
               <div className={`${styles.statCard} ${styles.peopleCard}`}>
                 <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="people" /></i> PEOPLE</span>
                 <strong>{partySize}</strong>
-                <small>{partySize === 1 ? "Solo mission" : "Adventure crew"}</small>
+                <small>{partySize === 1 ? "Going solo" : "People going"}</small>
               </div>
 
               <div className={`${styles.statCard} ${styles.lengthCard}`}>
                 <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="length" /></i> LENGTH</span>
                 <strong>{plan.requestedDuration}</strong>
-                <small>Time carved out</small>
+                <small>Planned length</small>
               </div>
 
               <div className={`${styles.statCard} ${styles.travelCard}`}>
@@ -3071,7 +3072,7 @@ export default function OutingResultsPage() {
               <div className={`${styles.statCard} ${styles.priceCard}`}>
                 <span><i className={styles.statIcon} aria-hidden="true"><SnapshotIcon kind="price" /></i> PER PERSON</span>
                 <strong>{formatCost(plan.estimatedTotalCad)}</strong>
-                <small>Estimated route total</small>
+                <small>Estimated spend</small>
               </div>
 
               {partySize > 1 ? (
