@@ -11,10 +11,10 @@
   width: 100%;
   box-sizing: border-box;
   padding: 11px 12px;
-  border-bottom: 2px solid #241f20;
+  border-bottom: 2px solid #0b2347;
   background:
     rgba(255, 250, 242, 0.98);
-  color: #241f20;
+  color: #0b2347;
   backdrop-filter: blur(12px);
 }
 
@@ -25,7 +25,7 @@
 }
 
 .identity span {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.58rem;
   font-weight: 900;
   letter-spacing: 0.11em;
@@ -57,10 +57,10 @@
   min-height: 38px;
   box-sizing: border-box;
   padding: 7px 8px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 11px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font: inherit;
   font-size: 0.69rem;
   font-weight: 900;
@@ -74,7 +74,7 @@
 
 .navigation a:hover,
 .logout button:hover {
-  background: #ffcf00;
+  background: #ffb65b;
 }
 
 .logout {

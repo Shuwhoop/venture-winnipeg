@@ -1163,7 +1163,7 @@
 }
 
 .profileCompletion strong {
-  color: #d81318;
+  color: #e02432;
   font-size: 0.92rem;
 }
 
@@ -1203,7 +1203,7 @@
 
 .aboutPreviewCard > div:last-child > span,
 .vibePreviewCard > span {
-  color: #d81318;
+  color: #e02432;
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -1282,7 +1282,7 @@
 
 .profileDisclosure[open] > summary {
   border-bottom: 1px solid rgba(33, 29, 36, 0.12);
-  background: #fffaf0;
+  background: #fff7ee;
 }
 
 .disclosureBody {
@@ -1362,13 +1362,13 @@
 }
 
 .deleteDisclosure {
-  border-color: #d81318;
+  border-color: #e02432;
   background: #fff8f7;
 }
 
 .deleteDisclosure > summary b {
   color: white;
-  background: #d81318;
+  background: #e02432;
 }
 
 .deleteWarning {

@@ -15,12 +15,12 @@
   margin: 18px auto 8px;
   padding: 17px;
   overflow: hidden;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 22px;
   background:
     radial-gradient(circle at 92% 12%, rgba(255, 207, 0, 0.36), transparent 28%),
-    linear-gradient(135deg, #fffaf2 0%, #fff3be 100%);
-  box-shadow: 5px 5px 0 #d01013;
+    linear-gradient(135deg, #fff5e8 0%, #fff3be 100%);
+  box-shadow: 5px 5px 0 #e02432;
 }
 
 .installCard::after {
@@ -41,10 +41,10 @@
   place-items: center;
   width: 58px;
   height: 58px;
-  border: 3px solid #241f20;
+  border: 3px solid #0b2347;
   border-radius: 18px;
-  background: #ffcf00;
-  box-shadow: 4px 4px 0 #d01013;
+  background: #ffb65b;
+  box-shadow: 4px 4px 0 #e02432;
   transform: rotate(-4deg);
 }
 
@@ -61,7 +61,7 @@
 
 .installCopy > span,
 .statusCard header > span {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.66rem;
   font-weight: 950;
   letter-spacing: 0.09em;
@@ -70,7 +70,7 @@
 .installCopy h2,
 .statusCard h2 {
   margin: 4px 0 5px;
-  color: #241f20;
+  color: #0b2347;
   font-size: 1.3rem;
   line-height: 1.02;
   letter-spacing: -0.035em;
@@ -96,7 +96,7 @@
 .installActions button,
 .iosHint {
   min-height: 44px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 14px;
   font: inherit;
   font-size: 0.77rem;
@@ -106,9 +106,9 @@
 .installActions > button:first-child {
   flex: 1;
   padding: 10px 14px;
-  background: #d01013;
+  background: #e02432;
   color: #fff;
-  box-shadow: 3px 3px 0 #ffcf00;
+  box-shadow: 3px 3px 0 #ffb65b;
 }
 
 .iosHint {
@@ -122,7 +122,7 @@
 .installActions .laterButton {
   padding: 9px 12px;
   background: #fff;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .connectionBanner,
@@ -137,7 +137,7 @@
   gap: 10px;
   width: min(440px, calc(100vw - 24px));
   padding: 11px 12px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 17px;
   box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.2);
 }
@@ -156,7 +156,7 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 12px;
   background: #fff;
   font-weight: 900;
@@ -184,9 +184,9 @@
 .connectionBanner a,
 .updatePrompt > button:not(.dismissIcon) {
   padding: 8px 10px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 11px;
-  background: #d01013;
+  background: #e02432;
   color: #fff;
   font: inherit;
   font-size: 0.68rem;
@@ -202,7 +202,7 @@
   place-items: center;
   width: 25px;
   height: 25px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 999px;
   background: #fff;
   font: inherit;
@@ -214,11 +214,11 @@
   gap: 14px;
   margin: 18px 0;
   padding: 18px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 22px;
   background:
     radial-gradient(circle at 90% 7%, rgba(255, 207, 0, 0.28), transparent 28%),
-    linear-gradient(180deg, #fffaf2, #fff);
+    linear-gradient(180deg, #fff5e8, #fff);
   box-shadow: 5px 5px 0 rgba(109, 40, 217, 0.18);
 }
 
@@ -243,7 +243,7 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border: 1.5px solid #241f20;
+  border: 1.5px solid #0b2347;
   border-radius: 13px;
   background: #ffefaa;
   font-weight: 900;
@@ -328,7 +328,7 @@
   gap: 10px;
   width: min(440px, calc(100vw - 24px));
   padding: 11px 12px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 17px;
   background: #dcfce7;
   box-shadow: 4px 4px 0 rgba(22, 131, 74, 0.28);
@@ -339,7 +339,7 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 12px;
   background: #fff;
 }
@@ -369,7 +369,7 @@
 
 .restoredBanner > button:not(.dismissIcon) {
   padding: 8px 10px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 11px;
   background: #16834a;
   color: #fff;

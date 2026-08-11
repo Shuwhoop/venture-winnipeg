@@ -2,7 +2,7 @@
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
   padding: 42px 0 120px;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .header {
@@ -11,7 +11,7 @@
   justify-content: space-between;
   gap: 24px;
   padding: 28px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 28px;
   background:
     linear-gradient(
@@ -20,13 +20,13 @@
       #ffffff 65%
     );
   box-shadow:
-    7px 7px 0 #edb200;
+    7px 7px 0 #ec8a34;
 }
 
 .eyebrow {
   display: block;
   margin-bottom: 8px;
-  color: #d01013;
+  color: #e02432;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -51,9 +51,9 @@
   display: grid;
   min-width: 120px;
   padding: 18px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 22px;
-  background: #ffcf00;
+  background: #ffb65b;
   text-align: center;
 }
 
@@ -76,7 +76,7 @@
   gap: 18px;
   margin: 28px 0;
   padding: 18px 20px;
-  border-left: 5px solid #d01013;
+  border-left: 5px solid #e02432;
   background: #fff4f1;
 }
 
@@ -98,7 +98,7 @@
 
 .card {
   overflow: hidden;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 26px;
   background: #ffffff;
   box-shadow:
@@ -112,13 +112,13 @@
   gap: 20px;
   padding: 24px;
   border-bottom: 1px solid #ded3ca;
-  background: #fffaf2;
+  background: #fff5e8;
 }
 
 .position {
   display: block;
   margin-bottom: 5px;
-  color: #d01013;
+  color: #e02432;
   font-size: 0.65rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -185,7 +185,7 @@
   border-radius: 13px;
   padding: 12px 13px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font: inherit;
 }
 
@@ -198,7 +198,7 @@
 .grid select:focus,
 .grid textarea:focus {
   outline: 3px solid rgba(255, 207, 0, 0.45);
-  border-color: #241f20;
+  border-color: #0b2347;
 }
 
 .wide {
@@ -243,7 +243,7 @@
 
 .actions button {
   min-height: 44px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 13px;
   padding: 10px 16px;
   font: inherit;
@@ -254,17 +254,17 @@
 
 .save {
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .publish {
-  background: #ffcf00;
-  color: #241f20;
+  background: #ffb65b;
+  color: #0b2347;
 }
 
 .reject {
   margin-left: auto;
-  background: #d01013;
+  background: #e02432;
   color: #ffffff;
 }
 
@@ -304,9 +304,9 @@
   place-items: center;
   width: 56px;
   height: 56px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 18px;
-  background: #ffcf00;
+  background: #ffb65b;
   font-size: 1.5rem;
   font-weight: 900;
 }

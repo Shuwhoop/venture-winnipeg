@@ -8,6 +8,7 @@ import Link from "next/link";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 import "./venture-theme.css";
+import "./venture-city-pulse-theme.css";
 
 import {
   AdminRouteChrome,
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor:
-    "#ffcf00",
+    "#0b2347",
 
   width:
     "device-width",

@@ -14,22 +14,22 @@
       rgba(208, 16, 19, 0.13),
       transparent 31%
     ),
-    #fffaf2;
-  color: #241f20;
+    #fff5e8;
+  color: #0b2347;
 }
 
 .card {
   width: min(510px, 100%);
   box-sizing: border-box;
   padding: 34px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 27px;
   background: #ffffff;
-  box-shadow: 7px 7px 0 #edb200;
+  box-shadow: 7px 7px 0 #ec8a34;
 }
 
 .eyebrow {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.69rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -92,26 +92,26 @@
   border: 1.5px solid #bdb1aa;
   border-radius: 13px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font: inherit;
 }
 
 .form input:focus {
   outline: 3px solid
     rgba(255, 207, 0, 0.44);
-  border-color: #241f20;
+  border-color: #0b2347;
 }
 
 .form button {
   min-height: 50px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 14px;
-  background: #d01013;
+  background: #e02432;
   color: #ffffff;
   font: inherit;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 4px 4px 0 #edb200;
+  box-shadow: 4px 4px 0 #ec8a34;
 }
 
 .form button:disabled {

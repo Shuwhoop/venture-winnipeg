@@ -2,7 +2,7 @@
   display: grid;
   gap: 18px;
   padding: 6px 16px 44px;
-  color: #17131d;
+  color: #06172f;
 }
 
 .hero {
@@ -10,7 +10,7 @@
   display: grid;
   gap: 17px;
   overflow: hidden;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 25px;
   padding: 21px;
   background:
@@ -40,7 +40,7 @@
 .eyebrow,
 .kicker {
   margin: 0;
-  color: #6d23d9;
+  color: #e02432;
   font-size: 0.68rem;
   font-weight: 950;
   letter-spacing: 0.15em;
@@ -67,7 +67,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   gap: 13px;
   align-items: start;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 20px;
   padding: 15px;
   box-shadow: 4px 4px 0 rgba(23, 19, 29, 0.13);
@@ -78,7 +78,7 @@
 }
 
 .launchCard.attention {
-  background: linear-gradient(145deg, #fff0af, #fffaf0);
+  background: linear-gradient(145deg, #fff0af, #fff7ee);
 }
 
 .launchCard.ready {
@@ -90,7 +90,7 @@
   place-items: center;
   width: 46px;
   height: 46px;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 15px;
   background: #fff;
   font-size: 1.3rem;
@@ -104,7 +104,7 @@
 }
 
 .launchCard small {
-  color: #6d23d9;
+  color: #e02432;
   font-size: 0.63rem;
   font-weight: 950;
   letter-spacing: 0.1em;
@@ -132,11 +132,11 @@
   display: grid;
   place-items: center;
   min-height: 46px;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 13px;
   padding: 9px;
   background: #fff;
-  color: #17131d;
+  color: #06172f;
   font: inherit;
   font-size: 0.78rem;
   font-weight: 900;
@@ -146,8 +146,8 @@
 }
 
 .heroActions a:first-child {
-  background: #ffcf00;
-  box-shadow: 3px 3px 0 #e20f18;
+  background: #ffb65b;
+  box-shadow: 3px 3px 0 #e02432;
 }
 
 .metrics {
@@ -243,7 +243,7 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: 13px;
-  border: 1.5px solid #e20f18;
+  border: 1.5px solid #e02432;
   border-radius: 19px;
   padding: 15px;
   background: linear-gradient(145deg, #ffe7e9, #fffafa);
@@ -254,7 +254,7 @@
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   background: #fff;
   font-weight: 950;
 }
@@ -268,7 +268,7 @@
 .blockerCard small,
 .checkCard > small,
 .manualCopy small {
-  color: #6d23d9;
+  color: #e02432;
   font-size: 0.62rem;
   font-weight: 950;
   letter-spacing: 0.08em;
@@ -301,7 +301,7 @@
   align-items: center;
   gap: 6px;
   margin-top: 11px;
-  color: #6d23d9;
+  color: #e02432;
   font-size: 0.78rem;
   font-weight: 900;
   text-decoration: none;
@@ -333,7 +333,7 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 12px;
   background: #fff;
   font-weight: 950;
@@ -358,13 +358,13 @@
 }
 
 .checkCard.blocked {
-  border-color: #e20f18;
+  border-color: #e02432;
   background: #fff4f5;
 }
 
 .checkCard.attention {
   border-color: #e4b72d;
-  background: #fffaf0;
+  background: #fff7ee;
 }
 
 .checkCard.ready {
@@ -406,11 +406,11 @@
 .resetButton {
   justify-self: start;
   min-height: 40px;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 12px;
   padding: 8px 12px;
   background: #fff;
-  color: #17131d;
+  color: #06172f;
   font: inherit;
   font-size: 0.75rem;
   font-weight: 900;
@@ -442,7 +442,7 @@
   place-items: center;
   width: 31px;
   height: 31px;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 10px;
   background: #fff;
   font-weight: 950;
@@ -454,7 +454,7 @@
 }
 
 .manualComplete .manualCheck {
-  background: #ffcf00;
+  background: #ffb65b;
 }
 
 .manualCopy {
@@ -470,7 +470,7 @@
 .notesCard {
   display: grid;
   gap: 8px;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 19px;
   padding: 15px;
   background: linear-gradient(145deg, #f5edff, #fff);
@@ -489,7 +489,7 @@
   border-radius: 14px;
   padding: 12px;
   background: #fff;
-  color: #17131d;
+  color: #06172f;
   font: inherit;
   line-height: 1.5;
 }
@@ -501,12 +501,12 @@
 .targetCard {
   display: grid;
   gap: 16px;
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 23px;
   padding: 18px;
   background:
     radial-gradient(circle at 92% 12%, rgba(255, 207, 0, 0.42), transparent 33%),
-    linear-gradient(145deg, #fff9de, #f4edff);
+    linear-gradient(145deg, #fff9de, #eef5fb);
 }
 
 .targetGrid {
@@ -527,7 +527,7 @@
 }
 
 .targetGrid strong {
-  color: #17131d;
+  color: #06172f;
   font-size: 1.35rem;
 }
 

@@ -1,9 +1,9 @@
 .page {
-  --home-paper: #fffaf2;
+  --home-paper: #fff5e8;
   --home-cream: #fff5df;
-  --home-ink: var(--venture-ink, #241f20);
+  --home-ink: var(--venture-ink, #0b2347);
   --home-red: var(--venture-red, #d81016);
-  --home-yellow: var(--venture-yellow, #ffcf00);
+  --home-yellow: var(--venture-yellow, #ffb65b);
   --home-green: var(--venture-green, #087a4c);
 
   display: grid;

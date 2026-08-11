@@ -2,12 +2,12 @@
   width: min(900px, calc(100% - 28px));
   margin: 0 auto;
   padding: 26px 0 130px;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .hero {
   padding: 26px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 28px;
   background:
     radial-gradient(
@@ -15,13 +15,13 @@
       rgba(255, 207, 0, 0.38),
       transparent 34%
     ),
-    #fffdf8;
-  box-shadow: 6px 6px 0 #edb200;
+    #fffaf4;
+  box-shadow: 6px 6px 0 #ec8a34;
 }
 
 .hero > span,
 .sectionHeading > span {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.69rem;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -59,7 +59,7 @@
   border: 2px solid #cbbfb6;
   border-radius: 20px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   text-align: left;
   cursor: pointer;
 }
@@ -79,9 +79,9 @@
 }
 
 .typeChooser button.active {
-  border-color: #241f20;
-  background: #ffcf00;
-  box-shadow: 4px 4px 0 #d01013;
+  border-color: #0b2347;
+  background: #ffb65b;
+  box-shadow: 4px 4px 0 #e02432;
 }
 
 .form {
@@ -92,7 +92,7 @@
 
 .section {
   padding: 24px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 24px;
   background: #ffffff;
 }
@@ -135,7 +135,7 @@
   border: 1.5px solid #bdb1aa;
   border-radius: 13px;
   background: #fff;
-  color: #241f20;
+  color: #0b2347;
   font: inherit;
   font-size: 0.93rem;
 }
@@ -149,7 +149,7 @@
 .grid select:focus,
 .grid textarea:focus {
   outline: 3px solid rgba(255, 207, 0, 0.42);
-  border-color: #241f20;
+  border-color: #0b2347;
 }
 
 .wide {
@@ -180,14 +180,14 @@
 
 .submitButton {
   min-height: 54px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 16px;
-  background: #d01013;
+  background: #e02432;
   color: #fff;
   font: inherit;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 4px 4px 0 #edb200;
+  box-shadow: 4px 4px 0 #ec8a34;
 }
 
 .submitButton:disabled {
@@ -314,7 +314,7 @@
   margin: 1px 0 0 !important;
   padding: 0 !important;
   flex: 0 0 20px !important;
-  accent-color: #d01013;
+  accent-color: #e02432;
   cursor: pointer;
 }
 

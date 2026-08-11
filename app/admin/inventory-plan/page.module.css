@@ -33,7 +33,7 @@
 .eyebrow,
 .kicker {
   margin: 0 0 8px;
-  color: #6d28d9;
+  color: #e02432;
   font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.14em;
@@ -80,8 +80,8 @@
 
 .headerActions a:last-child,
 .repairLink {
-  border-color: #6d28d9;
-  background: #6d28d9;
+  border-color: #e02432;
+  background: #e02432;
   color: #fff;
 }
 
@@ -128,7 +128,7 @@
 .coverageRow progress {
   width: 100%;
   height: 9px;
-  accent-color: #6d28d9;
+  accent-color: #e02432;
 }
 
 .warningMetric {

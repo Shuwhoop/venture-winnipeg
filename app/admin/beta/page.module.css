@@ -14,14 +14,14 @@
   border-radius: 24px;
   background:
     radial-gradient(circle at top right, rgba(255, 202, 40, 0.18), transparent 35%),
-    linear-gradient(145deg, #fff, #faf7ff);
+    linear-gradient(145deg, #fff, #f7faff);
 }
 
 .eyebrow,
 .cardHeader p,
 .sectionHeading p {
   margin: 0 0 7px;
-  color: #7c3aed;
+  color: #e02432;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -57,7 +57,7 @@
   border: 1px solid #ddd2ee;
   border-radius: 12px;
   background: white;
-  color: #5b21b6;
+  color: #b61725;
   font-size: 12px;
   font-weight: 850;
 }
@@ -69,8 +69,8 @@
 }
 
 .periods a.active {
-  border-color: #6d28d9;
-  background: #6d28d9;
+  border-color: #e02432;
+  background: #e02432;
   color: white;
 }
 
@@ -156,7 +156,7 @@
 }
 
 .funnel strong {
-  color: #5b21b6;
+  color: #b61725;
   font-size: 19px;
 }
 
@@ -188,7 +188,7 @@
 }
 
 .pageList span {
-  color: #5b21b6;
+  color: #b61725;
   font-size: 12px;
   font-weight: 850;
 }
@@ -250,8 +250,8 @@
 .feedbackList header span {
   padding: 5px 8px;
   border-radius: 999px;
-  background: #ede9fe;
-  color: #5b21b6;
+  background: #eaf2fb;
+  color: #b61725;
   font-size: 10px;
   font-weight: 900;
 }
@@ -282,7 +282,7 @@
 .feedbackList footer a,
 .feedbackList footer span {
   margin-left: auto;
-  color: #6d28d9;
+  color: #e02432;
   font-size: 11px;
   font-weight: 850;
 }
@@ -291,7 +291,7 @@
   display: grid;
   gap: 8px;
   border-color: #f2d38c;
-  background: #fffaf0;
+  background: #fff7ee;
 }
 
 .setup strong {

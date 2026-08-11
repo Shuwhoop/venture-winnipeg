@@ -12,8 +12,8 @@
   border: 1.5px solid #d8c8e8;
   border-radius: 18px;
   padding: 10px 13px;
-  background: linear-gradient(145deg, #f5efff, #fffaf2);
-  color: #3f3244;
+  background: linear-gradient(145deg, #f5efff, #fff5e8);
+  color: #304c6b;
   text-align: left;
   font: inherit;
   cursor: pointer;
@@ -32,7 +32,7 @@
 
 .visited {
   border-color: #8fd0ad;
-  background: linear-gradient(145deg, #e8fff1, #fffaf2);
+  background: linear-gradient(145deg, #e8fff1, #fff5e8);
 }
 
 .icon {
@@ -42,7 +42,7 @@
   height: 34px;
   place-items: center;
   border-radius: 12px;
-  background: #7c3aed;
+  background: #e02432;
   color: #fff;
   font-size: 1rem;
   font-weight: 900;
@@ -81,7 +81,7 @@
   max-width: 240px;
   border-radius: 12px;
   padding: 8px 10px;
-  background: #3f3244;
+  background: #304c6b;
   color: #fff;
   box-shadow: 0 12px 28px rgba(43, 31, 50, 0.18);
   font-size: 0.67rem;

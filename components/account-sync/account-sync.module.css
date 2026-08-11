@@ -40,7 +40,7 @@
   height: 10px;
   border: 2px solid #201432;
   border-radius: 999px;
-  background: #ffcf00;
+  background: #ffb65b;
 }
 
 .guestCopy,
@@ -95,7 +95,7 @@
   padding: 22px;
   background:
     radial-gradient(circle at 100% 0%, rgba(138, 85, 190, 0.2), transparent 38%),
-    #fffdf8;
+    #fffaf4;
 }
 
 .accountHeader {
@@ -149,7 +149,7 @@
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: #ffcf00;
+  background: #ffb65b;
   color: #281737;
   font-weight: 950;
 }

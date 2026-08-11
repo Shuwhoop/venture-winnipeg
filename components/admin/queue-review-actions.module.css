@@ -10,7 +10,7 @@
   border-radius: 11px;
   padding: 10px 11px;
   background: #fff;
-  color: #17131d;
+  color: #06172f;
   font: inherit;
 }
 
@@ -20,11 +20,11 @@
 }
 
 .form button {
-  border: 1.5px solid #17131d;
+  border: 1.5px solid #06172f;
   border-radius: 11px;
   padding: 10px 12px;
-  background: #ffcf00;
-  color: #17131d;
+  background: #ffb65b;
+  color: #06172f;
   font-weight: 900;
   cursor: pointer;
 }

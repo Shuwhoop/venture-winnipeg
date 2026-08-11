@@ -28,7 +28,7 @@ export function VentureNightAnimation() {
               width="268"
               height="112"
               rx="15"
-              fill="#241f20"
+              fill="#0b2347"
             />
 
             <rect
@@ -69,7 +69,7 @@ export function VentureNightAnimation() {
               cy="75"
               r="7"
               fill="#ffffff"
-              stroke="#241f20"
+              stroke="#0b2347"
               strokeWidth="2"
             />
 
@@ -79,14 +79,14 @@ export function VentureNightAnimation() {
               width="450"
               height="49"
               rx="15"
-              fill="#d01013"
-              stroke="#241f20"
+              fill="#e02432"
+              stroke="#0b2347"
               strokeWidth="4"
             />
 
             <g
               fill="#ffffff"
-              stroke="#241f20"
+              stroke="#0b2347"
               strokeWidth="3"
               strokeLinejoin="round"
             >
@@ -102,26 +102,26 @@ export function VentureNightAnimation() {
                 cy="154"
                 r="23"
                 fill="#74462f"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M53 154C53 123 98 122 99 154C87 145 65 145 53 158Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M43 183C50 164 96 164 107 184L111 224H38Z"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M65 160C71 169 82 169 89 159"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -130,7 +130,7 @@ export function VentureNightAnimation() {
                 className="vna-wave-left"
                 d="M54 188L26 151"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -142,26 +142,26 @@ export function VentureNightAnimation() {
                 cy="147"
                 r="25"
                 fill="#bd7956"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M159 147C160 115 207 114 209 147C196 138 174 137 160 151Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M151 178C158 158 204 158 215 179L220 226H145Z"
-                fill="#d01013"
-                stroke="#241f20"
+                fill="#e02432"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M172 154C179 163 190 163 197 153"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -170,7 +170,7 @@ export function VentureNightAnimation() {
                 className="vna-main-arm-left"
                 d="M160 184L132 132"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -179,7 +179,7 @@ export function VentureNightAnimation() {
                 className="vna-main-arm-right"
                 d="M207 184L237 132"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -191,7 +191,7 @@ export function VentureNightAnimation() {
                 cy="153"
                 r="24"
                 fill="#efc19d"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
@@ -203,14 +203,14 @@ export function VentureNightAnimation() {
               <path
                 d="M270 183C276 164 319 164 330 184L334 225H264Z"
                 fill="#ffffff"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M289 160C295 168 305 168 312 159"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -219,7 +219,7 @@ export function VentureNightAnimation() {
                 className="vna-wave-right"
                 d="M322 189L354 148"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -231,26 +231,26 @@ export function VentureNightAnimation() {
                 cy="159"
                 r="22"
                 fill="#d99570"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M386 162C381 128 431 124 432 158L425 193L418 151C407 162 396 163 386 154Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M380 187C386 170 426 170 435 188L439 225H375Z"
-                fill="#edb200"
-                stroke="#241f20"
+                fill="#ec8a34"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M398 166C404 174 413 174 419 165"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -258,8 +258,8 @@ export function VentureNightAnimation() {
 
             <g
               className="vna-confetti"
-              fill="#ffcf00"
-              stroke="#d01013"
+              fill="#ffb65b"
+              stroke="#e02432"
               strokeWidth="4"
               strokeLinecap="round"
             >
@@ -288,7 +288,7 @@ export function VentureNightAnimation() {
             />
 
             <g
-              stroke="#241f20"
+              stroke="#0b2347"
               strokeWidth="4"
             >
               <path d="M72 0V34" />
@@ -300,7 +300,7 @@ export function VentureNightAnimation() {
                 cx="72"
                 cy="48"
                 r="18"
-                fill="#ffcf00"
+                fill="#ffb65b"
               />
 
               <circle
@@ -308,7 +308,7 @@ export function VentureNightAnimation() {
                 cx="240"
                 cy="44"
                 r="18"
-                fill="#ffcf00"
+                fill="#ffb65b"
               />
 
               <circle
@@ -316,7 +316,7 @@ export function VentureNightAnimation() {
                 cx="408"
                 cy="48"
                 r="18"
-                fill="#ffcf00"
+                fill="#ffb65b"
               />
             </g>
 
@@ -327,7 +327,7 @@ export function VentureNightAnimation() {
                 rx="59"
                 ry="21"
                 fill="#ffffff"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
@@ -336,7 +336,7 @@ export function VentureNightAnimation() {
                 cy="135"
                 r="16"
                 fill="#efc19d"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
 
@@ -345,18 +345,18 @@ export function VentureNightAnimation() {
                 cy="135"
                 r="16"
                 fill="#74462f"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
 
               <path
                 d="M27 162Q48 141 69 162"
-                fill="#d01013"
+                fill="#e02432"
               />
 
               <path
                 d="M78 162Q99 141 120 162"
-                fill="#ffcf00"
+                fill="#ffb65b"
               />
 
               <ellipse
@@ -365,7 +365,7 @@ export function VentureNightAnimation() {
                 rx="59"
                 ry="21"
                 fill="#ffffff"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
@@ -374,7 +374,7 @@ export function VentureNightAnimation() {
                 cy="135"
                 r="16"
                 fill="#bd7956"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
 
@@ -383,20 +383,20 @@ export function VentureNightAnimation() {
                 cy="135"
                 r="16"
                 fill="#efc19d"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
 
               <path
                 d="M362 162Q383 141 404 162"
                 fill="#ffffff"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="2"
               />
 
               <path
                 d="M412 162Q433 141 454 162"
-                fill="#d01013"
+                fill="#e02432"
               />
             </g>
 
@@ -406,24 +406,24 @@ export function VentureNightAnimation() {
                 cy="84"
                 r="17"
                 fill="#d99570"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
 
               <path
                 d="M369 84C369 62 402 62 403 84C393 77 379 77 369 87Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M363 106Q385 93 407 107L410 150H360Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M364 115L335 128"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="7"
                 strokeLinecap="round"
               />
@@ -433,8 +433,8 @@ export function VentureNightAnimation() {
                 cy="130"
                 rx="25"
                 ry="6"
-                fill="#d01013"
-                stroke="#241f20"
+                fill="#e02432"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
             </g>
@@ -445,7 +445,7 @@ export function VentureNightAnimation() {
               rx="89"
               ry="30"
               fill="#ffffff"
-              stroke="#241f20"
+              stroke="#0b2347"
               strokeWidth="4"
             />
 
@@ -455,7 +455,7 @@ export function VentureNightAnimation() {
               width="16"
               height="55"
               rx="8"
-              fill="#241f20"
+              fill="#0b2347"
             />
 
             <g className="vna-date-person">
@@ -464,29 +464,29 @@ export function VentureNightAnimation() {
                 cy="124"
                 r="25"
                 fill="#bd7956"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M148 124C149 92 197 92 198 124C185 115 163 114 149 128Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M141 156C148 137 193 137 204 157L208 220H136Z"
-                fill="#d01013"
-                stroke="#241f20"
+                fill="#e02432"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
-              <circle cx="164" cy="125" r="2.5" fill="#241f20" />
-              <circle cx="181" cy="125" r="2.5" fill="#241f20" />
+              <circle cx="164" cy="125" r="2.5" fill="#0b2347" />
+              <circle cx="181" cy="125" r="2.5" fill="#0b2347" />
 
               <path
                 d="M162 137C169 133 177 133 184 137"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -494,14 +494,14 @@ export function VentureNightAnimation() {
               <path
                 d="M195 164L223 183"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
 
               <g
                 className="vna-sweat"
-                fill="#d01013"
+                fill="#e02432"
               >
                 <path d="M199 103C209 114 203 124 196 118C191 114 194 108 199 103Z" />
                 <path d="M211 117C219 126 214 134 208 129C204 126 207 121 211 117Z" />
@@ -514,29 +514,29 @@ export function VentureNightAnimation() {
                 cy="122"
                 r="25"
                 fill="#74462f"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M283 126C277 89 332 83 334 121L326 161L319 113C308 125 295 126 283 117Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M277 155C284 137 326 137 337 157L341 220H271Z"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
-              <circle cx="299" cy="123" r="2.5" fill="#241f20" />
-              <circle cx="316" cy="123" r="2.5" fill="#241f20" />
+              <circle cx="299" cy="123" r="2.5" fill="#0b2347" />
+              <circle cx="316" cy="123" r="2.5" fill="#0b2347" />
 
               <path
                 d="M297 134C304 143 314 143 321 133"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -544,7 +544,7 @@ export function VentureNightAnimation() {
               <path
                 d="M285 163L253 182"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -552,7 +552,7 @@ export function VentureNightAnimation() {
 
             <g
               fill="#ffffff"
-              stroke="#241f20"
+              stroke="#0b2347"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -565,7 +565,7 @@ export function VentureNightAnimation() {
 
             <g
               className="vna-hearts"
-              fill="#d01013"
+              fill="#e02432"
             >
               <path d="M231 87C223 76 205 85 231 104C257 85 239 76 231 87Z" />
               <path d="M267 101C261 93 247 100 267 115C287 100 273 93 267 101Z" />
@@ -593,10 +593,10 @@ export function VentureNightAnimation() {
               width="204"
               height="49"
               rx="12"
-              fill="#241f20"
+              fill="#0b2347"
             />
 
-            <g fill="#ffcf00">
+            <g fill="#ffb65b">
               <circle cx="177" cy="43" r="8" />
               <circle cx="210" cy="43" r="8" />
               <circle cx="243" cy="43" r="8" />
@@ -607,14 +607,14 @@ export function VentureNightAnimation() {
             <path
               d="M187 72H352L430 250H110Z"
               fill="#f5c56d"
-              stroke="#241f20"
+              stroke="#0b2347"
               strokeWidth="4"
             />
 
             <path
               d="M270 76V246"
               fill="none"
-              stroke="#d01013"
+              stroke="#e02432"
               strokeWidth="4"
               strokeDasharray="11 9"
             />
@@ -622,7 +622,7 @@ export function VentureNightAnimation() {
             <g
               className="vna-pins"
               fill="#ffffff"
-              stroke="#241f20"
+              stroke="#0b2347"
               strokeWidth="4"
               strokeLinejoin="round"
             >
@@ -637,26 +637,26 @@ export function VentureNightAnimation() {
                 cy="137"
                 r="25"
                 fill="#74462f"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M115 142C109 103 165 98 167 136L159 176L152 128C141 140 128 141 115 132Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M108 169C115 150 157 150 168 170L174 229H102Z"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M157 176L207 199"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -664,7 +664,7 @@ export function VentureNightAnimation() {
               <path
                 d="M116 174L87 143"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -672,7 +672,7 @@ export function VentureNightAnimation() {
               <path
                 d="M140 220L168 247"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -680,7 +680,7 @@ export function VentureNightAnimation() {
               <path
                 d="M129 146C136 154 146 154 153 145"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -691,14 +691,14 @@ export function VentureNightAnimation() {
                 cx="222"
                 cy="211"
                 r="19"
-                fill="#d01013"
-                stroke="#241f20"
+                fill="#e02432"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
-              <circle cx="215" cy="203" r="2.8" fill="#241f20" />
-              <circle cx="225" cy="201" r="2.8" fill="#241f20" />
-              <circle cx="232" cy="209" r="2.8" fill="#241f20" />
+              <circle cx="215" cy="203" r="2.8" fill="#0b2347" />
+              <circle cx="225" cy="201" r="2.8" fill="#0b2347" />
+              <circle cx="232" cy="209" r="2.8" fill="#0b2347" />
             </g>
 
             <g className="vna-bowling-guy">
@@ -707,26 +707,26 @@ export function VentureNightAnimation() {
                 cy="145"
                 r="24"
                 fill="#bd7956"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M386 145C387 114 433 114 434 145C421 136 400 136 387 149Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M379 175C386 157 429 157 439 176L444 231H374Z"
-                fill="#d01013"
-                stroke="#241f20"
+                fill="#e02432"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M399 152C406 160 416 160 423 151"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -735,7 +735,7 @@ export function VentureNightAnimation() {
                 className="vna-clap-left"
                 d="M390 184L363 165"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -744,7 +744,7 @@ export function VentureNightAnimation() {
                 className="vna-clap-right"
                 d="M428 183L363 165"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -752,8 +752,8 @@ export function VentureNightAnimation() {
 
             <g
               className="vna-stars"
-              fill="#ffcf00"
-              stroke="#241f20"
+              fill="#ffb65b"
+              stroke="#0b2347"
               strokeWidth="3"
             >
               <path d="M61 50L67 67L85 72L68 78L62 96L56 79L38 73L55 67Z" />
@@ -780,8 +780,8 @@ export function VentureNightAnimation() {
               cx="414"
               cy="46"
               r="28"
-              fill="#ffcf00"
-              stroke="#241f20"
+              fill="#ffb65b"
+              stroke="#0b2347"
               strokeWidth="4"
             />
 
@@ -792,27 +792,27 @@ export function VentureNightAnimation() {
 
             <g>
               <rect x="38" y="114" width="12" height="88" rx="6" fill="#765033" />
-              <circle cx="44" cy="99" r="36" fill="#4e9d53" stroke="#241f20" strokeWidth="3" />
+              <circle cx="44" cy="99" r="36" fill="#4e9d53" stroke="#0b2347" strokeWidth="3" />
 
               <rect x="409" y="111" width="12" height="91" rx="6" fill="#765033" />
-              <circle cx="415" cy="95" r="39" fill="#4e9d53" stroke="#241f20" strokeWidth="3" />
+              <circle cx="415" cy="95" r="39" fill="#4e9d53" stroke="#0b2347" strokeWidth="3" />
 
               <rect x="331" y="136" width="10" height="66" rx="5" fill="#765033" />
-              <circle cx="336" cy="125" r="28" fill="#4e9d53" stroke="#241f20" strokeWidth="3" />
+              <circle cx="336" cy="125" r="28" fill="#4e9d53" stroke="#0b2347" strokeWidth="3" />
             </g>
 
             <g className="vna-giraffe">
               <path
                 d="M54 136Q94 115 128 138L129 202H63Z"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M105 139L116 48H145L133 145Z"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
@@ -820,27 +820,27 @@ export function VentureNightAnimation() {
                 cx="132"
                 cy="44"
                 r="19"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M116 35L101 25L105 45Z"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
 
               <path
                 d="M146 34L160 23L158 44Z"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
 
-              <circle cx="126" cy="42" r="2.5" fill="#241f20" />
-              <circle cx="140" cy="42" r="2.5" fill="#241f20" />
+              <circle cx="126" cy="42" r="2.5" fill="#0b2347" />
+              <circle cx="140" cy="42" r="2.5" fill="#0b2347" />
 
               <g fill="#9a5e27">
                 <circle cx="84" cy="149" r="8" />
@@ -858,7 +858,7 @@ export function VentureNightAnimation() {
                 rx="54"
                 ry="41"
                 fill="#9da1a6"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
@@ -867,7 +867,7 @@ export function VentureNightAnimation() {
                 cy="158"
                 r="33"
                 fill="#9da1a6"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
@@ -876,7 +876,7 @@ export function VentureNightAnimation() {
                 cy="156"
                 r="24"
                 fill="#aeb2b6"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
@@ -888,13 +888,13 @@ export function VentureNightAnimation() {
                 strokeLinecap="round"
               />
 
-              <circle cx="326" cy="151" r="3" fill="#241f20" />
+              <circle cx="326" cy="151" r="3" fill="#0b2347" />
             </g>
 
             <path
               d="M0 211H480"
               fill="none"
-              stroke="#241f20"
+              stroke="#0b2347"
               strokeWidth="5"
               strokeDasharray="17 8"
             />
@@ -905,26 +905,26 @@ export function VentureNightAnimation() {
                 cy="158"
                 r="23"
                 fill="#74462f"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M194 161C189 127 239 122 240 157L233 190L227 150C217 160 205 161 194 153Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M188 187C194 171 232 171 242 188L247 245H183Z"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M196 192L220 175M235 193L220 175"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -935,8 +935,8 @@ export function VentureNightAnimation() {
                 width="30"
                 height="22"
                 rx="5"
-                fill="#d01013"
-                stroke="#241f20"
+                fill="#e02432"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
 
@@ -944,8 +944,8 @@ export function VentureNightAnimation() {
                 cx="224"
                 cy="176"
                 r="7"
-                fill="#ffcf00"
-                stroke="#241f20"
+                fill="#ffb65b"
+                stroke="#0b2347"
                 strokeWidth="3"
               />
             </g>
@@ -956,19 +956,19 @@ export function VentureNightAnimation() {
                 cy="161"
                 r="23"
                 fill="#bd7956"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
               <path
                 d="M263 161C264 132 307 132 308 161C296 153 276 152 264 165Z"
-                fill="#241f20"
+                fill="#0b2347"
               />
 
               <path
                 d="M256 190C263 173 303 173 313 191L318 245H251Z"
-                fill="#d01013"
-                stroke="#241f20"
+                fill="#e02432"
+                stroke="#0b2347"
                 strokeWidth="4"
               />
 
@@ -976,7 +976,7 @@ export function VentureNightAnimation() {
                 className="vna-point"
                 d="M302 195L347 151"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -984,7 +984,7 @@ export function VentureNightAnimation() {
               <path
                 d="M275 168C282 176 292 176 299 167"
                 fill="none"
-                stroke="#241f20"
+                stroke="#0b2347"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -993,8 +993,8 @@ export function VentureNightAnimation() {
             <path
               className="vna-camera-flash"
               d="M181 133L187 148L203 153L188 159L182 175L176 160L160 154L175 148Z"
-              fill="#ffcf00"
-              stroke="#241f20"
+              fill="#ffb65b"
+              stroke="#0b2347"
               strokeWidth="3"
             />
           </svg>
@@ -1005,13 +1005,13 @@ export function VentureNightAnimation() {
         .vna-root {
           width: 100%;
           overflow: hidden;
-          border: 3px solid #241f20;
+          border: 3px solid #0b2347;
           border-radius: 22px;
           background:
             linear-gradient(
               145deg,
-              #edb200,
-              #ffcf00
+              #ec8a34,
+              #ffb65b
             );
           box-shadow:
             7px 8px 0
@@ -1028,7 +1028,7 @@ export function VentureNightAnimation() {
           position: absolute;
           inset: 12px;
           overflow: hidden;
-          border: 3px solid #241f20;
+          border: 3px solid #0b2347;
           border-radius: 18px;
           background: #fff8ef;
           opacity: 0;
@@ -1185,7 +1185,7 @@ export function VentureNightAnimation() {
 
         @keyframes vna-light {
           50% {
-            fill: #edb200;
+            fill: #ec8a34;
             transform:
               translateY(3px);
           }

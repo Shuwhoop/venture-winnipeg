@@ -27,7 +27,7 @@
 .voteSection header > span,
 .blendHeading > span,
 .blendResultHeader span {
-  color: #d81318;
+  color: #e02432;
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -129,7 +129,7 @@
 }
 
 .attendance strong {
-  color: #d81318;
+  color: #e02432;
 }
 
 .memberNames {
@@ -279,7 +279,7 @@
 }
 
 .blendMeter strong {
-  color: #d81318;
+  color: #e02432;
   font-size: 1.35rem;
   line-height: 1;
 }
@@ -610,7 +610,7 @@
 }
 
 .voteButtons b {
-  color: #d81318;
+  color: #e02432;
 }
 
 .message {
@@ -857,7 +857,7 @@
 }
 
 .pulseNumber strong {
-  color: #d81318;
+  color: #e02432;
   font-size: 1.65rem;
   line-height: 1;
 }
@@ -983,7 +983,7 @@
 }
 
 .voteLoveBar {
-  background: #d81318;
+  background: #e02432;
 }
 
 .voteOkayBar {

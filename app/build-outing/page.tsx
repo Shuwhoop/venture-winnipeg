@@ -38,13 +38,13 @@ const STEP_VISUALS = [
   {
     icon: "👤",
     label: "Choose your crew",
-    accent: "#d01013",
+    accent: "#e02432",
     soft: "#ffd9dc"
   },
   {
     icon: "🧩",
     label: "Pick a build style",
-    accent: "#6d28d9",
+    accent: "#e02432",
     soft: "#eee3ff"
   },
   {
@@ -86,7 +86,7 @@ const STEP_VISUALS = [
   {
     icon: "🚀",
     label: "Review and launch",
-    accent: "#d01013",
+    accent: "#e02432",
     soft: "#fff0b9"
   }
 ] as const;

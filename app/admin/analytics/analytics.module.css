@@ -14,13 +14,13 @@
   border-radius: 24px;
   background:
     radial-gradient(circle at top right, rgba(255, 204, 0, 0.22), transparent 36%),
-    linear-gradient(145deg, #ffffff, #faf7ff);
+    linear-gradient(145deg, #ffffff, #f7faff);
 }
 
 .eyebrow,
 .kicker {
   margin: 0 0 7px;
-  color: #6d28d9;
+  color: #e02432;
   font-size: 10px;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -62,7 +62,7 @@
   border: 1px solid #ded4ec;
   border-radius: 12px;
   background: #fff;
-  color: #5b21b6;
+  color: #b61725;
   font-size: 11px;
   font-weight: 900;
   text-align: center;
@@ -85,7 +85,7 @@
 
 .nav a.active,
 .periods a.active {
-  background: #6d28d9;
+  background: #e02432;
   color: #fff;
 }
 
@@ -248,12 +248,12 @@
   height: 100%;
   min-width: 2px;
   border-radius: inherit;
-  background: linear-gradient(90deg, #6d28d9, #9b6be8);
+  background: linear-gradient(90deg, #e02432, #9b6be8);
 }
 
 .barRow strong,
 .simpleList strong {
-  color: #5b21b6;
+  color: #b61725;
   font-size: 11px;
 }
 
@@ -270,7 +270,7 @@
   position: relative;
   min-height: 3px;
   border-radius: 5px 5px 2px 2px;
-  background: linear-gradient(180deg, #7c3aed, #c4a3f4);
+  background: linear-gradient(180deg, #e02432, #c4a3f4);
 }
 
 .trendBar:hover::after {
@@ -312,7 +312,7 @@
 }
 
 .funnelTop strong {
-  color: #5b21b6;
+  color: #b61725;
   font-size: 20px;
 }
 
@@ -378,7 +378,7 @@
   background:
     color-mix(
       in srgb,
-      #6d28d9 var(--heat),
+      #e02432 var(--heat),
       #f5f1fa
     );
   color: #2e174a;
@@ -413,7 +413,7 @@
   padding: 5px 8px;
   border-radius: 999px;
   background: #eee8fa;
-  color: #5b21b6;
+  color: #b61725;
   font-size: 9px;
   font-weight: 900;
 }
@@ -440,7 +440,7 @@
 .feedbackItem a,
 .feedbackItem footer span {
   margin-left: auto;
-  color: #6d28d9;
+  color: #e02432;
   font-size: 10px;
   font-weight: 850;
 }
@@ -477,7 +477,7 @@
 }
 
 .taxonomy code {
-  color: #6d28d9;
+  color: #e02432;
   font-size: 10px;
   font-weight: 900;
 }
@@ -503,7 +503,7 @@
 }
 
 .statLine strong {
-  color: #4c1d95;
+  color: #8f1621;
 }
 
 @container (min-width: 620px) {

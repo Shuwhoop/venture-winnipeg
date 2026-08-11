@@ -6,7 +6,7 @@
   );
   margin: 0 auto;
   padding: 22px 0 130px;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .page,
@@ -20,20 +20,20 @@
   grid-template-columns: 1fr;
   gap: 20px;
   padding: 20px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 24px;
   background:
     linear-gradient(
       135deg,
-      #fff8d8,
+      #ffefd8,
       #ffffff 68%
     );
   box-shadow:
-    5px 5px 0 #edb200;
+    5px 5px 0 #ec8a34;
 }
 
 .heroCopy > span {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -76,9 +76,9 @@
   place-items: center;
   min-width: 0;
   padding: 14px 10px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 16px;
-  background: #ffcf00;
+  background: #ffb65b;
   text-align: center;
 }
 
@@ -98,7 +98,7 @@
 .controls {
   margin-top: 22px;
   padding: 15px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 18px;
   background: #ffffff;
 }
@@ -137,7 +137,7 @@
   border-radius: 12px;
   padding: 10px 11px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font: inherit;
   font-size: 0.84rem;
 }
@@ -147,7 +147,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   font-weight: 900;
   line-height: 1.15;
   text-align: center;
@@ -158,7 +158,7 @@
 }
 
 .searchForm button {
-  background: #ffcf00;
+  background: #ffb65b;
 }
 
 .clear {
@@ -181,7 +181,7 @@
 .card {
   width: 100%;
   overflow: hidden;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 21px;
   background: #ffffff;
   box-shadow:
@@ -209,7 +209,7 @@
   gap: 17px;
   padding: 18px;
   border-bottom: 1px solid #ded4cc;
-  background: #fffaf2;
+  background: #fff5e8;
 }
 
 .badgeRow {
@@ -372,7 +372,7 @@
   min-width: 0;
   min-height: 42px;
   padding: 9px 11px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 11px;
   font: inherit;
   font-size: 0.75rem;
@@ -386,13 +386,13 @@
 }
 
 .openListing {
-  background: #ffcf00;
-  color: #241f20;
+  background: #ffb65b;
+  color: #0b2347;
 }
 
 .sourceLink {
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .actions form {
@@ -401,7 +401,7 @@
 }
 
 .actions button {
-  background: #fff1b8;
+  background: #ffe1b8;
   color: #4f4005;
   cursor: pointer;
 }
@@ -437,10 +437,10 @@
   min-width: 0;
   min-height: 40px;
   padding: 8px 10px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 11px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font-size: 0.76rem;
   font-weight: 900;
   text-decoration: none;
@@ -457,8 +457,8 @@
   gap: 7px;
   margin-top: 22px;
   padding: 15px 16px;
-  border-left: 5px solid #edb200;
-  background: #fff8d8;
+  border-left: 5px solid #ec8a34;
+  background: #ffefd8;
 }
 
 .approvedNote p {
@@ -484,9 +484,9 @@
   place-items: center;
   width: 50px;
   height: 50px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 16px;
-  background: #ffcf00;
+  background: #ffb65b;
   font-size: 1.3rem;
   font-weight: 900;
 }

@@ -88,7 +88,7 @@
 }
 
 .sectionHeading span {
-  color: #6d28d9;
+  color: #e02432;
   font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.12em;
@@ -142,7 +142,7 @@
 .form input:focus,
 .form select:focus,
 .form textarea:focus {
-  border-color: #6d28d9;
+  border-color: #e02432;
   outline: 3px solid rgba(109, 40, 217, 0.13);
 }
 
@@ -151,7 +151,7 @@
 .hoursQuickFill {
   display: grid;
   gap: 14px;
-  border: 1px solid #d9c9f8;
+  border: 1px solid #d7e6f5;
   border-radius: 18px;
   padding: 16px;
   background:
@@ -171,7 +171,7 @@
 }
 
 .quickFillHeading span {
-  color: #6d28d9;
+  color: #e02432;
   font-size: 0.7rem;
   font-weight: 850;
   letter-spacing: 0.12em;
@@ -206,10 +206,10 @@
 
 .quickHourActions button {
   min-height: 42px;
-  border: 1px solid #6d28d9;
+  border: 1px solid #e02432;
   border-radius: 11px;
   padding: 9px 12px;
-  background: #6d28d9;
+  background: #e02432;
   color: white;
   font: inherit;
   font-size: 0.8rem;
@@ -293,7 +293,7 @@
 
 .inlineControl button {
   min-height: 44px;
-  border: 1px solid #6d28d9;
+  border: 1px solid #e02432;
   border-radius: 11px;
   padding: 8px 12px;
   background: #f3edff;
@@ -311,7 +311,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  border: 2px solid #211d26;
+  border: 2px solid #102a4d;
   border-radius: 18px;
   padding: 12px 14px;
   background: rgba(255, 255, 255, 0.96);
@@ -329,7 +329,7 @@
 .stickyActions button {
   min-width: 150px;
   min-height: 48px;
-  border: 2px solid #211d26;
+  border: 2px solid #102a4d;
   border-radius: 13px;
   padding: 10px 18px;
   background: #e10e17;
@@ -337,7 +337,7 @@
   font: inherit;
   font-weight: 850;
   cursor: pointer;
-  box-shadow: 4px 4px 0 #ffd200;
+  box-shadow: 4px 4px 0 #ffb65b;
 }
 
 .stickyActions button:disabled {
@@ -432,10 +432,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  border: 1px solid #d9c9f8;
+  border: 1px solid #d7e6f5;
   border-radius: 15px;
   padding: 13px 14px;
-  background: #faf7ff;
+  background: #f7faff;
 }
 
 .quickEditBar > div {
@@ -458,10 +458,10 @@
 .quickEditBar button,
 .inlineButtonGroup button {
   min-height: 40px;
-  border: 1px solid #6d28d9;
+  border: 1px solid #e02432;
   border-radius: 10px;
   padding: 8px 11px;
-  background: #6d28d9;
+  background: #e02432;
   color: #ffffff;
   font: inherit;
   font-size: 0.76rem;
@@ -517,7 +517,7 @@
 
 .secondarySave {
   background: #ffffff !important;
-  color: #17131d !important;
+  color: #06172f !important;
   box-shadow: none !important;
 }
 
@@ -529,8 +529,8 @@
 
 /* Direct publishing from the full listing editor */
 .publishAction {
-  background: #ffd200 !important;
-  color: #17131d !important;
+  background: #ffb65b !important;
+  color: #06172f !important;
   box-shadow: 4px 4px 0 #e10e17 !important;
 }
 

@@ -7,7 +7,7 @@
   max-width: 100%;
   padding: 24px 15px 118px;
   overflow: hidden;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .page,
@@ -70,9 +70,9 @@
   place-items: center;
   width: 76px;
   height: 76px;
-  border: 3px solid #241f20;
+  border: 3px solid #0b2347;
   border-radius: 23px;
-  background: #ffcf00;
+  background: #ffb65b;
   box-shadow:
     5px 6px 0
     rgba(36, 31, 32, 0.17);
@@ -95,7 +95,7 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 14px;
   background: #ffffff;
   box-shadow:
@@ -166,9 +166,9 @@
   z-index: 1;
   width: 8px;
   height: 8px;
-  border: 2px solid #d01013;
+  border: 2px solid #e02432;
   border-radius: 999px;
-  background: #ffcf00;
+  background: #ffb65b;
   animation:
     sparkPop 2.6s
     ease-in-out infinite;
@@ -199,7 +199,7 @@
 }
 
 .eyebrow {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.61rem;
   font-weight: 900;
   letter-spacing: 0.11em;
@@ -247,7 +247,7 @@
   min-height: 52px;
   max-width: 100%;
   padding: 11px 14px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 14px;
   font-size: 0.87rem;
   font-weight: 900;
@@ -263,15 +263,15 @@
 }
 
 .primary {
-  background: #d01013;
+  background: #e02432;
   color: #ffffff;
   box-shadow:
-    4px 4px 0 #edb200;
+    4px 4px 0 #ec8a34;
 }
 
 .secondary {
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   box-shadow:
     4px 4px 0
     rgba(36, 31, 32, 0.14);

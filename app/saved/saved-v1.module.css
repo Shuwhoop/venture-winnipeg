@@ -1,8 +1,8 @@
 .page {
-  --saved-ink: #241f20;
+  --saved-ink: #0b2347;
   --saved-cream: #fff9eb;
-  --saved-yellow: #ffcf00;
-  --saved-red: #d01013;
+  --saved-yellow: #ffb65b;
+  --saved-red: #e02432;
   --saved-muted: #716769;
 
   container-type: inline-size;
@@ -463,7 +463,7 @@
 }
 
 .purple {
-  background: #6d28d9;
+  background: #e02432;
 }
 
 .green {

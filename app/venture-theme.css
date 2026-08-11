@@ -5,13 +5,13 @@
  */
 
 :root {
-  --venture-yellow: #ffcf00;
+  --venture-yellow: #ffb65b;
   --venture-yellow-soft: #fff3b3;
-  --venture-gold: #edb200;
-  --venture-red: #d01013;
-  --venture-red-dark: #a80c0f;
-  --venture-ink: #241f20;
-  --venture-ink-soft: #383132;
+  --venture-gold: #ec8a34;
+  --venture-red: #e02432;
+  --venture-red-dark: #b61725;
+  --venture-ink: #0b2347;
+  --venture-ink-soft: #294563;
   --venture-muted: #746c6d;
   --venture-cream: #fff8ef;
   --venture-paper: #ffffff;

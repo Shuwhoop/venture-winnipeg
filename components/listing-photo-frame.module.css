@@ -2,10 +2,10 @@
   width: 100%;
   margin: 0;
   overflow: hidden;
-  border: 2px solid #17131d;
+  border: 2px solid #06172f;
   border-radius: 24px;
-  background: #ffcf00;
-  box-shadow: 5px 6px 0 #e20f18;
+  background: #ffb65b;
+  box-shadow: 5px 6px 0 #e02432;
 }
 
 .photo,
@@ -38,7 +38,7 @@
   content: "";
   position: absolute;
   pointer-events: none;
-  border: 3px solid #17131d;
+  border: 3px solid #06172f;
 }
 
 .placeholder::before {
@@ -70,35 +70,35 @@
 .doodle,
 .spark {
   fill: none;
-  stroke: #17131d;
+  stroke: #06172f;
   stroke-width: 6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .spark {
-  fill: #fffaf2;
+  fill: #fff5e8;
 }
 
 .dot {
-  fill: #e20f18;
-  stroke: #17131d;
+  fill: #e02432;
+  stroke: #06172f;
   stroke-width: 4;
 }
 
 .sun {
-  fill: #fffaf2;
-  stroke: #17131d;
+  fill: #fff5e8;
+  stroke: #06172f;
   stroke-width: 5;
 }
 
 .nightlife .placeholder,
 .music .placeholder {
-  background: linear-gradient(135deg, #6d23d9, #efb1b7 58%, #ffcf00);
+  background: linear-gradient(135deg, #e02432, #efb1b7 58%, #ffb65b);
 }
 
 .outdoor .placeholder {
-  background: linear-gradient(145deg, #d9f8e6, #ffcf00);
+  background: linear-gradient(145deg, #d9f8e6, #ffb65b);
 }
 
 .activity .placeholder {
@@ -106,7 +106,7 @@
 }
 
 .event .placeholder {
-  background: linear-gradient(145deg, #ffcf00, #ffeef0);
+  background: linear-gradient(145deg, #ffb65b, #ffeef0);
 }
 
 @media (prefers-reduced-motion: reduce) {

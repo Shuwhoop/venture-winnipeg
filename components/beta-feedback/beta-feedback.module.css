@@ -11,7 +11,7 @@
   border: 1px solid rgba(109, 40, 217, 0.18);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.96);
-  color: #5b21b6;
+  color: #b61725;
   box-shadow: 0 12px 30px rgba(43, 31, 74, 0.18);
   font: inherit;
   font-size: 13px;
@@ -59,7 +59,7 @@
 
 .header p {
   margin: 0 0 6px;
-  color: #7c3aed;
+  color: #e02432;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -79,7 +79,7 @@
   border: 0;
   border-radius: 50%;
   background: #f4f0fb;
-  color: #4c1d95;
+  color: #8f1621;
   font: inherit;
   font-size: 24px;
   cursor: pointer;
@@ -153,8 +153,8 @@
 }
 
 .ratings button.selected {
-  border-color: #7c3aed;
-  background: #7c3aed;
+  border-color: #e02432;
+  background: #e02432;
   color: white;
 }
 
@@ -185,7 +185,7 @@
   min-height: 48px;
   border: 0;
   border-radius: 15px;
-  background: #6d28d9;
+  background: #e02432;
   color: white;
   font: inherit;
   font-weight: 900;

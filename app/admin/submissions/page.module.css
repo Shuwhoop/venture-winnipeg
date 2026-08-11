@@ -2,7 +2,7 @@
   width: min(1120px, calc(100% - 28px));
   margin: 0 auto;
   padding: 30px 0 140px;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .hero {
@@ -10,16 +10,16 @@
   justify-content: space-between;
   gap: 24px;
   padding: 28px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 28px;
-  background: linear-gradient(135deg, #fff8d8, #ffffff 68%);
-  box-shadow: 7px 7px 0 #edb200;
+  background: linear-gradient(135deg, #ffefd8, #ffffff 68%);
+  box-shadow: 7px 7px 0 #ec8a34;
 }
 
 .hero > div > span,
 .sectionHeading > span,
 .cardHeader > div > span {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -46,9 +46,9 @@
   display: grid;
   min-width: 118px;
   padding: 18px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 20px;
-  background: #ffcf00;
+  background: #ffb65b;
   text-align: center;
 }
 
@@ -75,10 +75,10 @@
   justify-content: space-between;
   gap: 12px;
   padding: 15px 17px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 16px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font-size: 0.84rem;
   font-weight: 900;
   text-decoration: none;
@@ -90,7 +90,7 @@
   min-width: 28px;
   height: 28px;
   border-radius: 999px;
-  background: #ffcf00;
+  background: #ffb65b;
 }
 
 .notice {
@@ -99,7 +99,7 @@
   gap: 18px;
   margin: 16px 0 34px;
   padding: 17px 20px;
-  border-left: 5px solid #d01013;
+  border-left: 5px solid #e02432;
   background: #fff2ef;
 }
 
@@ -136,7 +136,7 @@
 
 .card {
   overflow: hidden;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 24px;
   background: #ffffff;
   box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.13);
@@ -148,7 +148,7 @@
   gap: 20px;
   padding: 22px 24px;
   border-bottom: 1px solid #ded4cc;
-  background: #fffaf2;
+  background: #fff5e8;
 }
 
 .cardHeader h3 {
@@ -215,7 +215,7 @@
   border: 1.5px solid #bdb1aa;
   border-radius: 13px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font: inherit;
 }
 
@@ -230,7 +230,7 @@
 .grid textarea:focus,
 .reviewNotes textarea:focus {
   outline: 3px solid rgba(255, 207, 0, 0.42);
-  border-color: #241f20;
+  border-color: #0b2347;
 }
 
 .wide {
@@ -279,7 +279,7 @@
 .actions button {
   min-height: 44px;
   padding: 10px 15px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 13px;
   font: inherit;
   font-size: 0.8rem;
@@ -289,22 +289,22 @@
 
 .save {
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
 }
 
 .changes {
-  background: #fff1b8;
+  background: #ffe1b8;
   color: #4f4005;
 }
 
 .approve {
-  background: #ffcf00;
-  color: #241f20;
+  background: #ffb65b;
+  color: #0b2347;
 }
 
 .reject {
   margin-left: auto;
-  background: #d01013;
+  background: #e02432;
   color: #ffffff;
 }
 
@@ -367,7 +367,7 @@
 }
 
 .linkedNotice strong {
-  color: #241f20;
+  color: #0b2347;
 }
 
 .actions .edit {
@@ -376,9 +376,9 @@
   justify-content: center;
   min-height: 44px;
   padding: 10px 15px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 13px;
-  background: #6d28d9;
+  background: #e02432;
   color: #ffffff;
   font: inherit;
   font-size: 0.8rem;
@@ -401,7 +401,7 @@
   gap: 18px;
   margin: 24px 0;
   padding: 21px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 24px;
   background:
     radial-gradient(
@@ -432,7 +432,7 @@
 .queueToolsHeading span,
 .queueFilters label > span,
 .quickFacts span {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.09em;
@@ -455,9 +455,9 @@
   display: grid;
   min-width: 105px;
   padding: 12px 15px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 17px;
-  background: #ffcf00;
+  background: #ffb65b;
   text-align: center;
 }
 
@@ -495,7 +495,7 @@
   border: 1.5px solid #bdb1aa;
   border-radius: 14px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font: inherit;
 }
 
@@ -514,7 +514,7 @@
   place-items: center;
   width: 42px;
   height: 100%;
-  color: #6d28d9;
+  color: #e02432;
   font-size: 1.35rem;
   font-weight: 900;
 }
@@ -532,7 +532,7 @@
 .searchField > div:focus-within,
 .queueFilters select:focus {
   outline: 3px solid rgba(255, 207, 0, 0.42);
-  border-color: #241f20;
+  border-color: #0b2347;
 }
 
 .queueToolActions {
@@ -544,10 +544,10 @@
 .queueToolActions button {
   min-height: 40px;
   padding: 8px 12px;
-  border: 1.5px solid #241f20;
+  border: 1.5px solid #0b2347;
   border-radius: 12px;
   background: #ffffff;
-  color: #241f20;
+  color: #0b2347;
   font: inherit;
   font-size: 0.75rem;
   font-weight: 900;
@@ -568,7 +568,7 @@
   margin: 0;
   padding: 13px 15px;
   border-radius: 13px;
-  background: #fff1b8;
+  background: #ffe1b8;
   color: #594807;
   font-size: 0.82rem;
   font-weight: 750;
@@ -593,7 +593,7 @@
   background:
     linear-gradient(
       145deg,
-      #fffaf2,
+      #fff5e8,
       #ffffff
     );
   cursor: pointer;
@@ -627,7 +627,7 @@
 }
 
 .cardSummary > div:first-child > span {
-  color: #d01013;
+  color: #e02432;
   font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.1em;
@@ -661,7 +661,7 @@
 
 .summaryMeta strong,
 .submitter strong {
-  color: #241f20;
+  color: #0b2347;
 }
 
 .expandHint {
@@ -672,10 +672,10 @@
   min-width: 74px;
   min-height: 37px;
   padding: 7px 10px;
-  border: 2px solid #241f20;
+  border: 2px solid #0b2347;
   border-radius: 999px;
-  background: #ffcf00;
-  color: #241f20;
+  background: #ffb65b;
+  color: #0b2347;
   font-size: 0.7rem;
   font-weight: 900;
 }
@@ -728,7 +728,7 @@
   padding: 12px;
   border: 1.5px solid #d8ccc5;
   border-radius: 14px;
-  background: #fffaf2;
+  background: #fff5e8;
 }
 
 .quickFacts strong {
@@ -902,10 +902,10 @@
   place-items: center;
   width: 25px;
   height: 25px;
-  border: 1.5px solid #241f20;
+  border: 1.5px solid #0b2347;
   border-radius: 999px;
-  background: #ffcf00;
-  color: #241f20;
+  background: #ffb65b;
+  color: #0b2347;
 }
 
 .inlineEditor[open] > summary {
@@ -1007,7 +1007,7 @@
     gap: 14px;
     padding: 20px;
     border-radius: 22px;
-    box-shadow: 5px 5px 0 #edb200;
+    box-shadow: 5px 5px 0 #ec8a34;
   }
 
   .hero > div:first-child {
