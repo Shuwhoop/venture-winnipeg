@@ -11,10 +11,6 @@ import {
 } from "react";
 
 import {
-  SavedSyncBanner
-} from "@/components/account-sync/account-sync";
-
-import {
   SavedListingCard
 } from "@/components/saved/saved-listing-card";
 
@@ -600,8 +596,7 @@ export default function SavedPage() {
   if (isEmpty) {
     return (
       <>
-        <SavedSyncBanner />
-        <VentureSavedEmptyState />
+<VentureSavedEmptyState />
       </>
     );
   }
@@ -612,9 +607,7 @@ export default function SavedPage() {
 
   return (
     <main className={styles.page}>
-      <SavedSyncBanner />
-
-      <header className={styles.hero}>
+<header className={styles.hero}>
         <div className={styles.heroTop}>
           <div>
             <span className={styles.eyebrow}>
