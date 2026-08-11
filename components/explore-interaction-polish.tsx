@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { useEffect } from "react";
 import styles from "./explore-interaction-polish.module.css";
 
@@ -135,6 +137,8 @@ function isInteractive(target: EventTarget | null, card: HTMLElement) {
 }
 
 export function ExploreInteractionPolish() {
+  const router = useRouter();
+
   useEffect(() => {
     let frame = 0;
     const queue = () => {
@@ -151,7 +155,7 @@ export function ExploreInteractionPolish() {
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
-      window.location.assign(href);
+      router.push(href);
     };
 
     const keydown = (event: KeyboardEvent) => {
@@ -162,7 +166,7 @@ export function ExploreInteractionPolish() {
       const href = card.getAttribute(CARD);
       if (!href) return;
       event.preventDefault();
-      window.location.assign(href);
+      router.push(href);
     };
 
     const observer = new MutationObserver(queue);
