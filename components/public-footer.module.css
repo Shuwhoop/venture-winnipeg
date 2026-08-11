@@ -3,11 +3,11 @@
   gap: 18px;
   margin: 24px 14px 104px;
   padding: 20px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 22px;
   background:
-    radial-gradient(circle at 92% 10%, rgba(255, 207, 0, 0.24), transparent 26%),
-    linear-gradient(160deg, #fffaf4 0%, #fff4df 100%);
+    radial-gradient(circle at 92% 10%, rgba(244, 162, 97, 0.24), transparent 26%),
+    linear-gradient(160deg, #fffaf5 0%, #fff4df 100%);
   box-shadow: 5px 5px 0 rgba(208, 16, 19, 0.12);
 }
 
@@ -19,10 +19,10 @@
 .badge {
   width: fit-content;
   padding: 6px 9px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 999px;
-  background: #ffb65b;
-  color: #0b2347;
+  background: #ffd6b3;
+  color: #0b2b50;
   font-size: 0.65rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -54,14 +54,14 @@
   border: 1.5px solid #cdbfb6;
   border-radius: 999px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font-size: 0.73rem;
   font-weight: 800;
   text-decoration: none;
 }
 
 .links a:hover {
-  border-color: #0b2347;
+  border-color: #0b2b50;
   background: #fff4bf;
   transform: translateY(-1px);
 }

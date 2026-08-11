@@ -13,7 +13,7 @@
 .hero {
   padding: 24px 21px;
   background:
-    radial-gradient(circle at 90% 8%, rgba(255, 207, 0, 0.72), transparent 30%),
+    radial-gradient(circle at 90% 8%, rgba(244, 162, 97, 0.72), transparent 30%),
     linear-gradient(145deg, #6f4297, #452757);
   color: white;
 }
@@ -46,7 +46,7 @@
 .section {
   padding: 19px;
   border: 1px solid rgba(37, 24, 47, 0.1);
-  background: #fffaf4;
+  background: #fffaf5;
 }
 
 .section header > span,

@@ -1,9 +1,9 @@
 .refreshRoot {
-  --result-ink: #0b2347;
-  --result-red: #e02432;
-  --result-yellow: #ffb65b;
-  --result-cream: #fff5e8;
-  --result-purple: #e02432;
+  --result-ink: #0b2b50;
+  --result-red: #dc2f3b;
+  --result-yellow: #ffd6b3;
+  --result-cream: #fff7ee;
+  --result-purple: #dc2f3b;
   --result-green: #0f8a4b;
   width: 100%;
   max-width: 100%;
@@ -20,7 +20,7 @@
   min-width: 0;
   overflow: hidden;
   background:
-    radial-gradient(circle at 90% 14%, rgba(255, 207, 0, 0.28), transparent 24%),
+    radial-gradient(circle at 90% 14%, rgba(244, 162, 97, 0.28), transparent 24%),
     radial-gradient(circle at 8% 95%, rgba(208, 16, 19, 0.12), transparent 25%),
     linear-gradient(145deg, #fffef9 0%, #fff4e9 100%);
 }
@@ -88,7 +88,7 @@
 .refreshRoot :global(.outing-map-caption-card) {
   min-width: 0;
   padding: 15px 16px;
-  background: linear-gradient(135deg, #0b2347 0%, #403638 100%);
+  background: linear-gradient(135deg, #0b2b50 0%, #403638 100%);
   color: #fff;
 }
 
@@ -153,8 +153,8 @@
 }
 
 .primaryAction {
-  background: linear-gradient(135deg, #ffb65b 0%, #ffe272 100%) !important;
-  box-shadow: 4px 4px 0 #e02432 !important;
+  background: linear-gradient(135deg, #ffd6b3 0%, #ffdfc1 100%) !important;
+  box-shadow: 4px 4px 0 #dc2f3b !important;
 }
 
 .refreshAction {
@@ -258,7 +258,7 @@
   overflow: hidden;
   border-radius: 22px;
   background:
-    radial-gradient(circle at 96% 12%, rgba(255, 207, 0, 0.22), transparent 24%),
+    radial-gradient(circle at 96% 12%, rgba(244, 162, 97, 0.22), transparent 24%),
     linear-gradient(145deg, #fffefb 0%, #fff5e9 100%);
 }
 
@@ -353,9 +353,9 @@
   width: 44px;
   height: 44px;
   border-radius: 15px;
-  background: #ffb65b;
-  color: #0b2347;
-  box-shadow: 3px 3px 0 #e02432;
+  background: #ffd6b3;
+  color: #0b2b50;
+  box-shadow: 3px 3px 0 #dc2f3b;
   font-size: 1.05rem;
 }
 
@@ -433,8 +433,8 @@
   padding: 9px 12px;
   border: 1.5px solid #d1c5bd;
   border-radius: 13px;
-  background: #fff5e8;
-  color: #0b2347;
+  background: #fff7ee;
+  color: #0b2b50;
   font: inherit;
   font-size: 0.76rem;
   font-weight: 900;
@@ -446,7 +446,7 @@
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  background: #ffb65b;
+  background: #ffd6b3;
   font-style: normal;
   font-size: 1rem;
 }
@@ -522,7 +522,7 @@
   padding: 10px 12px;
   border: 2px solid var(--result-ink);
   border-radius: 13px;
-  background: #0b2347;
+  background: #0b2b50;
   color: #fff;
   text-decoration: none;
 }
@@ -674,9 +674,9 @@
   position: relative;
   padding-bottom: 132px;
   background:
-    radial-gradient(circle at 8% 9%, rgba(255, 207, 0, 0.18), transparent 22%),
+    radial-gradient(circle at 8% 9%, rgba(244, 162, 97, 0.18), transparent 22%),
     radial-gradient(circle at 94% 34%, rgba(208, 16, 19, 0.08), transparent 24%),
-    linear-gradient(180deg, #fffaf4 0%, #fff7f1 100%);
+    linear-gradient(180deg, #fffaf5 0%, #fff7f1 100%);
   animation: resultsArrival 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -1032,8 +1032,8 @@
   border-radius: 24px;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.32) 0 12%, transparent 12% 24%, rgba(255, 255, 255, 0.24) 24% 36%, transparent 36% 48%, rgba(255, 255, 255, 0.22) 48% 60%, transparent 60%),
-    linear-gradient(135deg, #ffb65b 0%, #ffe87f 62%, #fff4c0 100%);
-  box-shadow: 6px 6px 0 #e02432;
+    linear-gradient(135deg, #ffd6b3 0%, #ffe2c8 62%, #fff1e5 100%);
+  box-shadow: 6px 6px 0 #dc2f3b;
   animation: recipeArrival 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -1085,7 +1085,7 @@
   width: 47px;
   height: 47px;
   border-radius: 16px;
-  background: #fff5e8;
+  background: #fff7ee;
   box-shadow: 3px 3px 0 rgba(208, 16, 19, 0.25);
   font-size: 1.2rem;
 }
@@ -1107,7 +1107,7 @@
   border: 2px solid var(--result-ink);
   border-radius: 24px;
   background:
-    radial-gradient(circle at 91% 7%, rgba(255, 207, 0, 0.2), transparent 22%),
+    radial-gradient(circle at 91% 7%, rgba(244, 162, 97, 0.2), transparent 22%),
     linear-gradient(180deg, #fffefb 0%, #fff7ee 100%);
   box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.11);
 }
@@ -1169,16 +1169,16 @@
   max-width: 190px;
   min-height: 46px;
   padding: 9px 11px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 14px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
   font-size: 0.67rem;
   font-weight: 950;
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
-  box-shadow: 3px 3px 0 #ffb65b;
+  box-shadow: 3px 3px 0 #ffd6b3;
 }
 
 .refreshRoot :global(.outing-route-heading a > span) {
@@ -1256,11 +1256,11 @@
   background:
     radial-gradient(circle at 88% 10%, rgba(255, 255, 255, 0.8), transparent 27%),
     linear-gradient(135deg, #ffd8df 0%, #ffc0cd 100%) !important;
-  box-shadow: 4px 4px 0 #e02432 !important;
+  box-shadow: 4px 4px 0 #dc2f3b !important;
 }
 
 .shareIcon {
-  color: #b61725;
+  color: #b51f2b;
   background: linear-gradient(145deg, #f8f2ff 0%, #ffffff 100%);
 }
 
@@ -1291,7 +1291,7 @@
   border: 2px solid var(--result-ink);
   border-radius: 25px;
   background:
-    radial-gradient(circle at 94% 2%, rgba(255, 207, 0, 0.2), transparent 23%),
+    radial-gradient(circle at 94% 2%, rgba(244, 162, 97, 0.2), transparent 23%),
     radial-gradient(circle at 2% 48%, rgba(109, 40, 217, 0.08), transparent 20%),
     linear-gradient(180deg, #fffefb 0%, #fff7f1 100%);
   box-shadow: 6px 6px 0 rgba(36, 31, 32, 0.11);
@@ -1307,9 +1307,9 @@
   background:
     repeating-linear-gradient(
       to bottom,
-      #e02432 0 13px,
-      #ffb65b 13px 25px,
-      #e02432 25px 37px
+      #dc2f3b 0 13px,
+      #ffd6b3 13px 25px,
+      #dc2f3b 25px 37px
     );
   opacity: 0.3;
   content: "";
@@ -1331,8 +1331,8 @@
   border-radius: 20px;
   background:
     radial-gradient(circle at 90% 15%, rgba(255, 255, 255, 0.55), transparent 25%),
-    linear-gradient(135deg, #ffb65b 0%, #ffe270 55%, #fff4bd 100%);
-  box-shadow: 4px 4px 0 #e02432;
+    linear-gradient(135deg, #ffd6b3 0%, #ffdfc1 55%, #fff1e5 100%);
+  box-shadow: 4px 4px 0 #dc2f3b;
 }
 
 .refreshRoot :global(.outing-timeline-v3 .section-heading span) {
@@ -1379,7 +1379,7 @@
 
 .refreshRoot :global(.outing-kind-food .outing-stop-card-v3) {
   background:
-    radial-gradient(circle at 94% 10%, rgba(255, 207, 0, 0.2), transparent 26%),
+    radial-gradient(circle at 94% 10%, rgba(244, 162, 97, 0.2), transparent 26%),
     linear-gradient(180deg, #fffdf7 0%, #fff2c8 100%);
 }
 
@@ -1438,7 +1438,7 @@
   min-height: 26px;
   padding: 5px 8px;
   border-radius: 999px;
-  background: #0b2347;
+  background: #0b2b50;
   color: #ffffff;
   font-size: 0.62rem;
   font-weight: 900;
@@ -1465,7 +1465,7 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: 4px;
-  background: linear-gradient(180deg, #e02432, #ffb65b);
+  background: linear-gradient(180deg, #dc2f3b, #ffd6b3);
   content: "";
 }
 
@@ -1481,7 +1481,7 @@
   padding: 12px 13px 12px 9px;
   overflow: hidden;
   border: 1.5px solid rgba(109, 40, 217, 0.22);
-  border-left: 4px dashed #e02432;
+  border-left: 4px dashed #dc2f3b;
   border-radius: 0 18px 18px 0;
   background:
     radial-gradient(circle at 88% 30%, rgba(255, 255, 255, 0.6), transparent 28%),
@@ -1494,7 +1494,7 @@
   bottom: -28px;
   width: 75px;
   height: 75px;
-  border: 12px solid rgba(255, 207, 0, 0.26);
+  border: 12px solid rgba(244, 162, 97, 0.26);
   border-radius: 999px;
   content: "";
 }
@@ -1508,9 +1508,9 @@
   height: 42px;
   border: 2px solid var(--result-ink);
   border-radius: 14px;
-  background: #fff5e8;
-  color: #b61725;
-  box-shadow: 3px 3px 0 #ffb65b;
+  background: #fff7ee;
+  color: #b51f2b;
+  box-shadow: 3px 3px 0 #ffd6b3;
 }
 
 .refreshRoot :global(.outing-travel-icon svg) {
@@ -1527,7 +1527,7 @@
 }
 
 .refreshRoot :global(.outing-travel-copy strong) {
-  color: #b61725;
+  color: #b51f2b;
   font-size: 0.62rem;
   font-weight: 950;
   letter-spacing: 0.08em;
@@ -1548,7 +1548,7 @@
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: #e02432;
+  background: #dc2f3b;
   box-shadow: 0 0 0 0 rgba(208, 16, 19, 0.42);
   animation: travelPulse 1.8s ease-out infinite;
 }
@@ -1579,7 +1579,7 @@
 }
 
 .detailsToggle i {
-  color: #0b2347;
+  color: #0b2b50;
   transition: transform 180ms ease;
 }
 
@@ -1595,7 +1595,7 @@
 .stopDetailsPanel {
   position: relative;
   z-index: 3;
-  box-shadow: inset 0 0 0 1px rgba(255, 207, 0, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(244, 162, 97, 0.18);
 }
 
 @media (max-width: 420px) {
@@ -1674,9 +1674,9 @@
   border: 2px solid var(--result-ink);
   border-radius: 26px;
   background:
-    radial-gradient(circle at 92% 9%, rgba(255, 207, 0, 0.32), transparent 24%),
+    radial-gradient(circle at 92% 9%, rgba(244, 162, 97, 0.32), transparent 24%),
     radial-gradient(circle at 8% 96%, rgba(177, 221, 255, 0.38), transparent 26%),
-    linear-gradient(145deg, #fffaf4 0%, #fff2dc 54%, #f5efff 100%);
+    linear-gradient(145deg, #fffaf5 0%, #fff2dc 54%, #f5efff 100%);
   box-shadow: 6px 6px 0 rgba(36, 31, 32, 0.12);
   isolation: isolate;
 }
@@ -1701,9 +1701,9 @@
   width: 42px;
   height: 42px;
   background:
-    radial-gradient(circle, #e02432 0 3px, transparent 4px),
-    radial-gradient(circle at 100% 0%, #ffb65b 0 3px, transparent 4px),
-    radial-gradient(circle at 100% 100%, #3d78b5 0 3px, transparent 4px);
+    radial-gradient(circle, #dc2f3b 0 3px, transparent 4px),
+    radial-gradient(circle at 100% 0%, #ffd6b3 0 3px, transparent 4px),
+    radial-gradient(circle at 100% 100%, #4f83b6 0 3px, transparent 4px);
   content: "";
   opacity: 0.45;
   z-index: -1;
@@ -1728,7 +1728,7 @@
   border: 1.5px solid var(--result-ink);
   border-radius: 999px;
   background: #ffffff;
-  box-shadow: 2px 2px 0 #ffb65b;
+  box-shadow: 2px 2px 0 #ffd6b3;
 }
 
 .snapshotBadge > span:last-child {
@@ -1744,8 +1744,8 @@
   width: 20px;
   height: 20px;
   border-radius: 999px;
-  background: #ffb65b;
-  color: #0b2347 !important;
+  background: #ffd6b3;
+  color: #0b2b50 !important;
   font-size: 0.75rem !important;
   animation: snapshotSpark 2.2s ease-in-out infinite;
 }
@@ -1787,7 +1787,7 @@
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #e02432, #ffb65b);
+  background: linear-gradient(90deg, #dc2f3b, #ffd6b3);
   content: "";
   transform-origin: left;
   animation: snapshotLine 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -1821,7 +1821,7 @@
   left: 0;
   width: 100%;
   height: 6px;
-  background: var(--stat-accent, #ffb65b);
+  background: var(--stat-accent, #ffd6b3);
   content: "";
 }
 
@@ -1837,12 +1837,12 @@
 }
 
 .refreshRoot :global(.outing-plan-summary-v3 > div).dateCard {
-  --stat-accent: #ec8a34;
+  --stat-accent: #dc2f3b;
   background: linear-gradient(135deg, #fff5be 0%, #ffdf6d 100%);
 }
 
 .refreshRoot :global(.outing-plan-summary-v3 > div).startCard {
-  --stat-accent: #e02432;
+  --stat-accent: #dc2f3b;
   background: linear-gradient(145deg, #ffe3e1 0%, #ffb8b2 100%);
 }
 
@@ -1857,7 +1857,7 @@
 }
 
 .refreshRoot :global(.outing-plan-summary-v3 > div).travelCard {
-  --stat-accent: #3d78b5;
+  --stat-accent: #4f83b6;
   background: linear-gradient(145deg, #f2ecff 0%, #d8c7ff 100%);
 }
 
@@ -1867,7 +1867,7 @@
 }
 
 .refreshRoot :global(.outing-plan-summary-v3 > div).groupCard {
-  --stat-accent: #e02432;
+  --stat-accent: #dc2f3b;
   background: linear-gradient(120deg, #fff1aa 0%, #ffd6cb 48%, #e7ddff 100%);
 }
 
@@ -1911,8 +1911,8 @@
   border: 2px solid var(--result-ink) !important;
   border-radius: 25px !important;
   background:
-    radial-gradient(circle at 94% 9%, rgba(255, 207, 0, 0.34), transparent 23%),
-    linear-gradient(145deg, #fffaf4 0%, #fff2dd 100%) !important;
+    radial-gradient(circle at 94% 9%, rgba(244, 162, 97, 0.34), transparent 23%),
+    linear-gradient(145deg, #fffaf5 0%, #fff2dd 100%) !important;
   box-shadow: 6px 6px 0 rgba(36, 31, 32, 0.13) !important;
 }
 
@@ -1941,9 +1941,9 @@
   height: 45px;
   border: 2px solid var(--result-ink);
   border-radius: 15px;
-  background: #ffb65b;
-  color: #0b2347;
-  box-shadow: 3px 3px 0 #e02432;
+  background: #ffd6b3;
+  color: #0b2b50;
+  box-shadow: 3px 3px 0 #dc2f3b;
   font-size: 1.35rem;
   font-weight: 950;
   animation: addStopBob 2.5s ease-in-out infinite;
@@ -2290,7 +2290,7 @@
 }
 
 .addStopCopy strong {
-  color: #0b2347 !important;
+  color: #0b2b50 !important;
   font-size: 1rem !important;
   font-weight: 900 !important;
   line-height: 1.08 !important;
@@ -2334,8 +2334,8 @@
 .snapshotSection {
   padding: 18px;
   background:
-    radial-gradient(circle at 91% 7%, rgba(255, 207, 0, 0.2), transparent 23%),
-    linear-gradient(155deg, #fffaf4 0%, #fff7e8 52%, #f8f3ff 100%);
+    radial-gradient(circle at 91% 7%, rgba(244, 162, 97, 0.2), transparent 23%),
+    linear-gradient(155deg, #fffaf5 0%, #fff7e8 52%, #f8f3ff 100%);
 }
 
 .snapshotHeading {
@@ -2401,7 +2401,7 @@
   gap: 12px !important;
   min-height: 136px !important;
   background: linear-gradient(135deg, #fff4b7 0%, #ffdc69 100%) !important;
-  --stat-accent: #e02432;
+  --stat-accent: #dc2f3b;
 }
 
 .whenMain,
@@ -2620,7 +2620,7 @@
 .refreshRoot :global(.outing-action-dock button) {
   min-height: 66px;
   padding: 10px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 16px;
   box-shadow: none !important;
   transition:
@@ -2640,7 +2640,7 @@
 }
 
 .primaryAction {
-  background: #ffb65b !important;
+  background: #ffd6b3 !important;
 }
 
 .shareAction {
@@ -2649,7 +2649,7 @@
 
 .refreshAction {
   color: #ffffff !important;
-  background: #0b2347 !important;
+  background: #0b2b50 !important;
 }
 
 .refreshAction .actionCopy small {
@@ -2671,18 +2671,18 @@
 }
 
 .saveIcon {
-  color: #0b2347;
+  color: #0b2b50;
   background: rgba(255, 255, 255, 0.72);
 }
 
 .shareIcon {
-  color: #0b2347;
+  color: #0b2b50;
   background: #f3eee6;
 }
 
 .refreshIcon {
-  color: #0b2347;
-  background: #ffb65b;
+  color: #0b2b50;
+  background: #ffd6b3;
 }
 
 .refreshRoot :global(.outing-action-dock button) .actionIcon,
@@ -2708,7 +2708,7 @@
   padding: 17px;
   border: 1.5px solid #d8cec7;
   border-radius: 24px;
-  background: #fff5e8;
+  background: #fff7ee;
   box-shadow: none;
 }
 
@@ -2738,7 +2738,7 @@
   min-height: 28px;
   padding: 5px 9px;
   border: 0;
-  background: #0b2347;
+  background: #0b2b50;
   box-shadow: none;
 }
 
@@ -2747,7 +2747,7 @@
 }
 
 .snapshotSpark {
-  background: #ffb65b;
+  background: #ffd6b3;
   animation: snapshotSparkCalm 2.6s ease-in-out infinite;
 }
 
@@ -2762,7 +2762,7 @@
 }
 
 .snapshotRouteLine span::after {
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .refreshRoot :global(.outing-plan-summary-v3) {
@@ -2822,14 +2822,14 @@
   padding: 16px !important;
   border: 0 !important;
   border-radius: 24px !important;
-  background: #0b2347 !important;
+  background: #0b2b50 !important;
   box-shadow: none !important;
 }
 
 .addStopPanel::after {
   right: -40px;
   bottom: -42px;
-  border-color: rgba(255, 207, 0, 0.12);
+  border-color: rgba(244, 162, 97, 0.12);
 }
 
 .addStopIntro {
@@ -2841,7 +2841,7 @@
   height: 42px;
   border: 0;
   border-radius: 13px;
-  background: #ffb65b;
+  background: #ffd6b3;
   box-shadow: none;
   animation: addStopPulse 2.6s ease-in-out infinite;
 }
@@ -2852,7 +2852,7 @@
 }
 
 .addStopIntro > div > span {
-  color: #ffb65b;
+  color: #ffd6b3;
 }
 
 .addStopIntro h2 {
@@ -2878,7 +2878,7 @@
   min-height: 72px !important;
   padding: 10px 11px !important;
   border: 0 !important;
-  border-left: 5px solid #ffb65b !important;
+  border-left: 5px solid #ffd6b3 !important;
   border-radius: 16px !important;
   background: #ffffff !important;
   box-shadow: none;
@@ -2888,8 +2888,8 @@
   display: none;
 }
 
-.foodChoice { border-left-color: #ec8a34 !important; }
-.eventChoice { border-left-color: #3d78b5 !important; }
+.foodChoice { border-left-color: #dc2f3b !important; }
+.eventChoice { border-left-color: #4f83b6 !important; }
 .drinksChoice { border-left-color: #0f8a4b !important; }
 
 .addStopChoice:hover:not(:disabled),
@@ -2929,7 +2929,7 @@
 }
 
 .addStopCopy strong {
-  color: #0b2347 !important;
+  color: #0b2b50 !important;
   font-size: 0.92rem !important;
   line-height: 1.1 !important;
 }
@@ -2960,7 +2960,7 @@
   height: 28px !important;
   min-width: 28px !important;
   border: 0;
-  background: #0b2347 !important;
+  background: #0b2b50 !important;
   color: #ffffff;
 }
 
@@ -2969,7 +2969,7 @@
   padding: 14px;
   border: 1.5px solid #d8cec7;
   border-radius: 24px;
-  background: #fff5e8;
+  background: #fff7ee;
   box-shadow: none;
 }
 
@@ -2995,12 +2995,12 @@
   padding: 16px;
   border: 0;
   border-radius: 18px;
-  background: #0b2347;
+  background: #0b2b50;
   box-shadow: none;
 }
 
 .refreshRoot :global(.outing-timeline-v3 .section-heading span) {
-  color: #ffb65b;
+  color: #ffd6b3;
 }
 
 .refreshRoot :global(.outing-timeline-v3 .section-heading h2) {
@@ -3030,13 +3030,13 @@
 
 .refreshRoot :global(.outing-stop-card-v3) {
   border: 1.5px solid #d8cec7;
-  border-left: 5px solid #ec8a34;
+  border-left: 5px solid #dc2f3b;
   background: #ffffff !important;
   box-shadow: none;
 }
 
 .refreshRoot :global(.outing-kind-event .outing-stop-card-v3) {
-  border-left-color: #3d78b5;
+  border-left-color: #4f83b6;
 }
 
 .refreshRoot :global(.outing-kind-drinks .outing-stop-card-v3) {
@@ -3050,7 +3050,7 @@
 .refreshRoot :global(.outing-stop-card-v3:hover) {
   transform: translateY(-2px);
   box-shadow: none;
-  border-color: #0b2347;
+  border-color: #0b2b50;
 }
 
 .refreshRoot :global(.outing-stop-order) {
@@ -3061,13 +3061,13 @@
 
 .refreshRoot :global(.outing-stop-topline > span) {
   background: #f3eee6;
-  color: #0b2347;
+  color: #0b2b50;
 }
 
 .refreshRoot :global(.outing-travel-row) {
   min-height: 64px;
   border: 0;
-  border-left: 3px solid #3d78b5;
+  border-left: 3px solid #4f83b6;
   background: #f1ecfb;
 }
 
@@ -3085,7 +3085,7 @@
 .detailsToggle:hover,
 .detailsToggle:focus-visible {
   transform: none;
-  border-color: #0b2347;
+  border-color: #0b2b50;
   box-shadow: none;
 }
 
@@ -3197,8 +3197,8 @@
 /* Keep the refreshed palette warm, soft, and app-first. */
 .refreshAction {
   color: #ffffff !important;
-  background: #3d78b5 !important;
-  border-color: #3d78b5 !important;
+  background: #4f83b6 !important;
+  border-color: #4f83b6 !important;
 }
 
 .refreshAction:hover:not(:disabled),
@@ -3211,26 +3211,26 @@
 }
 
 .snapshotBadge {
-  background: #e02432 !important;
+  background: #dc2f3b !important;
 }
 
 .addStopPanel {
-  border: 1.5px solid #d7e6f5 !important;
+  border: 1.5px solid #d9e8f5 !important;
   background:
     radial-gradient(
       circle at 100% 100%,
-      rgba(255, 207, 0, 0.22),
+      rgba(244, 162, 97, 0.22),
       transparent 34%
     ),
     linear-gradient(
       145deg,
       #eef5fb 0%,
-      #fff5e8 100%
+      #fff7ee 100%
     ) !important;
 }
 
 .addStopIntro > div > span {
-  color: #3d78b5 !important;
+  color: #4f83b6 !important;
 }
 
 .addStopIntro h2,
@@ -3245,7 +3245,7 @@
 
 .refreshRoot :global(.outing-add-stop-grid button) > .addStopArrow {
   color: #ffffff !important;
-  background: #3d78b5 !important;
+  background: #4f83b6 !important;
 }
 
 .refreshRoot :global(.outing-timeline-v3 .section-heading) {
@@ -3254,19 +3254,19 @@
     linear-gradient(
       145deg,
       #fff1bd 0%,
-      #fff5e8 100%
+      #fff7ee 100%
     ) !important;
 }
 
 .refreshRoot :global(.outing-timeline-v3 .section-heading span) {
-  color: #e02432 !important;
+  color: #dc2f3b !important;
 }
 
 .liveStopCount {
   display: inline-grid;
   min-width: 0.8em;
   place-items: center;
-  color: #3d78b5;
+  color: #4f83b6;
   font: inherit;
   animation: stopCountPop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -3293,7 +3293,7 @@
 
 .removeStopButton:hover:not(:disabled),
 .removeStopButton:focus-visible {
-  border-color: #e02432 !important;
+  border-color: #dc2f3b !important;
   background: #ffe4e7 !important;
 }
 
@@ -3329,7 +3329,7 @@
   background:
     radial-gradient(
       circle at 92% 4%,
-      rgba(255, 207, 0, 0.2),
+      rgba(244, 162, 97, 0.2),
       transparent 24%
     ),
     #fffaf3;
@@ -3379,7 +3379,7 @@
 }
 
 .addStopSheetHeader > span {
-  color: #3d78b5;
+  color: #4f83b6;
   font-size: 0.63rem;
   font-weight: 950;
   letter-spacing: 0.11em;
@@ -3438,7 +3438,7 @@
 
 .addStopOptionCard:hover:not(:disabled),
 .addStopOptionCard:focus-visible {
-  border-color: #3d78b5;
+  border-color: #4f83b6;
   background: #fbf8ff;
   transform: translateY(-2px);
 }
@@ -3454,7 +3454,7 @@
   height: 32px;
   place-items: center;
   border-radius: 11px;
-  background: #ffb65b;
+  background: #ffd6b3;
   color: #493a52;
   font-size: 0.78rem;
   font-weight: 950;
@@ -3467,7 +3467,7 @@
 }
 
 .addStopOptionMain > small {
-  color: #3d78b5;
+  color: #4f83b6;
   font-size: 0.59rem;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -3541,7 +3541,7 @@
   margin-top: 5px;
   place-items: center;
   border-radius: 999px;
-  background: #3d78b5;
+  background: #4f83b6;
   color: #ffffff;
   font-style: normal;
   font-weight: 900;
@@ -3569,7 +3569,7 @@
 
 .addStopSheetLoading p {
   margin: 0;
-  color: #3d78b5;
+  color: #4f83b6;
   font-size: 0.72rem;
   font-weight: 850;
   text-align: center;
@@ -3789,11 +3789,11 @@
   border: 1.5px solid #ead17a !important;
   background:
     radial-gradient(circle at 92% 12%, rgba(255, 255, 255, 0.7), transparent 25%),
-    linear-gradient(145deg, #fff1bd 0%, #fff5e8 100%) !important;
+    linear-gradient(145deg, #fff1bd 0%, #fff7ee 100%) !important;
 }
 
 .routeHeading > div > span {
-  color: #e02432 !important;
+  color: #dc2f3b !important;
 }
 
 .routeHeading > div > h2 {
@@ -3811,10 +3811,10 @@
   gap: 7px;
   min-height: 42px;
   padding: 9px 12px;
-  border: 1.5px solid #e02432;
+  border: 1.5px solid #dc2f3b;
   border-radius: 14px;
   background: #ffffff;
-  color: #b61725;
+  color: #b51f2b;
   font: inherit;
   font-size: 0.72rem;
   font-weight: 900;
@@ -3835,13 +3835,13 @@
 }
 
 .routeEditButton[aria-pressed="true"] {
-  border-color: #e02432;
-  background: #e02432;
+  border-color: #dc2f3b;
+  background: #dc2f3b;
   color: #ffffff;
 }
 
 .routeEditButton[aria-pressed="true"] span {
-  background: #ffb65b;
+  background: #ffd6b3;
   color: #304c6b;
 }
 
@@ -3859,9 +3859,9 @@
   align-items: center;
   margin: 0 0 12px;
   padding: 10px 11px;
-  border: 1.5px solid #d7e6f5;
+  border: 1.5px solid #d9e8f5;
   border-radius: 16px;
-  background: linear-gradient(135deg, #eef5fb 0%, #fff5e8 100%);
+  background: linear-gradient(135deg, #eef5fb 0%, #fff7ee 100%);
   color: #4b3c50;
 }
 
@@ -3871,7 +3871,7 @@
   width: 34px;
   height: 34px;
   border-radius: 11px;
-  background: #ffb65b;
+  background: #ffd6b3;
   color: #304c6b;
   font-size: 1rem;
 }
@@ -3900,7 +3900,7 @@
 }
 
 .draggingStop :global(.outing-stop-card-v3) {
-  border-color: #e02432 !important;
+  border-color: #dc2f3b !important;
   box-shadow: 0 14px 35px rgba(73, 58, 82, 0.2) !important;
 }
 
@@ -3930,10 +3930,10 @@
   min-width: 82px;
   min-height: 40px;
   padding: 8px 12px;
-  border: 1.5px solid #d7e6f5;
+  border: 1.5px solid #d9e8f5;
   border-radius: 13px;
   background: #eef5fb;
-  color: #b61725;
+  color: #b51f2b;
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -3991,9 +3991,9 @@
 
 .routeMoveButtons button:not(:disabled):hover,
 .routeMoveButtons button:not(:disabled):focus-visible {
-  border-color: #e02432;
+  border-color: #dc2f3b;
   background: #eef5fb;
-  color: #b61725;
+  color: #b51f2b;
 }
 
 :global(body.venture-route-reordering) .refreshRoot {
@@ -4092,7 +4092,7 @@
 
   .addStopSheet {
     max-height: calc(100dvh - 48px) !important;
-    border: 1.5px solid #d7e6f5 !important;
+    border: 1.5px solid #d9e8f5 !important;
     border-radius: 26px !important;
   }
 }
@@ -4116,8 +4116,8 @@
   border: 1px solid rgba(124, 58, 237, 0.2);
   border-radius: 24px;
   background:
-    radial-gradient(circle at 100% 0%, rgba(255, 207, 0, 0.22), transparent 34%),
-    linear-gradient(145deg, #eef5fb 0%, #fff5e8 100%);
+    radial-gradient(circle at 100% 0%, rgba(244, 162, 97, 0.22), transparent 34%),
+    linear-gradient(145deg, #eef5fb 0%, #fff7ee 100%);
   box-shadow: 0 18px 42px rgba(70, 52, 82, 0.09);
   animation: routeEditorRise 360ms ease-out both;
 }
@@ -4136,7 +4136,7 @@
   height: 42px;
   border-radius: 15px;
   color: #fff;
-  background: #e02432;
+  background: #dc2f3b;
   font-weight: 900;
   font-size: 1.15rem;
   box-shadow: 0 8px 18px rgba(208, 16, 19, 0.18);
@@ -4145,7 +4145,7 @@
 .scheduleCheckHeader small {
   display: block;
   margin-bottom: 4px;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.66rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -4210,7 +4210,7 @@
 
 .scheduleIssueCritical > span {
   color: #fff;
-  background: #e02432;
+  background: #dc2f3b;
 }
 
 .scheduleIssueWarning {
@@ -4220,7 +4220,7 @@
 
 .scheduleIssueWarning > span {
   color: #304c6b;
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .scheduleCheckActions {
@@ -4243,7 +4243,7 @@
 
 .scheduleCheckActions button:first-child {
   color: #fff;
-  background: #e02432;
+  background: #dc2f3b;
   box-shadow: 0 9px 20px rgba(124, 58, 237, 0.18);
 }
 
@@ -4289,8 +4289,8 @@
 
 .stopMenuButton[aria-expanded="true"] {
   color: #fff;
-  border-color: #e02432;
-  background: #e02432;
+  border-color: #dc2f3b;
+  background: #dc2f3b;
 }
 
 .stopMenuPanel {
@@ -4301,7 +4301,7 @@
   padding: 9px;
   border: 1px solid rgba(124, 58, 237, 0.15);
   border-radius: 17px;
-  background: linear-gradient(145deg, #eef5fb, #fff5e8);
+  background: linear-gradient(145deg, #eef5fb, #fff7ee);
   box-shadow: 0 14px 30px rgba(63, 50, 68, 0.1);
   animation: routeMenuOpen 180ms ease-out both;
 }
@@ -4336,7 +4336,7 @@
   height: 23px;
   border-radius: 8px;
   color: #fff;
-  background: #e02432;
+  background: #dc2f3b;
   font-size: 0.7rem;
   font-weight: 900;
 }
@@ -4352,13 +4352,13 @@
 }
 
 .stopMenuPanel .stopMenuRemove > span {
-  background: #e02432;
+  background: #dc2f3b;
 }
 
 .replacementSheet {
   background:
-    radial-gradient(circle at 100% 0%, rgba(255, 207, 0, 0.2), transparent 31%),
-    linear-gradient(165deg, #fff5e8 0%, #eef5fb 100%) !important;
+    radial-gradient(circle at 100% 0%, rgba(244, 162, 97, 0.2), transparent 31%),
+    linear-gradient(165deg, #fff7ee 0%, #eef5fb 100%) !important;
 }
 
 .replacementOptionCard {
@@ -4443,7 +4443,7 @@
 
 .completeIcon {
   color: #304c6b !important;
-  background: #ffb65b !important;
+  background: #ffd6b3 !important;
   font-size: 1rem !important;
 }
 
@@ -4481,8 +4481,8 @@
     14px
     calc(16px + env(safe-area-inset-bottom));
   background:
-    radial-gradient(circle at 100% 0, rgba(255, 207, 0, 0.24), transparent 32%),
-    linear-gradient(165deg, #fff5e8 0%, #eef5fb 100%);
+    radial-gradient(circle at 100% 0, rgba(244, 162, 97, 0.24), transparent 32%),
+    linear-gradient(165deg, #fff7ee 0%, #eef5fb 100%);
   box-shadow: 0 -18px 52px rgba(48, 31, 57, 0.24);
   animation: completionSheetIn 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -4518,7 +4518,7 @@
 }
 
 .completionHeader > span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.58rem;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -4602,7 +4602,7 @@
   height: 30px;
   place-items: center;
   border-radius: 10px;
-  background: #ffb65b;
+  background: #ffd6b3;
   color: #304c6b;
   font-size: 0.7rem;
   font-weight: 900;
@@ -4652,7 +4652,7 @@
   border: 0;
   border-radius: 14px;
   padding: 0 15px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #fff;
   font: inherit;
   font-size: 0.7rem;

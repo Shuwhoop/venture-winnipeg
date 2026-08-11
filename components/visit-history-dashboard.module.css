@@ -4,8 +4,8 @@
   border-radius: 26px;
   padding: 18px;
   background:
-    radial-gradient(circle at 100% 0, rgba(255, 207, 0, 0.22), transparent 32%),
-    linear-gradient(145deg, #f7f0ff 0%, #fff5e8 70%);
+    radial-gradient(circle at 100% 0, rgba(244, 162, 97, 0.22), transparent 32%),
+    linear-gradient(145deg, #f7f0ff 0%, #fff7ee 70%);
   box-shadow: 0 18px 45px rgba(54, 38, 63, 0.08);
 }
 
@@ -17,7 +17,7 @@
 }
 
 .header > div:first-child > span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -44,9 +44,9 @@
   height: 70px;
   place-items: center;
   align-content: center;
-  border: 1.5px solid #e02432;
+  border: 1.5px solid #dc2f3b;
   border-radius: 16px 16px 20px 20px;
-  background: #e02432;
+  background: #dc2f3b;
   color: white;
   box-shadow: inset 0 0 0 4px #eee3ff;
   transform: rotate(4deg);
@@ -86,7 +86,7 @@
 }
 
 .stats strong {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 1.25rem;
 }
 
@@ -115,7 +115,7 @@
   height: 38px;
   place-items: center;
   border-radius: 13px;
-  background: #ffb65b;
+  background: #ffd6b3;
   color: #304c6b;
   font-weight: 900;
 }
@@ -136,7 +136,7 @@
 .newToMeNote a {
   border-radius: 13px;
   padding: 9px 11px;
-  background: #e02432;
+  background: #dc2f3b;
   color: white;
   font-size: 0.67rem;
   font-weight: 850;
@@ -170,8 +170,8 @@
 }
 
 .filters .active {
-  border-color: #e02432;
-  background: #e02432;
+  border-color: #dc2f3b;
+  background: #dc2f3b;
   color: white;
 }
 
@@ -268,7 +268,7 @@
   border: 1px solid #d7c6e5;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.62);
-  color: #e02432;
+  color: #dc2f3b;
   font: inherit;
   font-size: 0.68rem;
   font-weight: 850;
@@ -292,7 +292,7 @@
   height: 34px;
   place-items: center;
   border-radius: 11px;
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .newToMeNote strong {

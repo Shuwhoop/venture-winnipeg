@@ -8,13 +8,13 @@
   margin: 24px auto;
   padding: 22px;
   overflow: hidden;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 24px;
   background:
     radial-gradient(circle at 88% 12%, rgba(208, 16, 19, 0.1), transparent 28%),
-    linear-gradient(135deg, #ffefd8, #ffffff 70%);
-  color: #0b2347;
-  box-shadow: 6px 6px 0 #ec8a34;
+    linear-gradient(135deg, #fff4e8, #ffffff 70%);
+  color: #0b2b50;
+  box-shadow: 6px 6px 0 #dc2f3b;
 }
 
 .card,
@@ -48,7 +48,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 14px;
   background: #ffffff;
   box-shadow: 3px 3px 0 rgba(36, 31, 32, 0.12);
@@ -70,7 +70,7 @@
   margin-left: 4px;
   background: repeating-linear-gradient(
     90deg,
-    #e02432 0 10px,
+    #dc2f3b 0 10px,
     transparent 10px 17px
   );
 }
@@ -83,7 +83,7 @@
 }
 
 .eyebrow {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -118,7 +118,7 @@
 
 .promiseRow span {
   padding: 7px 10px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 999px;
   background: #ffffff;
   font-size: 0.68rem;
@@ -154,7 +154,7 @@
   border: 1.5px solid #a99d96;
   border-radius: 13px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font: inherit;
   font-size: 0.84rem;
 }
@@ -162,7 +162,7 @@
 .form input:focus-visible {
   outline: 3px solid rgba(208, 16, 19, 0.2);
   outline-offset: 2px;
-  border-color: #e02432;
+  border-color: #dc2f3b;
 }
 
 .consent {
@@ -183,7 +183,7 @@
   min-width: 20px !important;
   height: 20px;
   margin: 1px 0 0;
-  accent-color: #e02432;
+  accent-color: #dc2f3b;
 }
 
 .consent span {
@@ -210,21 +210,21 @@
   width: 100%;
   min-height: 54px;
   padding: 11px 14px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 14px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
   font: inherit;
   font-size: 0.84rem;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 4px 4px 0 #ec8a34;
+  box-shadow: 4px 4px 0 #dc2f3b;
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
 .form button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 5px 5px 0 #ec8a34;
+  box-shadow: 5px 5px 0 #dc2f3b;
 }
 
 .form button:disabled {
@@ -247,9 +247,9 @@
   gap: 4px;
   margin: 0;
   padding: 13px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 14px;
-  background: #ffe1b8;
+  background: #fff0df;
   color: #574400;
   font-size: 0.76rem;
   line-height: 1.45;

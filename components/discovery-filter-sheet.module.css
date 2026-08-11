@@ -32,7 +32,7 @@
   height: 21px;
   padding-inline: 5px;
   border-radius: 999px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
   font-size: 0.61rem;
 }
@@ -59,10 +59,10 @@
   max-height: calc(100dvh - max(12px, env(safe-area-inset-top)));
   overflow: hidden;
   padding: 9px 14px calc(14px + env(safe-area-inset-bottom));
-  border: 1.5px solid #d7e6f5;
+  border: 1.5px solid #d9e8f5;
   border-bottom: 0;
   border-radius: 26px 26px 0 0;
-  background: #fff5e8;
+  background: #fff7ee;
   box-shadow: 0 -22px 60px rgba(63, 50, 68, 0.26);
   animation: sheetIn 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -89,7 +89,7 @@
 }
 
 .header span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.61rem;
   font-weight: 950;
   letter-spacing: 0.12em;
@@ -172,10 +172,10 @@
 }
 
 .segmented .selected {
-  border-color: #e02432;
+  border-color: #dc2f3b;
   background: #efe7ff;
-  color: #b61725;
-  box-shadow: inset 0 0 0 1px #e02432;
+  color: #b51f2b;
+  box-shadow: inset 0 0 0 1px #dc2f3b;
 }
 
 .optionGrid {
@@ -204,9 +204,9 @@
 }
 
 .optionGrid .selectedCard {
-  border-color: #e02432;
+  border-color: #dc2f3b;
   background: #fff0f0;
-  box-shadow: inset 0 0 0 1px #e02432;
+  box-shadow: inset 0 0 0 1px #dc2f3b;
 }
 
 .selectLabel {
@@ -235,9 +235,9 @@
   width: 100%;
   min-height: 76px;
   padding: 11px;
-  border: 1.5px solid #d7e6f5;
+  border: 1.5px solid #d9e8f5;
   border-radius: 18px;
-  background: linear-gradient(135deg, #eef5fb, #fff5e8);
+  background: linear-gradient(135deg, #eef5fb, #fff7ee);
   color: #304c6b;
   font: inherit;
   text-align: left;
@@ -254,7 +254,7 @@
 .newToggle > span {
   width: 38px;
   height: 38px;
-  background: #ffb65b;
+  background: #ffd6b3;
   font-size: 1rem;
 }
 
@@ -282,13 +282,13 @@
 }
 
 .newToggleActive {
-  border-color: #e02432;
-  box-shadow: inset 0 0 0 1px #e02432;
+  border-color: #dc2f3b;
+  box-shadow: inset 0 0 0 1px #dc2f3b;
 }
 
 .newToggleActive > b {
-  border-color: #e02432;
-  background: #e02432;
+  border-color: #dc2f3b;
+  background: #dc2f3b;
 }
 
 .footer {
@@ -314,10 +314,10 @@
 }
 
 .apply {
-  border: 1.5px solid #e02432;
-  background: #e02432;
+  border: 1.5px solid #dc2f3b;
+  background: #dc2f3b;
   color: #ffffff;
-  box-shadow: 3px 3px 0 #ffb65b;
+  box-shadow: 3px 3px 0 #ffd6b3;
 }
 
 @keyframes backdropIn {
@@ -356,7 +356,7 @@
 
   .sheet {
     max-height: calc(100dvh - 48px);
-    border-bottom: 1.5px solid #d7e6f5;
+    border-bottom: 1.5px solid #d9e8f5;
     border-radius: 26px;
   }
 }

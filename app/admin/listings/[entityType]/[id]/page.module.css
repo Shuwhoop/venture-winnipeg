@@ -88,7 +88,7 @@
 }
 
 .sectionHeading span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.12em;
@@ -142,7 +142,7 @@
 .form input:focus,
 .form select:focus,
 .form textarea:focus {
-  border-color: #e02432;
+  border-color: #dc2f3b;
   outline: 3px solid rgba(109, 40, 217, 0.13);
 }
 
@@ -151,7 +151,7 @@
 .hoursQuickFill {
   display: grid;
   gap: 14px;
-  border: 1px solid #d7e6f5;
+  border: 1px solid #d9e8f5;
   border-radius: 18px;
   padding: 16px;
   background:
@@ -171,7 +171,7 @@
 }
 
 .quickFillHeading span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.7rem;
   font-weight: 850;
   letter-spacing: 0.12em;
@@ -206,10 +206,10 @@
 
 .quickHourActions button {
   min-height: 42px;
-  border: 1px solid #e02432;
+  border: 1px solid #dc2f3b;
   border-radius: 11px;
   padding: 9px 12px;
-  background: #e02432;
+  background: #dc2f3b;
   color: white;
   font: inherit;
   font-size: 0.8rem;
@@ -293,7 +293,7 @@
 
 .inlineControl button {
   min-height: 44px;
-  border: 1px solid #e02432;
+  border: 1px solid #dc2f3b;
   border-radius: 11px;
   padding: 8px 12px;
   background: #f3edff;
@@ -337,7 +337,7 @@
   font: inherit;
   font-weight: 850;
   cursor: pointer;
-  box-shadow: 4px 4px 0 #ffb65b;
+  box-shadow: 4px 4px 0 #ffd6b3;
 }
 
 .stickyActions button:disabled {
@@ -432,7 +432,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  border: 1px solid #d7e6f5;
+  border: 1px solid #d9e8f5;
   border-radius: 15px;
   padding: 13px 14px;
   background: #f7faff;
@@ -458,10 +458,10 @@
 .quickEditBar button,
 .inlineButtonGroup button {
   min-height: 40px;
-  border: 1px solid #e02432;
+  border: 1px solid #dc2f3b;
   border-radius: 10px;
   padding: 8px 11px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
   font: inherit;
   font-size: 0.76rem;
@@ -517,7 +517,7 @@
 
 .secondarySave {
   background: #ffffff !important;
-  color: #06172f !important;
+  color: #071a33 !important;
   box-shadow: none !important;
 }
 
@@ -529,8 +529,8 @@
 
 /* Direct publishing from the full listing editor */
 .publishAction {
-  background: #ffb65b !important;
-  color: #06172f !important;
+  background: #ffd6b3 !important;
+  color: #071a33 !important;
   box-shadow: 4px 4px 0 #e10e17 !important;
 }
 

@@ -7,7 +7,7 @@
 .header {
   display: grid;
   gap: 14px;
-  border: 1.5px solid #06172f;
+  border: 1.5px solid #071a33;
   border-radius: 22px;
   padding: 20px;
   background: linear-gradient(145deg, #f2e9ff, #fff8e9);
@@ -15,7 +15,7 @@
 
 .eyebrow {
   margin: 0;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.68rem;
   font-weight: 950;
   letter-spacing: 0.15em;
@@ -24,7 +24,7 @@
 
 .header h1 {
   margin: 5px 0 0;
-  color: #06172f;
+  color: #071a33;
   font-size: clamp(2rem, 9vw, 3.4rem);
   line-height: 0.98;
   letter-spacing: -0.055em;
@@ -54,8 +54,8 @@
 }
 
 .active {
-  background: #e02432 !important;
-  border-color: #e02432 !important;
+  background: #dc2f3b !important;
+  border-color: #dc2f3b !important;
   color: #fff !important;
 }
 
@@ -92,7 +92,7 @@
 
 .cardHeader h2 {
   margin: 0;
-  color: #06172f;
+  color: #071a33;
   font-size: 1.08rem;
 }
 
@@ -132,7 +132,7 @@
 
 .row strong {
   margin-bottom: 5px;
-  color: #06172f;
+  color: #071a33;
   font-size: 0.79rem;
 }
 

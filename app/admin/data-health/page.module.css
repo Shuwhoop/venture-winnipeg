@@ -19,7 +19,7 @@
 
 .eyebrow {
   margin: 0 0 8px;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -67,8 +67,8 @@
 
 .headerActions a:first-child,
 .filterActions button {
-  border-color: #e02432;
-  background: #e02432;
+  border-color: #dc2f3b;
+  background: #dc2f3b;
   color: white;
 }
 
@@ -149,7 +149,7 @@
 
 .issueSummary strong {
   min-width: 30px;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 1.35rem;
 }
 
@@ -292,8 +292,8 @@
 }
 
 .rowActions a:first-child {
-  border-color: #e02432;
-  background: #e02432;
+  border-color: #dc2f3b;
+  background: #dc2f3b;
   color: white;
 }
 
@@ -311,7 +311,7 @@
 
 .table td a {
   margin-top: 7px;
-  color: #e02432;
+  color: #dc2f3b;
   font-weight: 740;
   text-decoration: none;
 }

@@ -5,12 +5,12 @@
  */
 
 :root {
-  --venture-yellow: #ffb65b;
-  --venture-yellow-soft: #fff3b3;
-  --venture-gold: #ec8a34;
-  --venture-red: #e02432;
-  --venture-red-dark: #b61725;
-  --venture-ink: #0b2347;
+  --venture-yellow: #ffd6b3;
+  --venture-yellow-soft: #fff0e2;
+  --venture-gold: #dc2f3b;
+  --venture-red: #dc2f3b;
+  --venture-red-dark: #b51f2b;
+  --venture-ink: #0b2b50;
   --venture-ink-soft: #294563;
   --venture-muted: #746c6d;
   --venture-cream: #fff8ef;
@@ -87,7 +87,7 @@ body.venture-body {
   background:
     radial-gradient(
       circle at 12% 3%,
-      rgba(255, 207, 0, 0.26),
+      rgba(244, 162, 97, 0.26),
       transparent 26rem
     ),
     radial-gradient(
@@ -1630,7 +1630,7 @@ h4,
   background:
     radial-gradient(
       circle at 90% 10%,
-      rgba(255, 207, 0, 0.28),
+      rgba(244, 162, 97, 0.28),
       transparent 35%
     ),
     linear-gradient(

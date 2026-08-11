@@ -1,8 +1,8 @@
 .page {
-  --saved-ink: #0b2347;
+  --saved-ink: #0b2b50;
   --saved-cream: #fff9eb;
-  --saved-yellow: #ffb65b;
-  --saved-red: #e02432;
+  --saved-yellow: #ffd6b3;
+  --saved-red: #dc2f3b;
   --saved-muted: #716769;
 
   container-type: inline-size;
@@ -10,7 +10,7 @@
   padding: 18px 16px 118px;
   color: var(--saved-ink);
   background:
-    radial-gradient(circle at 95% 0%, rgba(255, 207, 0, 0.22), transparent 29%),
+    radial-gradient(circle at 95% 0%, rgba(244, 162, 97, 0.22), transparent 29%),
     linear-gradient(180deg, #fffdf7 0%, #ffffff 38%);
 }
 
@@ -291,7 +291,7 @@
   align-items: start;
   padding: 16px;
   background:
-    radial-gradient(circle at 92% 18%, rgba(255, 207, 0, 0.78), transparent 24%),
+    radial-gradient(circle at 92% 18%, rgba(244, 162, 97, 0.78), transparent 24%),
     #f4efff;
 }
 
@@ -463,7 +463,7 @@
 }
 
 .purple {
-  background: #e02432;
+  background: #dc2f3b;
 }
 
 .green {
@@ -699,4 +699,11 @@
   .page * {
     scroll-behavior: auto !important;
   }
+}
+
+/* VENTURE CITY PULSE V1.1 - SAVED WARM BALANCE */
+.savedPage {
+  --saved-yellow: #ffd6b3;
+  --saved-red: #dc2f3b;
+  --saved-ink: #0b2b50;
 }

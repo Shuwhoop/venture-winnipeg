@@ -14,17 +14,17 @@
   margin: 22px auto 10px;
   padding: 18px;
   overflow: hidden;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 21px;
   background:
     linear-gradient(
       135deg,
-      #ffefd8,
+      #fff4e8,
       #ffffff 72%
     );
-  color: #0b2347;
+  color: #0b2b50;
   box-shadow:
-    5px 5px 0 #ec8a34;
+    5px 5px 0 #dc2f3b;
 }
 
 .card,
@@ -38,9 +38,9 @@
   place-items: center;
   width: 43px;
   height: 43px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 14px;
-  background: #ffb65b;
+  background: #ffd6b3;
   font-size: 1.7rem;
   font-weight: 900;
   line-height: 1;
@@ -51,7 +51,7 @@
 }
 
 .eyebrow {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.61rem;
   font-weight: 900;
   letter-spacing: 0.11em;
@@ -91,16 +91,16 @@
   min-height: 44px;
   margin-top: 14px;
   padding: 9px 13px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 12px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
   font-size: 0.79rem;
   font-weight: 900;
   line-height: 1.15;
   text-decoration: none;
   box-shadow:
-    3px 3px 0 #ec8a34;
+    3px 3px 0 #dc2f3b;
 }
 
 .button:hover {

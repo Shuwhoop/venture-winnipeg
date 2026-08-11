@@ -21,7 +21,7 @@
 .cardHeader p,
 .sectionHeading p {
   margin: 0 0 7px;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -57,7 +57,7 @@
   border: 1px solid #ddd2ee;
   border-radius: 12px;
   background: white;
-  color: #b61725;
+  color: #b51f2b;
   font-size: 12px;
   font-weight: 850;
 }
@@ -69,8 +69,8 @@
 }
 
 .periods a.active {
-  border-color: #e02432;
-  background: #e02432;
+  border-color: #dc2f3b;
+  background: #dc2f3b;
   color: white;
 }
 
@@ -156,7 +156,7 @@
 }
 
 .funnel strong {
-  color: #b61725;
+  color: #b51f2b;
   font-size: 19px;
 }
 
@@ -188,7 +188,7 @@
 }
 
 .pageList span {
-  color: #b61725;
+  color: #b51f2b;
   font-size: 12px;
   font-weight: 850;
 }
@@ -250,8 +250,8 @@
 .feedbackList header span {
   padding: 5px 8px;
   border-radius: 999px;
-  background: #eaf2fb;
-  color: #b61725;
+  background: #eaf3fb;
+  color: #b51f2b;
   font-size: 10px;
   font-weight: 900;
 }
@@ -282,7 +282,7 @@
 .feedbackList footer a,
 .feedbackList footer span {
   margin-left: auto;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 11px;
   font-weight: 850;
 }

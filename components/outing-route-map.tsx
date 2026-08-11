@@ -440,7 +440,7 @@ export function OutingRouteMap({
             "line-join": "round"
           },
           paint: {
-            "line-color": "#ffb65b",
+            "line-color": "#ffd6b3",
             "line-width": 10,
             "line-opacity": 0.82
           }
@@ -457,7 +457,7 @@ export function OutingRouteMap({
             "line-join": "round"
           },
           paint: {
-            "line-color": "#e02432",
+            "line-color": "#dc2f3b",
             "line-width": 4,
             "line-opacity": 0.96,
             "line-dasharray": [

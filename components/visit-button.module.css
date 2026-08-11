@@ -12,7 +12,7 @@
   border: 1.5px solid #d8c8e8;
   border-radius: 18px;
   padding: 10px 13px;
-  background: linear-gradient(145deg, #f5efff, #fff5e8);
+  background: linear-gradient(145deg, #f5efff, #fff7ee);
   color: #304c6b;
   text-align: left;
   font: inherit;
@@ -32,7 +32,7 @@
 
 .visited {
   border-color: #8fd0ad;
-  background: linear-gradient(145deg, #e8fff1, #fff5e8);
+  background: linear-gradient(145deg, #e8fff1, #fff7ee);
 }
 
 .icon {
@@ -42,7 +42,7 @@
   height: 34px;
   place-items: center;
   border-radius: 12px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #fff;
   font-size: 1rem;
   font-weight: 900;

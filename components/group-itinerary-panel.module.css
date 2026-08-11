@@ -27,7 +27,7 @@
 .voteSection header > span,
 .blendHeading > span,
 .blendResultHeader span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -129,7 +129,7 @@
 }
 
 .attendance strong {
-  color: #e02432;
+  color: #dc2f3b;
 }
 
 .memberNames {
@@ -279,7 +279,7 @@
 }
 
 .blendMeter strong {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 1.35rem;
   line-height: 1;
 }
@@ -610,7 +610,7 @@
 }
 
 .voteButtons b {
-  color: #e02432;
+  color: #dc2f3b;
 }
 
 .message {
@@ -857,7 +857,7 @@
 }
 
 .pulseNumber strong {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 1.65rem;
   line-height: 1;
 }
@@ -983,7 +983,7 @@
 }
 
 .voteLoveBar {
-  background: #e02432;
+  background: #dc2f3b;
 }
 
 .voteOkayBar {
@@ -1038,4 +1038,47 @@
   .verdict {
     justify-self: start;
   }
+}
+
+/* VENTURE CITY PULSE V1.1 - GROUP WARM BALANCE */
+.planPulseCard {
+  border-color: #0b2b50;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(79, 131, 182, 0.10),
+      transparent 30%
+    ),
+    #fffcf8;
+}
+
+.pulseCopy > span {
+  color: #dc2f3b;
+}
+
+.pulseTrack {
+  background: rgba(11, 43, 80, 0.08);
+}
+
+.pulseTrack span {
+  background: linear-gradient(
+    90deg,
+    #0b2b50,
+    #dc2f3b 72%,
+    #f4a261
+  );
+}
+
+.peopleDetails,
+.memberCard,
+.stopVoteCard {
+  border-color: #dce4ec;
+}
+
+.peopleDetails {
+  background: rgba(255, 252, 248, 0.82);
+}
+
+.memberCard {
+  background: #fffcf8;
 }

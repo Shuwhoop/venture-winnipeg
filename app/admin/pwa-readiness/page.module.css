@@ -10,15 +10,15 @@
   gap: 18px;
   align-items: end;
   padding: 22px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 24px;
-  background: linear-gradient(135deg, #fff5e8, #ffefaa);
-  box-shadow: 6px 6px 0 #e02432;
+  background: linear-gradient(135deg, #fff7ee, #ffefaa);
+  box-shadow: 6px 6px 0 #dc2f3b;
 }
 
 .hero span,
 .devicePlan > span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.66rem;
   font-weight: 950;
   letter-spacing: 0.1em;
@@ -46,10 +46,10 @@
   justify-items: center;
   min-width: 130px;
   padding: 16px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 20px;
   background: #fff;
-  box-shadow: 4px 4px 0 #e02432;
+  box-shadow: 4px 4px 0 #dc2f3b;
 }
 
 .score strong { font-size: 2rem; }
@@ -66,7 +66,7 @@
   gap: 11px;
   align-items: center;
   padding: 14px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 17px;
   background: #fff;
 }
@@ -76,7 +76,7 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 13px;
   font-weight: 950;
 }
@@ -88,11 +88,11 @@
 .checks small { color: #6c6263; font-size: 0.7rem; line-height: 1.4; }
 .checks b { font-size: 0.61rem; letter-spacing: 0.08em; }
 .ready b { color: #137447; }
-.blocked b { color: #e02432; }
+.blocked b { color: #dc2f3b; }
 
 .devicePlan {
   padding: 20px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 22px;
   background: #eee5ff;
   box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.15);
@@ -109,7 +109,7 @@
   display: grid;
   gap: 4px;
   padding: 12px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 14px;
   background: #fff;
 }

@@ -4,15 +4,15 @@
   width: 100%;
   padding: 18px 14px 120px;
   box-sizing: border-box;
-  color: #0b2347;
+  color: #0b2b50;
 }
 
 .hero,
 .filters,
 .requestCard {
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 22px;
-  background: #fffaf4;
+  background: #fffaf5;
   box-shadow: 5px 5px 0 rgba(237, 178, 0, 0.75);
 }
 
@@ -28,7 +28,7 @@
 .hero span,
 .filters label > span,
 .meta span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.62rem;
   font-weight: 900;
   letter-spacing: 0.09em;
@@ -58,9 +58,9 @@
   min-width: 78px;
   min-height: 78px;
   padding: 10px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 19px;
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .count strong {
@@ -97,7 +97,7 @@
   border: 1.5px solid #bcaea7;
   border-radius: 13px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font: inherit;
 }
 
@@ -112,10 +112,10 @@
 .filterActions a {
   min-height: 42px;
   padding: 9px 13px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 12px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font: inherit;
   font-size: 0.74rem;
   font-weight: 900;
@@ -124,7 +124,7 @@
 }
 
 .filterActions button {
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .list {
@@ -156,7 +156,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 14px;
   background: #fff1a8;
   font-size: 1.25rem;
@@ -181,7 +181,7 @@
 
 .status {
   padding: 6px 8px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 999px;
   background: #ffffff;
   font-size: 0.59rem;
@@ -194,7 +194,7 @@
   gap: 12px;
   padding: 14px;
   border-top: 1.5px solid #d7cbc4;
-  background: #fff5e8;
+  background: #fff7ee;
 }
 
 .meta {
@@ -215,7 +215,7 @@
 
 .meta strong,
 .meta a {
-  color: #0b2347;
+  color: #0b2b50;
   font-size: 0.76rem;
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -240,7 +240,7 @@
 .statusForm select,
 .statusForm button {
   min-height: 44px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 12px;
   font: inherit;
 }
@@ -253,7 +253,7 @@
 
 .statusForm button {
   padding: 8px 13px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
   font-weight: 900;
   cursor: pointer;
@@ -263,7 +263,7 @@
   padding: 28px 18px;
   border: 2px dashed #b9aaa3;
   border-radius: 20px;
-  background: #fff5e8;
+  background: #fff7ee;
   text-align: center;
 }
 

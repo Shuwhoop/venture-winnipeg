@@ -5,18 +5,18 @@
   padding: 20px 18px 120px;
   background:
     radial-gradient(circle at 95% 0%, rgba(111, 42, 229, 0.12), transparent 30%),
-    linear-gradient(180deg, #fff5e8 0%, #f7f1ff 100%);
-  color: #0b2347;
+    linear-gradient(180deg, #fff7ee 0%, #f7f1ff 100%);
+  color: #0b2b50;
 }
 
 .header {
   display: grid;
   gap: 18px;
   padding: 24px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 24px;
   background: #ffffff;
-  box-shadow: 8px 8px 0 #ffb65b;
+  box-shadow: 8px 8px 0 #ffd6b3;
 }
 
 .header h1 {
@@ -37,7 +37,7 @@
 
 .eyebrow {
   margin: 0;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.7rem;
   font-weight: 950;
   letter-spacing: 0.14em;
@@ -60,10 +60,10 @@
   min-height: 44px;
   box-sizing: border-box;
   padding: 10px 13px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 12px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font-weight: 900;
   text-align: center;
   text-decoration: none;
@@ -71,14 +71,14 @@
 
 .header nav a:first-child,
 .resultActions a:first-child {
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
 }
 
 .sessionNote {
   margin: 22px 0;
   padding: 11px 14px;
-  border-left: 5px solid #e02432;
+  border-left: 5px solid #dc2f3b;
   background: rgba(255, 255, 255, 0.78);
   color: #675d61;
   font-size: 0.86rem;
@@ -91,7 +91,7 @@
 .emptyHistory {
   margin-top: 22px;
   padding: 22px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 22px;
   background: #ffffff;
 }
@@ -144,9 +144,9 @@
   width: 26px;
   height: 26px;
   place-items: center;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 50%;
-  background: #ffb65b;
+  background: #ffd6b3;
   content: counter(steps);
   font-size: 0.72rem;
   font-weight: 950;
@@ -162,7 +162,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 9px;
   padding: 5px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 16px;
   background: #f0eaff;
 }
@@ -173,28 +173,28 @@
   border: 2px solid transparent;
   border-radius: 11px;
   background: transparent;
-  color: #0b2347;
+  color: #0b2b50;
   font: inherit;
   font-weight: 950;
   cursor: pointer;
 }
 
 .typePicker button.activeType {
-  border-color: #0b2347;
+  border-color: #0b2b50;
   background: #ffffff;
-  box-shadow: 3px 3px 0 #e02432;
+  box-shadow: 3px 3px 0 #dc2f3b;
 }
 
 .templateLink {
   width: 100%;
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .filePicker {
   display: grid;
   gap: 8px;
   padding: 18px;
-  border: 2px dashed #e02432;
+  border: 2px dashed #dc2f3b;
   border-radius: 16px;
   background: #faf8ff;
   cursor: pointer;
@@ -227,12 +227,12 @@
 }
 
 .primaryActions button {
-  border-color: #0b2347;
+  border-color: #0b2b50;
   background: #ffffff;
 }
 
 .primaryActions .commitButton {
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
 }
 
@@ -269,9 +269,9 @@
   min-width: 0;
   gap: 5px;
   padding: 13px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 14px;
-  background: #fff5e8;
+  background: #fff7ee;
 }
 
 .previewMetrics span {
@@ -318,7 +318,7 @@
 
 .previewRow header span,
 .historyList header span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.63rem;
   font-weight: 950;
   letter-spacing: 0.08em;
@@ -374,7 +374,7 @@
 
 .commitResult {
   background: #fff6ca;
-  box-shadow: 7px 7px 0 #ffb65b;
+  box-shadow: 7px 7px 0 #ffd6b3;
 }
 
 .resultActions {
@@ -412,7 +412,7 @@
   min-width: 0;
   padding: 10px;
   border-radius: 10px;
-  background: #fff5e8;
+  background: #fff7ee;
 }
 
 .historyList dt {
@@ -445,7 +445,7 @@
 
 .emptyHistory a {
   margin-top: 14px;
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 @container (min-width: 720px) {
@@ -518,7 +518,7 @@
 .inventoryBrowser {
   margin-top: 22px;
   padding: 22px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 22px;
   background: #ffffff;
 }
@@ -527,9 +527,9 @@
   display: grid;
   gap: 18px;
   background:
-    radial-gradient(circle at 95% 15%, rgba(255, 207, 0, 0.28), transparent 28%),
+    radial-gradient(circle at 95% 15%, rgba(244, 162, 97, 0.28), transparent 28%),
     linear-gradient(135deg, #fffdf6 0%, #fff5c7 100%);
-  box-shadow: 7px 7px 0 #e02432;
+  box-shadow: 7px 7px 0 #dc2f3b;
 }
 
 .coveragePlan h2,
@@ -556,7 +556,7 @@
 
 .coverageChips span {
   padding: 8px 11px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 999px;
   background: #ffffff;
   font-size: 0.74rem;
@@ -591,7 +591,7 @@
   border: 1.5px solid #bdb0b4;
   border-radius: 12px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font: inherit;
   font-size: 0.88rem;
   font-weight: 650;
@@ -603,7 +603,7 @@
 .inventoryFilters input:focus,
 .inventoryFilters select:focus {
   outline: 3px solid rgba(111, 42, 229, 0.2);
-  border-color: #e02432;
+  border-color: #dc2f3b;
 }
 
 .templateActions {
@@ -619,10 +619,10 @@
   min-height: 44px;
   box-sizing: border-box;
   padding: 10px 13px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 12px;
   background: #f0eaff;
-  color: #0b2347;
+  color: #0b2b50;
   font-weight: 900;
   text-align: center;
   text-decoration: none;
@@ -643,9 +643,9 @@
 
 .inventoryBrowser .sectionHeading > strong {
   padding: 10px 13px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 999px;
-  background: #ffb65b;
+  background: #ffd6b3;
   font-size: 0.78rem;
   white-space: nowrap;
 }
@@ -656,9 +656,9 @@
   gap: 11px;
   margin-top: 20px;
   padding: 16px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 17px;
-  background: #fff5e8;
+  background: #fff7ee;
 }
 
 .inventoryFilters .searchField {
@@ -680,7 +680,7 @@
   justify-content: center;
   box-sizing: border-box;
   padding: 10px 12px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 12px;
   font: inherit;
   font-size: 0.78rem;
@@ -690,13 +690,13 @@
 }
 
 .filterActions button {
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
 }
 
 .filterActions a {
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
 }
 
 .importedList {
@@ -707,7 +707,7 @@
 
 .importedCard {
   overflow: hidden;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 18px;
   background: #ffffff;
   box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.1);
@@ -720,8 +720,8 @@
   align-items: start;
   padding: 16px;
   background:
-    linear-gradient(135deg, rgba(255, 207, 0, 0.16), transparent 50%),
-    #fff5e8;
+    linear-gradient(135deg, rgba(244, 162, 97, 0.16), transparent 50%),
+    #fff7ee;
 }
 
 .importedCard header > div:first-child {
@@ -729,7 +729,7 @@
 }
 
 .importedCard header span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.63rem;
   font-weight: 950;
   letter-spacing: 0.09em;
@@ -796,7 +796,7 @@
 }
 
 .importedCard dt {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.6rem;
   font-weight: 950;
   letter-spacing: 0.07em;
@@ -847,9 +847,9 @@
   align-items: center;
   justify-content: center;
   padding: 8px 11px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 11px;
-  color: #0b2347;
+  color: #0b2b50;
   font-size: 0.72rem;
   font-weight: 950;
   text-decoration: none;
@@ -857,7 +857,7 @@
 }
 
 .recordActions a:first-child {
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .recordActions a:last-child {
@@ -867,7 +867,7 @@
 .emptyInventory {
   margin-top: 18px;
   padding: 26px;
-  border: 2px dashed #e02432;
+  border: 2px dashed #dc2f3b;
   border-radius: 17px;
   background: #faf8ff;
   text-align: center;

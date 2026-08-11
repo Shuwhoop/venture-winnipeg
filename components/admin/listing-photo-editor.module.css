@@ -10,7 +10,7 @@
       rgba(255, 250, 235, 0.98),
       rgba(255, 255, 255, 0.98)
     );
-  box-shadow: 8px 8px 0 #ffb65b;
+  box-shadow: 8px 8px 0 #ffd6b3;
 }
 
 .heading {
@@ -26,7 +26,7 @@
 
 .heading span,
 .libraryHeading span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.13em;
@@ -86,7 +86,7 @@
   background:
     linear-gradient(
       135deg,
-      #ffb65b,
+      #ffd6b3,
       #ffebe8
     );
 }
@@ -109,7 +109,7 @@
 }
 
 .currentPanel small {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -176,7 +176,7 @@
       #ffe8a3,
       #ffd4ce
     );
-  box-shadow: 5px 5px 0 #e02432;
+  box-shadow: 5px 5px 0 #dc2f3b;
   transform: translateY(-2px);
 }
 
@@ -196,10 +196,10 @@
   place-items: center;
   border: 2px solid #102a4d;
   border-radius: 18px;
-  background: #ffb65b;
+  background: #ffd6b3;
   font-size: 1.75rem;
   font-weight: 950;
-  box-shadow: 4px 4px 0 #e02432;
+  box-shadow: 4px 4px 0 #dc2f3b;
 }
 
 .preview {
@@ -274,7 +274,7 @@
 .fields input:focus,
 .fields select:focus,
 .fields textarea:focus {
-  border-color: #e02432;
+  border-color: #dc2f3b;
   outline: 3px solid rgba(208, 16, 19, 0.12);
 }
 
@@ -321,9 +321,9 @@
 }
 
 .uploadButton {
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
-  box-shadow: 4px 4px 0 #ffb65b;
+  box-shadow: 4px 4px 0 #ffd6b3;
 }
 
 .quietButton {
@@ -381,7 +381,7 @@
   place-items: center;
   border: 2px solid #102a4d;
   border-radius: 50%;
-  background: #ffb65b;
+  background: #ffd6b3;
   font-size: 0.85rem;
 }
 
@@ -430,7 +430,7 @@
   border: 2px solid #102a4d;
   border-radius: 999px;
   padding: 5px 8px;
-  background: #ffb65b;
+  background: #ffd6b3;
   color: #102a4d;
   font-size: 0.62rem;
   font-weight: 950;
@@ -449,7 +449,7 @@
 }
 
 .mediaCopy small {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.64rem;
   font-weight: 850;
   letter-spacing: 0.05em;
@@ -531,7 +531,7 @@
   .card {
     border-radius: 18px;
     padding: 14px;
-    box-shadow: 5px 5px 0 #ffb65b;
+    box-shadow: 5px 5px 0 #ffd6b3;
   }
 
   .dropzone {

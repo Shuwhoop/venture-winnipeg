@@ -11,12 +11,12 @@
   padding: clamp(1.25rem, 4vw, 2rem);
   border: 1px solid #dcd2ef;
   border-radius: 1.5rem;
-  background: linear-gradient(135deg, #f2eaff 0%, #ffefd8 100%);
+  background: linear-gradient(135deg, #f2eaff 0%, #fff4e8 100%);
 }
 
 .eyebrow {
   margin: 0 0 0.35rem;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.75rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -108,7 +108,7 @@
   padding: 0.65rem 0.95rem;
   border: 1px solid #24153e;
   border-radius: 0.8rem;
-  background: #e02432;
+  background: #dc2f3b;
   color: #fff;
   font: inherit;
   font-weight: 850;

@@ -1,0 +1,277 @@
+/*
+ * Venture City Pulse Theme V1.1
+ * Warm Balance pass
+ *
+ * Palette-only refinement. Layout, spacing, component hierarchy,
+ * routes and product behavior stay exactly where they are.
+ */
+
+:root {
+  --venture-navy-deep: #071a33;
+  --venture-navy: #0b2b50;
+  --venture-navy-mid: #1b4b78;
+  --venture-blue: #4f83b6;
+  --venture-ice: #eaf3fb;
+  --venture-ice-strong: #d9e8f5;
+
+  --venture-red: #dc2f3b;
+  --venture-red-dark: #b51f2b;
+  --venture-coral: #f05a4f;
+
+  /*
+   * Legacy "yellow" token remains for compatibility, but is now
+   * a quiet peach highlight rather than a dominant yellow/orange.
+   */
+  --venture-yellow: #ffd6b3;
+  --venture-yellow-soft: #fff0e2;
+  --venture-gold: #dc2f3b;
+
+  --venture-warm: #f4a261;
+  --venture-warm-soft: #ffe8d3;
+
+  --venture-ink: #0b2b50;
+  --venture-ink-soft: #31516f;
+  --venture-muted: #687789;
+
+  --venture-cream: #fff7ee;
+  --venture-paper: #fffcf8;
+  --venture-line: #dce4ec;
+  --venture-line-dark: #c7d2de;
+
+  --venture-green: #198754;
+  --venture-amber: #b86a19;
+
+  --venture-card-shadow:
+    0 13px 32px rgba(7, 26, 51, 0.085);
+
+  --venture-strong-shadow:
+    6px 7px 0 rgba(220, 47, 59, 0.13);
+
+  --purple: var(--venture-red);
+  --purple-dark: var(--venture-red-dark);
+  --purple-soft: var(--venture-ice);
+  --ink: var(--venture-ink);
+  --muted: var(--venture-muted);
+  --line: var(--venture-line);
+  --surface: var(--venture-paper);
+  --shadow: var(--venture-card-shadow);
+}
+
+html {
+  background: #f3eee8;
+}
+
+body.venture-body {
+  background:
+    radial-gradient(
+      circle at 10% 4%,
+      rgba(244, 162, 97, 0.22),
+      transparent 27rem
+    ),
+    radial-gradient(
+      circle at 92% 5%,
+      rgba(220, 47, 59, 0.085),
+      transparent 24rem
+    ),
+    radial-gradient(
+      circle at 88% 40%,
+      rgba(79, 131, 182, 0.085),
+      transparent 29rem
+    ),
+    var(--venture-cream);
+  color: var(--venture-ink);
+}
+
+.app-shell {
+  background: var(--venture-paper);
+  box-shadow: 0 0 56px rgba(7, 26, 51, 0.14);
+}
+
+.app-header {
+  border-bottom-color: rgba(11, 43, 80, 0.085);
+  background: rgba(255, 252, 248, 0.96);
+}
+
+.brand-mark {
+  border-color: var(--venture-navy);
+  background: var(--venture-navy);
+  color: #ffffff;
+  box-shadow: 4px 4px 0 var(--venture-red);
+}
+
+.brand-mark i {
+  background: var(--venture-red);
+}
+
+.brand-copy strong,
+.brand strong {
+  color: var(--venture-navy);
+}
+
+.brand-copy small,
+.brand small {
+  color: var(--venture-red);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline-color: var(--venture-coral);
+}
+
+.section-heading span,
+.page-heading span,
+.profile-card > span,
+.eyebrow,
+.kicker {
+  color: var(--venture-red);
+}
+
+.mode-switcher {
+  background: #eef5fb;
+}
+
+.mode-switcher .active,
+.mode-switcher button.active {
+  background: var(--venture-navy);
+  color: #ffffff;
+}
+
+.mode-switcher a.active {
+  background: #ffffff;
+  color: var(--venture-red);
+}
+
+.search-button,
+input,
+select,
+textarea {
+  border-color: var(--venture-line-dark);
+}
+
+.chips button,
+.filter-chip {
+  border-color: var(--venture-line-dark);
+  background: #fffdf9;
+  color: var(--venture-navy);
+}
+
+.chips .active,
+.filter-chip.active,
+.empty-action,
+.primary-action,
+.two-buttons .primary {
+  border-color: var(--venture-red);
+  background: var(--venture-red);
+  color: #ffffff;
+}
+
+.listing-card,
+.reason-card,
+.trust-panel,
+.settings-list button,
+.fact-grid div,
+.report-panel {
+  border-color: var(--venture-line);
+  background: #fffdf9;
+  box-shadow: var(--venture-card-shadow);
+}
+
+.pairing-card {
+  border-color: #f3c8c5;
+  background: #fff1ed;
+}
+
+.pairing-icon {
+  background: linear-gradient(
+    145deg,
+    var(--venture-red),
+    var(--venture-warm)
+  );
+}
+
+.newsletter-panel {
+  background:
+    radial-gradient(
+      circle at 84% 14%,
+      rgba(244, 162, 97, 0.22),
+      transparent 28%
+    ),
+    linear-gradient(
+      145deg,
+      var(--venture-navy-deep),
+      var(--venture-navy) 63%,
+      var(--venture-navy-mid)
+    );
+  color: #ffffff;
+}
+
+.itinerary-hero {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 26, 51, 0.02),
+      rgba(7, 26, 51, 0.91)
+    ),
+    linear-gradient(
+      120deg,
+      var(--venture-navy-deep),
+      var(--venture-navy) 52%,
+      var(--venture-red)
+    );
+}
+
+.profile-card {
+  border-color: var(--venture-line);
+  background: #f8fbfe;
+}
+
+.profile-card > div {
+  background: var(--venture-navy);
+  color: #ffffff;
+}
+
+.bottom-nav {
+  border-top-color: rgba(11, 43, 80, 0.10);
+  background: rgba(255, 252, 248, 0.97);
+  box-shadow: 0 -8px 28px rgba(7, 26, 51, 0.055);
+}
+
+.nav-link {
+  color: #6f7b87;
+}
+
+.nav-link.active {
+  color: var(--venture-red);
+}
+
+.nav-link.special span {
+  border: 2px solid var(--venture-red);
+  background: var(--venture-navy);
+  color: #ffffff;
+  box-shadow:
+    3px 3px 0 var(--venture-red),
+    0 10px 22px rgba(7, 26, 51, 0.20);
+}
+
+.page-content {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 239, 225, 0.14),
+      transparent 14rem
+    );
+}
+
+::selection {
+  background: rgba(220, 47, 59, 0.17);
+  color: var(--venture-navy-deep);
+}
+
+@media (min-width: 820px) {
+  .app-shell {
+    border-color: rgba(11, 43, 80, 0.10);
+  }
+}

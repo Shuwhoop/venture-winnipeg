@@ -1163,7 +1163,7 @@
 }
 
 .profileCompletion strong {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.92rem;
 }
 
@@ -1203,7 +1203,7 @@
 
 .aboutPreviewCard > div:last-child > span,
 .vibePreviewCard > span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -1362,13 +1362,13 @@
 }
 
 .deleteDisclosure {
-  border-color: #e02432;
+  border-color: #dc2f3b;
   background: #fff8f7;
 }
 
 .deleteDisclosure > summary b {
   color: white;
-  background: #e02432;
+  background: #dc2f3b;
 }
 
 .deleteWarning {

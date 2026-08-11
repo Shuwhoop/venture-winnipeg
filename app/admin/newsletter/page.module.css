@@ -4,7 +4,7 @@
   gap: 18px;
   width: 100%;
   padding: 18px 14px 120px;
-  color: #0b2347;
+  color: #0b2b50;
 }
 
 .page,
@@ -18,7 +18,7 @@
 .filters,
 .errorCard,
 .empty {
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 22px;
   background: #ffffff;
   box-shadow: 5px 5px 0 rgba(36, 31, 32, 0.12);
@@ -29,12 +29,12 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 16px;
   padding: 20px;
-  background: linear-gradient(135deg, #ffb65b, #fff7cf);
-  box-shadow: 6px 6px 0 #e02432;
+  background: linear-gradient(135deg, #ffd6b3, #fff7cf);
+  box-shadow: 6px 6px 0 #dc2f3b;
 }
 
 .hero span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.1em;
@@ -60,7 +60,7 @@
   align-content: center;
   gap: 4px;
   padding: 12px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 15px;
   background: #ffffff;
 }
@@ -96,8 +96,8 @@
 
 .readiness > a {
   place-items: center;
-  border: 2px solid #0b2347;
-  background: #e02432;
+  border: 2px solid #0b2b50;
+  background: #dc2f3b;
   color: #ffffff;
   font-weight: 900;
   text-decoration: none;
@@ -108,7 +108,7 @@
 }
 
 .warning {
-  background: #ffe1b8;
+  background: #fff0df;
 }
 
 .blocked {
@@ -125,7 +125,7 @@
   display: grid;
   gap: 5px;
   padding: 14px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 17px;
   background: #ffffff;
 }
@@ -139,7 +139,7 @@
 }
 
 .metrics > div:nth-child(3) {
-  background: #ffe1b8;
+  background: #fff0df;
 }
 
 .metrics > div:nth-child(4) {
@@ -148,7 +148,7 @@
 
 .metrics span,
 .filters label > span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.62rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -180,7 +180,7 @@
   border: 1.5px solid #9f938d;
   border-radius: 12px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font: inherit;
 }
 
@@ -188,14 +188,14 @@
 .filters a {
   display: grid;
   place-items: center;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   font-weight: 900;
   text-decoration: none;
   cursor: pointer;
 }
 
 .filters button {
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .list {
@@ -207,7 +207,7 @@
   display: grid;
   gap: 14px;
   padding: 16px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 19px;
   background: #ffffff;
   box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.1);
@@ -237,7 +237,7 @@
 .status {
   display: inline-flex;
   padding: 5px 8px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 999px;
   background: #f4efea;
   font-size: 0.61rem;
@@ -250,7 +250,7 @@
 }
 
 .pending {
-  background: #ffe1b8;
+  background: #fff0df;
 }
 
 .unsubscribed,
@@ -269,7 +269,7 @@
 .subscriber dl > div {
   padding: 10px;
   border-radius: 12px;
-  background: #fff5e8;
+  background: #fff7ee;
 }
 
 .subscriber dt {

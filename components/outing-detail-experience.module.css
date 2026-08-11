@@ -6,9 +6,9 @@
   padding: 15px 13px 132px;
   overflow-x: clip;
   background:
-    radial-gradient(circle at 7% 4%, rgba(255, 207, 0, 0.2), transparent 23%),
+    radial-gradient(circle at 7% 4%, rgba(244, 162, 97, 0.2), transparent 23%),
     radial-gradient(circle at 94% 23%, rgba(208, 16, 19, 0.08), transparent 24%),
-    linear-gradient(180deg, #fffaf4 0%, #fff7f1 100%);
+    linear-gradient(180deg, #fffaf5 0%, #fff7f1 100%);
 }
 
 .page,
@@ -26,7 +26,7 @@
   border: 1.5px solid #d8cbc4;
   border-radius: 999px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font-size: 0.76rem;
   font-weight: 900;
   text-decoration: none;
@@ -38,7 +38,7 @@
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .hero {
@@ -50,12 +50,12 @@
   min-width: 0;
   padding: 20px;
   overflow: hidden;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 25px;
   background:
     radial-gradient(circle at 91% 12%, rgba(208, 16, 19, 0.11), transparent 25%),
     linear-gradient(140deg, #fff2a9 0%, #ffdb70 55%, #fff6d5 100%);
-  box-shadow: 6px 6px 0 #e02432;
+  box-shadow: 6px 6px 0 #dc2f3b;
 }
 
 .hero::after {
@@ -79,7 +79,7 @@
 
 .heroCopy > span,
 .sectionHeading > span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.62rem;
   font-weight: 950;
   letter-spacing: 0.11em;
@@ -89,7 +89,7 @@
 .heroCopy h1 {
   max-width: 14ch;
   margin: 0;
-  color: #0b2347;
+  color: #0b2b50;
   font-size: clamp(2rem, 9.8vw, 3rem);
   line-height: 0.95;
   letter-spacing: -0.055em;
@@ -114,7 +114,7 @@
   max-width: 100%;
   margin-top: 4px;
   padding: 8px 11px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.82);
   color: #3f3638;
@@ -141,7 +141,7 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 999px;
   background: #ffffff;
   box-shadow: 2px 2px 0 rgba(36, 31, 32, 0.15);
@@ -151,7 +151,7 @@
 .heroRoute i {
   width: 3px;
   height: 22px;
-  border-left: 3px dashed #e02432;
+  border-left: 3px dashed #dc2f3b;
 }
 
 .snapshotSection,
@@ -170,7 +170,7 @@
 
 .sectionHeading h2 {
   margin: 0;
-  color: #0b2347;
+  color: #0b2b50;
   font-size: clamp(1.5rem, 6vw, 2rem);
   line-height: 1;
   letter-spacing: -0.04em;
@@ -199,7 +199,7 @@
   min-height: 119px;
   padding: 13px;
   overflow: hidden;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 20px;
   box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.12);
   animation: cardIn 380ms ease both;
@@ -223,7 +223,7 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.82);
   font-size: 1rem;
@@ -233,7 +233,7 @@
 .snapshotGrid article > span {
   position: relative;
   z-index: 1;
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 0.59rem;
   font-weight: 950;
   letter-spacing: 0.08em;
@@ -242,7 +242,7 @@
 .snapshotGrid article > strong {
   position: relative;
   z-index: 1;
-  color: #0b2347;
+  color: #0b2b50;
   font-size: 0.98rem;
   line-height: 1.2;
   overflow-wrap: anywhere;
@@ -286,8 +286,8 @@
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  background: #ffb65b;
-  color: #0b2347;
+  background: #ffd6b3;
+  color: #0b2b50;
   font-weight: 950;
 }
 
@@ -337,7 +337,7 @@
   min-width: 0;
   padding: 14px;
   overflow: hidden;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 22px;
   background: linear-gradient(180deg, #ffffff, #fffaf5);
   box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.12);
@@ -355,11 +355,11 @@
   place-items: center;
   width: 43px;
   height: 43px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 15px;
-  background: #ffb65b;
-  box-shadow: 3px 3px 0 #e02432;
-  color: #0b2347;
+  background: #ffd6b3;
+  box-shadow: 3px 3px 0 #dc2f3b;
+  color: #0b2b50;
   font-size: 1rem;
   font-weight: 950;
 }
@@ -402,7 +402,7 @@
 
 .stopCopy h3 {
   margin: 0;
-  color: #0b2347;
+  color: #0b2b50;
   font-size: 1.2rem;
   line-height: 1.04;
   letter-spacing: -0.035em;
@@ -449,10 +449,10 @@
   width: 100%;
   min-height: 42px;
   padding: 9px 11px;
-  border: 1.5px solid #0b2347;
+  border: 1.5px solid #0b2b50;
   border-radius: 13px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font-size: 0.72rem;
   font-weight: 950;
   text-decoration: none;
@@ -464,7 +464,7 @@
   width: 25px;
   height: 25px;
   border-radius: 999px;
-  background: #ffb65b;
+  background: #ffd6b3;
 }
 
 .actions {
@@ -472,9 +472,9 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   padding: 12px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 20px;
-  background: #fff5e8;
+  background: #fff7ee;
   box-shadow: 4px 4px 0 rgba(36, 31, 32, 0.12);
 }
 
@@ -486,10 +486,10 @@
   min-width: 0;
   min-height: 48px;
   padding: 10px 12px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 14px;
   background: #ffffff;
-  color: #0b2347;
+  color: #0b2b50;
   font: inherit;
   font-size: 0.72rem;
   font-weight: 950;
@@ -499,13 +499,13 @@
 }
 
 .actions a:first-child {
-  background: #ffb65b;
-  box-shadow: 3px 3px 0 #e02432;
+  background: #ffd6b3;
+  box-shadow: 3px 3px 0 #dc2f3b;
 }
 
 .actions button {
   color: #ffffff;
-  background: #e02432;
+  background: #dc2f3b;
 }
 
 @keyframes cardIn {
@@ -534,16 +534,16 @@
   max-width: 180px;
   min-height: 44px;
   padding: 8px 10px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 14px;
-  background: #e02432;
+  background: #dc2f3b;
   color: #ffffff;
   font-size: 0.66rem;
   font-weight: 950;
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
-  box-shadow: 3px 3px 0 #ffb65b;
+  box-shadow: 3px 3px 0 #ffd6b3;
 }
 
 .page :global(.outing-route-heading a > span) {
@@ -581,7 +581,7 @@
   .heroRoute i {
     width: 24px;
     height: 3px;
-    border-top: 3px dashed #e02432;
+    border-top: 3px dashed #dc2f3b;
     border-left: 0;
   }
 
@@ -648,8 +648,8 @@
 .page {
   gap: 15px;
   background:
-    radial-gradient(circle at 90% 2%, rgba(255, 207, 0, 0.16), transparent 20%),
-    #fff5e8;
+    radial-gradient(circle at 90% 2%, rgba(244, 162, 97, 0.16), transparent 20%),
+    #fff7ee;
 }
 
 .hero,
@@ -679,13 +679,13 @@
   background: #ffffff;
 }
 
-.startCard { border-top: 5px solid #e02432 !important; }
+.startCard { border-top: 5px solid #dc2f3b !important; }
 .lengthCard { border-top: 5px solid #5d9d32 !important; }
 .peopleCard { border-top: 5px solid #1682b5 !important; }
-.travelCard { border-top: 5px solid #3d78b5 !important; }
-.stopsCard { border-top: 5px solid #ec8a34 !important; }
+.travelCard { border-top: 5px solid #4f83b6 !important; }
+.stopsCard { border-top: 5px solid #dc2f3b !important; }
 .priceCard { border-top: 5px solid #dc7416 !important; }
-.groupCard { border-top: 5px solid #0b2347 !important; }
+.groupCard { border-top: 5px solid #0b2b50 !important; }
 
 .stopWrapper {
   opacity: 0;
@@ -694,17 +694,17 @@
 
 .stopCard {
   border: 1.5px solid #d8cec7;
-  border-left: 5px solid #ffb65b;
+  border-left: 5px solid #ffd6b3;
   background: #ffffff;
   transition: transform 160ms ease, border-color 160ms ease;
 }
 
-.foodStop { border-left-color: #ec8a34; }
-.eventStop { border-left-color: #3d78b5; }
+.foodStop { border-left-color: #dc2f3b; }
+.eventStop { border-left-color: #4f83b6; }
 .drinksStop { border-left-color: #0f8a4b; }
 
 .stopCard:focus-within {
-  border-color: #0b2347;
+  border-color: #0b2b50;
   transform: translateY(-2px);
 }
 

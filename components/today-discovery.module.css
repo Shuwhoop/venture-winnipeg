@@ -1,9 +1,9 @@
 .page {
-  --home-paper: #fff5e8;
+  --home-paper: #fff7ee;
   --home-cream: #fff5df;
-  --home-ink: var(--venture-ink, #0b2347);
+  --home-ink: var(--venture-ink, #0b2b50);
   --home-red: var(--venture-red, #d81016);
-  --home-yellow: var(--venture-yellow, #ffb65b);
+  --home-yellow: var(--venture-yellow, #ffd6b3);
   --home-green: var(--venture-green, #087a4c);
 
   display: grid;
@@ -14,7 +14,7 @@
   background:
     radial-gradient(
       circle at 92% 5%,
-      rgba(255, 207, 0, 0.14),
+      rgba(244, 162, 97, 0.14),
       transparent 12rem
     ),
     var(--home-paper);
@@ -1044,3 +1044,118 @@
 }
 /* VENTURE HOME QUICK FILTERS V2.6 END */
 
+/* VENTURE CITY PULSE V1.1 - HOME WARM BALANCE */
+.page {
+  --home-paper: #fffaf5;
+  --home-cream: #fff4e9;
+  --home-ink: #0b2b50;
+  --home-red: #dc2f3b;
+  --home-yellow: #ffd6b3;
+
+  background:
+    radial-gradient(
+      circle at 92% 5%,
+      rgba(244, 162, 97, 0.18),
+      transparent 12rem
+    ),
+    radial-gradient(
+      circle at 6% 28%,
+      rgba(79, 131, 182, 0.06),
+      transparent 15rem
+    ),
+    var(--home-paper);
+}
+
+.heroShapes::before {
+  border-color: rgba(220, 47, 59, 0.075);
+}
+
+.heroShapes span {
+  background: #ffd6b3;
+}
+
+.heroShapes b {
+  background: #4f83b6;
+}
+
+.search {
+  background: #fffcf8;
+  box-shadow: 3px 4px 0 rgba(220, 47, 59, 0.78);
+}
+
+.searchIcon {
+  background: var(--home-ink);
+}
+
+.searchIcon svg {
+  stroke: #ffffff;
+}
+
+.quickFilters a,
+.quickFilters button {
+  background: #fffcf8;
+  box-shadow: 1px 2px 0 rgba(11, 43, 80, 0.07);
+}
+
+.quickFilters a:hover,
+.quickFilters button:hover:not(:disabled) {
+  background: #fff0e2;
+}
+
+.pickHeading i,
+.sectionHeading i {
+  background: var(--home-red);
+}
+
+.pickHeading p,
+.sectionHeading a {
+  color: #667789;
+}
+
+.featuredTopline span {
+  border-color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 252, 248, 0.94);
+  color: var(--home-red);
+}
+
+.featuredTopline small {
+  color: #ffe1c7;
+}
+
+.trendCard {
+  background: #fffcf8;
+  box-shadow: 3px 4px 0 rgba(220, 47, 59, 0.17);
+}
+
+.emptyState {
+  border-color: #c8d2dc;
+  background: rgba(255, 252, 248, 0.82);
+  color: #667789;
+}
+
+.builderBanner {
+  background:
+    radial-gradient(
+      circle at 86% 22%,
+      rgba(244, 162, 97, 0.20),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #071a33,
+      #0b2b50 58%,
+      #1b4b78
+    );
+  color: #ffffff;
+  box-shadow: 6px 6px 0 var(--home-red);
+}
+
+.builderBanner span {
+  color: #ffd6b3;
+}
+
+.builderBanner > b {
+  border-color: rgba(255, 255, 255, 0.82);
+  background: var(--home-red);
+  color: #ffffff;
+}

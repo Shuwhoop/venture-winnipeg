@@ -6,7 +6,7 @@
 
 .hero,
 .tableCard {
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 24px;
   background: white;
   box-shadow: 7px 8px 0 rgba(36, 31, 32, 0.12);
@@ -16,12 +16,12 @@
   display: grid;
   gap: 14px;
   padding: 22px;
-  background: #fff3b3;
+  background: #fff0e2;
 }
 
 .hero span,
 .tableCard header span {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.15em;
@@ -30,7 +30,7 @@
 .hero h1,
 .tableCard h2 {
   margin: 4px 0 0;
-  color: #0b2347;
+  color: #0b2b50;
 }
 
 .hero h1 {
@@ -61,18 +61,18 @@
   display: grid;
   gap: 4px;
   padding: 16px;
-  border: 2px solid #0b2347;
+  border: 2px solid #0b2b50;
   border-radius: 18px;
   background: white;
 }
 
 .metrics article:nth-child(1),
 .metrics article:nth-child(4) {
-  background: #fff3b3;
+  background: #fff0e2;
 }
 
 .metrics strong {
-  color: #e02432;
+  color: #dc2f3b;
   font-size: 26px;
 }
 
@@ -91,7 +91,7 @@
   gap: 12px;
   align-items: end;
   padding: 18px;
-  border-bottom: 2px solid #0b2347;
+  border-bottom: 2px solid #0b2b50;
 }
 
 .tableCard h2 {
@@ -125,7 +125,7 @@
 }
 
 .tableWrap td {
-  color: #0b2347;
+  color: #0b2b50;
   font-size: 13px;
 }
 
@@ -149,7 +149,7 @@
 }
 
 .pending {
-  background: #fff3b3;
+  background: #fff0e2;
   color: #8a5600;
 }
 
