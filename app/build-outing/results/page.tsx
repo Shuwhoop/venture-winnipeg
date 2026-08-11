@@ -3372,24 +3372,32 @@ export default function OutingResultsPage() {
                     >
                       {stop.travelFromPreviousMinutes !==
                       null ? (
-                        <div className="outing-travel-row">
+                        <div className={styles.travelConnector}>
                           <span
-                            className="outing-travel-icon"
+                            className={styles.travelRail}
                             aria-hidden="true"
                           >
-                            <TravelModeIcon mode={plan.transportation} />
+                            <i />
+                            <b>
+                              <TravelModeIcon mode={plan.transportation} />
+                            </b>
+                            <i />
                           </span>
 
-                          <div className="outing-travel-copy">
+                          <div className={styles.travelMain}>
+                            <span>NEXT STOP</span>
                             <strong>
-                              {stop.travelFromPreviousMinutes} min to {stop.listing.name}
+                              {stop.travelFromPreviousMinutes} min
                             </strong>
-                            <p>
-                              {plan.transportation} · arrive around {stop.startTime}
-                            </p>
+                            <small>
+                              {plan.transportation} to {stop.listing.name}
+                            </small>
                           </div>
 
-                          <i className="outing-travel-pulse" aria-hidden="true" />
+                          <div className={styles.travelArrival}>
+                            <span>EST. ARRIVAL</span>
+                            <strong>{stop.startTime}</strong>
+                          </div>
                         </div>
                       ) : null}
 
@@ -3767,6 +3775,26 @@ export default function OutingResultsPage() {
               Edit preferences
             </Link>
           </div>
+
+          {/* VENTURE RESULTS FLOW POLISH V1.3 */}
+          <aside
+            className={styles.routeEstimateNote}
+            aria-label="Planning estimates"
+          >
+            <span
+              className={styles.routeEstimateIcon}
+              aria-hidden="true"
+            >
+              i
+            </span>
+
+            <div>
+              <strong>Plan with a little wiggle room.</strong>
+              <p>
+                Route order, travel and arrival times, prices, and outing totals are estimates based on the latest information Venture has available. Traffic, transit delays, venue availability, menu prices, tickets, cover charges, taxes, tips, and other costs can change. Check final hours, reservations, prices, and directions with the venue or your navigation app before heading out.
+              </p>
+            </div>
+          </aside>
         </>
       ) : null}
       {completionSheetOpen &&

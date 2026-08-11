@@ -5443,3 +5443,240 @@
     grid-column: auto;
   }
 }
+
+/* =========================================================
+   VENTURE RESULTS FLOW POLISH V1.3
+   Travel connector + estimation note.
+   ========================================================= */
+
+.travelConnector {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  width: calc(100% - 24px);
+  min-height: 72px;
+  margin: 8px 0 8px 24px;
+  padding: 10px 11px 10px 8px;
+  border: 1px solid #d7e1ea;
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(244, 162, 97, 0.13),
+      transparent 32%
+    ),
+    linear-gradient(
+      145deg,
+      #fffcf8 0%,
+      #f4f8fc 100%
+    );
+  box-shadow:
+    0 6px 18px rgba(7, 26, 51, 0.055);
+}
+
+.travelRail {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr 34px 1fr;
+  place-items: center;
+  align-self: stretch;
+  min-height: 50px;
+}
+
+.travelRail > i {
+  display: block;
+  width: 2px;
+  height: 100%;
+  min-height: 9px;
+  border-radius: 999px;
+  background: #dc2f3b;
+}
+
+.travelRail > b {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 2px solid #0b2b50;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0b2b50;
+  box-shadow: 2px 2px 0 rgba(220, 47, 59, 0.22);
+}
+
+.travelRail svg {
+  width: 18px;
+  height: 18px;
+}
+
+.travelMain {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.travelMain > span {
+  color: #dc2f3b;
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+}
+
+.travelMain > strong {
+  color: #0b2b50;
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1.05;
+}
+
+.travelMain > small {
+  overflow: hidden;
+  color: #5f7080;
+  font-size: 0.68rem;
+  font-weight: 760;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.travelArrival {
+  display: grid;
+  gap: 2px;
+  min-width: 74px;
+  padding: 7px 8px;
+  border: 1px solid #d7e1ea;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.90);
+  text-align: right;
+}
+
+.travelArrival span {
+  color: #718090;
+  font-size: 0.48rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.travelArrival strong {
+  color: #0b2b50;
+  font-size: 0.75rem;
+  font-weight: 950;
+}
+
+.routeEstimateNote {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin-top: 14px;
+  padding: 13px 14px;
+  border: 1px solid #d6e0e9;
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      circle at 96% 10%,
+      rgba(244, 162, 97, 0.10),
+      transparent 28%
+    ),
+    #fffcf8;
+  color: #5b6b79;
+  box-shadow: 0 5px 16px rgba(7, 26, 51, 0.04);
+}
+
+.routeEstimateIcon {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 1.5px solid #0b2b50;
+  border-radius: 999px;
+  background: #eaf3fb;
+  color: #0b2b50;
+  font-size: 0.68rem;
+  font-weight: 950;
+}
+
+.routeEstimateNote > div {
+  display: grid;
+  gap: 4px;
+}
+
+.routeEstimateNote strong {
+  color: #0b2b50;
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.routeEstimateNote p {
+  margin: 0;
+  color: #657482;
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+/* Smooth the handoff from one stop into its connector. */
+.detailsToggle {
+  margin-top: 2px;
+  border-color: #d6e0e9;
+  border-radius: 13px;
+  background: #fffcf8;
+  box-shadow: none;
+}
+
+.detailsToggle:hover,
+.detailsToggle:focus-visible {
+  border-color: #0b2b50;
+  background: #fff7ee;
+  box-shadow: 2px 2px 0 rgba(220, 47, 59, 0.13);
+}
+
+.stopQuickFacts {
+  gap: 6px;
+}
+
+.stopQuickFacts span {
+  border-color: #d7e1ea;
+  background: #ffffff;
+}
+
+@media (max-width: 420px) {
+  .travelConnector {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    width: calc(100% - 14px);
+    margin-left: 14px;
+    padding-right: 9px;
+  }
+
+  .travelRail > b {
+    width: 31px;
+    height: 31px;
+  }
+
+  .travelMain > small {
+    white-space: normal;
+  }
+
+  .travelArrival {
+    min-width: 67px;
+    padding: 6px 7px;
+  }
+
+  .routeEstimateNote {
+    margin-top: 11px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 350px) {
+  .travelConnector {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .travelArrival {
+    grid-column: 2;
+    justify-self: start;
+    text-align: left;
+  }
+}
