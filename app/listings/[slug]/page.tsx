@@ -856,6 +856,11 @@ export default async function ListingPage({
           ) : null}
         </div>
 
+        <ListingDetailActionDock
+          listing={listingSnapshot}
+          directionsUrl={null}
+        />
+
         <p className={styles.compassNote}>
           Directions may open in Google Maps. Venture uses maps as a compass, while listing facts come from official or independently verified sources.
         </p>
@@ -1083,11 +1088,6 @@ export default async function ListingPage({
           listingName={detail.name}
         />
       </section>
-
-      <ListingDetailActionDock
-        listing={listingSnapshot}
-        directionsUrl={listingDirectionsUrl}
-      />
-    </main>
+</main>
   );
 }

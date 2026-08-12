@@ -204,3 +204,138 @@
     -webkit-backdrop-filter: none;
   }
 }
+
+/* =========================================================
+   VENTURE LISTING QUICK ACTIONS MERGE V1.0
+   Save + Share + Build now live inside Make the next move.
+   ========================================================= */
+
+.dock {
+  position: static !important;
+  z-index: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+
+  display: grid !important;
+  grid-template-columns:
+    minmax(0, 0.78fr)
+    minmax(145px, 1.22fr) !important;
+
+  gap: 8px !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 12px 0 2px !important;
+  padding: 8px !important;
+
+  transform: none !important;
+
+  border: 1px solid #d9cfd7 !important;
+  border-radius: 17px !important;
+
+  background: #fffdfb !important;
+
+  box-shadow:
+    0 5px 16px
+    rgba(7, 26, 51, 0.055) !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.utilityRow {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    ) !important;
+
+  gap: 7px !important;
+}
+
+.utilityAction {
+  min-height: 58px !important;
+
+  border: 1px solid #d9cfd7 !important;
+  border-radius: 13px !important;
+
+  box-shadow: none !important;
+}
+
+.utilityAction:first-child {
+  background: #fff3bd !important;
+}
+
+.utilityAction:nth-child(2) {
+  background: #f7edff !important;
+}
+
+.utilityAction > span {
+  color: #0b2b50 !important;
+  font-size: 0.56rem !important;
+}
+
+.utilityAction :global(.save-button) {
+  width: 32px !important;
+  height: 32px !important;
+
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
+.utilityAction :global(button[class*="button"]) {
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
+.buildAction {
+  min-height: 58px !important;
+
+  border: 1.5px solid #0b2b50 !important;
+  border-radius: 13px !important;
+
+  background: #dc2f3b !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    2px 3px 0
+    #0b2b50 !important;
+}
+
+.buildAction small {
+  color: #ffd6b3 !important;
+}
+
+.buildAction strong {
+  font-size: 0.78rem !important;
+}
+
+.buildAction b {
+  width: 32px !important;
+  height: 32px !important;
+
+  border-color: #0b2b50 !important;
+
+  background: #fff7ee !important;
+  color: #0b2b50 !important;
+}
+
+@media (max-width: 390px) {
+  .dock {
+    grid-template-columns:
+      minmax(0, 0.82fr)
+      minmax(132px, 1.18fr) !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .dock {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .buildAction {
+    min-height: 52px !important;
+  }
+}
