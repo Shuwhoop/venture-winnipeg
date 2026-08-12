@@ -18,6 +18,7 @@ import type { Listing } from "@/lib/types";
 
 import styles from "./today-discovery.module.css";
 
+import { HomeSubmitLast } from "@/components/home-submit-last";
 type TodayDiscoveryProps = {
   events: Listing[];
   places: Listing[];
@@ -636,6 +637,7 @@ export function TodayDiscovery({
 
   return (
     <main className={styles.page}>
+      <HomeSubmitLast />
       <section className={styles.hero}>
         <div className={styles.heroShapes} aria-hidden="true">
           <i />

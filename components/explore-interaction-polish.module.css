@@ -356,3 +356,11 @@
       10px 10px 8px !important;
   }
 }
+
+
+/* VENTURE EXPLORE INSTANT PINS V1.3.2 */
+:global(.maplibregl-marker){width:21px!important;height:28px!important;min-width:21px!important;min-height:28px!important;overflow:visible!important;border:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;font-size:0!important}
+:global(.maplibregl-marker > *){opacity:0!important;pointer-events:none!important}
+:global(.maplibregl-marker)::before{position:absolute;top:1px;left:50%;width:17px;height:17px;border:2px solid #fff;border-radius:50% 50% 50% 12%;background:#dc2f3b;box-shadow:0 2px 6px rgba(7,26,51,.30);content:"";transform:translateX(-50%) rotate(-45deg);transform-origin:center}
+:global(.maplibregl-marker)::after{display:none!important;content:none!important}
+:global(.maplibregl-marker:hover)::before{background:#b51f2b}

@@ -26,6 +26,7 @@ import {
   ProfileHeaderAvatar
 } from "@/components/profile/profile-header-avatar";
 
+import { VentureSupportAccess } from "@/components/venture-support-access";
 export const metadata: Metadata = {
   title: "Venture",
 
@@ -141,6 +142,7 @@ export default function RootLayout({
 
           <ServiceWorkerRegistration />
         </div>
+              <VentureSupportAccess />
       </body>
     </html>
   );
