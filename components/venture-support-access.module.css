@@ -1,2 +1,204 @@
-.supportLink{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));z-index:58;display:grid;grid-template-columns:31px auto;gap:8px;align-items:center;min-height:47px;padding:7px 11px 7px 7px;border:1.5px solid #0b2b50;border-radius:15px;background:rgba(255,252,248,.97);color:#0b2b50;text-decoration:none;box-shadow:3px 4px 0 rgba(220,47,59,.18);backdrop-filter:blur(12px)}
-.icon{display:grid;width:31px;height:31px;place-items:center;border-radius:10px;background:#dc2f3b;color:#fff;font-size:.78rem;font-weight:950}.supportLink>span:last-child{display:grid;gap:1px}.supportLink strong{font-size:.68rem;line-height:1.05}.supportLink small{color:#718090;font-size:.55rem;font-weight:750}.supportLink:hover,.supportLink:focus-visible{background:#fff7ee;box-shadow:4px 5px 0 rgba(220,47,59,.24)}
+.supportRow {
+  display: grid;
+  grid-template-columns:
+    42px minmax(0, 1fr) 20px;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-height: 62px;
+  padding: 10px 12px;
+  border: 1.5px solid #0b2b50;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #0b2b50;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background 120ms ease;
+}
+
+.supportRow:hover,
+.supportRow:focus-visible {
+  background: #fffaf5;
+  box-shadow:
+    2px 3px 0
+    rgba(220, 47, 59, 0.16);
+  transform: translateY(-1px);
+}
+
+.supportRow:focus-visible {
+  outline:
+    3px solid
+    rgba(79, 131, 182, 0.2);
+  outline-offset: 2px;
+}
+
+.supportIcon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1.5px solid #0b2b50;
+  border-radius: 12px;
+  background: #dc2f3b;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 950;
+  box-shadow:
+    1px 2px 0
+    rgba(7, 26, 51, 0.15);
+}
+
+.supportCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.supportCopy strong {
+  color: #0b2b50;
+  font-size: 0.78rem;
+  line-height: 1.05;
+}
+
+.supportCopy small {
+  overflow: hidden;
+  color: #6e7c89;
+  font-size: 0.58rem;
+  font-weight: 650;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  justify-self: end;
+  color: #0b2b50;
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* =========================================================
+   QUICK ACTIONS
+   These existing actions now read as one compact stack
+   instead of five separate islands.
+   ========================================================= */
+
+:global(
+  [data-venture-quick-actions-heading="true"]
+) {
+  margin-bottom: 8px !important;
+}
+
+:global(
+  [data-venture-quick-action="true"]
+) {
+  margin-top: 0 !important;
+  margin-bottom: 6px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+:global(
+  [data-venture-quick-action="true"]
+  [data-venture-quick-action-card="true"]
+),
+:global(
+  [data-venture-quick-action-card="true"]
+) {
+  width: 100% !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  box-sizing: border-box !important;
+  box-shadow:
+    0 2px 8px
+    rgba(7, 26, 51, 0.045) !important;
+}
+
+/*
+ * Tight, consistent rhythm. Account sync can stay taller,
+ * but it belongs to the same visual family as the links.
+ */
+:global(
+  [data-venture-quick-action-position="first"]
+) {
+  margin-top: 0 !important;
+}
+
+:global(
+  [data-venture-quick-action-position="last"]
+) {
+  margin-bottom: 0 !important;
+}
+
+/*
+ * Neutralize oversized section spacing that previously made
+ * every Quick Action feel like its own separate feature.
+ */
+:global(
+  [data-venture-quick-action="true"]
+  > section
+),
+:global(
+  [data-venture-quick-action="true"]
+  > article
+),
+:global(
+  [data-venture-quick-action="true"]
+  > a
+),
+:global(
+  [data-venture-quick-action="true"]
+  > button
+) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/*
+ * Make the thin actions feel like rows in the same group.
+ */
+:global(
+  [data-venture-quick-action-card="true"]
+) {
+  border-radius: 14px !important;
+}
+
+/* Preserve the Account Sync internals but pull in excess air. */
+:global(
+  [data-venture-quick-action="true"]
+  p:first-child
+),
+:global(
+  [data-venture-quick-action="true"]
+  h2:first-child
+),
+:global(
+  [data-venture-quick-action="true"]
+  h3:first-child
+) {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 390px) {
+  .supportRow {
+    grid-template-columns:
+      40px minmax(0, 1fr) 18px;
+    min-height: 60px;
+    padding: 9px 11px;
+  }
+
+  .supportIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  :global(
+    [data-venture-quick-action="true"]
+  ) {
+    margin-bottom: 5px !important;
+  }
+}
