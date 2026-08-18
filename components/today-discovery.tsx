@@ -445,28 +445,56 @@ function WorthCard({
 function FilterIcon({
   type
 }: {
-  type: "location" | "price" | "heart";
+  type: "open" | "location" | "price" | "heart";
 }) {
+  if (type === "open") {
+    return (
+      <svg
+        className={styles.quickFilterIcon}
+        data-kind="open"
+        viewBox="0 0 20 20"
+        aria-hidden="true"
+      >
+        <circle cx="10" cy="10" r="6.4" />
+        <path d="M10 6.6v3.7l2.5 1.5" />
+      </svg>
+    );
+  }
+
   if (type === "location") {
     return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11Z" />
-        <circle cx="12" cy="10" r="2" />
+      <svg
+        className={styles.quickFilterIcon}
+        viewBox="0 0 20 20"
+        aria-hidden="true"
+      >
+        <circle cx="10" cy="10" r="4.2" />
+        <circle cx="10" cy="10" r="1.15" />
+        <path d="M10 2.7v2M10 15.3v2M2.7 10h2M15.3 10h2" />
       </svg>
     );
   }
 
   if (type === "price") {
     return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 3v18M16 7.2c-.8-1.2-2.1-1.8-4-1.8-2.2 0-3.7 1.1-3.7 2.8 0 4.2 7.7 1.8 7.7 6.2 0 1.8-1.6 3-4.1 3-1.9 0-3.4-.6-4.4-1.9" />
+      <svg
+        className={styles.quickFilterIcon}
+        viewBox="0 0 20 20"
+        aria-hidden="true"
+      >
+        <path d="M3.4 4.3h5.1l8.1 8.1-4.2 4.2-8.1-8.1V4.3Z" />
+        <circle cx="6.9" cy="7" r="1" />
       </svg>
     );
   }
 
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20.8 5.8a5 5 0 0 0-7.1 0L12 7.5l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 21l8.8-8.1a5 5 0 0 0 0-7.1Z" />
+    <svg
+      className={styles.quickFilterIcon}
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+    >
+      <path d="M10 16.2 4.2 10.8A3.7 3.7 0 0 1 9.5 5.6l.5.6.5-.6a3.7 3.7 0 0 1 5.3 5.2L10 16.2Z" />
     </svg>
   );
 }
@@ -639,11 +667,6 @@ export function TodayDiscovery({
     <main className={styles.page}>
       <HomeSubmitLast />
       <section className={styles.hero}>
-        <div className={styles.heroShapes} aria-hidden="true">
-          <i />
-          <span />
-          <b />
-        </div>
 
         <p className={styles.dateLine}>
           WINNIPEG · {daypart.dateLabel}
@@ -684,7 +707,7 @@ export function TodayDiscovery({
             href="/explore?when=open"
             onClick={() => trackQuickFilter("open-now")}
           >
-            <span className={styles.greenDot} aria-hidden="true" />
+            <FilterIcon type="open" />
             Open now
           </Link>
 

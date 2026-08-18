@@ -1159,3 +1159,34 @@
   background: var(--home-red);
   color: #ffffff;
 }
+
+
+/* VENTURE HOME ICON CLEANUP V1.0 */
+/* Keep Home calm: no decorative corner artwork competing with the greeting. */
+.heroShapes {
+  display: none !important;
+}
+
+/* One coherent icon language for the four quick filters. */
+.quickFilters svg.quickFilterIcon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  fill: none;
+  stroke: var(--home-ink);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.quickFilters svg.quickFilterIcon[data-kind="open"] {
+  stroke: var(--home-green, #198754);
+}
+
+@media (max-width: 350px) {
+  .quickFilters svg.quickFilterIcon {
+    width: 14px;
+    height: 14px;
+    flex-basis: 14px;
+  }
+}
