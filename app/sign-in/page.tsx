@@ -187,10 +187,10 @@ export default function SignInPage() {
         </div>
 
         <span>VENTURE ACCOUNT</span>
-        <h1>Your city plans, wherever you open Venture.</h1>
+        <h1>Keep your Winnipeg finds with you.</h1>
         <p>
-          Sign in only when it becomes useful. Guest browsing and outing
-          building stay completely open.
+          An account is optional. Browse what is happening, read the digest,
+          and explore Winnipeg without signing in.
         </p>
       </section>
 
@@ -239,22 +239,10 @@ export default function SignInPage() {
                 viewBox="0 0 24 24"
                 aria-hidden="true"
               >
-                <path
-                  fill="#4285F4"
-                  d="M21.6 12.23c0-.71-.06-1.23-.2-1.77H12v3.4h5.52c-.11.85-.71 2.13-2.04 2.99l-.02.11 2.96 2.3.2.02c1.84-1.7 2.98-4.2 2.98-7.05Z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 22c2.69 0 4.95-.89 6.6-2.42l-3.14-2.43c-.84.57-1.96.97-3.46.97-2.64 0-4.88-1.79-5.68-4.26l-.11.01-3.08 2.38-.04.1A9.98 9.98 0 0 0 12 22Z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M6.32 13.86A6.02 6.02 0 0 1 6 12c0-.65.11-1.27.3-1.86l-.01-.12-3.12-2.42-.1.05A10 10 0 0 0 2 12c0 1.57.37 3.05 1.09 4.35l3.23-2.49Z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.88c1.87 0 3.13.81 3.84 1.46l2.83-2.76C16.93 2.96 14.69 2 12 2a9.98 9.98 0 0 0-8.93 5.65l3.23 2.49C7.11 7.67 9.35 5.88 12 5.88Z"
-                />
+                <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.23-.2-1.77H12v3.4h5.52c-.11.85-.71 2.13-2.04 2.99l-.02.11 2.96 2.3.2.02c1.84-1.7 2.98-4.2 2.98-7.05Z" />
+                <path fill="#34A853" d="M12 22c2.69 0 4.95-.89 6.6-2.42l-3.14-2.43c-.84.57-1.96.97-3.46.97-2.64 0-4.88-1.79-5.68-4.26l-.11.01-3.08 2.38-.04.1A9.98 9.98 0 0 0 12 22Z" />
+                <path fill="#FBBC05" d="M6.32 13.86A6.02 6.02 0 0 1 6 12c0-.65.11-1.27.3-1.86l-.01-.12-3.12-2.42-.1.05A10 10 0 0 0 2 12c0 1.57.37 3.05 1.09 4.35l3.23-2.49Z" />
+                <path fill="#EA4335" d="M12 5.88c1.87 0 3.13.81 3.84 1.46l2.83-2.76C16.93 2.96 14.69 2 12 2a9.98 9.98 0 0 0-8.93 5.65l3.23 2.49C7.11 7.67 9.35 5.88 12 5.88Z" />
               </svg>
               <span>
                 {googleStatus === "redirecting"
@@ -315,7 +303,7 @@ export default function SignInPage() {
         <article>
           <span aria-hidden="true">♡</span>
           <strong>Keep your saves</strong>
-          <small>Places, events, and full outings move with you.</small>
+          <small>Events and places stay connected to your account.</small>
         </article>
         <article>
           <span aria-hidden="true">↻</span>
@@ -331,11 +319,11 @@ export default function SignInPage() {
 
       <section className={styles.newsletterArea}>
         <div className={styles.newsletterIntro}>
-          <span>DON&apos;T NEED AN ACCOUNT?</span>
-          <h2>Just want the good Winnipeg stuff in your inbox?</h2>
+          <span>JUST WANT THE DIGEST?</span>
+          <h2>Get what is happening in Winnipeg in your inbox.</h2>
           <p>
-            The Thursday Venture is separate from a Venture account. Join with
-            your name and email, confirm once, and get the weekly city edit.
+            The Thursday Venture is the main thing right now: a weekly Winnipeg
+            city digest with Venture&apos;s own curation and voice. No account needed.
           </p>
           <Link href="/newsletter">See what the newsletter is for →</Link>
         </div>

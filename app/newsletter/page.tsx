@@ -8,44 +8,31 @@ import NewsletterSignup from "@/components/newsletter-signup/newsletter-signup";
 
 import styles from "./page.module.css";
 
-
-export const metadata:
-  Metadata = {
-    title:
-      "The Thursday Venture | Venture by Boogie Bangers",
-    description:
-      "A weekly Winnipeg city edit with standout events, local discoveries, low-key finds, nightlife, culture, food, and outing ideas."
-  };
-
+export const metadata: Metadata = {
+  title:
+    "The Thursday Venture | Venture by Boogie Bangers",
+  description:
+    "A curated Winnipeg city digest covering what is happening now: events, nightlife, food, culture, free finds, local openings, and things worth knowing before the weekend."
+};
 
 export default function NewsletterPage() {
   return (
     <main className={styles.page}>
       <header className={styles.hero}>
-        <span>
-          THE THURSDAY VENTURE
-        </span>
+        <span>THE THURSDAY VENTURE</span>
 
         <h1>
-          Winnipeg, edited down to the moves worth knowing.
+          What is happening in Winnipeg, edited into one useful read.
         </h1>
 
         <p>
-          One useful city email before the weekend. Venture searches the obvious places and the corners people usually miss, then turns the noise into a short list you can actually use.
+          Think Winnipeg digest, but with Venture&apos;s own taste. Every week we scan the city, cross-check the details, and pull together the events, parties, food, culture, free finds, openings, and smaller things worth knowing about right now.
         </p>
 
         <div className={styles.heroBadges}>
-          <span>
-            Thursday delivery
-          </span>
-
-          <span>
-            No Venture account required
-          </span>
-
-          <span>
-            Confirm once, leave anytime
-          </span>
+          <span>Thursday delivery</span>
+          <span>Winnipeg-focused</span>
+          <span>No Venture account required</span>
         </div>
       </header>
 
@@ -57,21 +44,21 @@ export default function NewsletterPage() {
         <div className={styles.purposeGrid}>
           <div>
             <h2>
-              Less searching. Better weekends.
+              Stop finding out after it already happened.
             </h2>
 
             <p>
-              Winnipeg has plenty happening, but the information is scattered across venue calendars, ticket sites, Instagram posts, Facebook events, community pages, Reddit threads, flyers, and word of mouth. The Thursday Venture pulls those fragments into one city edit.
+              Winnipeg&apos;s good stuff is scattered across venue calendars, ticket sites, Instagram posts, Facebook events, community pages, Reddit threads, flyers, local media, and word of mouth. The Thursday Venture brings those fragments together while they are still useful.
             </p>
           </div>
 
           <aside>
             <strong>
-              Not a giant event dump.
+              A city digest, not a giant event database.
             </strong>
 
             <p>
-              The goal is not to list everything. It is to surface a useful mix of big moments, smaller finds, cultural events, nightlife, food, free options, and things you probably would not have searched for yourself.
+              We are not trying to dump every listing in Winnipeg into your inbox. We are trying to tell you what feels relevant, interesting, timely, unusual, or genuinely worth leaving the house for.
             </p>
           </aside>
         </div>
@@ -83,82 +70,62 @@ export default function NewsletterPage() {
         </div>
 
         <h2>
-          A few lanes, not one kind of night.
+          The city, with a little hierarchy.
         </h2>
 
         <div className={styles.editionGrid}>
           <article>
             <span>01</span>
             <strong>The Move</strong>
-            <p>The standout city-scale pick or the one event worth building a plan around.</p>
+            <p>The biggest or most interesting thing happening right now.</p>
           </article>
 
           <article>
             <span>02</span>
             <strong>This Weekend</strong>
-            <p>The strongest mix across music, food, parties, sports, culture, comedy, markets, and more.</p>
+            <p>Music, parties, sports, comedy, food, markets, culture, and more.</p>
           </article>
 
           <article>
             <span>03</span>
             <strong>Lowkey</strong>
-            <p>Free finds, smaller rooms, oddball ideas, art, community events, and quieter alternatives.</p>
+            <p>Free finds, smaller rooms, niche events, community things, and quieter gems.</p>
           </article>
 
           <article>
             <span>04</span>
-            <strong>Next Week</strong>
-            <p>A small heads-up so good plans do not only reach you after tickets disappear.</p>
+            <strong>On the Radar</strong>
+            <p>Upcoming openings, next-week events, and things worth knowing before everyone else catches on.</p>
           </article>
         </div>
       </section>
 
       <div id="newsletter-signup" className={styles.signupAnchor}>
-        <NewsletterSignup
-          placement="page"
-        />
+        <NewsletterSignup placement="page" />
       </div>
 
       <section className={styles.promise}>
         <div>
-          <span>
-            🎟️
-          </span>
-
-          <strong>
-            Events with range
-          </strong>
-
+          <span>🎟️</span>
+          <strong>What&apos;s happening</strong>
           <p>
-            Festivals, concerts, community nights, sports, comedy, markets, niche events, and whatever deserves attention.
+            Festivals, concerts, parties, sports, comedy, community events, pop-ups, markets, and niche things that deserve attention.
           </p>
         </div>
 
         <div>
-          <span>
-            🍽️
-          </span>
-
-          <strong>
-            Local discoveries
-          </strong>
-
+          <span>🍜</span>
+          <strong>What&apos;s new around town</strong>
           <p>
-            Food, drinks, places, pop-ups, and neighbourhood stops that can turn one event into a full outing.
+            Food, drinks, local openings, temporary menus, neighbourhood finds, and places suddenly worth knowing about.
           </p>
         </div>
 
         <div>
-          <span>
-            🧭
-          </span>
-
-          <strong>
-            An editor, not an algorithm
-          </strong>
-
+          <span>🧭</span>
+          <strong>Venture&apos;s point of view</strong>
           <p>
-            Picks are researched, cross-checked, and mixed for usefulness instead of ranked by whoever bought the loudest placement.
+            We research broadly, verify the important details, and edit for usefulness instead of ranking whatever got the most promotion.
           </p>
         </div>
       </section>
@@ -170,15 +137,18 @@ export default function NewsletterPage() {
           </span>
 
           <h2>
-            We go where Winnipeg posts.
+            We go where Winnipeg actually posts.
           </h2>
 
           <p>
-            Venture checks official organizers and venues first, then widens the search across ticketing sites, community calendars, social platforms, local media, Reddit, neighbourhood pages, and smaller organizers. Social posts can be great leads, but important details get corroborated before they make the cut.
+            Venture checks organizers and venues first, then widens the search across Eventbrite, Instagram, Facebook Events, Reddit, city and community calendars, local media, neighbourhood pages, independent promoters, and smaller organizations. Social posts can be excellent leads, but important details get corroborated before they make the cut.
           </p>
         </div>
 
-        <div className={styles.sourceCloud} aria-label="Typical newsletter sources">
+        <div
+          className={styles.sourceCloud}
+          aria-label="Typical newsletter sources"
+        >
           <span>Official venues</span>
           <span>Eventbrite</span>
           <span>Instagram</span>
@@ -196,10 +166,10 @@ export default function NewsletterPage() {
             NEWSLETTER ≠ ACCOUNT
           </span>
           <h2>
-            Subscribe without signing up for Venture.
+            Just subscribe. You do not need the app side yet.
           </h2>
           <p>
-            A Venture account is for saves, synced outings, preferences, and other app features. The newsletter only needs your name, email, and confirmation. They work together, but neither is required for the other.
+            Right now the newsletter stands on its own. A Venture account can support saves and other features, while the larger app experience will grow later. To get The Thursday Venture, all you need is your name, email, and confirmation.
           </p>
         </div>
 
@@ -214,9 +184,7 @@ export default function NewsletterPage() {
       </section>
 
       <section className={styles.howItWorks}>
-        <span>
-          HOW IT WORKS
-        </span>
+        <span>HOW IT WORKS</span>
 
         <h2>
           Two taps, then Thursdays.
@@ -224,32 +192,23 @@ export default function NewsletterPage() {
 
         <div>
           <article>
-            <strong>
-              1
-            </strong>
-
+            <strong>1</strong>
             <p>
               Enter your name and email anywhere Venture shows the newsletter form.
             </p>
           </article>
 
           <article>
-            <strong>
-              2
-            </strong>
-
+            <strong>2</strong>
             <p>
               Confirm through the email Venture sends you. No silent opt-ins.
             </p>
           </article>
 
           <article>
-            <strong>
-              3
-            </strong>
-
+            <strong>3</strong>
             <p>
-              Get the city edit, then open Venture when you want to explore deeper or build an outing.
+              Get the weekly Winnipeg edit and use Venture to check what is happening when you want to dig deeper.
             </p>
           </article>
         </div>
