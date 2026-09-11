@@ -8,6 +8,7 @@ import {
   useState
 } from "react";
 
+import NewsletterSignup from "@/components/newsletter-signup/newsletter-signup";
 import {
   getSupabaseBrowserClient
 } from "@/lib/supabase/client";
@@ -326,6 +327,20 @@ export default function SignInPage() {
           <strong>Guest mode remains</strong>
           <small>Explore first. Sign in only when you see the value.</small>
         </article>
+      </section>
+
+      <section className={styles.newsletterArea}>
+        <div className={styles.newsletterIntro}>
+          <span>DON&apos;T NEED AN ACCOUNT?</span>
+          <h2>Just want the good Winnipeg stuff in your inbox?</h2>
+          <p>
+            The Thursday Venture is separate from a Venture account. Join with
+            your name and email, confirm once, and get the weekly city edit.
+          </p>
+          <Link href="/newsletter">See what the newsletter is for →</Link>
+        </div>
+
+        <NewsletterSignup placement="sign-in" />
       </section>
 
       <Link className={styles.backLink} href={nextPath}>
