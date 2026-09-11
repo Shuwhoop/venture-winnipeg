@@ -14,6 +14,7 @@ type VaultResult = {
   message?: string;
   draft?: VentureNewsletterDraft | null;
   savedAt?: string | null;
+  broadcastId?: string;
 };
 
 function readError(value: unknown): string {
@@ -46,7 +47,7 @@ async function readJson(response: Response): Promise<VaultResult> {
 }
 
 export function NewsletterDraftVault() {
-  const [busy, setBusy] = useState<"save" | "restore" | "">("");
+  const [busy, setBusy] = useState<"save" | "restore" | "broadcast" | "">("");
   const [notice, setNotice] = useState<{
     tone: "success" | "error" | "info";
     text: string;
@@ -136,14 +137,56 @@ export function NewsletterDraftVault() {
     }
   }
 
+  async function createEditorialBroadcast() {
+    if (busy) {
+      return;
+    }
+
+    setBusy("broadcast");
+    setNotice(null);
+
+    try {
+      const response = await fetch(
+        "/api/admin/newsletter/issues/broadcast",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({})
+        }
+      );
+
+      const result = await readJson(response);
+
+      setNotice({
+        tone: "success",
+        text:
+          result.message ||
+          "Editorial Resend draft created. Review it before sending."
+      });
+    } catch (error) {
+      setNotice({
+        tone: "error",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Venture could not create the Resend draft."
+      });
+    } finally {
+      setBusy("");
+    }
+  }
+
   return (
     <section className={styles.vault} aria-label="Newsletter draft vault">
       <div className={styles.copy}>
         <span>DRAFT VAULT</span>
         <strong>Keep Issue 001 in Venture, not only this browser.</strong>
         <p>
-          The studio still autosaves locally. Use the vault whenever you want a
-          durable Supabase copy you can restore from another session.
+          The studio still autosaves locally. The vault keeps durable Supabase
+          issues, and the editorial action can turn the latest saved issue into
+          a reviewable Resend draft without sending it.
         </p>
       </div>
 
@@ -159,6 +202,16 @@ export function NewsletterDraftVault() {
           type="button"
         >
           {busy === "restore" ? "Restoring…" : "Restore latest"}
+        </button>
+
+        <button
+          disabled={busy !== ""}
+          onClick={createEditorialBroadcast}
+          type="button"
+        >
+          {busy === "broadcast"
+            ? "Creating Resend draft…"
+            : "Create editorial Resend draft"}
         </button>
       </div>
 
