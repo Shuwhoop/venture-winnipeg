@@ -185,7 +185,7 @@ export function NewsletterDraftVault() {
         <strong>Keep Issue 001 in Venture, not only this browser.</strong>
         <p>
           The studio still autosaves locally. The vault keeps durable Supabase
-          issues, and the editorial action can turn the latest saved issue into
+          issues, lets you preview the full saved edition, and can turn it into
           a reviewable Resend draft without sending it.
         </p>
       </div>
@@ -203,6 +203,15 @@ export function NewsletterDraftVault() {
         >
           {busy === "restore" ? "Restoring…" : "Restore latest"}
         </button>
+
+        <a
+          className={styles.secondary}
+          href="/api/admin/newsletter/issues/preview"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Preview full editorial issue
+        </a>
 
         <button
           disabled={busy !== ""}
