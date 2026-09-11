@@ -36,11 +36,18 @@ const GROUPS = [
     ]
   },
   {
+    title: "Newsletter",
+    links: [
+      ["/admin/newsletter", "Subscribers"],
+      ["/admin/newsletter/studio", "Newsletter studio"]
+    ]
+  },
+  {
     title: "Public Venture",
     links: [
       ["/", "View homepage"],
       ["/explore", "Explore"],
-      ["/build-outing", "Build outing"],
+      ["/newsletter", "Newsletter page"],
       ["/submit", "Submit listing"]
     ]
   }
@@ -95,15 +102,26 @@ export function AdminCommandBar() {
           className={styles.homeLink}
           href="/admin"
         >
-          <span className={styles.mark}>
-            V
-          </span>
+          <span className={styles.mark}>V</span>
           <span>
             Admin · {currentLabel(pathname)}
           </span>
         </Link>
 
         <div className={styles.quickLinks}>
+          <Link
+            href="/admin/newsletter/studio"
+            className={
+              isActive(
+                pathname,
+                "/admin/newsletter/studio"
+              )
+                ? styles.active
+                : ""
+            }
+          >
+            Newsletter
+          </Link>
           <Link
             href="/admin/data-health"
             className={
