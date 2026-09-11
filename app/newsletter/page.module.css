@@ -14,9 +14,17 @@
 }
 
 .hero,
-.howItWorks {
+.howItWorks,
+.purpose,
+.editionMap,
+.sourcing,
+.accountNote {
   width: min(100% - 18px, 720px);
   margin: 0 auto;
+}
+
+.hero,
+.howItWorks {
   padding: 24px;
   border: 2px solid #0b2b50;
   border-radius: 26px;
@@ -27,7 +35,8 @@
 }
 
 .hero > span,
-.howItWorks > span {
+.howItWorks > span,
+.sectionLabel {
   color: #dc2f3b;
   font-size: 0.65rem;
   font-weight: 900;
@@ -35,7 +44,11 @@
 }
 
 .hero h1,
-.howItWorks h2 {
+.howItWorks h2,
+.editionMap h2,
+.sourcing h2,
+.accountNote h2,
+.purpose h2 {
   max-width: 100%;
   margin: 10px 0 0;
   font-size: clamp(2.45rem, 11cqw, 4.3rem);
@@ -47,7 +60,7 @@
 }
 
 .hero p {
-  max-width: 600px;
+  max-width: 610px;
   margin: 15px 0 0;
   color: #5e5455;
   font-size: 0.92rem;
@@ -69,6 +82,96 @@
   background: rgba(255, 255, 255, 0.82);
   font-size: 0.68rem;
   font-weight: 850;
+}
+
+.purpose,
+.editionMap,
+.sourcing,
+.accountNote {
+  margin-top: 24px;
+  padding: 22px;
+  border: 2px solid #0b2b50;
+  border-radius: 24px;
+  background: #ffffff;
+}
+
+.purposeGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.8fr);
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.purpose h2,
+.editionMap h2,
+.sourcing h2,
+.accountNote h2 {
+  font-size: clamp(1.85rem, 7.8cqw, 2.8rem);
+}
+
+.purpose p,
+.editionMap p,
+.sourcing p,
+.accountNote p {
+  margin: 12px 0 0;
+  color: #655b5c;
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.purpose aside {
+  align-self: stretch;
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff5c7;
+}
+
+.purpose aside strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.purpose aside p {
+  margin-top: 8px;
+}
+
+.editionMap {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 214, 179, 0.8), transparent 24%),
+    #f7f0fa;
+}
+
+.editionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.editionGrid article {
+  display: grid;
+  gap: 7px;
+  padding: 15px;
+  border: 1.5px solid #0b2b50;
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.editionGrid article > span {
+  color: #dc2f3b;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.editionGrid strong {
+  font-size: 0.96rem;
+}
+
+.editionGrid p {
+  margin: 0;
+  font-size: 0.73rem;
+  line-height: 1.5;
 }
 
 .promise {
@@ -114,6 +217,69 @@
   color: #6b6162;
   font-size: 0.7rem;
   line-height: 1.45;
+}
+
+.sourcing {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 18px;
+  background: #fff7ee;
+}
+
+.sourceCloud {
+  display: flex;
+  align-content: start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sourceCloud span {
+  padding: 9px 11px;
+  border: 1.5px solid #0b2b50;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.accountNote {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+  background: #e6f7ff;
+}
+
+.accountActions {
+  display: grid;
+  gap: 8px;
+  min-width: 175px;
+}
+
+.accountActions a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 10px 13px;
+  border: 2px solid #0b2b50;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #0b2b50;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.accountActions a:last-child {
+  background: #dc2f3b;
+  color: #ffffff;
+}
+
+.signupAnchor {
+  position: relative;
+  top: -18px;
+  height: 1px;
 }
 
 .howItWorks {
@@ -238,7 +404,11 @@
 
 @container (max-width: 430px) {
   .hero,
-  .howItWorks {
+  .howItWorks,
+  .purpose,
+  .editionMap,
+  .sourcing,
+  .accountNote {
     width: calc(100% - 16px);
     padding: 19px;
   }
@@ -247,9 +417,17 @@
     font-size: clamp(2.25rem, 12cqw, 3.1rem);
   }
 
+  .purposeGrid,
+  .editionGrid,
   .promise,
+  .sourcing,
+  .accountNote,
   .howItWorks > div,
   .preferenceActions {
     grid-template-columns: 1fr;
+  }
+
+  .accountActions {
+    min-width: 0;
   }
 }
