@@ -77,7 +77,27 @@ export function AdminRouteChrome() {
     return null;
   }
 
-  return <AdminCommandBar />;
+  return (
+    <>
+      <style>{`
+        .venture-body.venture-admin-route .app-shell {
+          width: min(100%, 1440px);
+          padding-bottom: 28px;
+        }
+
+        .venture-body.venture-admin-route .page-content {
+          padding: 22px clamp(16px, 2.4vw, 34px) 46px;
+        }
+
+        @media (max-width: 720px) {
+          .venture-body.venture-admin-route .page-content {
+            padding: 14px 10px 32px;
+          }
+        }
+      `}</style>
+      <AdminCommandBar />
+    </>
+  );
 }
 
 export function PublicRouteChrome({
