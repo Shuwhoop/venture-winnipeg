@@ -294,6 +294,56 @@
   line-height: 1.35;
 }
 
+.newsletterArea {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(38, 24, 50, 0.1);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(255, 214, 179, 0.9), transparent 24%),
+    #f7f0fa;
+}
+
+.newsletterIntro {
+  display: grid;
+  gap: 7px;
+}
+
+.newsletterIntro > span {
+  color: #70419a;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+}
+
+.newsletterIntro h2,
+.newsletterIntro p {
+  margin: 0;
+}
+
+.newsletterIntro h2 {
+  max-width: 18ch;
+  color: #2d1b39;
+  font-size: clamp(1.55rem, 6vw, 2.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.newsletterIntro p {
+  max-width: 42rem;
+  color: #716876;
+  line-height: 1.5;
+}
+
+.newsletterIntro a {
+  justify-self: start;
+  color: #70419a;
+  font-size: 0.82rem;
+  font-weight: 950;
+  text-decoration: none;
+}
+
 .backLink {
   justify-self: center;
   color: #69418c;
@@ -304,7 +354,8 @@
 
 @media (max-width: 390px) {
   .hero,
-  .formCard {
+  .formCard,
+  .newsletterArea {
     border-radius: 23px;
   }
 
@@ -312,7 +363,8 @@
     padding: 23px 18px 21px;
   }
 
-  .formCard {
+  .formCard,
+  .newsletterArea {
     padding: 18px;
   }
 
