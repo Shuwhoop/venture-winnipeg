@@ -15,35 +15,34 @@ export type VentureNewsletterDraft = {
   closingNote: string;
 };
 
-
 export const defaultVentureNewsletterDraft:
   VentureNewsletterDraft = {
     issueLabel:
       "Issue 001 · Winnipeg Weekend Starter",
     subject:
-      "Winnipeg this weekend: one solid plan and three reasons to leave home",
+      "Winnipeg this weekend: what is actually worth knowing about",
     preheader:
-      "A focused Winnipeg roundup from Venture by Boogie Bangers.",
+      "A focused Winnipeg city digest from Venture by Boogie Bangers.",
     intro:
-      "This is the first proper Thursday Venture. The goal is simple: fewer tabs, less scrolling, and one email that helps you choose what to do in Winnipeg.",
+      "This is The Thursday Venture: one Winnipeg city edit built from the places people actually post. Events, nightlife, food, culture, free finds, openings, and smaller things worth knowing before the weekend starts.",
     venturePickTitle:
-      "A full evening without the planning spiral",
+      "The one thing leading Winnipeg this week",
     venturePickBody:
-      "Start with dinner somewhere worth sitting down for, add one activity nearby, then finish with a late drink or dessert. Venture can build the route around your budget and travel style.",
+      "Use this space for the city-scale moment, standout event, or story that deserves to lead the issue. Keep it specific, timely, and useful enough that someone could decide to go from this paragraph alone.",
     venturePickUrl:
-      "/build-outing",
+      "/explore",
     weekendTitle:
-      "Three things worth checking before the weekend disappears",
+      "What is happening this weekend",
     weekendBody:
-      "Use Explore to filter for events, nightlife, food, free options, and places that are actually open when you need them.",
+      "Pull together the strongest mix across music, parties, sports, comedy, food, markets, culture, community events, and anything else Winnipeg should know about now.",
     weekendUrl:
       "/explore?time=this-weekend",
     budgetTitle:
-      "Keep the outing under control",
+      "Lowkey and free finds",
     budgetBody:
-      "Try the Cheap filter, choose walking or transit, and build around one paid stop instead of letting every part of the night nibble at your wallet.",
+      "Use this lane for free events, smaller rooms, neighbourhood happenings, niche ideas, and the kind of Winnipeg thing people usually hear about after it is over.",
     budgetUrl:
       "/explore?price=cheap",
     closingNote:
-      "Venture is still growing, so replies are useful. Tell us what you wanted to find, what felt missing, or what part of Winnipeg deserves a better spotlight."
+      "Venture is still growing, so replies are useful. Send us the event, opening, party, pop-up, community thing, or strange little Winnipeg find we should have caught."
   };
