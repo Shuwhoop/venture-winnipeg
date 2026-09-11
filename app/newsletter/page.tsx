@@ -113,9 +113,11 @@ export default function NewsletterPage() {
         </div>
       </section>
 
-      <NewsletterSignup
-        placement="page"
-      />
+      <div id="newsletter-signup" className={styles.signupAnchor}>
+        <NewsletterSignup
+          placement="page"
+        />
+      </div>
 
       <section className={styles.promise}>
         <div>
@@ -210,8 +212,6 @@ export default function NewsletterPage() {
           </a>
         </div>
       </section>
-
-      <div id="newsletter-signup" className={styles.signupAnchor} aria-hidden="true" />
 
       <section className={styles.howItWorks}>
         <span>
