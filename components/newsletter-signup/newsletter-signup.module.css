@@ -295,6 +295,31 @@
   margin-top: 18px;
 }
 
+.sign-in {
+  width: 100%;
+  margin: 0;
+  border-color: #3a244a;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(130, 80, 179, 0.13), transparent 28%),
+    linear-gradient(135deg, #fff9f4, #ffffff 70%);
+  box-shadow: 6px 6px 0 #8250b3;
+}
+
+.sign-in .form button {
+  background: #5d347f;
+  box-shadow: 4px 4px 0 #8250b3;
+}
+
+.sign-in .form button:hover:not(:disabled) {
+  box-shadow: 5px 5px 0 #8250b3;
+}
+
+.sign-in .eyebrow,
+.sign-in .footer a,
+.sign-in .consent a {
+  color: #70419a;
+}
+
 @keyframes newsletter-float {
   0%,
   100% {
@@ -310,6 +335,10 @@
   .card {
     width: calc(100% - 16px);
     padding: 18px;
+  }
+
+  .sign-in {
+    width: 100%;
   }
 
   .form {

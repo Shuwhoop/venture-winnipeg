@@ -18,7 +18,8 @@ type NewsletterSignupProps = {
   placement?:
     | "home"
     | "profile"
-    | "page";
+    | "page"
+    | "sign-in";
 };
 
 
