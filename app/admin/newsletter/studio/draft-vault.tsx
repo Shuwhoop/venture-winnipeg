@@ -47,7 +47,9 @@ async function readJson(response: Response): Promise<VaultResult> {
 }
 
 export function NewsletterDraftVault() {
-  const [busy, setBusy] = useState<"save" | "restore" | "broadcast" | "">("");
+  const [busy, setBusy] = useState<
+    "save" | "restore" | "test" | "broadcast" | ""
+  >("");
   const [notice, setNotice] = useState<{
     tone: "success" | "error" | "info";
     text: string;
@@ -137,6 +139,47 @@ export function NewsletterDraftVault() {
     }
   }
 
+  async function sendEditorialTest() {
+    if (busy) {
+      return;
+    }
+
+    setBusy("test");
+    setNotice(null);
+
+    try {
+      const response = await fetch(
+        "/api/admin/newsletter/issues/test",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({})
+        }
+      );
+
+      const result = await readJson(response);
+
+      setNotice({
+        tone: "success",
+        text:
+          result.message ||
+          "Full editorial test sent to your admin email."
+      });
+    } catch (error) {
+      setNotice({
+        tone: "error",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Venture could not send the editorial test."
+      });
+    } finally {
+      setBusy("");
+    }
+  }
+
   async function createEditorialBroadcast() {
     if (busy) {
       return;
@@ -185,8 +228,8 @@ export function NewsletterDraftVault() {
         <strong>Keep Issue 001 in Venture, not only this browser.</strong>
         <p>
           The studio still autosaves locally. The vault keeps durable Supabase
-          issues, lets you preview the full saved edition, and can turn it into
-          a reviewable Resend draft without sending it.
+          issues, lets you preview and privately test the full saved edition,
+          then turns it into a reviewable Resend draft without sending it.
         </p>
       </div>
 
@@ -212,6 +255,17 @@ export function NewsletterDraftVault() {
         >
           Preview full editorial issue
         </a>
+
+        <button
+          className={styles.secondary}
+          disabled={busy !== ""}
+          onClick={sendEditorialTest}
+          type="button"
+        >
+          {busy === "test"
+            ? "Sending full test…"
+            : "Send full issue test to me"}
+        </button>
 
         <button
           disabled={busy !== ""}
