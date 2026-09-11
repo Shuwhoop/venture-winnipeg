@@ -15,6 +15,10 @@ import {
 } from "@/lib/newsletter/resend";
 
 import {
+  NewsletterDraftVault
+} from "./draft-vault";
+
+import {
   NewsletterStudio
 } from "./newsletter-studio";
 
@@ -59,6 +63,8 @@ export default async function NewsletterStudioPage() {
           </Link>
         </nav>
       </header>
+
+      <NewsletterDraftVault />
 
       <NewsletterStudio
         adminEmail={admin.email}
