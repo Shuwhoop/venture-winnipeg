@@ -1,7 +1,8 @@
 "use client";
 
 import {
-  Suspense
+  Suspense,
+  useEffect
 } from "react";
 
 import {
@@ -55,6 +56,22 @@ export function AdminRouteChrome() {
     isAdmin,
     isAdminAuth
   } = useRouteKind();
+
+  useEffect(() => {
+    const shouldUseAdminShell =
+      isAdmin && !isAdminAuth;
+
+    document.body.classList.toggle(
+      "venture-admin-route",
+      shouldUseAdminShell
+    );
+
+    return () => {
+      document.body.classList.remove(
+        "venture-admin-route"
+      );
+    };
+  }, [isAdmin, isAdminAuth]);
 
   if (!isAdmin || isAdminAuth) {
     return null;
