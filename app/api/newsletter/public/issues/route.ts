@@ -13,7 +13,7 @@ export async function GET() {
       { ok: true, issues },
       {
         headers: {
-          "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60",
+          "Cache-Control": "public, max-age=0, s-maxage=15, stale-while-revalidate=30",
         },
       },
     );
