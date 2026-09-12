@@ -1,1405 +1,228 @@
 "use client";
 
-import {
-  FormEvent,
-  useMemo,
-  useState
-} from "react";
+import { FormEvent, useState } from "react";
+import Link from "next/link";
 
 import styles from "./page.module.css";
 
+type FormStatus = "idle" | "submitting" | "success" | "error";
 
-type SubmissionType =
-  | "restaurant"
-  | "event";
+type SubmissionType = "event" | "place" | "find" | "other";
 
-type FormStatus =
-  | "idle"
-  | "submitting"
-  | "success"
-  | "error";
+export default function SubmitToVenturePage() {
+  const [status, setStatus] = useState<FormStatus>("idle");
+  const [message, setMessage] = useState("");
+  const [submissionType, setSubmissionType] = useState<SubmissionType>("find");
+  const [title, setTitle] = useState("");
+  const [sourceUrl, setSourceUrl] = useState("");
+  const [whenText, setWhenText] = useState("");
+  const [whereText, setWhereText] = useState("");
+  const [whyText, setWhyText] = useState("");
+  const [submitterName, setSubmitterName] = useState("");
+  const [submitterEmail, setSubmitterEmail] = useState("");
+  const [website, setWebsite] = useState("");
 
-
-const initialRestaurant = {
-  name: "",
-  addressLine1: "",
-  neighbourhood: "",
-  category: "",
-  cuisine: "",
-  website: "",
-  phone: "",
-  description: ""
-};
-
-
-const initialEvent = {
-  title: "",
-  description: "",
-  category: "",
-  organizerName: "",
-  organizerWebsite: "",
-  venueName: "",
-  venueAddress: "",
-  neighbourhood: "",
-  startAt: "",
-  endAt: "",
-  ticketUrl: "",
-  minimumPriceCad: "",
-  maximumPriceCad: "",
-  ageLabel: "",
-  accessibilityNotes: ""
-};
-
-
-export default function SubmitListingPage() {
-  const [
-    submissionType,
-    setSubmissionType
-  ] =
-    useState<SubmissionType>(
-      "restaurant"
-    );
-
-  const [
-    status,
-    setStatus
-  ] =
-    useState<FormStatus>(
-      "idle"
-    );
-
-  const [
-    message,
-    setMessage
-  ] =
-    useState("");
-
-  const [
-    submitterName,
-    setSubmitterName
-  ] =
-    useState("");
-
-  const [
-    submitterEmail,
-    setSubmitterEmail
-  ] =
-    useState("");
-
-  const [
-    submitterPhone,
-    setSubmitterPhone
-  ] =
-    useState("");
-
-  const [
-    organizationName,
-    setOrganizationName
-  ] =
-    useState("");
-
-  const [
-    relationship,
-    setRelationship
-  ] =
-    useState(
-      "community_member"
-    );
-
-  const [
-    sourceUrl,
-    setSourceUrl
-  ] =
-    useState("");
-
-  const [
-    notes,
-    setNotes
-  ] =
-    useState("");
-
-  const [
-    consentToContact,
-    setConsentToContact
-  ] =
-    useState(false);
-
-  const [
-    termsAccepted,
-    setTermsAccepted
-  ] =
-    useState(false);
-
-  const [
-    website,
-    setWebsite
-  ] =
-    useState("");
-
-  const [
-    restaurant,
-    setRestaurant
-  ] =
-    useState(
-      initialRestaurant
-    );
-
-  const [
-    event,
-    setEvent
-  ] =
-    useState(
-      initialEvent
-    );
-
-  const heading =
-    useMemo(
-      () =>
-        submissionType ===
-        "restaurant"
-          ? "Share a restaurant"
-          : "Share an event",
-      [
-        submissionType
-      ]
-    );
-
-  function updateRestaurant(
-    key:
-      keyof typeof initialRestaurant,
-    value: string
-  ) {
-    setRestaurant(
-      (current) => ({
-        ...current,
-        [key]:
-          value
-      })
-    );
-  }
-
-  function updateEvent(
-    key:
-      keyof typeof initialEvent,
-    value: string
-  ) {
-    setEvent(
-      (current) => ({
-        ...current,
-        [key]:
-          value
-      })
-    );
-  }
-
-  function resetForm() {
-    setSubmitterName("");
-    setSubmitterEmail("");
-    setSubmitterPhone("");
-    setOrganizationName("");
-    setRelationship(
-      "community_member"
-    );
-    setSourceUrl("");
-    setNotes("");
-    setConsentToContact(false);
-    setTermsAccepted(false);
-    setWebsite("");
-    setRestaurant(
-      initialRestaurant
-    );
-    setEvent(
-      initialEvent
-    );
-  }
-
-  async function handleSubmit(
-    browserEvent:
-      FormEvent<HTMLFormElement>
-  ) {
-    browserEvent.preventDefault();
-
-    if (status === "submitting") {
-      return;
-    }
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (status === "submitting") return;
 
     setStatus("submitting");
-    setMessage(
-      "Sending your submission to Venture..."
-    );
-
-    const payload =
-      submissionType ===
-      "restaurant"
-        ? restaurant
-        : {
-            ...event,
-            timezone:
-              "America/Winnipeg"
-          };
+    setMessage("Sending it to the Venture desk...");
 
     try {
-      const response =
-        await fetch(
-          "/api/submissions",
-          {
-            method:
-              "POST",
+      const response = await fetch("/api/newsletter/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          submissionType,
+          title,
+          sourceUrl,
+          whenText,
+          whereText,
+          whyText,
+          submitterName,
+          submitterEmail,
+          website
+        })
+      });
 
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
+      const result = (await response.json()) as {
+        ok?: boolean;
+        reference?: string;
+        error?: string;
+      };
 
-            body:
-              JSON.stringify({
-                submissionType,
-                submitterName,
-                submitterEmail,
-                submitterPhone,
-                organizationName,
-                submitterRelationship:
-                  relationship,
-                sourceUrl,
-                submitterNotes:
-                  notes,
-                consentToContact,
-                termsAccepted,
-                website,
-                payload
-              })
-          }
-        );
-
-      const result =
-        await response.json() as {
-          ok?: boolean;
-          reference?: string;
-          error?: string;
-        };
-
-      if (
-        !response.ok ||
-        !result.ok
-      ) {
-        throw new Error(
-          result.error ||
-          "Venture could not receive the submission."
-        );
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || "Venture could not receive that find.");
       }
 
       setStatus("success");
       setMessage(
-        `Thanks. Your submission is waiting for review${
-          result.reference
-            ? ` under reference ${result.reference}.`
-            : "."
-        }`
+        `Got it. It is in the Venture editorial inbox${result.reference ? ` · ${result.reference}` : ""}.`
       );
-
-      resetForm();
+      setTitle("");
+      setSourceUrl("");
+      setWhenText("");
+      setWhereText("");
+      setWhyText("");
+      setWebsite("");
     } catch (error) {
       setStatus("error");
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Venture could not receive the submission."
-      );
+      setMessage(error instanceof Error ? error.message : "Venture could not receive that find.");
     }
   }
 
   return (
-    <main
-      className={
-        styles.page
-      }
-    >
-      <header
-        className={
-          styles.hero
-        }
-      >
-        <span>
-          HELP MAP WINNIPEG
-        </span>
+    <main className={styles.page}>
+      <nav className={styles.topbar} aria-label="Venture website">
+        <Link href="/newsletter" className={styles.brand}>Venture</Link>
+        <Link href="/newsletter" className={styles.back}>← The Thursday Venture</Link>
+      </nav>
 
-        <h1>
-          Add something worth
-          discovering.
-        </h1>
-
+      <header className={styles.hero}>
+        <div className={styles.sticker}>SEND US THE GOOD STUFF</div>
+        <h1>Found something Winnipeg should know about?</h1>
         <p>
-          Send Venture a restaurant or
-          event. Every submission waits
-          for review before it can appear
-          publicly.
+          A party in a tiny room. A new food spot. A gallery night. A run club. A weird pop-up.
+          Drop it here and Venture will take a look for an upcoming Thursday issue.
         </p>
+        <div className={styles.marquee} aria-hidden="true">
+          EVENTS ✦ FOOD ✦ CULTURE ✦ NIGHTLIFE ✦ COMMUNITY ✦ SMALL WEIRD THINGS ✦
+        </div>
       </header>
 
-      <section
-        className={
-          styles.typeChooser
-        }
-        aria-label="Submission type"
-      >
-        <button
-          className={
-            submissionType ===
-            "restaurant"
-              ? styles.active
-              : ""
-          }
-          type="button"
-          onClick={() => {
-            setSubmissionType(
-              "restaurant"
-            );
-            setMessage("");
-            setStatus("idle");
-          }}
-        >
-          <span aria-hidden="true">
-            🍽
-          </span>
+      <section className={styles.layout}>
+        <aside className={styles.sideNote}>
+          <span>HOW IT WORKS</span>
+          <strong>You send the lead. We do the digging.</strong>
+          <p>
+            You do not need an account, and submitting something does not automatically put it on Venture.
+            It lands in our editorial inbox first.
+          </p>
+          <div className={styles.doodle}>↳ keep it simple</div>
+        </aside>
 
-          <strong>
-            Restaurant
-          </strong>
-
-          <small>
-            Restaurant, café, bakery,
-            bar, food truck, or market
-          </small>
-        </button>
-
-        <button
-          className={
-            submissionType ===
-            "event"
-              ? styles.active
-              : ""
-          }
-          type="button"
-          onClick={() => {
-            setSubmissionType(
-              "event"
-            );
-            setMessage("");
-            setStatus("idle");
-          }}
-        >
-          <span aria-hidden="true">
-            🎟
-          </span>
-
-          <strong>
-            Event
-          </strong>
-
-          <small>
-            Concert, festival, market,
-            comedy, sports, arts, or
-            community event
-          </small>
-        </button>
-      </section>
-
-      <form
-        className={
-          styles.form
-        }
-        onSubmit={
-          handleSubmit
-        }
-      >
-        <section
-          className={
-            styles.section
-          }
-        >
-          <div
-            className={
-              styles.sectionHeading
-            }
-          >
-            <span>
-              LISTING DETAILS
-            </span>
-
-            <h2>
-              {heading}
-            </h2>
-          </div>
-
-          {submissionType ===
-          "restaurant" ? (
-            <div
-              className={
-                styles.grid
-              }
-            >
-              <label>
-                <span>
-                  Business name
-                </span>
-
-                <input
-                  required
-                  maxLength={
-                    200
-                  }
-                  value={
-                    restaurant.name
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateRestaurant(
-                        "name",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Street address
-                </span>
-
-                <input
-                  required
-                  maxLength={
-                    250
-                  }
-                  placeholder="Example: 123 Main Street"
-                  value={
-                    restaurant
-                      .addressLine1
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateRestaurant(
-                        "addressLine1",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Neighbourhood
-                </span>
-
-                <input
-                  maxLength={
-                    120
-                  }
-                  placeholder="Optional"
-                  value={
-                    restaurant
-                      .neighbourhood
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateRestaurant(
-                        "neighbourhood",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Category
-                </span>
-
-                <input
-                  required
-                  maxLength={
-                    120
-                  }
-                  placeholder="Restaurant, café, bakery..."
-                  value={
-                    restaurant.category
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateRestaurant(
-                        "category",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Cuisine
-                </span>
-
-                <input
-                  maxLength={
-                    120
-                  }
-                  placeholder="Optional"
-                  value={
-                    restaurant.cuisine
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateRestaurant(
-                        "cuisine",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Phone
-                </span>
-
-                <input
-                  maxLength={
-                    80
-                  }
-                  placeholder="Optional"
-                  value={
-                    restaurant.phone
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateRestaurant(
-                        "phone",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label
-                className={
-                  styles.wide
-                }
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <fieldset className={styles.typeRow}>
+            <legend>What is it?</legend>
+            {([
+              ["find", "✨ Find"],
+              ["event", "🎟 Event"],
+              ["place", "📍 Place"],
+              ["other", "🌀 Other"]
+            ] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={submissionType === value ? styles.activeType : ""}
+                onClick={() => setSubmissionType(value)}
               >
-                <span>
-                  Official website (optional)
-                </span>
+                {label}
+              </button>
+            ))}
+          </fieldset>
 
-                <input
-                  type="url"
-                  maxLength={
-                    500
-                  }
-                  placeholder="https://..."
-                  value={
-                    restaurant.website
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateRestaurant(
-                        "website",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
+          <label className={styles.bigField}>
+            <span>Name / title *</span>
+            <input
+              required
+              maxLength={180}
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="What should we look up?"
+            />
+          </label>
 
-              <label
-                className={
-                  styles.wide
-                }
-              >
-                <span>
-                  What should people know?
-                </span>
-
-                <textarea
-                  required
-                  rows={
-                    5
-                  }
-                  maxLength={
-                    1500
-                  }
-                  placeholder="Describe the food, atmosphere, or why this place belongs on Venture."
-                  value={
-                    restaurant.description
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateRestaurant(
-                        "description",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-            </div>
-          ) : (
-            <div
-              className={
-                styles.grid
-              }
-            >
-              <label>
-                <span>
-                  Event title
-                </span>
-
-                <input
-                  required
-                  maxLength={
-                    200
-                  }
-                  value={
-                    event.title
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "title",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Category
-                </span>
-
-                <input
-                  required
-                  maxLength={
-                    120
-                  }
-                  placeholder="Music, comedy, market..."
-                  value={
-                    event.category
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "category",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Organizer
-                </span>
-
-                <input
-                  required
-                  maxLength={
-                    200
-                  }
-                  value={
-                    event.organizerName
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "organizerName",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Organizer website
-                </span>
-
-                <input
-                  type="url"
-                  maxLength={
-                    500
-                  }
-                  placeholder="Optional"
-                  value={
-                    event
-                      .organizerWebsite
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "organizerWebsite",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Venue
-                </span>
-
-                <input
-                  required
-                  maxLength={
-                    200
-                  }
-                  value={
-                    event.venueName
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "venueName",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Venue address
-                </span>
-
-                <input
-                  required
-                  maxLength={
-                    250
-                  }
-                  value={
-                    event.venueAddress
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "venueAddress",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Neighbourhood
-                </span>
-
-                <input
-                  maxLength={
-                    120
-                  }
-                  placeholder="Optional"
-                  value={
-                    event.neighbourhood
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "neighbourhood",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Age information
-                </span>
-
-                <input
-                  maxLength={
-                    80
-                  }
-                  placeholder="All ages, 18+, family..."
-                  value={
-                    event.ageLabel
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "ageLabel",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Starts
-                </span>
-
-                <input
-                  required
-                  type="datetime-local"
-                  value={
-                    event.startAt
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "startAt",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Ends
-                </span>
-
-                <input
-                  type="datetime-local"
-                  value={
-                    event.endAt
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "endAt",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Minimum price
-                </span>
-
-                <input
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  type="number"
-                  placeholder="0 for free"
-                  value={
-                    event
-                      .minimumPriceCad
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "minimumPriceCad",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label>
-                <span>
-                  Maximum price
-                </span>
-
-                <input
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  type="number"
-                  placeholder="Optional"
-                  value={
-                    event
-                      .maximumPriceCad
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "maximumPriceCad",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label
-                className={
-                  styles.wide
-                }
-              >
-                <span>
-                  Official or ticket link
-                </span>
-
-                <input
-                  type="url"
-                  maxLength={
-                    500
-                  }
-                  placeholder="https://..."
-                  value={
-                    event.ticketUrl
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "ticketUrl",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label
-                className={
-                  styles.wide
-                }
-              >
-                <span>
-                  Event description
-                </span>
-
-                <textarea
-                  required
-                  rows={
-                    5
-                  }
-                  maxLength={
-                    2000
-                  }
-                  value={
-                    event.description
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "description",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-
-              <label
-                className={
-                  styles.wide
-                }
-              >
-                <span>
-                  Accessibility information
-                </span>
-
-                <textarea
-                  rows={
-                    3
-                  }
-                  maxLength={
-                    1000
-                  }
-                  placeholder="Optional"
-                  value={
-                    event
-                      .accessibilityNotes
-                  }
-                  onChange={
-                    (inputEvent) =>
-                      updateEvent(
-                        "accessibilityNotes",
-                        inputEvent
-                          .target
-                          .value
-                      )
-                  }
-                />
-              </label>
-            </div>
-          )}
-        </section>
-
-        <section
-          className={
-            styles.section
-          }
-        >
-          <div
-            className={
-              styles.sectionHeading
-            }
-          >
-            <span>
-              ABOUT YOU
-            </span>
-
-            <h2>
-              Who is submitting this?
-            </h2>
-          </div>
-
-          <div
-            className={
-              styles.grid
-            }
-          >
+          <div className={styles.twoCol}>
             <label>
-              <span>
-                Your name
-              </span>
-
-              <input
-                required
-                maxLength={
-                  150
-                }
-                value={
-                  submitterName
-                }
-                onChange={
-                  (inputEvent) =>
-                    setSubmitterName(
-                      inputEvent
-                        .target
-                        .value
-                    )
-                }
-              />
-            </label>
-
-            <label>
-              <span>
-                Email
-              </span>
-
-              <input
-                required
-                type="email"
-                maxLength={
-                  320
-                }
-                value={
-                  submitterEmail
-                }
-                onChange={
-                  (inputEvent) =>
-                    setSubmitterEmail(
-                      inputEvent
-                        .target
-                        .value
-                    )
-                }
-              />
-            </label>
-
-            <label>
-              <span>
-                Phone
-              </span>
-
-              <input
-                maxLength={
-                  80
-                }
-                placeholder="Optional"
-                value={
-                  submitterPhone
-                }
-                onChange={
-                  (inputEvent) =>
-                    setSubmitterPhone(
-                      inputEvent
-                        .target
-                        .value
-                    )
-                }
-              />
-            </label>
-
-            <label>
-              <span>
-                Organization
-              </span>
-
-              <input
-                maxLength={
-                  200
-                }
-                placeholder="Optional"
-                value={
-                  organizationName
-                }
-                onChange={
-                  (inputEvent) =>
-                    setOrganizationName(
-                      inputEvent
-                        .target
-                        .value
-                    )
-                }
-              />
-            </label>
-
-            <label>
-              <span>
-                Your relationship
-              </span>
-
-              <select
-                value={
-                  relationship
-                }
-                onChange={
-                  (inputEvent) =>
-                    setRelationship(
-                      inputEvent
-                        .target
-                        .value
-                    )
-                }
-              >
-                <option
-                  value="community_member"
-                >
-                  Community recommendation
-                </option>
-
-                <option value="owner">
-                  Owner
-                </option>
-
-                <option value="employee">
-                  Employee
-                </option>
-
-                <option value="organizer">
-                  Event organizer
-                </option>
-
-                <option value="representative">
-                  Authorized representative
-                </option>
-
-                <option value="other">
-                  Other
-                </option>
-              </select>
-            </label>
-
-            <label>
-              <span>
-                Supporting source
-              </span>
-
+              <span>Link</span>
               <input
                 type="url"
-                maxLength={
-                  500
-                }
-                placeholder="Official page, social post, or announcement"
-                value={
-                  sourceUrl
-                }
-                onChange={
-                  (inputEvent) =>
-                    setSourceUrl(
-                      inputEvent
-                        .target
-                        .value
-                    )
-                }
+                maxLength={600}
+                value={sourceUrl}
+                onChange={(event) => setSourceUrl(event.target.value)}
+                placeholder="Instagram, Eventbrite, website..."
               />
             </label>
-
-            <label
-              className={
-                styles.wide
-              }
-            >
-              <span>
-                Notes for Venture
-              </span>
-
-              <textarea
-                rows={
-                  3
-                }
-                maxLength={
-                  1000
-                }
-                placeholder="Optional context for the reviewer"
-                value={
-                  notes
-                }
-                onChange={
-                  (inputEvent) =>
-                    setNotes(
-                      inputEvent
-                        .target
-                        .value
-                    )
-                }
-              />
-            </label>
-
-            <label
-              className={
-                styles.honeypot
-              }
-              aria-hidden="true"
-            >
-              Website
+            <label>
+              <span>Where</span>
               <input
-                tabIndex={
-                  -1
-                }
-                autoComplete="off"
-                value={
-                  website
-                }
-                onChange={
-                  (inputEvent) =>
-                    setWebsite(
-                      inputEvent
-                        .target
-                        .value
-                    )
-                }
+                maxLength={220}
+                value={whereText}
+                onChange={(event) => setWhereText(event.target.value)}
+                placeholder="Venue, neighbourhood, address..."
               />
             </label>
           </div>
 
-          <div
-            className={
-              styles.checks
-            }
-          >
-            <label>
-              <input
-                type="checkbox"
-                checked={
-                  consentToContact
-                }
-                onChange={
-                  (inputEvent) =>
-                    setConsentToContact(
-                      inputEvent
-                        .target
-                        .checked
-                    )
-                }
-              />
+          <label>
+            <span>When</span>
+            <input
+              maxLength={180}
+              value={whenText}
+              onChange={(event) => setWhenText(event.target.value)}
+              placeholder="Saturday night, Sept 19 at 8 PM..."
+            />
+          </label>
 
-              <span>
-                Venture may contact me
-                about this submission.
-              </span>
-            </label>
+          <label className={styles.bigField}>
+            <span>Why should Venture know about it? *</span>
+            <textarea
+              required
+              rows={6}
+              maxLength={1800}
+              value={whyText}
+              onChange={(event) => setWhyText(event.target.value)}
+              placeholder="Give us the quick version. What makes it worth putting on someone’s radar?"
+            />
+          </label>
 
-            <label>
-              <input
-                required
-                type="checkbox"
-                checked={
-                  termsAccepted
-                }
-                onChange={
-                  (inputEvent) =>
-                    setTermsAccepted(
-                      inputEvent
-                        .target
-                        .checked
-                    )
-                }
-              />
+          <details className={styles.contactDetails}>
+            <summary>Want us to know who sent it?</summary>
+            <div className={styles.twoCol}>
+              <label>
+                <span>Your name</span>
+                <input
+                  maxLength={150}
+                  value={submitterName}
+                  onChange={(event) => setSubmitterName(event.target.value)}
+                  placeholder="Optional"
+                />
+              </label>
+              <label>
+                <span>Email</span>
+                <input
+                  type="email"
+                  maxLength={320}
+                  value={submitterEmail}
+                  onChange={(event) => setSubmitterEmail(event.target.value)}
+                  placeholder="Optional"
+                />
+              </label>
+            </div>
+          </details>
 
-              <span>
-                I confirm that the
-                information is accurate
-                to the best of my
-                knowledge and may be
-                reviewed before
-                publication.
-              </span>
-            </label>
-          </div>
-        </section>
+          <label className={styles.honeypot} aria-hidden="true">
+            Website
+            <input tabIndex={-1} autoComplete="off" value={website} onChange={(event) => setWebsite(event.target.value)} />
+          </label>
 
-        <button
-          className={
-            styles.submitButton
-          }
-          disabled={
-            status ===
-            "submitting"
-          }
-          type="submit"
-        >
-          {status ===
-          "submitting"
-            ? "Sending..."
-            : "Send for review"}
-        </button>
+          <button className={styles.submitButton} disabled={status === "submitting"} type="submit">
+            {status === "submitting" ? "Sending..." : "Send it to Venture →"}
+          </button>
 
-        {message ? (
-          <p
-            className={`${styles.message} ${
-              status ===
-              "success"
-                ? styles.success
-                : status ===
-                    "error"
-                  ? styles.error
-                  : ""
-            }`}
-            role="status"
-          >
-            {message}
-          </p>
-        ) : null}
-      </form>
+          {message ? (
+            <p className={`${styles.message} ${status === "success" ? styles.success : status === "error" ? styles.error : ""}`} role="status">
+              {message}
+            </p>
+          ) : null}
+        </form>
+      </section>
+
+      <footer className={styles.footer}>
+        <strong>Venture by Boogie Bangers</strong>
+        <span>Winnipeg, edited into one useful Thursday read.</span>
+      </footer>
     </main>
   );
 }
