@@ -7,6 +7,10 @@ import {
   updateSupabaseSession
 } from "@/lib/supabase/proxy";
 
+const PUBLICATION_HOME = "https://boogiebangers.com/venture-access/";
+const PUBLICATION_SUBMIT = "https://boogiebangers.com/venture-access/submit/";
+const PUBLICATION_CONFIRM = "https://boogiebangers.com/venture-access/confirm/";
+
 const PRELAUNCH_APP_PATHS = [
   "/explore",
   "/tonight",
@@ -30,11 +34,23 @@ export async function proxy(
 ) {
   const pathname = request.nextUrl.pathname;
 
-  if (pathname === "/" || isPrelaunchAppPath(pathname)) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/newsletter";
-    url.search = "";
+  if (pathname === "/newsletter/confirm") {
+    const url = new URL(PUBLICATION_CONFIRM);
+    const token = request.nextUrl.searchParams.get("token");
+    if (token) url.searchParams.set("token", token);
     return NextResponse.redirect(url);
+  }
+
+  if (pathname === "/submit") {
+    return NextResponse.redirect(PUBLICATION_SUBMIT);
+  }
+
+  if (
+    pathname === "/" ||
+    pathname === "/newsletter" ||
+    isPrelaunchAppPath(pathname)
+  ) {
+    return NextResponse.redirect(PUBLICATION_HOME);
   }
 
   return updateSupabaseSession(
@@ -45,6 +61,9 @@ export async function proxy(
 export const config = {
   matcher: [
     "/",
+    "/newsletter",
+    "/newsletter/confirm",
+    "/submit",
     "/admin/:path*",
     "/api/admin/:path*",
     "/explore/:path*",
