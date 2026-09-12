@@ -19,6 +19,10 @@ import {
 } from "./draft-vault";
 
 import {
+  LegacyNewsletterDraftMigration
+} from "./legacy-draft-migration";
+
+import {
   NewsletterStudio
 } from "./newsletter-studio";
 
@@ -38,6 +42,8 @@ export default async function NewsletterStudioPage() {
 
   return (
     <main className={styles.page}>
+      <LegacyNewsletterDraftMigration />
+
       <header className={styles.hero}>
         <div>
           <span>
@@ -49,7 +55,7 @@ export default async function NewsletterStudioPage() {
           </h1>
 
           <p>
-            Prepare the issue, preview it, send a private test, and create a reviewable draft inside Resend.
+            The Draft Vault above is the source of truth for the full editorial issue. Preview it, send yourself the real issue test, then create a reviewable Resend draft. The editor below is only a quick starter workspace.
           </p>
         </div>
 
