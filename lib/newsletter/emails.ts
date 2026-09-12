@@ -158,11 +158,8 @@ export function buildWelcomeEmail({
   const exploreUrl =
     `${appUrl}/explore`;
 
-  const buildUrl =
-    `${appUrl}/build-outing`;
-
   const subject =
-    "Welcome to The Thursday Venture ✦";
+    "You’re in. Welcome to Venture.";
 
   const html = `<!doctype html>
 <html lang="en">
@@ -172,6 +169,7 @@ export function buildWelcomeEmail({
     <title>${subject}</title>
   </head>
   <body style="margin:0;padding:0;background:#fff8ef;color:#241f20;font-family:Arial,Helvetica,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Winnipeg, every Thursday.</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff8ef;padding:24px 12px;">
       <tr>
         <td align="center">
@@ -179,41 +177,36 @@ export function buildWelcomeEmail({
             <tr>
               <td style="padding:24px;background:#ffcf00;border-bottom:2px solid #241f20;">
                 <div style="font-size:24px;font-weight:900;">Venture</div>
-                <div style="margin-top:5px;color:#d01013;font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;">The Thursday Venture</div>
+                <div style="margin-top:5px;color:#d01013;font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;">Winnipeg / Every Thursday</div>
               </td>
             </tr>
             <tr>
               <td style="padding:30px 26px 12px;">
                 <div style="color:#d01013;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;">YOU’RE CONFIRMED</div>
                 <h1 style="margin:10px 0 0;font-size:36px;line-height:1.02;letter-spacing:-.04em;">Hi ${safeName}, you’re in.</h1>
-                <p style="margin:16px 0 0;color:#615758;font-size:17px;line-height:1.65;">Every Thursday, Venture will send a focused Winnipeg roundup with worthwhile events, local food and drink spots, and complete outing ideas.</p>
+                <p style="margin:16px 0 0;color:#615758;font-size:17px;line-height:1.65;">Every Thursday, Venture will send you a curated look at what’s happening around Winnipeg.</p>
+                <p style="margin:12px 0 0;color:#615758;font-size:17px;line-height:1.65;">Events worth knowing about. Places worth trying. Food, nightlife, culture, and the people making the city move.</p>
+                <p style="margin:12px 0 0;color:#615758;font-size:17px;line-height:1.65;">Not everything. Just the stuff we think is worth your time.</p>
               </td>
             </tr>
             <tr>
               <td style="padding:14px 26px;">
                 <div style="padding:18px;border:2px solid #241f20;border-radius:18px;background:#fff8d8;">
                   <div style="color:#d01013;font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;">THE PROMISE</div>
-                  <p style="margin:9px 0 0;font-size:16px;line-height:1.6;">One useful email a week. No clutter. No paid placement disguised as an organic recommendation.</p>
+                  <p style="margin:9px 0 0;font-size:16px;line-height:1.6;"><strong>One useful email a week. No clutter.</strong><br />No paid placement disguised as a recommendation. If something is sponsored, we’ll tell you.</p>
                 </div>
               </td>
             </tr>
             <tr>
-              <td style="padding:12px 26px 28px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td style="padding:5px;">
-                      <a href="${exploreUrl}" style="display:block;padding:15px 16px;border:2px solid #241f20;border-radius:13px;background:#ffcf00;color:#241f20;font-size:15px;font-weight:900;text-align:center;text-decoration:none;">Explore Winnipeg</a>
-                    </td>
-                    <td style="padding:5px;">
-                      <a href="${buildUrl}" style="display:block;padding:15px 16px;border:2px solid #241f20;border-radius:13px;background:#d01013;color:#ffffff;font-size:15px;font-weight:900;text-align:center;text-decoration:none;">Build an outing</a>
-                    </td>
-                  </tr>
-                </table>
+              <td style="padding:17px 31px 33px;">
+                <a href="${exploreUrl}" style="display:block;padding:15px 16px;border:2px solid #241f20;border-radius:13px;background:#ffcf00;color:#241f20;font-size:15px;font-weight:900;text-align:center;text-decoration:none;box-shadow:4px 4px 0 #d01013;">Explore Winnipeg</a>
               </td>
             </tr>
             <tr>
               <td style="padding:20px 26px;background:#241f20;color:#ffffff;text-align:center;">
-                <div style="font-size:13px;font-weight:900;">${ventureBrand.fullName}</div>
+                <div style="font-size:14px;font-weight:900;">Same city. Different perspective.</div>
+                <div style="margin-top:6px;color:#ffffff;font-size:12px;line-height:1.55;">See you Thursday.</div>
+                <div style="margin-top:12px;font-size:13px;font-weight:900;">${ventureBrand.fullName}</div>
                 <div style="margin-top:7px;color:#d9d0d1;font-size:12px;line-height:1.55;">Winnipeg, Manitoba · Replies go to ${ventureBrand.replyToEmail}</div>
                 <div style="margin-top:12px;font-size:12px;"><a href="${unsubscribeUrl}" style="color:#ffcf00;">Unsubscribe</a> at any time.</div>
               </td>
@@ -228,12 +221,21 @@ export function buildWelcomeEmail({
   const text = [
     `Hi ${firstName}, you’re in.`,
     "",
-    "Every Thursday, Venture will send a focused Winnipeg roundup with worthwhile events, local food and drink spots, and complete outing ideas.",
+    "Every Thursday, Venture will send you a curated look at what’s happening around Winnipeg.",
     "",
-    "One useful email a week. No clutter. No paid placement disguised as an organic recommendation.",
+    "Events worth knowing about. Places worth trying. Food, nightlife, culture, and the people making the city move.",
+    "",
+    "Not everything. Just the stuff we think is worth your time.",
+    "",
+    "THE PROMISE",
+    "One useful email a week. No clutter.",
+    "No paid placement disguised as a recommendation. If something is sponsored, we’ll tell you.",
     "",
     `Explore Winnipeg: ${exploreUrl}`,
-    `Build an outing: ${buildUrl}`,
+    "",
+    "Same city. Different perspective.",
+    "See you Thursday.",
+    ventureBrand.fullName,
     "",
     `Questions and replies: ${ventureBrand.replyToEmail}`,
     `Unsubscribe: ${unsubscribeUrl}`
