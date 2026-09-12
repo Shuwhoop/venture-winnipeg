@@ -34,6 +34,15 @@ const ADMIN_AUTH_PATHS = [
   "/admin/reset-password"
 ];
 
+const WEBSITE_PATHS = [
+  "/newsletter",
+  "/submit",
+  "/privacy",
+  "/terms",
+  "/support",
+  "/accessibility"
+];
+
 function useRouteKind() {
   const pathname = usePathname();
   const isAdmin =
@@ -43,11 +52,15 @@ function useRouteKind() {
     ADMIN_AUTH_PATHS.some(
       (path) => pathname.startsWith(path)
     );
+  const isWebsite = WEBSITE_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
 
   return {
     pathname,
     isAdmin,
-    isAdminAuth
+    isAdminAuth,
+    isWebsite
   };
 }
 
@@ -109,11 +122,20 @@ export function PublicRouteChrome({
 }) {
   const {
     pathname,
-    isAdmin
+    isAdmin,
+    isWebsite
   } = useRouteKind();
 
   if (isAdmin) {
     return null;
+  }
+
+  if (isWebsite) {
+    return analyticsEnabled ? (
+      <Suspense fallback={null}>
+        <VentureAnalytics />
+      </Suspense>
+    ) : null;
   }
 
   return (
