@@ -7,12 +7,27 @@ import {
 } from "resend";
 
 import {
+  getNewsletterTopicName,
+  listResendTopics,
+  resendApiRequest
+} from "@/lib/newsletter/resend";
+
+import {
   getSupabaseAdminClient
 } from "@/lib/supabase/admin";
 
 
 export const runtime =
   "nodejs";
+
+
+type DeliveryUpdate = {
+  status:
+    | "bounced"
+    | "complained"
+    | "unsubscribed";
+  note: string;
+};
 
 
 function normalizeEmail(
@@ -68,12 +83,7 @@ function extractEmail(
 
 function deliveryUpdateForEvent(
   type: string
-): {
-  status:
-    | "bounced"
-    | "complained";
-  note: string;
-} | null {
+): DeliveryUpdate | null {
   if (
     type ===
       "email.bounced"
@@ -113,6 +123,97 @@ function deliveryUpdateForEvent(
   }
 
   return null;
+}
+
+
+async function contactPreferenceUpdate({
+  type,
+  data,
+  email
+}: {
+  type: string;
+  data: Record<string, unknown>;
+  email: string;
+}): Promise<DeliveryUpdate | null> {
+  if (
+    type !==
+      "contact.updated"
+  ) {
+    return null;
+  }
+
+  if (
+    data.unsubscribed ===
+      true
+  ) {
+    return {
+      status:
+        "unsubscribed",
+      note:
+        "The recipient unsubscribed from Venture in Resend."
+    };
+  }
+
+  const topics =
+    await listResendTopics();
+
+  if (
+    topics.error ||
+    topics.items.length === 0
+  ) {
+    return null;
+  }
+
+  const newsletterTopic =
+    topics.items.find(
+      (topic) =>
+        topic.name
+          .trim()
+          .toLowerCase() ===
+        getNewsletterTopicName()
+          .trim()
+          .toLowerCase()
+    );
+
+  if (!newsletterTopic) {
+    return null;
+  }
+
+  const result =
+    await resendApiRequest<{
+      data?: Array<{
+        id?: string;
+        subscription?:
+          | "opt_in"
+          | "opt_out";
+      }>;
+    }>({
+      path:
+        `/contacts/${encodeURIComponent(email)}/topics`
+    });
+
+  if (!result.ok) {
+    return null;
+  }
+
+  const optedOut =
+    (result.data?.data || [])
+      .some(
+        (topic) =>
+          topic.id ===
+            newsletterTopic.id &&
+          topic.subscription ===
+            "opt_out"
+      );
+
+  return optedOut
+    ? {
+        status:
+          "unsubscribed",
+        note:
+          "The recipient opted out of The Thursday Venture in Resend."
+      }
+    : null;
 }
 
 
@@ -243,10 +344,27 @@ export async function POST(
         >
       : {};
 
-  const update =
+  const email =
+    extractEmail(
+      data
+    );
+
+  let update =
     deliveryUpdateForEvent(
       type
     );
+
+  if (
+    !update &&
+    email
+  ) {
+    update =
+      await contactPreferenceUpdate({
+        type,
+        data,
+        email
+      });
+  }
 
   if (!update) {
     return NextResponse.json({
@@ -257,11 +375,6 @@ export async function POST(
       type
     });
   }
-
-  const email =
-    extractEmail(
-      data
-    );
 
   if (!email) {
     return NextResponse.json({
