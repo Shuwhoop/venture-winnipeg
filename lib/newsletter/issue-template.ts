@@ -17,6 +17,11 @@ export type NewsletterIssueItemRecord = {
   custom_title: string | null;
   custom_description: string | null;
   custom_url: string | null;
+  custom_image_url: string | null;
+  event_date: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  venue_name: string | null;
   sort_order: number;
 };
 
@@ -44,10 +49,7 @@ function normalizeAppUrl(value: string): string {
 }
 
 function absoluteUrl(appUrl: string, value: string): string {
-  if (/^https?:\/\//i.test(value)) {
-    return value;
-  }
-
+  if (/^https?:\/\//i.test(value)) return value;
   return `${normalizeAppUrl(appUrl)}${value.startsWith("/") ? value : `/${value}`}`;
 }
 
@@ -56,23 +58,44 @@ function sectionLabel(section: string): string {
 }
 
 function cardBackground(section: string): string {
-  if (section === "the_move") {
-    return "#fff4b8";
-  }
-
-  if (section === "lowkey") {
-    return "#eaf6ff";
-  }
-
-  if (section === "next_week") {
-    return "#f1e8ff";
-  }
-
-  if (section === "boogie_bangers") {
-    return "#fff0f0";
-  }
-
+  if (section === "the_move") return "#fff4b8";
+  if (section === "lowkey") return "#eaf6ff";
+  if (section === "next_week") return "#f1e8ff";
+  if (section === "boogie_bangers") return "#fff0f0";
   return "#ffffff";
+}
+
+function formatDate(value: string | null): string {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return "";
+  const [year, month, day] = value.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-CA", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function formatTime(value: string | null): string {
+  if (!value) return "";
+  const match = value.match(/^(\d{2}):(\d{2})/);
+  if (!match) return "";
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const shownHour = hour % 12 || 12;
+  return `${shownHour}${minute ? `:${String(minute).padStart(2, "0")}` : ""} ${suffix}`;
+}
+
+function itemMeta(item: NewsletterIssueItemRecord): string {
+  const parts: string[] = [];
+  const date = formatDate(item.event_date);
+  const start = formatTime(item.start_time);
+  const end = formatTime(item.end_time);
+  if (date) parts.push(date);
+  if (start) parts.push(end ? `${start}–${end}` : start);
+  if (item.venue_name?.trim()) parts.push(item.venue_name.trim());
+  return parts.join(" · ");
 }
 
 export function buildNewsletterIssueCampaign({
@@ -83,14 +106,9 @@ export function buildNewsletterIssueCampaign({
   issue: NewsletterIssueRecord;
   items: NewsletterIssueItemRecord[];
   appUrl: string;
-}): {
-  subject: string;
-  html: string;
-  text: string;
-} {
+}): { subject: string; html: string; text: string } {
   const unsubscribeUrl = "{{{RESEND_UNSUBSCRIBE_URL}}}";
-  const postalAddress = process.env.VENTURE_POSTAL_ADDRESS?.trim() ||
-    "Winnipeg, Manitoba, Canada";
+  const postalAddress = process.env.VENTURE_POSTAL_ADDRESS?.trim() || "Winnipeg, Manitoba, Canada";
   const exploreUrl = absoluteUrl(appUrl, "/explore");
   const submitUrl = absoluteUrl(appUrl, "/submit");
 
@@ -98,132 +116,63 @@ export function buildNewsletterIssueCampaign({
   const itemHtml = items.map((item) => {
     const title = item.custom_title?.trim() || "Untitled pick";
     const description = item.custom_description?.trim() || "";
-    const url = item.custom_url?.trim()
-      ? absoluteUrl(appUrl, item.custom_url.trim())
-      : exploreUrl;
+    const meta = itemMeta(item);
+    const imageUrl = item.custom_image_url?.trim() || "";
+    const url = item.custom_url?.trim() ? absoluteUrl(appUrl, item.custom_url.trim()) : exploreUrl;
     const showHeading = item.section !== previousSection;
     previousSection = item.section;
 
     return `${showHeading ? `
-      <tr>
-        <td style="padding:22px 26px 7px;">
-          <div style="color:#d01013;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;">${escapeHtml(sectionLabel(item.section))}</div>
-        </td>
-      </tr>` : ""}
+      <tr><td style="padding:22px 26px 7px;"><div style="color:#d01013;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;">${escapeHtml(sectionLabel(item.section))}</div></td></tr>` : ""}
       <tr>
         <td style="padding:7px 26px;">
-          <div style="padding:19px;border:2px solid #241f20;border-radius:17px;background:${cardBackground(item.section)};">
-            <h2 style="margin:0;font-size:22px;line-height:1.16;letter-spacing:-.02em;">${escapeHtml(title)}</h2>
-            ${description ? `<p style="margin:10px 0 0;color:#5f5556;font-size:15px;line-height:1.62;">${escapeHtml(description)}</p>` : ""}
-            <a href="${escapeHtml(url)}" style="display:inline-block;margin-top:13px;color:#8d0c10;font-size:14px;font-weight:900;">See details →</a>
+          <div style="overflow:hidden;border:2px solid #241f20;border-radius:17px;background:${cardBackground(item.section)};">
+            ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}" width="628" style="display:block;width:100%;max-height:330px;object-fit:cover;border:0;" />` : ""}
+            <div style="padding:19px;">
+              ${meta ? `<div style="margin-bottom:8px;color:#8d0c10;font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;">${escapeHtml(meta)}</div>` : ""}
+              <h2 style="margin:0;font-size:22px;line-height:1.16;letter-spacing:-.02em;">${escapeHtml(title)}</h2>
+              ${description ? `<p style="margin:10px 0 0;color:#5f5556;font-size:15px;line-height:1.62;">${escapeHtml(description)}</p>` : ""}
+              <a href="${escapeHtml(url)}" style="display:inline-block;margin-top:13px;color:#8d0c10;font-size:14px;font-weight:900;">See details →</a>
+            </div>
           </div>
         </td>
       </tr>`;
   }).join("");
 
   const intro = issue.intro?.trim() || "Winnipeg, edited down to the moves worth knowing about.";
-  const closing = issue.closing_note?.trim() ||
-    "Know something Venture should have caught? Send it in and help make the next issue sharper.";
+  const closing = issue.closing_note?.trim() || "Know something Venture should have caught? Send it in and help make the next issue sharper.";
   const preheader = issue.preheader?.trim() || intro;
 
   const html = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(issue.subject)}</title>
-  </head>
-  <body style="margin:0;padding:0;background:#fff8ef;color:#241f20;font-family:Arial,Helvetica,sans-serif;">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(preheader)}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff8ef;padding:24px 12px;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;background:#ffffff;border:2px solid #241f20;border-radius:24px;overflow:hidden;box-shadow:8px 8px 0 #edb200;">
-            <tr>
-              <td style="padding:24px 26px;background:#ffcf00;border-bottom:2px solid #241f20;">
-                <div style="font-size:30px;font-weight:900;letter-spacing:-.05em;">Venture</div>
-                <div style="margin-top:5px;color:#d01013;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;">THE WEEKEND DROP</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:29px 26px 14px;">
-                <div style="color:#d01013;font-size:12px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;">${escapeHtml(issue.title)}</div>
-                <h1 style="margin:10px 0 0;font-size:38px;line-height:1.03;letter-spacing:-.05em;">Hi {{{contact.first_name|there}}}, Winnipeg is busy.</h1>
-                <p style="margin:17px 0 0;color:#5f5556;font-size:17px;line-height:1.68;">${escapeHtml(intro)}</p>
-              </td>
-            </tr>
-            ${itemHtml}
-            <tr>
-              <td style="padding:19px 26px 27px;">
-                <div style="padding:19px;border:2px solid #241f20;border-radius:17px;background:#ffffff;">
-                  <div style="color:#d01013;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;">A NOTE FROM VENTURE</div>
-                  <p style="margin:9px 0 0;color:#5f5556;font-size:15px;line-height:1.65;">${escapeHtml(closing)}</p>
-                </div>
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
-                  <tr>
-                    <td style="padding:5px;">
-                      <a href="${escapeHtml(exploreUrl)}" style="display:block;padding:15px 16px;border:2px solid #241f20;border-radius:13px;background:#ffcf00;color:#241f20;font-size:15px;font-weight:900;text-align:center;text-decoration:none;">Explore Winnipeg</a>
-                    </td>
-                    <td style="padding:5px;">
-                      <a href="${escapeHtml(submitUrl)}" style="display:block;padding:15px 16px;border:2px solid #241f20;border-radius:13px;background:#d01013;color:#ffffff;font-size:15px;font-weight:900;text-align:center;text-decoration:none;">Submit a find</a>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:21px 26px;background:#241f20;color:#ffffff;text-align:center;">
-                <div style="font-size:13px;font-weight:900;">${escapeHtml(ventureBrand.fullName)}</div>
-                <div style="margin-top:7px;color:#d9d0d1;font-size:12px;line-height:1.55;">${escapeHtml(postalAddress)} · ${escapeHtml(ventureBrand.replyToEmail)}</div>
-                <div style="margin-top:12px;font-size:12px;"><a href="${escapeHtml(unsubscribeUrl)}" style="color:#ffcf00;">Manage your email preferences or unsubscribe</a>.</div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`;
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>${escapeHtml(issue.subject)}</title></head>
+<body style="margin:0;padding:0;background:#fff8ef;color:#241f20;font-family:Arial,Helvetica,sans-serif;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(preheader)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff8ef;padding:24px 12px;"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;background:#ffffff;border:2px solid #241f20;border-radius:24px;overflow:hidden;box-shadow:8px 8px 0 #edb200;">
+<tr><td style="padding:24px 26px;background:#ffcf00;border-bottom:2px solid #241f20;"><div style="font-size:30px;font-weight:900;letter-spacing:-.05em;">Venture</div><div style="margin-top:5px;color:#d01013;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;">THE WEEKEND DROP</div></td></tr>
+<tr><td style="padding:29px 26px 14px;"><div style="color:#d01013;font-size:12px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;">${escapeHtml(issue.title)}</div><h1 style="margin:10px 0 0;font-size:38px;line-height:1.03;letter-spacing:-.05em;">Hi {{{contact.first_name|there}}}, Winnipeg is busy.</h1><p style="margin:17px 0 0;color:#5f5556;font-size:17px;line-height:1.68;">${escapeHtml(intro)}</p></td></tr>
+${itemHtml}
+<tr><td style="padding:19px 26px 27px;"><div style="padding:19px;border:2px solid #241f20;border-radius:17px;background:#ffffff;"><div style="color:#d01013;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;">A NOTE FROM VENTURE</div><p style="margin:9px 0 0;color:#5f5556;font-size:15px;line-height:1.65;">${escapeHtml(closing)}</p></div><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;"><tr><td style="padding:5px;"><a href="${escapeHtml(exploreUrl)}" style="display:block;padding:15px 16px;border:2px solid #241f20;border-radius:13px;background:#ffcf00;color:#241f20;font-size:15px;font-weight:900;text-align:center;text-decoration:none;">Explore Winnipeg</a></td><td style="padding:5px;"><a href="${escapeHtml(submitUrl)}" style="display:block;padding:15px 16px;border:2px solid #241f20;border-radius:13px;background:#d01013;color:#ffffff;font-size:15px;font-weight:900;text-align:center;text-decoration:none;">Submit a find</a></td></tr></table></td></tr>
+<tr><td style="padding:21px 26px;background:#241f20;color:#ffffff;text-align:center;"><div style="font-size:13px;font-weight:900;">${escapeHtml(ventureBrand.fullName)}</div><div style="margin-top:7px;color:#d9d0d1;font-size:12px;line-height:1.55;">${escapeHtml(postalAddress)} · ${escapeHtml(ventureBrand.replyToEmail)}</div><div style="margin-top:12px;font-size:12px;"><a href="${escapeHtml(unsubscribeUrl)}" style="color:#ffcf00;">Manage your email preferences or unsubscribe</a>.</div></td></tr>
+</table></td></tr></table></body></html>`;
 
-  const textParts: string[] = [
-    issue.title,
-    "",
-    `Hi {{{contact.first_name|there}}}, Winnipeg is busy.`,
-    "",
-    intro,
-    ""
-  ];
-
+  const textParts: string[] = [issue.title, "", "Hi {{{contact.first_name|there}}}, Winnipeg is busy.", "", intro, ""];
   let previousTextSection = "";
   for (const item of items) {
     if (item.section !== previousTextSection) {
       textParts.push(sectionLabel(item.section), "");
       previousTextSection = item.section;
     }
-
+    const meta = itemMeta(item);
     textParts.push(
       item.custom_title?.trim() || "Untitled pick",
+      meta,
       item.custom_description?.trim() || "",
       item.custom_url?.trim() ? absoluteUrl(appUrl, item.custom_url.trim()) : exploreUrl,
       ""
     );
   }
+  textParts.push(closing, "", `Explore Winnipeg: ${exploreUrl}`, `Submit a find: ${submitUrl}`, "", ventureBrand.fullName, postalAddress, ventureBrand.replyToEmail, `Unsubscribe: ${unsubscribeUrl}`);
 
-  textParts.push(
-    closing,
-    "",
-    `Explore Winnipeg: ${exploreUrl}`,
-    `Submit a find: ${submitUrl}`,
-    "",
-    ventureBrand.fullName,
-    postalAddress,
-    ventureBrand.replyToEmail,
-    `Unsubscribe: ${unsubscribeUrl}`
-  );
-
-  return {
-    subject: issue.subject,
-    html,
-    text: textParts.join("\n")
-  };
+  return { subject: issue.subject, html, text: textParts.join("\n") };
 }
