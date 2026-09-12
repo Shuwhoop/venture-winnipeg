@@ -33,6 +33,7 @@ export default async function NewsletterStudioPage() {
         </div>
 
         <nav aria-label="Newsletter admin navigation">
+          <Link href="/admin/newsletter/tips">Editorial inbox</Link>
           <Link href="/admin/newsletter">Subscribers</Link>
           <Link href="/newsletter">Public page</Link>
         </nav>
