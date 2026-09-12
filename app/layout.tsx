@@ -10,6 +10,7 @@ import "./globals.css";
 import "./venture-theme.css";
 import "./venture-city-pulse-theme.css";
 import "./venture-city-pulse-theme-v1-1.css";
+import "./venture-newsletter-first.css";
 
 import {
   AdminRouteChrome,
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   title: "Venture",
 
   description:
-    "Find trustworthy events, restaurants, and complete outings across Winnipeg.",
+    "Find what is happening in Winnipeg now: events, nightlife, food, culture, free finds, and local discoveries worth knowing about.",
 
   applicationName:
     "Venture",
@@ -142,7 +143,7 @@ export default function RootLayout({
 
           <ServiceWorkerRegistration />
         </div>
-              <VentureSupportAccess />
+        <VentureSupportAccess />
       </body>
     </html>
   );
