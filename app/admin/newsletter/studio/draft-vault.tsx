@@ -1,291 +1,95 @@
 "use client";
 
 import { useState } from "react";
-
-import type { VentureNewsletterDraft } from "@/lib/newsletter/campaign-draft";
-
 import styles from "./draft-vault.module.css";
-
-const STORAGE_KEY = "venture-newsletter-draft-v1";
 
 type VaultResult = {
   ok?: boolean;
   error?: string;
   message?: string;
-  draft?: VentureNewsletterDraft | null;
-  savedAt?: string | null;
   broadcastId?: string;
 };
 
 function readError(value: unknown): string {
-  if (
-    value &&
-    typeof value === "object" &&
-    "error" in value &&
-    typeof value.error === "string"
-  ) {
+  if (value && typeof value === "object" && "error" in value && typeof value.error === "string") {
     return value.error;
   }
-
-  return "Venture could not complete that draft action.";
+  return "Venture could not complete that newsletter action.";
 }
 
 async function readJson(response: Response): Promise<VaultResult> {
-  let data: unknown = {};
-
-  try {
-    data = await response.json();
-  } catch {
-    data = {};
-  }
-
-  if (!response.ok) {
-    throw new Error(readError(data));
-  }
-
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(readError(data));
   return data as VaultResult;
 }
 
 export function NewsletterDraftVault() {
-  const [busy, setBusy] = useState<
-    "save" | "restore" | "test" | "broadcast" | ""
-  >("");
+  const [busy, setBusy] = useState<"test" | "broadcast" | "">("");
   const [notice, setNotice] = useState<{
     tone: "success" | "error" | "info";
     text: string;
   } | null>(null);
 
-  async function saveDraft() {
-    if (busy) {
-      return;
-    }
-
-    setBusy("save");
-    setNotice(null);
-
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-
-      if (!stored) {
-        throw new Error(
-          "No browser draft was found yet. Make one edit in the studio, then save again."
-        );
-      }
-
-      const draft = JSON.parse(stored) as VentureNewsletterDraft;
-      const response = await fetch("/api/admin/newsletter/issues", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ draft })
-      });
-
-      const result = await readJson(response);
-
-      setNotice({
-        tone: "success",
-        text: result.message || "Draft saved to Venture."
-      });
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        text:
-          error instanceof Error
-            ? error.message
-            : "Venture could not save the draft."
-      });
-    } finally {
-      setBusy("");
-    }
-  }
-
-  async function restoreLatest() {
-    if (busy) {
-      return;
-    }
-
-    setBusy("restore");
-    setNotice(null);
-
-    try {
-      const response = await fetch("/api/admin/newsletter/issues", {
-        method: "GET",
-        cache: "no-store"
-      });
-
-      const result = await readJson(response);
-
-      if (!result.draft) {
-        setNotice({
-          tone: "info",
-          text: "No saved Venture draft exists yet."
-        });
-        return;
-      }
-
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(result.draft));
-      window.location.reload();
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        text:
-          error instanceof Error
-            ? error.message
-            : "Venture could not restore the latest draft."
-      });
-    } finally {
-      setBusy("");
-    }
-  }
-
   async function sendEditorialTest() {
-    if (busy) {
-      return;
-    }
-
+    if (busy) return;
     setBusy("test");
     setNotice(null);
-
     try {
-      const response = await fetch(
-        "/api/admin/newsletter/issues/test",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({})
-        }
-      );
-
-      const result = await readJson(response);
-
-      setNotice({
-        tone: "success",
-        text:
-          result.message ||
-          "Full editorial test sent to your admin email."
-      });
+      const result = await readJson(await fetch("/api/admin/newsletter/issues/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      }));
+      setNotice({ tone: "success", text: result.message || "Full issue test sent to your admin email." });
     } catch (error) {
-      setNotice({
-        tone: "error",
-        text:
-          error instanceof Error
-            ? error.message
-            : "Venture could not send the editorial test."
-      });
+      setNotice({ tone: "error", text: error instanceof Error ? error.message : "Venture could not send the issue test." });
     } finally {
       setBusy("");
     }
   }
 
   async function createEditorialBroadcast() {
-    if (busy) {
-      return;
-    }
-
+    if (busy) return;
     setBusy("broadcast");
     setNotice(null);
-
     try {
-      const response = await fetch(
-        "/api/admin/newsletter/issues/broadcast",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({})
-        }
-      );
-
-      const result = await readJson(response);
-
-      setNotice({
-        tone: "success",
-        text:
-          result.message ||
-          "Editorial Resend draft created. Review it before sending."
-      });
+      const result = await readJson(await fetch("/api/admin/newsletter/issues/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      }));
+      setNotice({ tone: "success", text: result.message || "Editorial Resend draft created. Review it before sending." });
     } catch (error) {
-      setNotice({
-        tone: "error",
-        text:
-          error instanceof Error
-            ? error.message
-            : "Venture could not create the Resend draft."
-      });
+      setNotice({ tone: "error", text: error instanceof Error ? error.message : "Venture could not create the Resend draft." });
     } finally {
       setBusy("");
     }
   }
 
   return (
-    <section className={styles.vault} aria-label="Newsletter draft vault">
+    <section className={styles.vault} aria-label="Newsletter review and handoff">
       <div className={styles.copy}>
-        <span>DRAFT VAULT</span>
-        <strong>Keep Issue 001 in Venture, not only this browser.</strong>
+        <span>REVIEW & HANDOFF</span>
+        <strong>Save above. Review here. Send later.</strong>
         <p>
-          The studio still autosaves locally. The vault keeps durable Supabase
-          issues, lets you preview and privately test the full saved edition,
-          then turns it into a reviewable Resend draft without sending it.
+          The editorial builder is now the source of truth. Preview the exact saved issue,
+          send yourself a private test, then create a Resend draft only when the issue feels finished.
         </p>
       </div>
 
       <div className={styles.actions}>
-        <button disabled={busy !== ""} onClick={saveDraft} type="button">
-          {busy === "save" ? "Saving…" : "Save to Venture"}
-        </button>
-
-        <button
-          className={styles.secondary}
-          disabled={busy !== ""}
-          onClick={restoreLatest}
-          type="button"
-        >
-          {busy === "restore" ? "Restoring…" : "Restore latest"}
-        </button>
-
-        <a
-          className={styles.secondary}
-          href="/api/admin/newsletter/issues/preview"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Preview full editorial issue
+        <a className={styles.secondary} href="/api/admin/newsletter/issues/preview" rel="noreferrer" target="_blank">
+          Preview full issue
         </a>
-
-        <button
-          className={styles.secondary}
-          disabled={busy !== ""}
-          onClick={sendEditorialTest}
-          type="button"
-        >
-          {busy === "test"
-            ? "Sending full test…"
-            : "Send full issue test to me"}
+        <button className={styles.secondary} disabled={busy !== ""} onClick={sendEditorialTest} type="button">
+          {busy === "test" ? "Sending test…" : "Send issue test to me"}
         </button>
-
-        <button
-          disabled={busy !== ""}
-          onClick={createEditorialBroadcast}
-          type="button"
-        >
-          {busy === "broadcast"
-            ? "Creating Resend draft…"
-            : "Create editorial Resend draft"}
+        <button disabled={busy !== ""} onClick={createEditorialBroadcast} type="button">
+          {busy === "broadcast" ? "Creating Resend draft…" : "Create Resend draft"}
         </button>
       </div>
 
-      {notice ? (
-        <p
-          className={`${styles.notice} ${styles[notice.tone]}`}
-          role="status"
-        >
-          {notice.text}
-        </p>
-      ) : null}
+      {notice ? <p className={`${styles.notice} ${styles[notice.tone]}`} role="status">{notice.text}</p> : null}
     </section>
   );
 }
