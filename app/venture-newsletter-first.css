@@ -1,9 +1,0 @@
-/*
- * Venture is newsletter/discovery-first for the current public launch.
- * Keep the outing-builder implementation available for the future app,
- * but do not surface public links into it yet.
- */
-
-body:not(.venture-admin) a[href^="/build-outing"] {
-  display: none !important;
-}
