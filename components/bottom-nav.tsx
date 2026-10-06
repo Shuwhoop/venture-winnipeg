@@ -5,7 +5,7 @@ import {
   useState
 } from "react";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 
 import {
   usePathname
@@ -157,6 +157,18 @@ function isItemActive(
   );
 }
 
+function NavigationFeedback({ label }: { label: string }) {
+  const { pending } = useLinkStatus();
+
+  return pending ? (
+    <span
+      className="nav-pending"
+      role="status"
+      aria-label={`Opening ${label}`}
+    />
+  ) : null;
+}
+
 export function BottomNav() {
   const pathname = usePathname();
 
@@ -256,6 +268,7 @@ export function BottomNav() {
             </span>
 
             <small>{item.label}</small>
+            <NavigationFeedback label={item.label} />
           </Link>
         );
       })}

@@ -672,7 +672,19 @@ export function TodayDiscovery({
           WINNIPEG · {daypart.dateLabel}
         </p>
 
-        <h1>{daypart.greeting}</h1>
+        <div className="home-greeting">
+          <h1>{daypart.greeting}</h1>
+          <span className="home-sun" aria-hidden="true">
+            <svg viewBox="0 0 72 72" fill="none">
+              <path d="M36 3v7M36 62v7M3 36h7M62 36h7M13 13l5 5M54 54l5 5M13 59l5-5M54 18l5-5" />
+              <circle className="sun-face" cx="36" cy="36" r="19" />
+              <circle className="sun-eye" cx="30" cy="34" r="1.8" />
+              <circle className="sun-eye" cx="42" cy="34" r="1.8" />
+              <path className="sun-smile" d="M29 41q7 8 14 0" />
+            </svg>
+          </span>
+        </div>
+        <p className="home-invitation">Good food. New places. Your kind of plans.</p>
 
         <form
           action="/explore"
