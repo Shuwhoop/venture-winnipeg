@@ -1,0 +1,250 @@
+/* Venture V1 tightening pass
+ * Keep the working product behaviour intact while reducing visual noise,
+ * making discovery easier to scan, and shortening the perceived outing flow.
+ */
+
+:root {
+  --venture-v1-radius-sm: 14px;
+  --venture-v1-radius-md: 18px;
+  --venture-v1-radius-lg: 24px;
+  --venture-v1-control-height: 44px;
+}
+
+/* Keep the app comfortably dense on small phones without feeling cramped. */
+.page-content {
+  padding-inline: clamp(12px, 3.7vw, 16px);
+}
+
+.app-header {
+  padding-inline: clamp(13px, 4vw, 17px);
+}
+
+/* Rails should feel intentionally swipeable rather than like clipped rows. */
+[class*="today-discovery-module"][class$="__miniRail"],
+[class*="today-discovery-module"][class$="__trendRail"],
+[class*="explore-module"][class$="__mapResultRail"] {
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+[class*="today-discovery-module"][class$="__miniRail"]::-webkit-scrollbar,
+[class*="today-discovery-module"][class$="__trendRail"]::-webkit-scrollbar,
+[class*="explore-module"][class$="__mapResultRail"]::-webkit-scrollbar {
+  display: none;
+}
+
+[class*="today-discovery-module"][class$="__miniCard"],
+[class*="today-discovery-module"][class$="__trendCard"],
+[class*="explore-module"][class$="__mapResultCard"] {
+  scroll-snap-align: start;
+}
+
+[class*="today-discovery-module"][class$="__sectionHeading"] {
+  margin-bottom: 10px;
+}
+
+[class*="today-discovery-module"][class$="__sectionHeading"] h2 {
+  letter-spacing: -0.025em;
+}
+
+/* Explore: surface the fast decisions and leave deeper taxonomy in Filters. */
+[class*="explore-module"][class$="__filterRail"] a[href*="filter=activities"],
+[class*="explore-module"][class$="__filterRail"] a[href*="filter=nightlife"],
+[class*="explore-module"][class$="__filterRail"] a[href*="filter=attractions"],
+[class*="explore-module"][class$="__filterRail"] a[href*="filter=verified"] {
+  display: none;
+}
+
+[class*="explore-module"][class$="__discoveryControls"] {
+  gap: 10px;
+}
+
+[class*="explore-module"][class$="__searchForm"] {
+  min-height: var(--venture-v1-control-height);
+  border-radius: var(--venture-v1-radius-md);
+}
+
+[class*="explore-module"][class$="__filterActionRow"] {
+  gap: 8px;
+}
+
+[class*="explore-module"][class$="__filterRail"] {
+  gap: 7px;
+  scrollbar-width: none;
+}
+
+[class*="explore-module"][class$="__filterRail"]::-webkit-scrollbar {
+  display: none;
+}
+
+[class*="explore-module"][class$="__filterChip"] {
+  min-height: 40px;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+
+[class*="explore-module"][class$="__viewToolbar"] {
+  gap: 9px;
+}
+
+[class*="explore-module"][class$="__resultHeading"] strong {
+  letter-spacing: -0.025em;
+}
+
+[class*="explore-module"][class$="__viewSwitcher"] button,
+[class*="explore-module"][class$="__sortControl"] select {
+  min-height: 40px;
+}
+
+/* The map cards had three utility actions plus two primary actions.
+ * Keep save/share here and reserve visit logging for the detail view.
+ */
+[class*="explore-module"][class$="__mapResultUtilityActions"]
+  [class*="visit-button-module"] {
+  display: none;
+}
+
+[class*="explore-module"][class$="__mapResultUtilityActions"] {
+  gap: 5px;
+}
+
+[class*="explore-module"][class$="__mapResultPrimaryActions"] {
+  gap: 7px;
+}
+
+[class*="explore-module"][class$="__mapResultPrimaryActions"] a {
+  min-height: 40px;
+}
+
+[class*="explore-module"][class$="__mapTip"] {
+  opacity: 0.72;
+}
+
+/* Build: nine steps can stay powerful without reminding the user three times
+ * that there are nine steps. Keep Step X of 9 + the progress bar.
+ */
+.outing-wizard-progress > div:first-child strong,
+[class*="build-outing-experience-module"][class$="__stepDots"] {
+  display: none;
+}
+
+.outing-wizard-progress > div:first-child {
+  justify-content: flex-start;
+}
+
+.outing-wizard-progress {
+  margin-bottom: 12px;
+}
+
+.outing-wizard-heading {
+  gap: 7px;
+}
+
+.outing-wizard-heading h1 {
+  margin-top: 1px;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.outing-wizard-heading > p {
+  max-width: 38rem;
+  margin-top: 1px;
+  text-wrap: pretty;
+}
+
+[class*="build-outing-experience-module"][class$="__stepBadge"] {
+  margin-bottom: 1px;
+}
+
+.mode-choice-stage {
+  gap: 12px;
+}
+
+.mode-choice-card {
+  border-radius: var(--venture-v1-radius-lg);
+}
+
+.mode-choice-copy {
+  gap: 4px;
+}
+
+.mode-choice-copy small {
+  line-height: 1.42;
+}
+
+.outing-wizard-actions {
+  gap: 10px;
+}
+
+.outing-wizard-next,
+.outing-wizard-back {
+  min-height: var(--venture-v1-control-height);
+}
+
+/* Make the floating nav feel stable on narrow iPhones. */
+.bottom-nav {
+  width: min(calc(100% - 18px), 480px);
+}
+
+.nav-link small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  [class*="explore-module"][class$="__viewToolbar"] {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  [class*="explore-module"][class$="__sortControl"] {
+    display: none;
+  }
+
+  [class*="explore-module"][class$="__viewSwitcher"] {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  [class*="explore-module"][class$="__viewSwitcher"] button {
+    flex: 1 1 50%;
+  }
+
+  .planning-mode-illustration {
+    max-height: 178px;
+    overflow: hidden;
+  }
+
+  .bottom-nav {
+    min-height: 68px;
+    border-radius: 22px;
+  }
+
+  .nav-link {
+    min-height: 50px;
+  }
+}
+
+@media (max-width: 360px) {
+  .brand-copy small {
+    display: none;
+  }
+
+  [class*="today-discovery-module"][class$="__quickFilters"] a,
+  [class*="today-discovery-module"][class$="__quickFilters"] button {
+    padding-inline: 11px;
+  }
+
+  .nav-link small {
+    font-size: 0.58rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="today-discovery-module"][class$="__miniRail"],
+  [class*="today-discovery-module"][class$="__trendRail"],
+  [class*="explore-module"][class$="__mapResultRail"] {
+    scroll-behavior: auto;
+  }
+}
