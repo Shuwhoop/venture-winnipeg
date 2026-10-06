@@ -28,6 +28,7 @@ import {
 type NavIconName =
   | "home"
   | "explore"
+  | "build"
   | "saved"
   | "profile";
 
@@ -35,6 +36,8 @@ type NavItem = {
   href: string;
   label: string;
   icon: NavIconName;
+  special?: boolean;
+  activePaths?: string[];
 };
 
 const items: NavItem[] = [
@@ -47,6 +50,13 @@ const items: NavItem[] = [
     href: "/explore",
     label: "Explore",
     icon: "explore"
+  },
+  {
+    href: "/build-outing",
+    label: "Build",
+    icon: "build",
+    special: true,
+    activePaths: ["/build-outing", "/outings"]
   },
   {
     href: "/saved",
@@ -91,6 +101,18 @@ function NavigationIcon({
     );
   }
 
+  if (name === "build") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="M12 4v16" />
+        <path d="M4 12h16" />
+      </svg>
+    );
+  }
+
   if (name === "saved") {
     return (
       <svg
@@ -110,6 +132,28 @@ function NavigationIcon({
       <circle cx="12" cy="8" r="4" />
       <path d="M4.5 21c.5-5 3-7.5 7.5-7.5s7 2.5 7.5 7.5" />
     </svg>
+  );
+}
+
+function isItemActive(
+  pathname: string,
+  item: NavItem
+) {
+  if (item.href === "/") {
+    return pathname === "/";
+  }
+
+  if (item.activePaths?.length) {
+    return item.activePaths.some(
+      (path) =>
+        pathname === path ||
+        pathname.startsWith(`${path}/`)
+    );
+  }
+
+  return (
+    pathname === item.href ||
+    pathname.startsWith(`${item.href}/`)
   );
 }
 
@@ -169,22 +213,22 @@ export function BottomNav() {
     >
       {items.map((item) => {
         const active =
-          item.href === "/"
-            ? pathname === "/"
-            : pathname.startsWith(item.href);
+          isItemActive(pathname, item);
         const isSavedLink =
           item.href === "/saved";
 
         return (
           <Link
-            className={`nav-link ${active ? "active" : ""}`}
+            className={`nav-link ${item.special ? "special" : ""} ${active ? "active" : ""}`}
             href={item.href}
             key={item.href}
             aria-current={active ? "page" : undefined}
             aria-label={
               isSavedLink && savedCount > 0
                 ? `${item.label}, ${savedCount} saved ${savedCount === 1 ? "item" : "items"}`
-                : item.label
+                : item.special
+                  ? "Build an outing"
+                  : item.label
             }
             onClick={() => {
               trackBetaEvent({
