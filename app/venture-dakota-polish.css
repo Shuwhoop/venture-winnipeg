@@ -1,31 +1,52 @@
-/* Dakota-inspired Venture mobile polish
- * Keeps Venture's identity while borrowing the calmer, app-first hierarchy
- * and touch ergonomics used in the Dakota Lanes mobile experience.
+/* Venture's warm app theme.
+ * Cream, coral and sunshine accents with responsive, tactile controls.
  */
 
 :root {
-  --venture-polish-canvas: #f7f3ed;
-  --venture-polish-surface: #fffdf9;
+  --venture-polish-canvas: #fff7ec;
+  --venture-polish-surface: #fffaf3;
   --venture-polish-surface-strong: #ffffff;
-  --venture-polish-ink: #102a43;
-  --venture-polish-muted: #728091;
-  --venture-polish-line: rgba(16, 42, 67, 0.11);
-  --venture-polish-red: #e42f3c;
-  --venture-polish-red-soft: #fff0ee;
-  --venture-polish-blue-soft: #eef5fb;
-  --venture-polish-shadow: 0 12px 34px rgba(16, 42, 67, 0.08);
-  --venture-polish-shadow-strong: 0 18px 42px rgba(16, 42, 67, 0.12);
+  --venture-polish-ink: #283544;
+  --venture-polish-muted: #756659;
+  --venture-polish-line: rgba(114, 75, 47, 0.14);
+  --venture-polish-red: #bd3d30;
+  --venture-polish-red-soft: #ffe8df;
+  --venture-polish-blue-soft: #eaf1e8;
+  --venture-polish-shadow: 0 8px 24px rgba(114, 75, 47, 0.08);
+  --venture-polish-shadow-strong: 0 14px 32px rgba(114, 75, 47, 0.13);
+  --venture-ink: var(--venture-polish-ink);
+  --venture-navy: var(--venture-polish-ink);
+  --venture-muted: var(--venture-polish-muted);
+  --venture-red: var(--venture-polish-red);
+  --venture-red-dark: #a63127;
+  --venture-yellow: #f6c65b;
+  --venture-yellow-soft: #fff0c9;
+  --venture-gold: #9c651f;
+  --venture-cream: var(--venture-polish-canvas);
+  --venture-paper: var(--venture-polish-surface);
+  --venture-line: #ead9c9;
+  --venture-ice: #ffede1;
+  --venture-card-shadow: var(--venture-polish-shadow);
+}
+
+html {
+  background: #f3e6d7;
 }
 
 body.venture-body {
-  background: var(--venture-polish-canvas);
+  background:
+    radial-gradient(ellipse at 15% 5%, #ffe3bb 0%, transparent 45%),
+    radial-gradient(ellipse at 90% 35%, #f8d9ce 0%, transparent 50%),
+    #f3e6d7;
   color: var(--venture-polish-ink);
 }
 
 .app-shell {
   width: min(100%, 500px);
-  background: var(--venture-polish-canvas);
-  box-shadow: 0 0 46px rgba(16, 42, 67, 0.10);
+  background:
+    radial-gradient(circle at 95% 9%, rgba(246, 198, 91, 0.20), transparent 20rem),
+    var(--venture-polish-canvas);
+  box-shadow: 0 0 46px rgba(114, 75, 47, 0.10);
   padding-bottom: 102px;
 }
 
@@ -33,7 +54,7 @@ body.venture-body {
   min-height: 62px;
   padding: 9px 15px 8px;
   border-bottom: 1px solid var(--venture-polish-line);
-  background: rgba(255, 253, 249, 0.93);
+  background: rgba(255, 250, 243, 0.94);
   box-shadow: 0 6px 18px rgba(16, 42, 67, 0.035);
   backdrop-filter: blur(22px) saturate(1.1);
 }
@@ -89,27 +110,31 @@ body.venture-body {
 }
 
 .page-content {
+  min-width: 0;
   padding: 14px 14px 8px;
 }
 
 /* Floating, thumb-friendly app navigation */
 .bottom-nav {
-  bottom: 10px;
+  bottom: max(12px, env(safe-area-inset-bottom));
   width: min(calc(100% - 20px), 480px);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   min-height: 70px;
-  padding: 7px 8px max(8px, env(safe-area-inset-bottom));
-  border: 1px solid rgba(16, 42, 67, 0.10);
+  padding: 7px 8px 8px;
+  border: 1px solid var(--venture-polish-line);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 14px 40px rgba(16, 42, 67, 0.16);
+  background: rgba(255, 252, 246, 0.96);
+  box-shadow: 0 12px 30px rgba(114, 75, 47, 0.15);
   backdrop-filter: blur(24px) saturate(1.18);
 }
 
 .nav-link {
+  position: relative;
+  min-width: 0;
   min-height: 52px;
   gap: 2px;
   border-radius: 16px;
-  color: #7b8794;
+  color: #756659;
 }
 
 .nav-link .nav-icon {
@@ -119,7 +144,7 @@ body.venture-body {
 }
 
 .nav-link small {
-  font-size: 0.57rem;
+  font-size: 0.62rem;
   font-weight: 760;
   letter-spacing: -0.01em;
 }
@@ -140,11 +165,11 @@ body.venture-body {
   width: 54px;
   height: 54px;
   margin-top: -28px;
-  border: 4px solid var(--venture-polish-canvas);
+  border: 4px solid #fff7ec;
   border-radius: 19px;
-  background: var(--venture-polish-red);
+  background: linear-gradient(145deg, #df5842, #b9372d);
   color: #ffffff;
-  box-shadow: 0 10px 24px rgba(228, 47, 60, 0.28);
+  box-shadow: 0 7px 0 #f4d19a, 0 12px 24px rgba(201, 67, 53, 0.24);
   transform: none;
 }
 
@@ -176,7 +201,7 @@ body.venture-body {
 }
 
 [class*="today-discovery-module"][class$="__hero"] {
-  gap: 12px;
+  gap: 10px;
   padding: 5px 2px 0;
 }
 
@@ -214,6 +239,11 @@ body.venture-body {
   height: 40px;
   border-radius: 13px;
   background: var(--venture-polish-red-soft);
+  color: var(--venture-polish-red);
+}
+
+[class*="today-discovery-module"][class$="__searchIcon"] svg {
+  stroke: currentColor;
 }
 
 [class*="today-discovery-module"][class$="__search"] input {
@@ -225,10 +255,10 @@ body.venture-body {
 
 [class*="today-discovery-module"][class$="__search"] button {
   min-width: 72px;
-  min-height: 40px;
+  min-height: 44px;
   border: 0;
   border-radius: 13px;
-  background: var(--venture-polish-red);
+  background: linear-gradient(135deg, #c94335, #b9372d);
   box-shadow: none;
   font-size: 0.72rem;
 }
@@ -249,15 +279,27 @@ body.venture-body {
 [class*="today-discovery-module"][class$="__quickFilters"] a,
 [class*="today-discovery-module"][class$="__quickFilters"] button {
   flex: 0 0 auto;
-  min-height: 40px;
+  min-height: 44px;
   padding: 8px 13px;
   border: 1px solid var(--venture-polish-line);
   border-radius: 999px;
-  background: var(--venture-polish-surface-strong);
+  background: #fff0d1;
   color: var(--venture-polish-ink);
   box-shadow: none;
   font-size: 0.72rem;
   font-weight: 760;
+}
+
+[class*="today-discovery-module"][class$="__quickFilters"] button {
+  background: #eaf0e2;
+}
+
+[class*="today-discovery-module"][class$="__quickFilters"] a[href*="price="] {
+  background: #ffe8d9;
+}
+
+[class*="today-discovery-module"][class$="__quickFilters"] a[href*="occasion="] {
+  background: #fae0df;
 }
 
 [class*="today-discovery-module"][class$="__quickFilters"] a:hover,
@@ -440,9 +482,9 @@ body.venture-body {
 .image-market,
 .image-concert {
   background:
-    radial-gradient(circle at 72% 18%, rgba(228, 47, 60, 0.18), transparent 28%),
-    radial-gradient(circle at 18% 80%, rgba(77, 132, 180, 0.17), transparent 30%),
-    linear-gradient(145deg, #e8edf1, #f5eee6 56%, #eee2d8);
+    radial-gradient(circle at 72% 18%, rgba(246, 198, 91, 0.65), transparent 35%),
+    radial-gradient(circle at 18% 80%, rgba(220, 101, 74, 0.30), transparent 40%),
+    linear-gradient(145deg, #f1d7b0, #fbead7 56%, #eabdb0);
 }
 
 .featuredTopline .save-button,
@@ -456,15 +498,17 @@ body.venture-body {
 [class*="today-discovery-module"][class$="__builderBanner"] {
   min-height: 96px;
   padding: 16px 16px;
-  border: 1px solid rgba(16, 42, 67, 0.12);
+  border: 1px solid #efb96b;
   border-radius: 24px;
-  background: linear-gradient(135deg, #102a43 0%, #173f61 100%);
-  color: #ffffff;
+  background:
+    radial-gradient(circle at 100% 0%, #ffe7b0, transparent 65%),
+    linear-gradient(135deg, #f6c65b, #ffdaa4);
+  color: var(--venture-polish-ink);
   box-shadow: var(--venture-polish-shadow-strong);
 }
 
 [class*="today-discovery-module"][class$="__builderBanner"] span {
-  color: #ffd7d3;
+  color: #8b452c;
 }
 
 [class*="today-discovery-module"][class$="__builderBanner"] strong {
@@ -493,6 +537,166 @@ body.venture-body {
   box-shadow: 0 8px 22px rgba(16, 42, 67, 0.12);
 }
 
+.home-greeting {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-sun {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin-right: 5px;
+  transform: rotate(6deg);
+  transition: transform 250ms cubic-bezier(.2, .8, .3, 1.2);
+}
+
+.home-sun svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  stroke: #bd5d36;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.home-sun .sun-face {
+  fill: #f6c65b;
+  stroke: #e9a946;
+  stroke-width: 1.5;
+}
+
+.home-sun .sun-eye {
+  fill: #654737;
+  stroke: none;
+}
+
+.home-sun .sun-smile {
+  stroke: #654737;
+  stroke-width: 2;
+}
+
+.home-invitation {
+  margin: 0 0 3px;
+  color: var(--venture-polish-muted);
+  font-size: 0.81rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+/* Immediate feedback for touch, mouse and keyboard navigation. */
+.nav-link,
+.page-content :is(a, button) {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    transform 160ms cubic-bezier(.2, .8, .3, 1.2),
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.nav-link .nav-icon {
+  transition: transform 180ms cubic-bezier(.2, .8, .3, 1.3), box-shadow 180ms ease;
+}
+
+.nav-link:active .nav-icon {
+  transform: scale(.88);
+}
+
+.nav-link.special:active .nav-icon {
+  transform: translateY(3px) scale(.94);
+  box-shadow: 0 3px 0 #f4d19a, 0 6px 14px rgba(201, 67, 53, .20);
+}
+
+.page-content :is(a, button):not(:disabled):active {
+  transform: scale(.97);
+}
+
+.nav-link:focus-visible,
+.page-content :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--venture-polish-red);
+  outline-offset: 3px;
+}
+
+[class*="today-discovery-module"][class$="__search"]:focus-within {
+  border-color: var(--venture-polish-red);
+  box-shadow: 0 0 0 3px rgba(201, 67, 53, .12), var(--venture-polish-shadow);
+}
+
+[class*="today-discovery-module"][class$="__search"] input {
+  font-size: 16px;
+}
+
+[class*="today-discovery-module"][class$="__miniRail"],
+[class*="today-discovery-module"][class$="__trendRail"] {
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: 4px;
+}
+
+.nav-link .nav-pending {
+  position: absolute;
+  top: auto;
+  bottom: 2px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--venture-polish-red);
+  box-shadow: none;
+  opacity: 0;
+  transform: translateX(-50%);
+  animation: venture-loading 800ms ease-in-out 100ms infinite;
+}
+
+@keyframes venture-loading {
+  0%, 100% { opacity: .35; }
+  50% { opacity: 1; }
+}
+
+@keyframes venture-arrive {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+[class*="today-discovery-module"][class$="__hero"],
+[class*="today-discovery-module"][class$="__featuredSection"],
+[class*="today-discovery-module"][class$="__railSection"] {
+  animation: venture-arrive 420ms ease-out both;
+}
+
+[class*="today-discovery-module"][class$="__featuredSection"] {
+  animation-delay: 50ms;
+}
+
+[class*="today-discovery-module"][class$="__railSection"] {
+  animation-delay: 100ms;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-greeting:hover .home-sun {
+    transform: rotate(-5deg) scale(1.05);
+  }
+
+  .nav-link:hover .nav-icon {
+    transform: translateY(-3px);
+  }
+
+  .nav-link.special:hover .nav-icon {
+    transform: translateY(-3px) rotate(-4deg);
+  }
+
+  [class*="today-discovery-module"][class$="__quickFilters"] :is(a, button):hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(114, 75, 47, .10);
+  }
+}
+
 @media (max-width: 390px) {
   .app-header {
     padding-left: 13px;
@@ -501,6 +705,16 @@ body.venture-body {
 
   .brand-copy strong {
     font-size: 1.18rem;
+  }
+
+  .home-sun {
+    width: 58px;
+    height: 58px;
+    margin-right: 0;
+  }
+
+  .home-invitation {
+    font-size: .76rem;
   }
 
   [class*="today-discovery-module"][class$="__hero"] h1 {
@@ -514,7 +728,29 @@ body.venture-body {
   }
 }
 
+@media (max-width: 360px) {
+  .nav-link.special .nav-icon {
+    width: 48px;
+    height: 48px;
+    margin-top: -24px;
+    border-width: 3px;
+  }
+
+  [class*="today-discovery-module"][class$="__search"] input {
+    min-width: 0;
+  }
+
+  [class*="today-discovery-module"][class$="__searchIcon"] {
+    width: 32px;
+    flex-basis: 32px;
+  }
+}
+
 @media (min-width: 820px) {
+  .app-shell {
+    border: 1px solid rgba(114, 75, 47, .12);
+  }
+
   .bottom-nav {
     bottom: 34px;
     border-radius: 24px;
@@ -524,7 +760,15 @@ body.venture-body {
 @media (prefers-reduced-motion: reduce) {
   .nav-link,
   .nav-link .nav-icon,
-  [class*="today-discovery-module"] {
+  .home-sun,
+  .page-content :is(a, button),
+  [class*="today-discovery-module"],
+  .nav-link .nav-pending {
+    animation: none !important;
     transition: none !important;
+  }
+
+  .nav-link .nav-pending {
+    opacity: 1;
   }
 }
