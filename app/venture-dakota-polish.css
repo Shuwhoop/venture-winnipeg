@@ -1,0 +1,530 @@
+/* Dakota-inspired Venture mobile polish
+ * Keeps Venture's identity while borrowing the calmer, app-first hierarchy
+ * and touch ergonomics used in the Dakota Lanes mobile experience.
+ */
+
+:root {
+  --venture-polish-canvas: #f7f3ed;
+  --venture-polish-surface: #fffdf9;
+  --venture-polish-surface-strong: #ffffff;
+  --venture-polish-ink: #102a43;
+  --venture-polish-muted: #728091;
+  --venture-polish-line: rgba(16, 42, 67, 0.11);
+  --venture-polish-red: #e42f3c;
+  --venture-polish-red-soft: #fff0ee;
+  --venture-polish-blue-soft: #eef5fb;
+  --venture-polish-shadow: 0 12px 34px rgba(16, 42, 67, 0.08);
+  --venture-polish-shadow-strong: 0 18px 42px rgba(16, 42, 67, 0.12);
+}
+
+body.venture-body {
+  background: var(--venture-polish-canvas);
+  color: var(--venture-polish-ink);
+}
+
+.app-shell {
+  width: min(100%, 500px);
+  background: var(--venture-polish-canvas);
+  box-shadow: 0 0 46px rgba(16, 42, 67, 0.10);
+  padding-bottom: 102px;
+}
+
+.app-header {
+  min-height: 62px;
+  padding: 9px 15px 8px;
+  border-bottom: 1px solid var(--venture-polish-line);
+  background: rgba(255, 253, 249, 0.93);
+  box-shadow: 0 6px 18px rgba(16, 42, 67, 0.035);
+  backdrop-filter: blur(22px) saturate(1.1);
+}
+
+.brand {
+  gap: 9px;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--venture-polish-ink);
+  color: #ffffff;
+  box-shadow: 0 5px 14px rgba(16, 42, 67, 0.15);
+  transform: none;
+}
+
+.brand-mark > i {
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  background: var(--venture-polish-red);
+}
+
+.brand-mark > span {
+  font-size: 1.1rem;
+}
+
+.brand-copy strong {
+  font-size: 1.28rem;
+  letter-spacing: -0.045em;
+}
+
+.brand-copy small {
+  margin-top: 2px;
+  color: var(--venture-polish-muted);
+  font-size: 0.56rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--venture-polish-line);
+  border-radius: 13px;
+  background: var(--venture-polish-surface-strong);
+  color: var(--venture-polish-ink);
+  box-shadow: 0 6px 16px rgba(16, 42, 67, 0.08);
+}
+
+.page-content {
+  padding: 14px 14px 8px;
+}
+
+/* Floating, thumb-friendly app navigation */
+.bottom-nav {
+  bottom: 10px;
+  width: min(calc(100% - 20px), 480px);
+  min-height: 70px;
+  padding: 7px 8px max(8px, env(safe-area-inset-bottom));
+  border: 1px solid rgba(16, 42, 67, 0.10);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 40px rgba(16, 42, 67, 0.16);
+  backdrop-filter: blur(24px) saturate(1.18);
+}
+
+.nav-link {
+  min-height: 52px;
+  gap: 2px;
+  border-radius: 16px;
+  color: #7b8794;
+}
+
+.nav-link .nav-icon {
+  width: 36px;
+  height: 34px;
+  border-radius: 12px;
+}
+
+.nav-link small {
+  font-size: 0.57rem;
+  font-weight: 760;
+  letter-spacing: -0.01em;
+}
+
+.nav-link.active:not(.special) {
+  color: var(--venture-polish-red);
+}
+
+.nav-link.active:not(.special) .nav-icon {
+  background: var(--venture-polish-red-soft);
+}
+
+.nav-link.special {
+  color: var(--venture-polish-ink);
+}
+
+.nav-link.special .nav-icon {
+  width: 54px;
+  height: 54px;
+  margin-top: -28px;
+  border: 4px solid var(--venture-polish-canvas);
+  border-radius: 19px;
+  background: var(--venture-polish-red);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(228, 47, 60, 0.28);
+  transform: none;
+}
+
+.nav-link.special .nav-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 2.25;
+}
+
+.nav-link.special.active .nav-icon {
+  background: #c92331;
+  box-shadow: 0 10px 26px rgba(201, 35, 49, 0.34);
+}
+
+.saved-count-badge {
+  top: -5px;
+  right: -7px;
+  border: 2px solid #ffffff;
+  background: var(--venture-polish-red);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* Today screen. The generated CSS-module names keep their readable suffixes. */
+[class*="today-discovery-module"][class$="__page"] {
+  gap: 24px;
+  padding: 8px 0 116px;
+  background: transparent;
+}
+
+[class*="today-discovery-module"][class$="__hero"] {
+  gap: 12px;
+  padding: 5px 2px 0;
+}
+
+[class*="today-discovery-module"][class$="__heroShapes"] {
+  display: none;
+}
+
+[class*="today-discovery-module"][class$="__dateLine"] {
+  color: var(--venture-polish-red);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+[class*="today-discovery-module"][class$="__hero"] h1 {
+  max-width: 11ch;
+  color: var(--venture-polish-ink);
+  font-size: clamp(2.25rem, 10vw, 3.35rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.058em;
+}
+
+[class*="today-discovery-module"][class$="__search"] {
+  min-height: 52px;
+  padding: 5px;
+  border: 1px solid var(--venture-polish-line);
+  border-radius: 18px;
+  background: var(--venture-polish-surface-strong);
+  box-shadow: var(--venture-polish-shadow);
+}
+
+[class*="today-discovery-module"][class$="__searchIcon"] {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background: var(--venture-polish-red-soft);
+}
+
+[class*="today-discovery-module"][class$="__search"] input {
+  min-height: 40px;
+  color: var(--venture-polish-ink);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+[class*="today-discovery-module"][class$="__search"] button {
+  min-width: 72px;
+  min-height: 40px;
+  border: 0;
+  border-radius: 13px;
+  background: var(--venture-polish-red);
+  box-shadow: none;
+  font-size: 0.72rem;
+}
+
+[class*="today-discovery-module"][class$="__quickFilters"] {
+  flex-wrap: nowrap;
+  gap: 8px;
+  width: calc(100% + 14px);
+  padding: 2px 14px 3px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+[class*="today-discovery-module"][class$="__quickFilters"]::-webkit-scrollbar {
+  display: none;
+}
+
+[class*="today-discovery-module"][class$="__quickFilters"] a,
+[class*="today-discovery-module"][class$="__quickFilters"] button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 8px 13px;
+  border: 1px solid var(--venture-polish-line);
+  border-radius: 999px;
+  background: var(--venture-polish-surface-strong);
+  color: var(--venture-polish-ink);
+  box-shadow: none;
+  font-size: 0.72rem;
+  font-weight: 760;
+}
+
+[class*="today-discovery-module"][class$="__quickFilters"] a:hover,
+[class*="today-discovery-module"][class$="__quickFilters"] button:hover:not(:disabled) {
+  background: var(--venture-polish-red-soft);
+  transform: none;
+}
+
+[class*="today-discovery-module"][class$="__pickHeading"],
+[class*="today-discovery-module"][class$="__sectionHeading"] {
+  gap: 10px;
+}
+
+[class*="today-discovery-module"][class$="__pickHeading"] > span,
+[class*="today-discovery-module"][class$="__sectionHeading"] h2 {
+  color: var(--venture-polish-ink);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+[class*="today-discovery-module"][class$="__pickHeading"] i,
+[class*="today-discovery-module"][class$="__sectionHeading"] i {
+  height: 1px;
+  background: var(--venture-polish-line);
+}
+
+[class*="today-discovery-module"][class$="__pickHeading"] p,
+[class*="today-discovery-module"][class$="__sectionHeading"] a {
+  color: var(--venture-polish-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+[class*="today-discovery-module"][class$="__featuredSection"],
+[class*="today-discovery-module"][class$="__railSection"] {
+  gap: 11px;
+}
+
+[class*="today-discovery-module"][class$="__featuredCard"] {
+  min-height: 238px;
+  border: 1px solid var(--venture-polish-line);
+  border-radius: 26px;
+  background: var(--venture-polish-ink);
+  box-shadow: var(--venture-polish-shadow-strong);
+}
+
+[class*="today-discovery-module"][class$="__featuredImage"] {
+  height: 238px;
+  min-height: 238px;
+}
+
+[class*="today-discovery-module"][class$="__featuredShade"] {
+  background:
+    linear-gradient(90deg, rgba(9, 28, 46, 0.88) 0%, rgba(9, 28, 46, 0.58) 48%, rgba(9, 28, 46, 0.12) 100%),
+    linear-gradient(0deg, rgba(9, 28, 46, 0.46), transparent 58%);
+}
+
+[class*="today-discovery-module"][class$="__featuredTopline"] {
+  top: 14px;
+  left: 14px;
+  right: 14px;
+}
+
+[class*="today-discovery-module"][class$="__featuredTopline"] span {
+  padding: 6px 9px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--venture-polish-red);
+  font-size: 0.58rem;
+  box-shadow: 0 5px 14px rgba(9, 28, 46, 0.12);
+}
+
+[class*="today-discovery-module"][class$="__featuredTopline"] small {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.57rem;
+  letter-spacing: 0.07em;
+}
+
+[class*="today-discovery-module"][class$="__featuredCopy"] {
+  right: 70px;
+  bottom: 16px;
+  gap: 7px;
+}
+
+[class*="today-discovery-module"][class$="__featuredCopy"] h2 {
+  max-width: 12ch;
+  font-size: clamp(1.8rem, 8.4vw, 2.55rem);
+  line-height: 0.98;
+  letter-spacing: -0.052em;
+}
+
+[class*="today-discovery-module"][class$="__featuredCopy"] p {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+[class*="today-discovery-module"][class$="__priceBadge"] {
+  padding: 6px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[class*="today-discovery-module"][class$="__miniRail"],
+[class*="today-discovery-module"][class$="__trendRail"] {
+  gap: 12px;
+  padding-bottom: 10px;
+}
+
+[class*="today-discovery-module"][class$="__miniCard"] {
+  flex-basis: 154px;
+  height: 190px;
+  border: 1px solid var(--venture-polish-line);
+  border-radius: 22px;
+  background: var(--venture-polish-surface-strong);
+  box-shadow: var(--venture-polish-shadow);
+}
+
+[class*="today-discovery-module"][class$="__miniImage"] {
+  min-height: 190px;
+}
+
+[class*="today-discovery-module"][class$="__miniCopy"] {
+  left: 12px;
+  right: 11px;
+  bottom: 12px;
+  gap: 4px;
+}
+
+[class*="today-discovery-module"][class$="__miniCopy"] span,
+[class*="today-discovery-module"][class$="__trendCopy"] span {
+  color: #ffd9d6;
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+}
+
+[class*="today-discovery-module"][class$="__miniCopy"] h3 {
+  font-size: 0.94rem;
+  line-height: 1.05;
+}
+
+[class*="today-discovery-module"][class$="__miniCopy"] p {
+  font-size: 0.62rem;
+}
+
+[class*="today-discovery-module"][class$="__trendCard"] {
+  flex-basis: 182px;
+  border: 1px solid var(--venture-polish-line);
+  border-radius: 22px;
+  background: var(--venture-polish-surface-strong);
+  box-shadow: var(--venture-polish-shadow);
+}
+
+[class*="today-discovery-module"][class$="__trendImage"] {
+  height: 116px;
+  min-height: 116px;
+}
+
+[class*="today-discovery-module"][class$="__trendCopy"] {
+  min-height: 82px;
+  padding: 11px 12px 13px;
+}
+
+[class*="today-discovery-module"][class$="__trendCopy"] span {
+  color: var(--venture-polish-red);
+}
+
+[class*="today-discovery-module"][class$="__trendCopy"] h3 {
+  color: var(--venture-polish-ink);
+  font-size: 0.92rem;
+}
+
+[class*="today-discovery-module"][class$="__trendCopy"] p {
+  color: var(--venture-polish-muted);
+  font-size: 0.6rem;
+}
+
+/* Calm the placeholder art. It should read as an intentional fallback, not broken content. */
+.image-food,
+.image-market,
+.image-concert {
+  background:
+    radial-gradient(circle at 72% 18%, rgba(228, 47, 60, 0.18), transparent 28%),
+    radial-gradient(circle at 18% 80%, rgba(77, 132, 180, 0.17), transparent 30%),
+    linear-gradient(145deg, #e8edf1, #f5eee6 56%, #eee2d8);
+}
+
+.featuredTopline .save-button,
+[class*="today-discovery-module"] .save-button {
+  border: 1px solid rgba(16, 42, 67, 0.12) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: var(--venture-polish-ink) !important;
+  box-shadow: 0 6px 16px rgba(16, 42, 67, 0.10) !important;
+}
+
+[class*="today-discovery-module"][class$="__builderBanner"] {
+  min-height: 96px;
+  padding: 16px 16px;
+  border: 1px solid rgba(16, 42, 67, 0.12);
+  border-radius: 24px;
+  background: linear-gradient(135deg, #102a43 0%, #173f61 100%);
+  color: #ffffff;
+  box-shadow: var(--venture-polish-shadow-strong);
+}
+
+[class*="today-discovery-module"][class$="__builderBanner"] span {
+  color: #ffd7d3;
+}
+
+[class*="today-discovery-module"][class$="__builderBanner"] strong {
+  font-size: 1.08rem;
+  line-height: 1.08;
+}
+
+[class*="today-discovery-module"][class$="__builderBanner"] > b {
+  width: 44px;
+  height: 44px;
+  flex-basis: 44px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--venture-polish-red);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(228, 47, 60, 0.25);
+}
+
+/* Beta feedback stays reachable but stops competing with the primary app controls. */
+[class*="beta-feedback-module"][class$="__launcher"] {
+  right: 16px;
+  bottom: 96px;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--venture-polish-line);
+  box-shadow: 0 8px 22px rgba(16, 42, 67, 0.12);
+}
+
+@media (max-width: 390px) {
+  .app-header {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .brand-copy strong {
+    font-size: 1.18rem;
+  }
+
+  [class*="today-discovery-module"][class$="__hero"] h1 {
+    font-size: clamp(2.05rem, 10.8vw, 2.85rem);
+  }
+
+  [class*="today-discovery-module"][class$="__featuredCard"],
+  [class*="today-discovery-module"][class$="__featuredImage"] {
+    min-height: 224px;
+    height: 224px;
+  }
+}
+
+@media (min-width: 820px) {
+  .bottom-nav {
+    bottom: 34px;
+    border-radius: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link,
+  .nav-link .nav-icon,
+  [class*="today-discovery-module"] {
+    transition: none !important;
+  }
+}
