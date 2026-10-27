@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  useEffect,
   useMemo,
   useState,
   type CSSProperties,
@@ -9,6 +10,8 @@ import {
   type KeyboardEvent
 } from "react";
 
+import { useRouter } from "next/navigation";
+import { loadPreferences, PROFILE_PREFERENCES_EVENT } from "@/lib/profile-preferences";
 import { SaveButton } from "@/components/save-button";
 import { trackBetaEvent } from "@/lib/beta/client";
 import {
@@ -160,6 +163,7 @@ function hasPhoto(listing: Listing) {
 
 function hasCoordinates(listing: Listing) {
   return (
+    listing.latitude != null && listing.longitude != null &&
     Number.isFinite(Number(listing.latitude)) &&
     Number.isFinite(Number(listing.longitude))
   );
@@ -326,7 +330,7 @@ function FeaturedCard({
       <header className={styles.pickHeading}>
         <span>VENTURE PICK</span>
         <i aria-hidden="true" />
-        <p>Chosen for trust and strong details</p>
+        <p>A place to start exploring</p>
       </header>
 
       <article className={styles.featuredCard}>
@@ -503,7 +507,23 @@ export function TodayDiscovery({
   events,
   places
 }: TodayDiscoveryProps) {
-  const daypart = useMemo(getDaypart, []);
+  const router = useRouter();
+  const [daypart, setDaypart] = useState<ReturnType<typeof getDaypart> | null>(null);
+  const [displayName, setDisplayName] = useState("");
+  useEffect(() => {
+    const refresh = () => {
+      setDaypart(getDaypart());
+      const name = loadPreferences().displayName.trim();
+      setDisplayName(name && name !== "Guest" ? name.split(/\s+/)[0] : "");
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 60000);
+    window.addEventListener(PROFILE_PREFERENCES_EVENT, refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener(PROFILE_PREFERENCES_EVENT, refresh);
+    };
+  }, []);
   const [locationState, setLocationState] =
     useState<LocationState>("idle");
   const [locationMessage, setLocationMessage] =
@@ -572,6 +592,7 @@ export function TodayDiscovery({
   function handleSearchSubmit(
     event: FormEvent<HTMLFormElement>
   ) {
+    event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const query = String(formData.get("q") ?? "").trim();
 
@@ -581,10 +602,10 @@ export function TodayDiscovery({
       properties: {
         surface: "home",
         interaction: "search-submitted",
-        query,
         queryLength: query.length
       }
     });
+    router.push(query ? `/explore?q=${encodeURIComponent(query)}` : "/explore");
   }
 
   function findNearby() {
@@ -664,16 +685,16 @@ export function TodayDiscovery({
   }
 
   return (
-    <main className={styles.page}>
+    <main className={`venture-today ${styles.page}`}>
       <HomeSubmitLast />
       <section className={styles.hero}>
 
         <p className={styles.dateLine}>
-          WINNIPEG · {daypart.dateLabel}
+          WINNIPEG{daypart ? ` · ${daypart.dateLabel}` : ""}
         </p>
 
         <div className="home-greeting">
-          <h1>{daypart.greeting}</h1>
+          <h1>{daypart?.greeting ?? "Discover Winnipeg"}{displayName ? `, ${displayName}` : ""}</h1>
           <span className="home-sun" aria-hidden="true">
             <svg viewBox="0 0 72 72" fill="none">
               <path d="M36 3v7M36 62v7M3 36h7M62 36h7M13 13l5 5M54 54l5 5M13 59l5-5M54 18l5-5" />
@@ -701,7 +722,10 @@ export function TodayDiscovery({
           <input
             name="q"
             aria-label="Search Winnipeg"
-            placeholder="Try “cheap food somewhere new”"
+            placeholder="Search food, events, or places"
+            type="search"
+            maxLength={160}
+            enterKeyHint="search"
             autoComplete="off"
           />
 
@@ -751,6 +775,10 @@ export function TodayDiscovery({
 
         </nav>
 
+        <Link className={styles.planShortcut} href="/build-outing">
+          <span><strong>Make a plan, not just a shortlist</strong><small>Choose your people, time, and budget. We’ll connect the stops.</small></span>
+          <b aria-hidden="true">→</b>
+        </Link>
         {locationMessage ? (
           <div
             className={`${styles.locationMessage} ${
@@ -775,8 +803,8 @@ export function TodayDiscovery({
 
       <section className={styles.railSection}>
         <SectionHeading
-          title="Happening now"
-          href="/explore?when=tonight"
+          title="Open & happening now"
+          href="/explore?when=open"
           source="happening-now-see-all"
         />
 
@@ -797,7 +825,7 @@ export function TodayDiscovery({
           </div>
         ) : (
           <div className={styles.emptyState}>
-            Nothing verified is live right now. Explore the full city for the next good move.
+            Nothing is confirmed open or live right now. <Link href="/explore">Find something for later →</Link>
           </div>
         )}
       </section>
@@ -826,7 +854,7 @@ export function TodayDiscovery({
           </div>
         ) : (
           <div className={styles.emptyState}>
-            Fresh, dependable picks are on the way.
+            More places are on the way. <Link href="/explore">Explore Winnipeg →</Link>
           </div>
         )}
       </section>
