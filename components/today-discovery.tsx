@@ -825,7 +825,7 @@ export function TodayDiscovery({
           </div>
         ) : (
           <div className={styles.emptyState}>
-            Nothing is confirmed open or live right now. <Link href="/explore">Find something for later →</Link>
+            Browse more places and upcoming plans across Winnipeg. <Link href="/explore">Find something for later →</Link>
           </div>
         )}
       </section>
