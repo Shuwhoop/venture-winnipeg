@@ -1175,6 +1175,7 @@ export default function BuildOutingPage() {
           if (draft.planningMode === "solo" || draft.planningMode === "group") setPlanningMode(draft.planningMode);
           if (draft.buildMethod === "surprise" || draft.buildMethod === "mix" || draft.buildMethod === "anchor") setBuildMethod(draft.buildMethod);
           if (typeof draft.currentStep === "number" && Number.isInteger(draft.currentStep) && draft.currentStep >= 0 && draft.currentStep < TOTAL_STEPS) setCurrentStep(draft.currentStep);
+          if (typeof draft.reviewReturn === "boolean") setReviewReturn(draft.reviewReturn);
           if (strings(draft.interests)) setSelectedInterests(draft.interests);
           if (strings(draft.neighbourhoods)) setSelectedNeighbourhoods(draft.neighbourhoods);
           if (typeof draft.outingDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(draft.outingDate)) setOutingDate(draft.outingDate);
@@ -1183,9 +1184,9 @@ export default function BuildOutingPage() {
           if (["free", "under-40", "under-80", "flexible"].includes(String(draft.budget))) setBudget(draft.budget as BudgetPreference);
           if (typeof draft.alcoholFree === "boolean") setAlcoholFree(draft.alcoholFree);
           if (typeof draft.transportation === "string" && ["Walking", "Transit", "Driving", "Rideshare"].includes(draft.transportation)) setTransportation(draft.transportation);
-          if (typeof draft.partySize === "number" && draft.partySize >= 2 && draft.partySize <= 20) setPartySize(draft.partySize);
+          if (typeof draft.partySize === "number" && Number.isInteger(draft.partySize) && draft.partySize >= 2 && draft.partySize <= 20) setPartySize(draft.partySize);
           if (typeof draft.maxTravelMinutes === "number" && [10,20,35,60].includes(draft.maxTravelMinutes)) setMaxTravelMinutes(draft.maxTravelMinutes);
-          if (typeof draft.totalStops === "number" && draft.totalStops >= 1 && draft.totalStops <= 5) setTotalStops(draft.totalStops);
+          if (typeof draft.totalStops === "number" && Number.isInteger(draft.totalStops) && draft.totalStops >= 1 && draft.totalStops <= 5) setTotalStops(draft.totalStops);
           if (strings(draft.allowedKinds) && draft.allowedKinds.every(kind => ["food","event","drinks"].includes(kind))) setAllowedKinds(draft.allowedKinds as StopKind[]);
           if (draft.stopMix && typeof draft.stopMix === "object") {
             const mix = draft.stopMix as StopMix;
@@ -1472,7 +1473,7 @@ export default function BuildOutingPage() {
     if (!sessionReady) return;
     try {
       window.sessionStorage.setItem(BUILDER_SESSION_KEY, JSON.stringify({
-        date: getTodayInputValue(), currentStep, planningMode, buildMethod,
+        date: getTodayInputValue(), currentStep, planningMode, buildMethod, reviewReturn,
         interests: selectedInterests, neighbourhoods: selectedNeighbourhoods,
         budget, alcoholFree, outingDate, startTime, duration, transportation,
         partySize, maxTravelMinutes, mustIncludeText, avoidText, discoveryPreference,
@@ -1480,7 +1481,7 @@ export default function BuildOutingPage() {
         groupPriority, anchorListingKey
       }));
     } catch { /* Planning remains available when browser storage is restricted. */ }
-  }, [sessionReady, currentStep, planningMode, buildMethod, selectedInterests,
+  }, [sessionReady, currentStep, planningMode, buildMethod, reviewReturn, selectedInterests,
     selectedNeighbourhoods, budget, alcoholFree, outingDate, startTime, duration,
     transportation, partySize, maxTravelMinutes, mustIncludeText, avoidText,
     discoveryPreference, stopMix, totalStops, allowedKinds, soloVibe, soloPace,
@@ -2130,6 +2131,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option}
+                      aria-pressed={duration ===
+                        option}
                       className={
                         duration ===
                         option
@@ -2386,7 +2389,9 @@ export default function BuildOutingPage() {
                       <button
                         type="button"
                         key={kind}
-                        className={
+                        aria-pressed={anchorKindFilter ===
+                          kind}
+                      className={
                           anchorKindFilter ===
                           kind
                             ? "selected"
@@ -2603,6 +2608,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.id}
+                      aria-pressed={soloVibe ===
+                        option.id}
                       className={
                         soloVibe ===
                         option.id
@@ -2651,6 +2658,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.id}
+                      aria-pressed={soloPace ===
+                        option.id}
                       className={
                         soloPace ===
                         option.id
@@ -2755,6 +2764,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.id}
+                      aria-pressed={groupVibe ===
+                        option.id}
                       className={
                         groupVibe ===
                         option.id
@@ -2811,6 +2822,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.id}
+                      aria-pressed={groupPriority ===
+                        option.id}
                       className={
                         groupPriority ===
                         option.id
@@ -2880,7 +2893,8 @@ export default function BuildOutingPage() {
                       <button
                         type="button"
                         key={interest}
-                        className={
+                        aria-pressed={selected}
+                      className={
                           selected
                             ? "selected"
                             : ""
@@ -3149,6 +3163,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.value}
+                      aria-pressed={transportation ===
+                        option.value}
                       className={
                         transportation ===
                         option.value
@@ -3194,7 +3210,9 @@ export default function BuildOutingPage() {
                       <button
                         type="button"
                         key={option.value}
-                        className={
+                        aria-pressed={maxTravelMinutes ===
+                          option.value}
+                      className={
                           maxTravelMinutes ===
                           option.value
                             ? "selected"
