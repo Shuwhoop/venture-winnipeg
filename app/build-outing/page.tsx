@@ -1200,7 +1200,9 @@ export default function BuildOutingPage() {
           if (typeof draft.avoidText === "string") setAvoidText(draft.avoidText.slice(0,500));
           if (["best","new-only","mix"].includes(String(draft.discoveryPreference))) setDiscoveryPreference(draft.discoveryPreference as DiscoveryPreference);
           if (typeof draft.anchorListingKey === "string") setAnchorListingKey(draft.anchorListingKey);
-          setFlowMessage("Welcome back. Your plan is right where you left it.");
+          if (draft.planningMode === "solo" || draft.planningMode === "group") {
+            setFlowMessage("Welcome back. Your plan is right where you left it.");
+          }
         }
       } catch { /* A damaged or unavailable session must not block planning. */ }
     }
