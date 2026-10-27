@@ -1411,3 +1411,6 @@
 .guestCheck span { display:grid; gap:4px; }
 .guestCheck small { font-size:.875rem; line-height:1.5; color:var(--venture-muted); }
 .collectionSummary { text-decoration:none; color:inherit; }
+
+.formCard .guestCheck { display:flex; align-items:center; gap:12px; }
+.formCard .guestCheck input { width:22px; min-height:22px; margin:0; }
