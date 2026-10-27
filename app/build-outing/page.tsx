@@ -3,6 +3,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties
 } from "react";
@@ -33,6 +34,7 @@ const OUTING_DRAFT_KEY =
   "venture:outing-draft:v1";
 
 const TOTAL_STEPS = 9;
+const BUILDER_SESSION_KEY = "venture:builder-session:v1";
 
 const STEP_VISUALS = [
   {
@@ -589,20 +591,18 @@ function getInterestIcon(interest: string): string {
 }
 
 function getTodayInputValue(): string {
-  const currentDate =
-    new Date();
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Winnipeg", year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(new Date());
+}
 
-  const timezoneOffset =
-    currentDate.getTimezoneOffset() *
-    60 *
-    1000;
-
-  return new Date(
-    currentDate.getTime() -
-      timezoneOffset
-  )
-    .toISOString()
-    .slice(0, 10);
+function isFutureOuting(date: string, time: string): boolean {
+  const now = new Date();
+  const today = getTodayInputValue();
+  const localTime = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "America/Winnipeg", hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+  }).format(now);
+  return date > today || (date === today && time > localTime);
 }
 
 function toggleValue(
@@ -921,6 +921,12 @@ function CountStepper({
 }
 
 export default function BuildOutingPage() {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const firstStepRender = useRef(true);
+  const [sessionReady, setSessionReady] = useState(false);
+  const [flowMessage, setFlowMessage] = useState("");
+  const [launchError, setLaunchError] = useState("");
+  const [reviewReturn, setReviewReturn] = useState(false);
   const [
     currentStep,
     setCurrentStep
@@ -1158,6 +1164,49 @@ export default function BuildOutingPage() {
         requestedAnchor
       );
     }
+
+    if (!requestedAnchor) {
+      try {
+        const raw = window.sessionStorage.getItem(BUILDER_SESSION_KEY);
+        const draft = raw ? JSON.parse(raw) as Record<string, unknown> : null;
+        const strings = (value: unknown): value is string[] =>
+          Array.isArray(value) && value.length <= 50 && value.every(item => typeof item === "string" && item.length <= 200);
+        if (draft && typeof draft === "object" && draft.date === getTodayInputValue()) {
+          if (draft.planningMode === "solo" || draft.planningMode === "group") setPlanningMode(draft.planningMode);
+          if (draft.buildMethod === "surprise" || draft.buildMethod === "mix" || draft.buildMethod === "anchor") setBuildMethod(draft.buildMethod);
+          if (typeof draft.currentStep === "number" && Number.isInteger(draft.currentStep) && draft.currentStep >= 0 && draft.currentStep < TOTAL_STEPS) setCurrentStep(draft.currentStep);
+          if (typeof draft.reviewReturn === "boolean") setReviewReturn(draft.reviewReturn);
+          if (strings(draft.interests)) setSelectedInterests(draft.interests);
+          if (strings(draft.neighbourhoods)) setSelectedNeighbourhoods(draft.neighbourhoods);
+          if (typeof draft.outingDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(draft.outingDate)) setOutingDate(draft.outingDate);
+          if (typeof draft.startTime === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(draft.startTime)) setStartTime(draft.startTime);
+          if (typeof draft.duration === "string" && durationOptions.includes(draft.duration)) setDuration(draft.duration);
+          if (["free", "under-40", "under-80", "flexible"].includes(String(draft.budget))) setBudget(draft.budget as BudgetPreference);
+          if (typeof draft.alcoholFree === "boolean") setAlcoholFree(draft.alcoholFree);
+          if (typeof draft.transportation === "string" && ["Walking", "Transit", "Driving", "Rideshare"].includes(draft.transportation)) setTransportation(draft.transportation);
+          if (typeof draft.partySize === "number" && Number.isInteger(draft.partySize) && draft.partySize >= 2 && draft.partySize <= 20) setPartySize(draft.partySize);
+          if (typeof draft.maxTravelMinutes === "number" && [10,20,35,60].includes(draft.maxTravelMinutes)) setMaxTravelMinutes(draft.maxTravelMinutes);
+          if (typeof draft.totalStops === "number" && Number.isInteger(draft.totalStops) && draft.totalStops >= 1 && draft.totalStops <= 5) setTotalStops(draft.totalStops);
+          if (strings(draft.allowedKinds) && draft.allowedKinds.every(kind => ["food","event","drinks"].includes(kind))) setAllowedKinds(draft.allowedKinds as StopKind[]);
+          if (draft.stopMix && typeof draft.stopMix === "object") {
+            const mix = draft.stopMix as StopMix;
+            if ([mix.food, mix.events, mix.drinks].every(n => Number.isInteger(n) && n >= 0) && getMixTotal(mix) <= 5) setStopMix(mix);
+          }
+          if (typeof draft.soloVibe === "string" && soloVibes.some(option => option.id === draft.soloVibe)) setSoloVibe(draft.soloVibe as SoloVibe);
+          if (typeof draft.soloPace === "string" && ["relaxed","balanced","packed"].includes(draft.soloPace)) setSoloPace(draft.soloPace as SoloPace);
+          if (typeof draft.groupVibe === "string" && groupVibes.some(option => option.id === draft.groupVibe)) setGroupVibe(draft.groupVibe as GroupVibe);
+          if (typeof draft.groupPriority === "string" && groupPriorities.some(option => option.id === draft.groupPriority)) setGroupPriority(draft.groupPriority as GroupPriority);
+          if (typeof draft.mustIncludeText === "string") setMustIncludeText(draft.mustIncludeText.slice(0,500));
+          if (typeof draft.avoidText === "string") setAvoidText(draft.avoidText.slice(0,500));
+          if (["best","new-only","mix"].includes(String(draft.discoveryPreference))) setDiscoveryPreference(draft.discoveryPreference as DiscoveryPreference);
+          if (typeof draft.anchorListingKey === "string") setAnchorListingKey(draft.anchorListingKey);
+          if (draft.planningMode === "solo" || draft.planningMode === "group") {
+            setFlowMessage("Welcome back. Your plan is right where you left it.");
+          }
+        }
+      } catch { /* A damaged or unavailable session must not block planning. */ }
+    }
+    setSessionReady(true);
   }, []);
 
   useEffect(() => {
@@ -1421,6 +1470,37 @@ export default function BuildOutingPage() {
       [soloVibe]
     );
 
+
+  useEffect(() => {
+    if (!sessionReady) return;
+    try {
+      window.sessionStorage.setItem(BUILDER_SESSION_KEY, JSON.stringify({
+        date: getTodayInputValue(), currentStep, planningMode, buildMethod, reviewReturn,
+        interests: selectedInterests, neighbourhoods: selectedNeighbourhoods,
+        budget, alcoholFree, outingDate, startTime, duration, transportation,
+        partySize, maxTravelMinutes, mustIncludeText, avoidText, discoveryPreference,
+        stopMix, totalStops, allowedKinds, soloVibe, soloPace, groupVibe,
+        groupPriority, anchorListingKey
+      }));
+    } catch { /* Planning remains available when browser storage is restricted. */ }
+  }, [sessionReady, currentStep, planningMode, buildMethod, reviewReturn, selectedInterests,
+    selectedNeighbourhoods, budget, alcoholFree, outingDate, startTime, duration,
+    transportation, partySize, maxTravelMinutes, mustIncludeText, avoidText,
+    discoveryPreference, stopMix, totalStops, allowedKinds, soloVibe, soloPace,
+    groupVibe, groupPriority, anchorListingKey]);
+
+  useEffect(() => {
+    if (firstStepRender.current) { firstStepRender.current = false; return; }
+    headingRef.current?.focus({ preventScroll: true });
+  }, [currentStep]);
+
+  function editReviewStep(step: number) {
+    setReviewReturn(step !== 0 && step !== 1);
+    setCurrentStep(step);
+    setLaunchError("");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
   const selectedGroupExperience =
     useMemo(
       () =>
@@ -1464,7 +1544,7 @@ export default function BuildOutingPage() {
         ? buildMethod !== null
         : currentStep === 2
           ? Boolean(
-              outingDate &&
+              isFutureOuting(outingDate, startTime) &&
               startTime &&
               duration
             )
@@ -1569,6 +1649,8 @@ export default function BuildOutingPage() {
   }
 
   function goForward() {
+    setLaunchError("");
+    setFlowMessage("");
     if (!canContinue) {
       return;
     }
@@ -1581,14 +1663,16 @@ export default function BuildOutingPage() {
       return;
     }
 
-    setCurrentStep(
-      (current) =>
-        current + 1
-    );
+    if (reviewReturn) {
+      setCurrentStep(TOTAL_STEPS - 1);
+      setReviewReturn(false);
+    } else {
+      setCurrentStep(current => current + 1);
+    }
 
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"
     });
   }
 
@@ -1604,7 +1688,7 @@ export default function BuildOutingPage() {
 
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"
     });
   }
 
@@ -1615,6 +1699,12 @@ export default function BuildOutingPage() {
   }
 
   function handlePrepareOuting() {
+    if (!isFutureOuting(outingDate, startTime)) {
+      setLaunchError("Choose a start time that is still ahead of you. Times are in Winnipeg.");
+      setCurrentStep(2);
+      setReviewReturn(true);
+      return;
+    }
     if (
       !planningMode ||
       !buildMethod ||
@@ -1705,10 +1795,12 @@ export default function BuildOutingPage() {
         new Date().toISOString()
     };
 
-    window.localStorage.setItem(
-      OUTING_DRAFT_KEY,
-      JSON.stringify(draft)
-    );
+    try {
+      window.localStorage.setItem(OUTING_DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      setLaunchError("Your browser could not save this plan. Allow site storage, then try again. Your choices are still here.");
+      return;
+    }
 
     setIsLaunchingResults(true);
 
@@ -1725,7 +1817,7 @@ export default function BuildOutingPage() {
       },
       prefersReducedMotion
         ? 220
-        : 1800
+        : 350
     );
   }
 
@@ -1738,7 +1830,10 @@ export default function BuildOutingPage() {
         "--outing-soft": stepVisual.soft
       } as CSSProperties}
     >
-      <div className="outing-wizard-progress">
+      {flowMessage ? <p className="outing-flow-message" role="status">{flowMessage}</p> : null}
+      <div className="outing-wizard-progress" role="progressbar" aria-label="Outing builder progress"
+        aria-valuemin={1} aria-valuemax={TOTAL_STEPS} aria-valuenow={currentStep + 1}
+        aria-valuetext={"Step " + (currentStep + 1) + " of " + TOTAL_STEPS + ": " + content.title}>
         <div>
           <span>
             STEP {currentStep + 1} OF{" "}
@@ -1759,6 +1854,15 @@ export default function BuildOutingPage() {
         </div>
       </div>
 
+      <details className="outing-restart">
+        <summary>Start a new plan</summary>
+        <p>This clears the current setup in this tab. Saved outings stay in My saves.</p>
+        <button type="button" onClick={() => {
+          try { window.sessionStorage.removeItem(BUILDER_SESSION_KEY); }
+          catch { setLaunchError("This browser could not reset the plan. Try reloading the page."); return; }
+          window.location.assign("/build-outing");
+        }}>Clear setup and start again</button>
+      </details>
       <section className="outing-wizard-screen">
         <header className="outing-wizard-heading">
           <div className={styles.stepBadge}>
@@ -1775,7 +1879,7 @@ export default function BuildOutingPage() {
             {content.eyebrow}
           </span>
 
-          <h1>
+          <h1 ref={headingRef} tabIndex={-1}>
             {content.title}
           </h1>
 
@@ -1986,12 +2090,14 @@ export default function BuildOutingPage() {
 
           {currentStep === 2 ? (
             <section className="wizard-compact-panel">
+              <p className="outing-time-note">All times are in Winnipeg.</p>
               <div className="wizard-date-grid">
                 <label>
                   <span>Date</span>
 
                   <input
                     type="date"
+                    min={getTodayInputValue()}
                     value={outingDate}
                     onChange={(event) =>
                       setOutingDate(
@@ -2018,12 +2124,17 @@ export default function BuildOutingPage() {
                 </label>
               </div>
 
+              {outingDate && startTime && !isFutureOuting(outingDate, startTime) ? (
+                <p className="outing-flow-error" role="status">That time has passed. Choose a later time or another day.</p>
+              ) : null}
               <div className="wizard-small-grid">
                 {durationOptions.map(
                   (option) => (
                     <button
                       type="button"
                       key={option}
+                      aria-pressed={duration ===
+                        option}
                       className={
                         duration ===
                         option
@@ -2280,7 +2391,9 @@ export default function BuildOutingPage() {
                       <button
                         type="button"
                         key={kind}
-                        className={
+                        aria-pressed={anchorKindFilter ===
+                          kind}
+                      className={
                           anchorKindFilter ===
                           kind
                             ? "selected"
@@ -2497,6 +2610,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.id}
+                      aria-pressed={soloVibe ===
+                        option.id}
                       className={
                         soloVibe ===
                         option.id
@@ -2545,6 +2660,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.id}
+                      aria-pressed={soloPace ===
+                        option.id}
                       className={
                         soloPace ===
                         option.id
@@ -2649,6 +2766,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.id}
+                      aria-pressed={groupVibe ===
+                        option.id}
                       className={
                         groupVibe ===
                         option.id
@@ -2705,6 +2824,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.id}
+                      aria-pressed={groupPriority ===
+                        option.id}
                       className={
                         groupPriority ===
                         option.id
@@ -2774,7 +2895,8 @@ export default function BuildOutingPage() {
                       <button
                         type="button"
                         key={interest}
-                        className={
+                        aria-pressed={selected}
+                      className={
                           selected
                             ? "selected"
                             : ""
@@ -3043,6 +3165,8 @@ export default function BuildOutingPage() {
                     <button
                       type="button"
                       key={option.value}
+                      aria-pressed={transportation ===
+                        option.value}
                       className={
                         transportation ===
                         option.value
@@ -3088,7 +3212,9 @@ export default function BuildOutingPage() {
                       <button
                         type="button"
                         key={option.value}
-                        className={
+                        aria-pressed={maxTravelMinutes ===
+                          option.value}
+                      className={
                           maxTravelMinutes ===
                           option.value
                             ? "selected"
@@ -3171,7 +3297,7 @@ export default function BuildOutingPage() {
 
               <div className="review-compact-grid">
                 <div>
-                  <span>WHEN</span>
+                  <span>WHEN <button type="button" className="outing-review-edit" onClick={() => editReviewStep(2)} aria-label="Edit when">Edit</button></span>
 
                   <strong>
                     {outingDate},{" "}
@@ -3184,7 +3310,7 @@ export default function BuildOutingPage() {
                 </div>
 
                 <div>
-                  <span>ROUTE</span>
+                  <span>ROUTE <button type="button" className="outing-review-edit" onClick={() => editReviewStep(3)} aria-label="Edit route">Edit</button></span>
 
                   <strong>
                     {buildMethod ===
@@ -3202,7 +3328,7 @@ export default function BuildOutingPage() {
                 </div>
 
                 <div>
-                  <span>PEOPLE</span>
+                  <span>PEOPLE <button type="button" className="outing-review-edit" onClick={() => editReviewStep(0)} aria-label="Edit people">Edit</button></span>
 
                   <strong>
                     {planningMode ===
@@ -3220,7 +3346,7 @@ export default function BuildOutingPage() {
                 </div>
 
                 <div>
-                  <span>BUDGET</span>
+                  <span>BUDGET <button type="button" className="outing-review-edit" onClick={() => editReviewStep(6)} aria-label="Edit budget">Edit</button></span>
 
                   <strong>
                     {getBudgetLabel(
@@ -3234,7 +3360,7 @@ export default function BuildOutingPage() {
                 </div>
 
                 <div>
-                  <span>TRAVEL</span>
+                  <span>TRAVEL <button type="button" className="outing-review-edit" onClick={() => editReviewStep(7)} aria-label="Edit travel">Edit</button></span>
 
                   <strong>
                     {transportation}
@@ -3248,7 +3374,7 @@ export default function BuildOutingPage() {
                 </div>
 
                 <div>
-                  <span>AREA</span>
+                  <span>AREA <button type="button" className="outing-review-edit" onClick={() => editReviewStep(7)} aria-label="Edit area">Edit</button></span>
 
                   <strong>
                     {selectedNeighbourhoods.length >
@@ -3261,7 +3387,7 @@ export default function BuildOutingPage() {
                 </div>
 
                 <div className="review-wide">
-                  <span>INTERESTS</span>
+                  <span>INTERESTS <button type="button" className="outing-review-edit" onClick={() => editReviewStep(5)} aria-label="Edit interests">Edit</button></span>
 
                   <strong>
                     {selectedInterests.length >
@@ -3274,7 +3400,7 @@ export default function BuildOutingPage() {
                 </div>
 
                 <div className="review-wide">
-                  <span>DISCOVERY</span>
+                  <span>DISCOVERY <button type="button" className="outing-review-edit" onClick={() => editReviewStep(5)} aria-label="Edit discovery">Edit</button></span>
                   <strong>
                     {effectiveDiscoveryPreference === "new-only"
                       ? "Only places and event dates new to me"
@@ -3317,6 +3443,7 @@ export default function BuildOutingPage() {
         </div>
       </section>
 
+      {launchError ? <p className="outing-flow-error" role="alert">{launchError}</p> : null}
       <div className="outing-wizard-actions">
         {currentStep > 0 ? (
           <button
@@ -3344,7 +3471,7 @@ export default function BuildOutingPage() {
             : currentStep ===
                 TOTAL_STEPS - 1
               ? "Create my outing"
-              : "Continue"}
+              : reviewReturn ? "Back to review" : currentStep === 5 ? "Continue · interests optional" : "Continue"}
 
           <span aria-hidden="true">
             →

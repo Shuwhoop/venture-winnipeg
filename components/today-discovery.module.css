@@ -1190,3 +1190,9 @@
     flex-basis: 14px;
   }
 }
+
+.planShortcut { display:flex; align-items:center; gap:16px; padding:16px; border:1px solid var(--venture-line); border-radius:18px; color:var(--venture-ink); background:#fff0d1; text-decoration:none; }
+.planShortcut span { display:grid; gap:5px; min-width:0; }
+.planShortcut strong { font-size:1rem; line-height:1.35; }
+.planShortcut small { font-size:.875rem; line-height:1.5; color:#66574b; }
+.planShortcut b { margin-left:auto; font-size:1.4rem; }

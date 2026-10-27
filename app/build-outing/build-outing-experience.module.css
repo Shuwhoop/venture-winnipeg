@@ -1723,3 +1723,31 @@
     transition: none;
   }
 }
+
+/* Keep content-driven sizing after the earlier full-screen wizard layouts. */
+.wizardV4 :global(.mode-choice-stage) { min-height:0; height:auto; align-content:start; grid-auto-rows:auto; }
+.wizardV4 :global(.outing-wizard-heading) { padding:18px; gap:10px; }
+.wizardV4 :global(.outing-wizard-heading h1) { max-width:22ch; font-size:clamp(1.75rem,6.5vw,2.25rem); line-height:1.2; letter-spacing:-.035em; }
+.wizardV4 :global(.outing-wizard-heading > p) { font-size:1rem; line-height:1.6; max-width:none; }
+.wizardV4 :global(.mode-choice-card) { min-height:132px; height:auto; padding:16px; grid-template-columns:56px minmax(0,1fr) 24px; gap:12px; }
+.wizardV4 :global(.planning-mode-illustration) { width:56px; min-width:56px; min-height:56px; max-height:64px; }
+.wizardV4 :global(.mode-choice-copy strong), .wizardV4 :global(.outing-build-method-copy strong) { font-size:1.0625rem; line-height:1.35; }
+.wizardV4 :global(.mode-choice-copy small), .wizardV4 :global(.outing-build-method-copy small) { font-size:.875rem; line-height:1.5; }
+.wizardV4 :global(.outing-wizard-actions) { position:static; display:flex; flex-wrap:wrap; width:calc(100% - 24px); margin:0 auto; padding:12px; gap:12px; box-shadow:none; border:1px solid #d2c5bd; }
+.wizardV4 :global(.outing-wizard-actions button) { min-height:52px; font-size:1rem; line-height:1.4; }
+.wizardV4 :global(.outing-wizard-actions .outing-wizard-next) { flex:1 1 180px; min-width:0; white-space:normal; }
+.wizardV4 :global(.outing-wizard-actions .outing-wizard-back) { min-width:88px; }
+.wizardV4 :global(.review-compact-grid > div > span) { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.wizardV4 :global(.review-compact-grid .outing-review-edit) { min-width:44px; min-height:44px; font-size:.875rem; }
+.wizardV4 :global(.review-compact-grid strong) { font-size:1rem; line-height:1.4; }
+.wizardV4 :global(.wizard-date-grid) { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.wizardV4 :global(.wizard-date-grid input) { min-width:0; max-width:100%; min-height:48px; font-size:1rem; }
+.wizardV4 :global(.mood-stage-panel .outing-experience-grid button small),
+.wizardV4 :global(.interest-stage-panel small),
+.wizardV4 :global(.area-experience-panel small) { font-size:.875rem; line-height:1.5; }
+@media(max-width:350px) {
+ .wizardV4 :global(.wizard-date-grid), .wizardV4 :global(.review-compact-grid) { grid-template-columns:minmax(0,1fr); }
+ .wizardV4 :global(.mode-choice-card) { grid-template-columns:minmax(0,1fr) 24px; }
+ .wizardV4 :global(.mode-choice-card .planning-mode-illustration) { display:none; }
+ .wizardV4 :global(.outing-wizard-actions .outing-wizard-next) { flex-basis:100%; order:-1; }
+}

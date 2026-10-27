@@ -767,6 +767,8 @@ function getStopDomId(
 }
 
 export default function OutingResultsPage() {
+  const [showRouteMap, setShowRouteMap] = useState(false);
+
   const [
     status,
     setStatus
@@ -2788,13 +2790,17 @@ export default function OutingResultsPage() {
           ) : null}
 
           <section className="outing-map-first-stage">
-            <OutingRouteMap
-              plan={plan}
-            />
+            <button className="outing-map-toggle" type="button" aria-expanded={showRouteMap}
+              aria-controls="outing-route-map" onClick={() => setShowRouteMap(value => !value)}>
+              <span><strong>{showRouteMap ? "Hide route map" : "View map & directions"}</strong>
+                <small>{plan.stops.length} stops · {plan.transportation}</small></span>
+              <span aria-hidden="true">{showRouteMap ? "−" : "+"}</span>
+            </button>
+            <div id="outing-route-map">{showRouteMap ? <OutingRouteMap plan={plan} /> : null}</div>
 
             <div className={styles.routeRecipeCard}>
               <div className={styles.routeRecipeCopy}>
-                <span>TONIGHT&apos;S ROUTE RECIPE</span>
+                <span>YOUR ROUTE</span>
 
                 <strong>
                   {formatMixSummary(plan.actualMix)}
@@ -3002,7 +3008,7 @@ export default function OutingResultsPage() {
                       document
                         .getElementById(getStopDomId(stop))
                         ?.scrollIntoView({
-                          behavior: "smooth",
+                          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
                           block: "center"
                         });
                     }}
@@ -3018,6 +3024,7 @@ export default function OutingResultsPage() {
             </ol>
           </nav>
 
+          <details className="outing-plan-details"><summary>Plan details · date, budget & travel</summary>
           <section className={styles.snapshotSection}>
             {/* VENTURE ADVENTURE SNAPSHOT V1.4 */}
             <div className={styles.snapshotHeading}>
@@ -3025,7 +3032,7 @@ export default function OutingResultsPage() {
                 <span className={styles.snapshotSpark} aria-hidden="true">✦</span>
                 <span>ADVENTURE SNAPSHOT</span>
               </div>
-              <h2>Your outing at a glance</h2>
+              <h2>The practical details</h2>
               <p>The useful details, lined up before you head out.</p>
             </div>
 
@@ -3084,6 +3091,7 @@ export default function OutingResultsPage() {
               ) : null}
             </div>
           </section>
+          </details>
 
           <section className={`outing-add-stop-panel ${styles.addStopPanel}`}>
             <div className={styles.addStopIntro}>
