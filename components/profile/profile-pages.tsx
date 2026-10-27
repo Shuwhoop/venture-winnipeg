@@ -13,9 +13,6 @@ import {
 } from "react";
 
 import {
-  AccountSyncCard
-} from "@/components/account-sync/account-sync";
-import {
   ProfileAvatarEditor
 } from "@/components/profile/profile-avatar-editor";
 import {
@@ -140,7 +137,7 @@ function GuestProfile() {
         </div>
         <small>Saves and preferences stay in this browser until you connect an account.</small>
       </section>
-      <form className={styles.formCard} onSubmit={saveGuestPreferences} onChange={() => setSaved(false)}>
+      <form className={styles.formCard} onSubmit={saveGuestPreferences} onChange={() => { setSaved(false); setMessage(""); }}>
         <div><span className={styles.sectionEyebrow}>YOUR STARTING POINT</span>
           <h2>Make the next plan feel like you</h2>
           <p>These are defaults. You can change every choice when you build.</p>
@@ -152,7 +149,7 @@ function GuestProfile() {
         </label>
         <fieldset className={styles.guestFieldset}><legend>Your interests</legend>
           <OptionChips options={INTEREST_OPTIONS} selected={preferences.interests}
-            onToggle={(value) => { setSaved(false); setPreferences({ ...preferences, interests: toggleArray(preferences.interests, value) }); }} />
+            onToggle={(value) => { setSaved(false); setMessage(""); setPreferences({ ...preferences, interests: toggleArray(preferences.interests, value) }); }} />
         </fieldset>
         <label className={styles.guestField}>Default budget per person
           <select value={preferences.budget} onChange={(event) => setPreferences({
