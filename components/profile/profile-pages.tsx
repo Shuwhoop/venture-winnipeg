@@ -37,10 +37,12 @@ import {
 } from "@/lib/profile-system";
 
 import {
-  getSavedListingReferences
+  getSavedListingReferences,
+  SAVED_LISTINGS_EVENT
 } from "@/lib/saved-listings";
 import {
-  getSavedOutings
+  getSavedOutings,
+  SAVED_OUTINGS_EVENT
 } from "@/lib/saved-outings";
 import {
   loadPreferences,
@@ -93,21 +95,87 @@ function ErrorProfile({
 }
 
 function GuestProfile() {
+  const [preferences, setPreferences] = useState(loadPreferences);
+  const [saved, setSaved] = useState(false);
+  const [message, setMessage] = useState("");
+  const [counts, setCounts] = useState({ listings: 0, outings: 0 });
+  useEffect(() => {
+    const refresh = () => setCounts({
+      listings: getSavedListingReferences().length,
+      outings: getSavedOutings().length
+    });
+    refresh();
+    window.addEventListener(SAVED_LISTINGS_EVENT, refresh);
+    window.addEventListener(SAVED_OUTINGS_EVENT, refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener(SAVED_LISTINGS_EVENT, refresh);
+      window.removeEventListener(SAVED_OUTINGS_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+  function saveGuestPreferences(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    try {
+      const next = { ...preferences, updatedAt: new Date().toISOString() };
+      savePreferences(next);
+      setPreferences(next);
+      setSaved(true);
+      setMessage("Preferences saved on this device. Your next outing will start with these choices.");
+    } catch {
+      setMessage("Your browser could not save these choices. You can still choose them in the outing builder.");
+    }
+  }
   return (
-    <>
+    <div className={styles.guestDashboard}>
       <section className={styles.guestHero}>
-        <span>PRIVATE WHEN YOU WANT IT</span>
-        <h1>Use Venture freely. Connect an account when it becomes useful.</h1>
-        <p>
-          Guest browsing stays open. Signing in adds cross-device saves,
-          private preferences, outing history, and account controls.
-        </p>
-        <Link className={styles.primaryButton} href="/sign-in?next=/profile/onboarding">
-          Create or connect profile
-        </Link>
+        <span>MY VENTURE · GUEST</span>
+        <h1>Your city, your way.</h1>
+        <p>Keep your favourites and shape your next outing. An account is optional.</p>
+        <div className={styles.guestActions}>
+          <Link className={styles.primaryButton} href="/saved">
+            My saves · {counts.listings + counts.outings}
+          </Link>
+          <Link className={styles.secondaryButton} href="/build-outing">Build an outing</Link>
+        </div>
+        <small>Saves and preferences stay in this browser until you connect an account.</small>
       </section>
-      <AccountSyncCard />
-    </>
+      <form className={styles.formCard} onSubmit={saveGuestPreferences} onChange={() => setSaved(false)}>
+        <div><span className={styles.sectionEyebrow}>YOUR STARTING POINT</span>
+          <h2>Make the next plan feel like you</h2>
+          <p>These are defaults. You can change every choice when you build.</p>
+        </div>
+        <label className={styles.guestField}>What should we call you?
+          <input value={preferences.displayName === "Guest" ? "" : preferences.displayName}
+            maxLength={60} autoComplete="given-name" placeholder="Your first name (optional)"
+            onChange={(event) => setPreferences({ ...preferences, displayName: event.target.value })} />
+        </label>
+        <fieldset className={styles.guestFieldset}><legend>Your interests</legend>
+          <OptionChips options={INTEREST_OPTIONS} selected={preferences.interests}
+            onToggle={(value) => { setSaved(false); setPreferences({ ...preferences, interests: toggleArray(preferences.interests, value) }); }} />
+        </fieldset>
+        <label className={styles.guestField}>Default budget per person
+          <select value={preferences.budget} onChange={(event) => setPreferences({
+            ...preferences, budget: event.target.value as typeof preferences.budget
+          })}>
+            <option value="free">Free</option><option value="under-40">Under $40</option>
+            <option value="under-80">Under $80</option><option value="flexible">Flexible</option>
+          </select>
+        </label>
+        <label className={styles.guestCheck}>
+          <input type="checkbox" checked={preferences.alcoholFree}
+            onChange={(event) => setPreferences({ ...preferences, alcoholFree: event.target.checked })} />
+          <span><strong>Alcohol-free outings</strong><small>Leave out alcohol-focused places by default.</small></span>
+        </label>
+        <button type="submit" className={styles.primaryButton}>{saved ? "Preferences saved" : "Save my preferences"}</button>
+        {message ? <p role="status">{message}</p> : null}
+      </form>
+      <section className={styles.settingsCard}>
+        <h2>Take Venture with you</h2>
+        <p>Connect an account to sync your saves and preferences across devices.</p>
+        <Link className={styles.secondaryButton} href="/sign-in?next=/profile">Connect an account</Link>
+      </section>
+    </div>
   );
 }
 
@@ -239,10 +307,19 @@ export function ProfileDashboard() {
   });
 
   useEffect(() => {
-    setCounts({
+    const refreshCounts = () => setCounts({
       listings: getSavedListingReferences().length,
       outings: getSavedOutings().length
     });
+    refreshCounts();
+    window.addEventListener(SAVED_LISTINGS_EVENT, refreshCounts);
+    window.addEventListener(SAVED_OUTINGS_EVENT, refreshCounts);
+    window.addEventListener("storage", refreshCounts);
+    return () => {
+      window.removeEventListener(SAVED_LISTINGS_EVENT, refreshCounts);
+      window.removeEventListener(SAVED_OUTINGS_EVENT, refreshCounts);
+      window.removeEventListener("storage", refreshCounts);
+    };
   }, []);
 
   if (state === "loading") {
@@ -315,7 +392,7 @@ export function ProfileDashboard() {
         ) : null}
 
         <div className={styles.passFooter}>
-          <div className={styles.collectionSummary} aria-label="Your saved Venture activity">
+          <Link href="/saved" className={styles.collectionSummary} aria-label="Open your saved places and outings">
             <span>
               <strong>{counts.listings}</strong>
               saved
@@ -325,7 +402,7 @@ export function ProfileDashboard() {
               <strong>{counts.outings}</strong>
               outings
             </span>
-          </div>
+          </Link>
           <Link className={styles.passEditLink} href="/profile/edit">
             Edit profile
           </Link>
@@ -333,7 +410,7 @@ export function ProfileDashboard() {
 
         <div className={styles.profileCompletion}>
           <span>
-            <strong>{profileCompletion}%</strong> your Venture profile
+            <strong>{profileCompletion}%</strong> of optional profile details
           </span>
           <div aria-hidden="true"><i style={{ width: `${profileCompletion}%` }} /></div>
         </div>
