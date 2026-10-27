@@ -2796,7 +2796,7 @@ export default function OutingResultsPage() {
                 <small>{plan.stops.length} stops · {plan.transportation}</small></span>
               <span aria-hidden="true">{showRouteMap ? "−" : "+"}</span>
             </button>
-            {showRouteMap ? <div id="outing-route-map"><OutingRouteMap plan={plan} /></div> : null}
+            <div id="outing-route-map">{showRouteMap ? <OutingRouteMap plan={plan} /> : null}</div>
 
             <div className={styles.routeRecipeCard}>
               <div className={styles.routeRecipeCopy}>
