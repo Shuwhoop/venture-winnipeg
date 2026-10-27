@@ -1,0 +1,142 @@
+/* Shared ergonomics for the existing warm Venture app. */
+:root { --venture-tap-size:48px; }
+.page-content { min-width:0; }
+.app-shell { padding-bottom:calc(100px + env(safe-area-inset-bottom)); }
+.page-content :is(button,a,input,select,textarea):focus-visible {
+  outline:3px solid #a63127; outline-offset:3px;
+}
+.page-content input:not([type="checkbox"]):not([type="radio"]),
+.page-content select, .page-content textarea { font-size:1rem; }
+.page-content :is(h1,h2,h3,p,strong,small) { overflow-wrap:anywhere; }
+.bottom-nav .nav-link { min-height:52px; }
+.bottom-nav .nav-link small { font-size:.75rem; }
+.bottom-nav { bottom:calc(10px + env(safe-area-inset-bottom)); }
+.save-button { min-width:44px; min-height:44px; }
+
+.venture-today { gap:28px; padding-bottom:28px; overflow:visible; }
+.venture-today [class$="__hero"] { gap:14px; overflow:visible; }
+.venture-today [class$="__hero"] h1 {
+  max-width:16ch; font-size:clamp(2rem,8vw,2.75rem); line-height:1.08; letter-spacing:-.045em;
+}
+.venture-today .home-greeting { align-items:center; gap:12px; }
+.venture-today .home-sun { flex:0 0 42px; width:42px; height:42px; }
+.venture-today .home-invitation { font-size:1rem; line-height:1.5; }
+.venture-today [class$="__dateLine"] { font-size:.75rem; }
+.venture-today [class$="__search"] { min-height:56px; gap:4px; }
+.venture-today [class$="__search"] input { min-width:0; font-size:1rem; min-height:44px; }
+.venture-today [class$="__search"] button { min-width:54px; min-height:44px; font-size:.875rem; }
+.venture-today [class$="__searchIcon"] { width:32px; height:36px; }
+.venture-today [class$="__search"] button span { display:none; }
+.venture-today [class$="__quickFilters"] {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; padding:0;
+  gap:8px; overflow:visible;
+}
+.venture-today [class$="__quickFilters"] :is(a,button) {
+  width:100%; min-width:0; min-height:44px; padding:10px 8px; gap:8px;
+  font-size:.875rem; line-height:1.25; white-space:normal;
+}
+.venture-today :is([class$="__pickHeading"],[class$="__sectionHeading"]) {
+  flex-wrap:wrap; gap:8px; margin:0;
+}
+.venture-today [class$="__pickHeading"] > span,
+.venture-today [class$="__sectionHeading"] h2 { font-size:.875rem; letter-spacing:.02em; }
+.venture-today [class$="__pickHeading"] p { flex-basis:100%; margin:0; font-size:.8125rem; line-height:1.5; }
+.venture-today [class$="__sectionHeading"] a { display:inline-flex; align-items:center; min-height:44px; padding:0 4px; font-size:.875rem; text-decoration:underline; text-underline-offset:3px; }
+.venture-today :is([class$="__featuredCard"],[class$="__featuredImage"]) { min-height:260px; height:auto; }
+.venture-today [class$="__featuredImage"] { height:260px; }
+.venture-today [class$="__featuredTopline"] { gap:8px; }
+.venture-today [class$="__featuredTopline"] > div { max-width:calc(100% - 56px); }
+.venture-today [class$="__featuredTopline"] :is(span,small) { font-size:.75rem; line-height:1.4; }
+.venture-today [class$="__featuredCopy"] { right:16px; bottom:16px; gap:8px; }
+.venture-today [class$="__featuredCopy"] h2 { max-width:16ch; font-size:clamp(1.65rem,6vw,2.25rem); line-height:1.12; }
+.venture-today [class$="__featuredCopy"] p { font-size:.875rem; line-height:1.5; }
+.venture-today [class$="__priceBadge"] { font-size:.8125rem; }
+.venture-today :is([class$="__miniRail"],[class$="__trendRail"]) {
+  width:100%; gap:12px; padding:4px 4px 12px; scroll-padding-inline:4px;
+}
+.venture-today [class$="__miniCard"] { flex-basis:190px; height:232px; }
+.venture-today [class$="__miniImage"] { height:232px; min-height:232px; }
+.venture-today [class$="__miniCopy"] { gap:6px; }
+.venture-today [class$="__miniCopy"] span { color:#ffe0c6; font-size:.6875rem; line-height:1.4; }
+.venture-today [class$="__miniCopy"] h3 { font-size:1.0625rem; line-height:1.3; }
+.venture-today [class$="__miniCopy"] p { font-size:.875rem; line-height:1.4; }
+.venture-today [class$="__trendCard"] { flex-basis:200px; }
+.venture-today [class$="__trendImage"] { height:132px; min-height:132px; }
+.venture-today [class$="__trendCopy"] { min-height:112px; padding:12px; gap:6px; align-content:start; }
+.venture-today [class$="__trendCopy"] span { font-size:.6875rem; line-height:1.4; }
+.venture-today [class$="__trendCopy"] h3 { font-size:1rem; line-height:1.35; }
+.venture-today [class$="__trendCopy"] p { font-size:.875rem; line-height:1.5; }
+.venture-today :is([class$="__miniCard"],[class$="__trendCard"]) .save-button { width:44px; height:44px; }
+.venture-today [class$="__emptyState"] { font-size:.9375rem; line-height:1.6; padding:20px; }
+.venture-today [class$="__emptyState"] a { display:block; min-height:44px; margin-top:8px; text-decoration:underline; }
+.venture-today [class$="__builderBanner"] { min-height:100px; }
+.venture-today [class$="__builderBanner"] span { font-size:.75rem; line-height:1.5; }
+.venture-today [class$="__builderBanner"] strong { font-size:1.125rem; line-height:1.3; }
+.venture-today [class$="__locationMessage"] { font-size:.875rem; line-height:1.5; flex-wrap:wrap; }
+.venture-today [class$="__locationMessage"] a { display:inline-flex; align-items:center; min-height:44px; }
+
+/* Builder controls stay in document flow, above the persistent navigation. */
+.outing-wizard { padding-bottom:32px; }
+.outing-wizard-heading h1 { font-size:clamp(1.75rem,6.5vw,2.25rem); line-height:1.2; }
+.outing-wizard-heading > p { font-size:1rem; line-height:1.6; }
+.outing-wizard-heading h1:focus { outline:none; }
+.outing-wizard :is(.wizard-small-grid,.wizard-choice-grid,.transport-grid) button { min-height:48px; }
+.outing-wizard button { touch-action:manipulation; }
+.outing-wizard :is(input[type="date"],input[type="time"]) { min-width:0; max-width:100%; min-height:48px; font-size:1rem; }
+.wizard-date-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.wizard-date-grid label { min-width:0; }
+.outing-wizard-actions { position:static; padding:16px 0 8px; background:transparent; display:flex; flex-wrap:wrap; gap:12px; }
+.outing-wizard-actions .outing-wizard-next { flex:1 1 180px; min-height:52px; white-space:normal; line-height:1.4; }
+.outing-wizard-actions .outing-wizard-back { min-width:88px; min-height:52px; }
+.outing-flow-message,.outing-flow-error { margin:0 0 16px; border:1px solid #bad1bc; border-radius:14px; background:#eef6ec; padding:14px; font-size:.9375rem; line-height:1.5; }
+.outing-flow-error { background:#fff0eb; border-color:#daac9e; }
+.review-compact-grid > div { min-width:0; }
+.review-compact-grid > div > span { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.outing-wizard .outing-review-edit { display:inline-flex; align-items:center; min-width:44px; min-height:44px; border:0; background:transparent; color:#9f3027; font-size:.875rem; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.outing-wizard .review-compact-grid strong { font-size:1rem; line-height:1.4; }
+
+/* Profile keeps optional identity details separate from useful planning controls. */
+[class*="profile-system-module"][class$="__guestHero"] h1 { font-size:clamp(1.75rem,7vw,2.5rem); line-height:1.15; }
+[class*="profile-system-module"][class$="__guestHero"] { padding:24px 20px; }
+[class*="profile-system-module"][class$="__formCard"] { gap:20px; padding:24px 20px; }
+[class*="profile-system-module"][class$="__formCard"] h2 { margin:8px 0; font-size:1.3rem; line-height:1.3; }
+[class*="profile-system-module"][class$="__formCard"] p { font-size:1rem; line-height:1.6; }
+[class*="profile-system-module"][class$="__settingsCard"] { display:grid; gap:16px; }
+[class*="profile-system-module"]:is([class$="__chip"],[class$="__chipActive"]) { min-height:44px; padding:10px 12px; font-size:.875rem; line-height:1.4; white-space:normal; }
+[class*="profile-system-module"][class$="__profileMenu"] a { min-height:76px; padding:16px 12px; }
+[class*="profile-system-module"][class$="__profileMenu"] strong { font-size:1rem; line-height:1.4; }
+[class*="profile-system-module"][class$="__profileMenu"] small { font-size:.875rem; line-height:1.5; }
+[class*="profile-system-module"][class$="__passIdentityCopy"] { min-width:0; }
+[class*="profile-system-module"][class$="__passIdentityCopy"] h1 { font-size:clamp(1.5rem,6vw,2rem); line-height:1.2; white-space:normal; }
+[class*="profile-system-module"][class$="__collectionSummary"] { min-height:48px; border-radius:10px; }
+
+@media (min-width:420px) {
+  .venture-today [class$="__quickFilters"] { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .venture-today [class$="__quickFilters"] :is(a,button) { padding-inline:5px; font-size:.8125rem; gap:5px; }
+}
+@media (max-width:350px) {
+  .outing-wizard-actions .outing-wizard-next { flex-basis:100%; order:-1; }
+  .wizard-date-grid { grid-template-columns:minmax(0,1fr); }
+  .review-compact-grid { grid-template-columns:minmax(0,1fr); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .page-content *, .page-content *::before, .page-content *::after {
+    scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;
+  }
+}
+
+.outing-restart { margin:0 0 16px; color:var(--venture-muted); }
+.outing-restart summary { width:fit-content; min-height:44px; padding:12px 0; font-size:.875rem; text-decoration:underline; cursor:pointer; }
+.outing-restart p { font-size:.9375rem; line-height:1.5; }
+.outing-restart button { min-height:44px; padding:10px 12px; border:1px solid var(--venture-line); border-radius:12px; background:white; color:var(--venture-ink); font:inherit; cursor:pointer; }
+.outing-time-note { font-size:.875rem; line-height:1.5; color:var(--venture-muted); }
+.outing-map-toggle { width:100%; display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:64px; padding:16px; border:1px solid var(--venture-line); border-radius:16px; background:var(--venture-paper); color:var(--venture-ink); text-align:left; cursor:pointer; font:inherit; }
+.outing-map-toggle > span:first-child { display:grid; gap:5px; }
+.outing-map-toggle small { font-size:.875rem; color:var(--venture-muted); }
+.outing-map-toggle > span:last-child { font-size:1.5rem; }
+.outing-plan-details { margin-block:20px; border:1px solid var(--venture-line); border-radius:18px; background:var(--venture-paper); }
+.outing-plan-details > summary { min-height:56px; padding:18px 16px; font-size:1rem; font-weight:750; cursor:pointer; }
+.outing-plan-details > section { padding:16px; }
+.outing-action-dock button { min-height:64px; }
+.outing-action-dock button strong { font-size:1rem; line-height:1.4; }
+.outing-action-dock button small { font-size:.8125rem; line-height:1.4; }
